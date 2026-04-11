@@ -4,6 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:shadowrun/core/theme/app_theme.dart';
 import 'package:shadowrun/core/database/database_helper.dart';
 import 'package:shadowrun/shared/models/run_model.dart';
+import 'package:shadowrun/core/l10n/app_strings.dart';
 
 class HistoryScreen extends StatefulWidget {
   const HistoryScreen({super.key});
@@ -43,7 +44,7 @@ class _HistoryScreenState extends State<HistoryScreen>
         backgroundColor: SRColors.card,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         title: Text(
-          'Delete Record',
+          S.deleteRecord,
           style: GoogleFonts.spaceGrotesk(
             fontSize: 18,
             fontWeight: FontWeight.w700,
@@ -51,7 +52,7 @@ class _HistoryScreenState extends State<HistoryScreen>
           ),
         ),
         content: Text(
-          'This run record will be permanently deleted.\nThis action cannot be undone.',
+          S.deleteRecordMessage,
           style: GoogleFonts.inter(
             color: SRColors.onSurface.withValues(alpha: 0.6),
             height: 1.5,
@@ -61,7 +62,7 @@ class _HistoryScreenState extends State<HistoryScreen>
           TextButton(
             onPressed: () => Navigator.pop(ctx, false),
             child: Text(
-              'CANCEL',
+              S.cancel,
               style: GoogleFonts.inter(
                 fontSize: 12,
                 fontWeight: FontWeight.w700,
@@ -73,7 +74,7 @@ class _HistoryScreenState extends State<HistoryScreen>
           TextButton(
             onPressed: () => Navigator.pop(ctx, true),
             child: Text(
-              'DELETE',
+              S.delete,
               style: GoogleFonts.inter(
                 fontSize: 12,
                 fontWeight: FontWeight.w700,
@@ -105,7 +106,7 @@ class _HistoryScreenState extends State<HistoryScreen>
           onPressed: () => context.pop(),
         ),
         title: Text(
-          'RECORDS',
+          S.records,
           style: GoogleFonts.spaceGrotesk(
             fontSize: 20,
             fontWeight: FontWeight.w900,
@@ -132,9 +133,9 @@ class _HistoryScreenState extends State<HistoryScreen>
             letterSpacing: 1.5,
           ),
           dividerColor: Colors.transparent,
-          tabs: const [
-            Tab(text: 'ALL'),
-            Tab(text: 'CHALLENGES'),
+          tabs: [
+            Tab(text: S.all),
+            Tab(text: S.challenges),
           ],
         ),
       ),
@@ -165,8 +166,8 @@ class _HistoryScreenState extends State<HistoryScreen>
                 runs: challengeRuns,
                 onTap: (run) => context.push('/prepare', extra: run.id),
                 onDismiss: _deleteRun,
-                emptyMessage: 'No challenge records yet.',
-                emptySubtitle: 'Take on a challenge to see results here.',
+                emptyMessage: S.noChallengesEmpty,
+                emptySubtitle: S.noChallengesSubtitle,
               ),
             ],
           );
@@ -183,13 +184,14 @@ class _RunList extends StatelessWidget {
   final String emptyMessage;
   final String emptySubtitle;
 
-  const _RunList({
+  _RunList({
     required this.runs,
     required this.onTap,
     required this.onDismiss,
-    this.emptyMessage = 'No runs yet.',
-    this.emptySubtitle = 'Wake up your shadow.',
-  });
+    String? emptyMessage,
+    String? emptySubtitle,
+  })  : emptyMessage = emptyMessage ?? S.noRunsEmpty,
+        emptySubtitle = emptySubtitle ?? S.wakeUpShadow;
 
   @override
   Widget build(BuildContext context) {
@@ -559,7 +561,7 @@ class _ChallengeBadge extends StatelessWidget {
         borderRadius: BorderRadius.circular(20),
       ),
       child: Text(
-        isWin ? 'WIN' : 'LOSE',
+        isWin ? S.win : S.lose,
         style: GoogleFonts.inter(
           fontSize: 10,
           fontWeight: FontWeight.w800,

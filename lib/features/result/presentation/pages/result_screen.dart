@@ -7,6 +7,7 @@ import 'package:share_plus/share_plus.dart';
 import 'package:shadowrun/core/theme/app_theme.dart';
 import 'package:shadowrun/core/database/database_helper.dart';
 import 'package:shadowrun/shared/models/run_model.dart';
+import 'package:shadowrun/core/l10n/app_strings.dart';
 
 class ResultScreen extends StatefulWidget {
   final int runId;
@@ -161,7 +162,7 @@ class _ResultScreenState extends State<ResultScreen>
       child: Row(
         children: [
           Text(
-            'DEBRIEF',
+            S.debrief,
             style: GoogleFonts.spaceGrotesk(
               fontSize: 20,
               fontWeight: FontWeight.w700,
@@ -189,13 +190,13 @@ class _ResultScreenState extends State<ResultScreen>
     String statusText;
     Color statusColor;
     if (_isWin) {
-      statusText = 'SURVIVED';
+      statusText = S.survived;
       statusColor = SRColors.safe;
     } else if (_isLose) {
-      statusText = 'CAUGHT';
+      statusText = S.caught;
       statusColor = SRColors.primaryContainer;
     } else {
-      statusText = 'COMPLETE';
+      statusText = S.complete;
       statusColor = SRColors.textPrimary;
     }
 
@@ -220,7 +221,7 @@ class _ResultScreenState extends State<ResultScreen>
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'RUN STATUS',
+                  S.runStatus,
                   style: SRTheme.labelMedium.copyWith(
                     color: SRColors.textMuted,
                   ),
@@ -280,13 +281,13 @@ class _ResultScreenState extends State<ResultScreen>
             Row(
               children: [
                 _bentoCard(
-                  label: 'DISTANCE',
+                  label: S.distance,
                   value: run.formattedDistance,
                   borderColor: SRColors.safe,
                 ),
                 const SizedBox(width: 12),
                 _bentoCard(
-                  label: 'DURATION',
+                  label: S.duration,
                   value: run.formattedDuration,
                   borderColor: SRColors.primary,
                 ),
@@ -296,13 +297,13 @@ class _ResultScreenState extends State<ResultScreen>
             Row(
               children: [
                 _bentoCard(
-                  label: 'AVG PACE',
+                  label: S.avgPace,
                   value: run.formattedPace,
                   borderColor: SRColors.primaryContainer,
                 ),
                 const SizedBox(width: 12),
                 _bentoCard(
-                  label: 'CALORIES',
+                  label: S.calories,
                   value: '${run.calories}kcal',
                   borderColor: SRColors.outline,
                 ),
@@ -371,7 +372,7 @@ class _ResultScreenState extends State<ResultScreen>
             child: Row(
               children: [
                 Text(
-                  'VISUAL RECONSTRUCTION',
+                  S.visualReconstruction,
                   style: SRTheme.labelMedium.copyWith(
                     color: SRColors.textMuted,
                   ),
@@ -398,7 +399,7 @@ class _ResultScreenState extends State<ResultScreen>
                       ),
                       const SizedBox(width: 6),
                       Text(
-                        'Threat Detected',
+                        S.threatDetected,
                         style: SRTheme.labelMedium.copyWith(
                           color: SRColors.primaryContainer,
                           fontSize: 9,
@@ -626,7 +627,7 @@ class _ResultScreenState extends State<ResultScreen>
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'INCIDENT REPORT',
+                  S.incidentReport,
                   style: SRTheme.labelLarge.copyWith(
                     color: SRColors.primaryContainer,
                   ),
@@ -658,7 +659,7 @@ class _ResultScreenState extends State<ResultScreen>
               onPressed: _shareResult,
               icon: const Icon(Icons.share_outlined, size: 18),
               label: Text(
-                'SHARE',
+                S.share,
                 style: GoogleFonts.inter(
                   fontSize: 12,
                   fontWeight: FontWeight.w900,
@@ -696,7 +697,7 @@ class _ResultScreenState extends State<ResultScreen>
                 onPressed: () => context.go('/'),
                 shape: const StadiumBorder(),
                 child: Text(
-                  'HOME',
+                  S.home,
                   style: GoogleFonts.inter(
                     fontSize: 12,
                     fontWeight: FontWeight.w900,
@@ -716,10 +717,10 @@ class _ResultScreenState extends State<ResultScreen>
     if (_run == null) return;
     final run = _run!;
     final resultText = _isWin
-        ? 'SURVIVED'
+        ? S.survived
         : _isLose
-            ? 'CAUGHT'
-            : 'COMPLETE';
+            ? S.caught
+            : S.complete;
     final text = '''
 SHADOW RUN - $resultText
 

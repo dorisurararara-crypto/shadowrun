@@ -9,6 +9,7 @@ import 'package:shadowrun/core/theme/app_theme.dart';
 import 'package:shadowrun/core/services/running_service.dart';
 import 'package:shadowrun/core/services/horror_service.dart';
 import 'package:shadowrun/shared/models/run_model.dart';
+import 'package:shadowrun/core/l10n/app_strings.dart';
 
 class RunningScreen extends StatefulWidget {
   final int? shadowRunId;
@@ -119,6 +120,7 @@ class _RunningScreenState extends State<RunningScreen>
 
     // Shadow marker
     final shadowPoint = _runService.currentShadowPoint;
+    debugPrint('SHADOW MAP: shadowPoint=$shadowPoint, shadowIdx=${_runService.currentShadowIndex}, shadowDist=${_runService.shadowDistanceM}');
     if (shadowPoint != null) {
       controller.addOverlay(NMarker(
         id: 'shadow',
@@ -158,20 +160,20 @@ class _RunningScreenState extends State<RunningScreen>
       builder: (ctx) => AlertDialog(
         backgroundColor: SRColors.card,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        title: Text('러닝 종료', style: SRTheme.headlineMedium.copyWith(fontSize: 20)),
+        title: Text(S.stopRunTitle, style: SRTheme.headlineMedium.copyWith(fontSize: 20)),
         content: Text(
-          '정말 러닝을 종료하시겠습니까?',
+          S.stopRunMessage,
           style: SRTheme.bodyMedium,
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx, false),
-            child: Text('계속 뛰기',
+            child: Text(S.keepRunning,
                 style: GoogleFonts.inter(color: SRColors.textMuted)),
           ),
           TextButton(
             onPressed: () => Navigator.pop(ctx, true),
-            child: Text('종료',
+            child: Text(S.stop,
                 style: GoogleFonts.inter(
                     color: SRColors.primaryContainer, fontWeight: FontWeight.w700)),
           ),
@@ -246,6 +248,14 @@ class _RunningScreenState extends State<RunningScreen>
                 top: MediaQuery.of(context).padding.top + 12,
                 right: 16,
                 child: _buildDangerBadge(),
+              ),
+            // Speed warning banner
+            if (_runService.speedWarning != null)
+              Positioned(
+                top: MediaQuery.of(context).padding.top + 60,
+                left: 40,
+                right: 40,
+                child: _buildSpeedWarningBanner(),
               ),
             // Bottom controls + threat bar
             Positioned(
@@ -326,7 +336,7 @@ class _RunningScreenState extends State<RunningScreen>
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              _hudStat('PACE', _runService.formattedPace),
+              _hudStat(S.pace, _runService.formattedPace),
               Container(
                 width: 1,
                 height: 28,
@@ -334,7 +344,7 @@ class _RunningScreenState extends State<RunningScreen>
                 color: Colors.white.withValues(alpha: 0.1),
               ),
               _hudStat(
-                'DIST',
+                S.dist,
                 _runService.totalDistanceM >= 1000
                     ? '${(_runService.totalDistanceM / 1000).toStringAsFixed(2)}km'
                     : '${_runService.totalDistanceM.toInt()}m',
@@ -413,12 +423,54 @@ class _RunningScreenState extends State<RunningScreen>
               ),
               const SizedBox(width: 8),
               Text(
-                'SHADOW $text',
+                '${S.shadow} $text',
                 style: GoogleFonts.spaceGrotesk(
                   fontSize: 14,
                   fontWeight: FontWeight.w700,
                   color: Colors.white,
                   letterSpacing: 0.5,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSpeedWarningBanner() {
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(12),
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 8, sigmaY: 8),
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+          decoration: BoxDecoration(
+            color: SRColors.primaryContainer.withValues(alpha: 0.2),
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(
+              color: SRColors.primaryContainer.withValues(alpha: 0.4),
+            ),
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(
+                Icons.warning_amber_rounded,
+                color: SRColors.primaryContainer,
+                size: 18,
+              ),
+              const SizedBox(width: 8),
+              Flexible(
+                child: Text(
+                  _runService.speedWarning!,
+                  style: GoogleFonts.inter(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w700,
+                    color: SRColors.primaryContainer,
+                  ),
+                  textAlign: TextAlign.center,
                 ),
               ),
             ],
@@ -483,13 +535,13 @@ class _RunningScreenState extends State<RunningScreen>
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text(
-              'THREAT LEVEL',
+              S.threatLevel,
               style: SRTheme.labelMedium.copyWith(
                 color: SRColors.textMuted,
               ),
             ),
             Text(
-              '$levelLabel PROXIMITY',
+              '$levelLabel ${S.proximity}',
               style: SRTheme.labelMedium.copyWith(
                 color: SRColors.primaryContainer,
               ),

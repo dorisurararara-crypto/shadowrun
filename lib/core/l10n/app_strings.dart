@@ -79,4 +79,35 @@ class S {
   static String get stopRunMessage => isKo ? '정말 러닝을 종료하시겠습니까?' : 'Are you sure you want to stop?';
   static String get keepRunning => isKo ? '계속 뛰기' : 'Keep Running';
   static String get stop => isKo ? '종료' : 'Stop';
+
+  // Running screen HUD
+  static String get pace => isKo ? '페이스' : 'PACE';
+  static String get dist => isKo ? '거리' : 'DIST';
+  static String get shadow => isKo ? '그림자' : 'SHADOW';
+
+  // Result screen
+  static String get visualReconstruction => isKo ? '경로 재구성' : 'VISUAL RECONSTRUCTION';
+  static String get incidentReport => isKo ? '인시던트 리포트' : 'INCIDENT REPORT';
+  static String get threatDetected => isKo ? '위협 감지' : 'Threat Detected';
+
+  // Prepare screen
+  static String get shadowRunStats => isKo ? '그림자 기록' : 'SHADOW RUN STATS';
+  static String get date => isKo ? '날짜' : 'DATE';
+
+  // History screen
+  static String get noRunsEmpty => isKo ? '아직 러닝 기록이 없어요' : 'No runs yet.';
+  static String get noChallengesEmpty => isKo ? '아직 도전 기록이 없어요' : 'No challenge records yet.';
+  static String get noChallengesSubtitle => isKo ? '도전을 시작해 결과를 확인하세요' : 'Take on a challenge to see results here.';
+  static String get deleteRecord => isKo ? '기록 삭제' : 'Delete Record';
+  static String get deleteRecordMessage => isKo ? '이 러닝 기록이 영구적으로 삭제됩니다.\n이 작업은 되돌릴 수 없습니다.' : 'This run record will be permanently deleted.\nThis action cannot be undone.';
+  static String get cancel => isKo ? '취소' : 'CANCEL';
+  static String get delete => isKo ? '삭제' : 'DELETE';
+  static String get viewAll => isKo ? '전체 보기' : 'VIEW ALL';
+  static String get dailyLimitReached => isKo ? '일일 도전 횟수를 초과했습니다' : 'Daily challenge limit reached';
+  static String get win => isKo ? '승리' : 'WIN';
+  static String get lose => isKo ? '패배' : 'LOSE';
+
+  // Speed validation
+  static String get tooSlow => isKo ? '너무 느려요! 뛰세요!' : 'Too slow! Start running!';
+  static String get tooFast => isKo ? '너무 빨라요! 차량 감지' : 'Too fast! Vehicle detected';
 }

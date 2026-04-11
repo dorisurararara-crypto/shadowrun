@@ -397,7 +397,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Text(
-                      'VIEW ALL',
+                      S.viewAll,
                       style: GoogleFonts.inter(
                         fontSize: 10,
                         fontWeight: FontWeight.w700,
@@ -470,7 +470,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
                         content: Text(
-                          'Daily challenge limit reached',
+                          S.dailyLimitReached,
                           style: GoogleFonts.inter(),
                         ),
                         backgroundColor: SRColors.surface,
@@ -661,7 +661,7 @@ class _ChallengeBadge extends StatelessWidget {
         borderRadius: BorderRadius.circular(20),
       ),
       child: Text(
-        isWin ? 'WIN' : 'LOSE',
+        isWin ? S.win : S.lose,
         style: GoogleFonts.inter(
           fontSize: 10,
           fontWeight: FontWeight.w800,

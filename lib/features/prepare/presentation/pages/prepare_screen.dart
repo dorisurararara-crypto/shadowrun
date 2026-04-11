@@ -7,6 +7,7 @@ import 'package:flutter_naver_map/flutter_naver_map.dart';
 import 'package:shadowrun/core/theme/app_theme.dart';
 import 'package:shadowrun/core/database/database_helper.dart';
 import 'package:shadowrun/shared/models/run_model.dart';
+import 'package:shadowrun/core/l10n/app_strings.dart';
 
 class PrepareScreen extends StatefulWidget {
   final int? shadowRunId;
@@ -211,7 +212,7 @@ class _PrepareScreenState extends State<PrepareScreen>
           const SizedBox(height: 20),
           // Title
           Text(
-            _isChallenge ? 'SHADOW CHALLENGE' : 'NEW RUN',
+            _isChallenge ? S.shadowChallenge : S.newRun,
             style: GoogleFonts.spaceGrotesk(
               fontSize: 22,
               fontWeight: FontWeight.w700,
@@ -265,7 +266,7 @@ class _PrepareScreenState extends State<PrepareScreen>
               ),
               const SizedBox(width: 8),
               Text(
-                'SHADOW RUN STATS',
+                S.shadowRunStats,
                 style: SRTheme.labelMedium.copyWith(
                   color: SRColors.primaryContainer,
                 ),
@@ -275,11 +276,11 @@ class _PrepareScreenState extends State<PrepareScreen>
           const SizedBox(height: 16),
           Row(
             children: [
-              _statItem('DISTANCE', run.formattedDistance),
+              _statItem(S.distance, run.formattedDistance),
               _statDivider(),
-              _statItem('PACE', run.formattedPace),
+              _statItem(S.pace, run.formattedPace),
               _statDivider(),
-              _statItem('DATE', dateStr),
+              _statItem(S.date, dateStr),
             ],
           ),
         ],
@@ -401,7 +402,7 @@ class _PrepareScreenState extends State<PrepareScreen>
                 ),
                 const SizedBox(width: 10),
                 Text(
-                  _gpsReady ? 'GPS SIGNAL GOOD' : 'SEARCHING...',
+                  _gpsReady ? S.gpsSignalGood : S.searching,
                   style: SRTheme.labelLarge.copyWith(
                     color: color,
                     letterSpacing: 1.5,
@@ -448,7 +449,7 @@ class _PrepareScreenState extends State<PrepareScreen>
               borderRadius: BorderRadius.circular(100),
             ),
             child: Text(
-              'START',
+              S.start,
               style: GoogleFonts.spaceGrotesk(
                 fontSize: 20,
                 fontWeight: FontWeight.w700,

@@ -4,8 +4,12 @@ import 'package:flutter/foundation.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:shadowrun/shared/models/run_model.dart';
 import 'package:shadowrun/core/database/database_helper.dart';
+import 'package:shadowrun/core/l10n/app_strings.dart';
 
 class RunningService extends ChangeNotifier {
+  static const double minSpeedMps = 1.0; // 3.6 km/h
+  static const double maxSpeedMps = 8.0; // 28.8 km/h
+
   StreamSubscription<Position>? _positionSub;
   final List<RunPoint> _points = [];
   List<RunPoint>? _shadowPoints;
@@ -16,6 +20,7 @@ class RunningService extends ChangeNotifier {
   double _totalDistanceM = 0;
   Position? _lastPosition;
   int _currentShadowIndex = 0;
+  double _currentSpeed = 0;
 
   // Public getters
   bool get isRunning => _isRunning;
@@ -30,6 +35,16 @@ class RunningService extends ChangeNotifier {
   }
 
   int get calories => (_totalDistanceM * 0.06).round(); // 대략적 계산
+
+  double get currentSpeed => _currentSpeed;
+
+  bool get isValidSpeed => _currentSpeed >= minSpeedMps && _currentSpeed <= maxSpeedMps;
+
+  String? get speedWarning {
+    if (_currentSpeed < minSpeedMps) return S.tooSlow;
+    if (_currentSpeed > maxSpeedMps) return S.tooFast;
+    return null;
+  }
 
   Position? get currentPosition => _lastPosition;
   int get currentShadowIndex => _currentShadowIndex;
@@ -91,6 +106,9 @@ class RunningService extends ChangeNotifier {
     _shadowRunId = shadowRunId;
     if (shadowRunId != null) {
       _shadowPoints = await DatabaseHelper.getRunPoints(shadowRunId);
+      debugPrint('SHADOW: loaded ${_shadowPoints?.length ?? 0} points for run $shadowRunId');
+    } else {
+      debugPrint('SHADOW: no shadow run (new run mode)');
     }
 
     _points.clear();
@@ -114,7 +132,9 @@ class RunningService extends ChangeNotifier {
   void _onPosition(Position pos) {
     if (!_isRunning) return;
 
-    if (_lastPosition != null) {
+    _currentSpeed = pos.speed >= 0 ? pos.speed : 0;
+
+    if (_lastPosition != null && isValidSpeed) {
       _totalDistanceM += Geolocator.distanceBetween(
         _lastPosition!.latitude, _lastPosition!.longitude,
         pos.latitude, pos.longitude,
