@@ -50,7 +50,7 @@ class DatabaseHelper {
       )
     ''');
     // 기본 설정
-    await db.insert('settings', {'key': 'horror_level', 'value': '3'});
+    await db.insert('settings', {'key': 'horror_level', 'value': '2'});
     await db.insert('settings', {'key': 'tts_enabled', 'value': 'true'});
     await db.insert('settings', {'key': 'vibration_enabled', 'value': 'true'});
     await db.insert('settings', {'key': 'run_mode', 'value': 'fullmap'});

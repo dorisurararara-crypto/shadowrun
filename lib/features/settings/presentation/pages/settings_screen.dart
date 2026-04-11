@@ -91,7 +91,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
               ),
             )
           : ListView(
-              padding: const EdgeInsets.fromLTRB(20, 20, 20, 40),
+              padding: const EdgeInsets.fromLTRB(24, 24, 24, 80),
               children: [
                 _buildLanguageSettings(),
                 const SizedBox(height: 24),
@@ -705,7 +705,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
         children: [
           SizedBox(
             width: double.infinity,
-            height: 56,
+            height: 72,
             child: ElevatedButton(
               onPressed: () async {
                 final success = await PurchaseService().buyPro();

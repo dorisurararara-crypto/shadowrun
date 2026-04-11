@@ -255,51 +255,56 @@ class _PrepareScreenState extends State<PrepareScreen>
     );
   }
 
+  // Stitch: p-8 (32), bg-[#1c1b1b], rounded-xl (12), title text-3xl (32px)
   Widget _buildModeCard() {
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.symmetric(vertical: 36, horizontal: 24),
+      padding: const EdgeInsets.all(32),
       decoration: BoxDecoration(
-        color: SRColors.card,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: SRColors.divider),
+        color: const Color(0xFF1C1B1B),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.05)),
       ),
       child: Column(
         children: [
-          // Icon
+          // Icon (Stitch: w-16 h-16 rounded-full)
           Container(
             width: 64,
             height: 64,
             decoration: BoxDecoration(
               shape: BoxShape.circle,
-              color: (_isChallenge ? SRColors.primaryContainer : SRColors.runner)
-                  .withValues(alpha: 0.15),
+              color: (_isChallenge ? SRColors.primaryContainer : const Color(0xFF2AA192))
+                  .withValues(alpha: 0.2),
             ),
             child: Icon(
               _isChallenge ? Icons.people_alt_rounded : Icons.directions_run_rounded,
-              color: _isChallenge ? SRColors.primaryContainer : SRColors.runner,
+              color: _isChallenge ? SRColors.primaryContainer : SRColors.safe,
               size: 32,
             ),
           ),
-          const SizedBox(height: 20),
-          // Title
+          const SizedBox(height: 24),
+          // Title (Stitch: text-3xl font-bold = 32px)
           Text(
             _isChallenge ? S.shadowChallenge : S.newRun,
             style: GoogleFonts.spaceGrotesk(
-              fontSize: 22,
+              fontSize: 32,
               fontWeight: FontWeight.w700,
-              color: SRColors.textPrimary,
-              letterSpacing: 2,
+              color: SRColors.onSurface,
             ),
           ),
-          const SizedBox(height: 10),
-          // Subtitle
-          Text(
-            _selectedQuote,
-            style: SRTheme.bodyMedium.copyWith(
-              color: SRColors.textMuted,
+          const SizedBox(height: 8),
+          // Subtitle (Stitch: text-sm, max-w-[200px], leading-relaxed)
+          SizedBox(
+            width: 200,
+            child: Text(
+              _selectedQuote,
+              style: GoogleFonts.inter(
+                fontSize: 14,
+                color: SRColors.onSurfaceVariant.withValues(alpha: 0.6),
+                height: 1.6,
+              ),
+              textAlign: TextAlign.center,
             ),
-            textAlign: TextAlign.center,
           ),
         ],
       ),

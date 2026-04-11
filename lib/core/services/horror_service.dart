@@ -69,23 +69,26 @@ class HorrorService {
           await _playBgm('heartbeat.mp3');
         }
         if (_ttsEnabled) {
-          await _playTts('tts_warning');
+          // 레벨 5: 2차 대사 사용
+          await _playTts(_horrorLevel >= 5 ? 'tts_warning2' : 'tts_warning');
         }
         break;
 
       case ThreatLevel.danger:
         if (_horrorLevel >= 3) {
           await _playBgm('breathing.mp3');
+          // 레벨 5: BGM 볼륨 증가
+          _bgmPlayer.setVolume(_horrorLevel >= 5 ? 0.9 : 0.6);
         }
         if (_ttsEnabled) {
-          await _playTts('tts_danger');
+          await _playTts(_horrorLevel >= 5 ? 'tts_danger2' : 'tts_danger');
         }
         break;
 
       case ThreatLevel.critical:
         await _stopBgm();
         if (_horrorLevel >= 4) {
-          await _playSfx('jumpscare.mp3');
+          await _playSfx(_horrorLevel >= 5 ? 'jumpscare2.mp3' : 'jumpscare.mp3');
         }
         if (_ttsEnabled) {
           await _playTts('tts_critical');
@@ -189,8 +192,10 @@ class HorrorService {
       case ThreatLevel.safe:
         return 0.0;
       case ThreatLevel.warning:
+        if (_horrorLevel >= 5) return 0.5;
         return _horrorLevel >= 2 ? 0.4 : 0.0;
       case ThreatLevel.danger:
+        if (_horrorLevel >= 5) return 0.9;
         return _horrorLevel >= 3 ? 0.7 : 0.3;
       case ThreatLevel.critical:
         return 1.0;
