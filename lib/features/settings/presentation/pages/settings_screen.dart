@@ -795,20 +795,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
             onTap: () {},
           ),
           _NavIcon(
-            icon: Icons.shield_outlined,
+            icon: Icons.analytics_outlined,
             isActive: _selectedNavIndex == 3,
-            onTap: () {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text(
-                    S.isKo ? '곧 출시됩니다!' : 'Coming soon!',
-                    style: GoogleFonts.inter(),
-                  ),
-                  backgroundColor: SRColors.surface,
-                  duration: const Duration(seconds: 1),
-                ),
-              );
-            },
+            onTap: () => context.go('/analysis'),
           ),
         ],
       ),

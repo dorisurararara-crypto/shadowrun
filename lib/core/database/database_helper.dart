@@ -143,6 +143,58 @@ class DatabaseHelper {
     };
   }
 
+  // --- Analysis ---
+  static Future<List<RunModel>> getRunsByDateRange(DateTime from, DateTime to) async {
+    final db = await database;
+    final maps = await db.query('runs',
+      where: 'date >= ? AND date < ?',
+      whereArgs: [from.toIso8601String(), to.toIso8601String()],
+      orderBy: 'date ASC',
+    );
+    return maps.map((m) => RunModel.fromMap(m)).toList();
+  }
+
+  static Future<Map<String, List<RunModel>>> getRunsGroupedByDate(DateTime month) async {
+    final from = DateTime(month.year, month.month, 1);
+    final to = DateTime(month.year, month.month + 1, 1);
+    final runs = await getRunsByDateRange(from, to);
+    final grouped = <String, List<RunModel>>{};
+    for (final run in runs) {
+      final dateKey = run.date.substring(0, 10);
+      grouped.putIfAbsent(dateKey, () => []).add(run);
+    }
+    return grouped;
+  }
+
+  static Future<List<Map<String, dynamic>>> getWeeklyStats(int weeks) async {
+    final result = <Map<String, dynamic>>[];
+    final now = DateTime.now();
+    for (int i = weeks - 1; i >= 0; i--) {
+      final weekStart = now.subtract(Duration(days: now.weekday - 1 + i * 7));
+      final weekEnd = weekStart.add(const Duration(days: 7));
+      final from = DateTime(weekStart.year, weekStart.month, weekStart.day);
+      final to = DateTime(weekEnd.year, weekEnd.month, weekEnd.day);
+      final runs = await getRunsByDateRange(from, to);
+      double totalDist = 0;
+      double totalPace = 0;
+      int paceCount = 0;
+      for (final r in runs) {
+        totalDist += r.distanceM;
+        if (r.avgPace > 0) {
+          totalPace += r.avgPace;
+          paceCount++;
+        }
+      }
+      result.add({
+        'weekStart': from,
+        'distance': totalDist,
+        'avgPace': paceCount > 0 ? totalPace / paceCount : 0.0,
+        'runs': runs.length,
+      });
+    }
+    return result;
+  }
+
   // --- Daily Challenge Limit ---
   static Future<int> getDailyChallengeCount() async {
     final today = DateTime.now().toIso8601String().substring(0, 10);

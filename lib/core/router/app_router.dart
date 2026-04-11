@@ -6,6 +6,7 @@ import 'package:shadowrun/features/running/presentation/pages/running_screen.dar
 import 'package:shadowrun/features/result/presentation/pages/result_screen.dart';
 import 'package:shadowrun/features/history/presentation/pages/history_screen.dart';
 import 'package:shadowrun/features/settings/presentation/pages/settings_screen.dart';
+import 'package:shadowrun/features/analysis/presentation/pages/analysis_screen.dart';
 import 'package:shadowrun/features/onboarding/presentation/pages/language_select_screen.dart';
 
 GoRouter createRouter(bool languageSelected) => GoRouter(
@@ -50,6 +51,10 @@ GoRouter createRouter(bool languageSelected) => GoRouter(
     GoRoute(
       path: '/settings',
       builder: (context, state) => const SettingsScreen(),
+    ),
+    GoRoute(
+      path: '/analysis',
+      builder: (context, state) => const AnalysisScreen(),
     ),
   ],
 );
