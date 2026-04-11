@@ -21,6 +21,7 @@ class RunningService extends ChangeNotifier {
   Position? _lastPosition;
   int _currentShadowIndex = 0;
   double _currentSpeed = 0;
+  double _heading = 0;
 
   // Public getters
   bool get isRunning => _isRunning;
@@ -37,6 +38,7 @@ class RunningService extends ChangeNotifier {
   int get calories => (_totalDistanceM * 0.06).round(); // 대략적 계산
 
   double get currentSpeed => _currentSpeed;
+  double get heading => _heading;
 
   bool get isValidSpeed => _currentSpeed >= minSpeedMps && _currentSpeed <= maxSpeedMps;
 
@@ -133,6 +135,7 @@ class RunningService extends ChangeNotifier {
     if (!_isRunning) return;
 
     _currentSpeed = pos.speed >= 0 ? pos.speed : 0;
+    if (pos.heading >= 0) _heading = pos.heading;
 
     if (_lastPosition != null && isValidSpeed) {
       _totalDistanceM += Geolocator.distanceBetween(

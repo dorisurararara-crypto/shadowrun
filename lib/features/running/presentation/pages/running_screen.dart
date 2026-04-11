@@ -11,6 +11,7 @@ import 'package:shadowrun/core/services/running_service.dart';
 import 'package:shadowrun/core/database/database_helper.dart';
 import 'package:shadowrun/core/services/horror_service.dart';
 import 'package:shadowrun/core/l10n/app_strings.dart';
+import 'package:shadowrun/shared/models/run_model.dart';
 
 class RunningScreen extends StatefulWidget {
   final int? shadowRunId;
@@ -43,6 +44,11 @@ class _RunningScreenState extends State<RunningScreen>
   // 차량 감지 자동 일시정지
   int _vehicleDetectCount = 0;
 
+  // 화살표 마커 아이콘
+  NOverlayImage? _runnerArrowIcon;
+  NOverlayImage? _shadowArrowIcon;
+  NOverlayImage? _kmSplitIcon;
+
   @override
   void initState() {
     super.initState();
@@ -72,6 +78,51 @@ class _RunningScreenState extends State<RunningScreen>
     );
 
     _startRun();
+    _createMarkerIcons();
+  }
+
+  Future<void> _createMarkerIcons() async {
+    _runnerArrowIcon = await NOverlayImage.fromWidget(
+      widget: Container(
+        width: 32,
+        height: 32,
+        decoration: BoxDecoration(
+          color: SRColors.runner,
+          shape: BoxShape.circle,
+          boxShadow: [BoxShadow(color: SRColors.runner.withValues(alpha: 0.6), blurRadius: 8)],
+        ),
+        child: const Icon(Icons.navigation_rounded, color: Colors.white, size: 18),
+      ),
+      size: const Size(32, 32),
+      context: context,
+    );
+    _shadowArrowIcon = await NOverlayImage.fromWidget(
+      widget: Container(
+        width: 28,
+        height: 28,
+        decoration: BoxDecoration(
+          color: SRColors.shadow,
+          shape: BoxShape.circle,
+          boxShadow: [BoxShadow(color: SRColors.shadow.withValues(alpha: 0.6), blurRadius: 8)],
+        ),
+        child: const Icon(Icons.person_rounded, color: Colors.white, size: 16),
+      ),
+      size: const Size(28, 28),
+      context: context,
+    );
+    _kmSplitIcon = await NOverlayImage.fromWidget(
+      widget: Container(
+        width: 22,
+        height: 22,
+        decoration: BoxDecoration(
+          color: SRColors.onSurface,
+          shape: BoxShape.circle,
+          border: Border.all(color: SRColors.background, width: 2),
+        ),
+      ),
+      size: const Size(22, 22),
+      context: context,
+    );
   }
 
   Future<void> _loadRunMode() async {
@@ -177,15 +228,21 @@ class _RunningScreenState extends State<RunningScreen>
       outlineWidth: 2,
     ));
 
-    // Runner marker
-    controller.addOverlay(NMarker(
+    // Runner arrow marker (방향 표시)
+    final runnerMarker = NMarker(
       id: 'runner',
       position: target,
-      iconTintColor: SRColors.runner,
-      size: const Size(24, 24),
-    ));
+      size: const Size(32, 32),
+      angle: _runService.heading,
+    );
+    if (_runnerArrowIcon != null) {
+      runnerMarker.setIcon(_runnerArrowIcon!);
+    } else {
+      runnerMarker.setIconTintColor(SRColors.runner);
+    }
+    controller.addOverlay(runnerMarker);
 
-    // Runner path polyline (두께 증가 4→8)
+    // Runner path polyline
     final runnerCoords = _runService.points
         .map((p) => NLatLng(p.latitude, p.longitude))
         .toList();
@@ -199,12 +256,14 @@ class _RunningScreenState extends State<RunningScreen>
       ));
     }
 
+    // km 스플릿 마커
+    _addKmSplitMarkers(controller, _runService.points);
+
     // Shadow marker + glow
     final shadowPoint = _runService.currentShadowPoint;
     if (shadowPoint != null) {
       final shadowLatLng = NLatLng(shadowPoint.latitude, shadowPoint.longitude);
 
-      // Shadow glow circle (핑 효과)
       controller.addOverlay(NCircleOverlay(
         id: 'shadow_glow',
         center: shadowLatLng,
@@ -214,15 +273,20 @@ class _RunningScreenState extends State<RunningScreen>
         outlineWidth: 3,
       ));
 
-      controller.addOverlay(NMarker(
+      final shadowMarker = NMarker(
         id: 'shadow',
         position: shadowLatLng,
-        iconTintColor: SRColors.shadow,
-        size: const Size(24, 24),
-      ));
+        size: const Size(28, 28),
+      );
+      if (_shadowArrowIcon != null) {
+        shadowMarker.setIcon(_shadowArrowIcon!);
+      } else {
+        shadowMarker.setIconTintColor(SRColors.shadow);
+      }
+      controller.addOverlay(shadowMarker);
     }
 
-    // Shadow path polyline (빨간색, 두께 6, 구분되는 스타일)
+    // Shadow path polyline
     final shadowPoints = _runService.shadowPoints;
     final shadowIdx = _runService.currentShadowIndex;
     if (shadowPoints != null && shadowIdx >= 1) {
@@ -238,6 +302,35 @@ class _RunningScreenState extends State<RunningScreen>
           outlineColor: SRColors.shadow.withValues(alpha: 0.2),
           width: 6,
         ));
+      }
+    }
+  }
+
+  void _addKmSplitMarkers(NaverMapController controller, List<RunPoint> points) {
+    if (points.length < 2 || _kmSplitIcon == null) return;
+    double dist = 0;
+    int nextKm = 1;
+    for (int i = 1; i < points.length; i++) {
+      final p0 = points[i - 1];
+      final p1 = points[i];
+      final dx = (p1.latitude - p0.latitude);
+      final dy = (p1.longitude - p0.longitude);
+      dist += sqrt(dx * dx + dy * dy) * 111320; // 대략적 미터 변환
+      if (dist >= nextKm * 1000) {
+        final marker = NMarker(
+          id: 'km_$nextKm',
+          position: NLatLng(p1.latitude, p1.longitude),
+          size: const Size(22, 22),
+        );
+        marker.setIcon(_kmSplitIcon!);
+        marker.setCaption(NOverlayCaption(
+          text: '${nextKm}km',
+          textSize: 10,
+          color: SRColors.onSurface,
+          haloColor: SRColors.background,
+        ));
+        controller.addOverlay(marker);
+        nextKm++;
       }
     }
   }

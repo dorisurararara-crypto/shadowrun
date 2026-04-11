@@ -506,6 +506,9 @@ class _ResultScreenState extends State<ResultScreen>
                     size: const Size(20, 20),
                   ));
                 }
+
+                // km 스플릿 마커
+                _addKmSplitsToMap(controller, _points);
               },
             ),
           ),
@@ -610,6 +613,34 @@ class _ResultScreenState extends State<ResultScreen>
       return S.isKo
           ? '도플갱어가 ${km}km 지점에서 추월했습니다. ${min}분 시점에서 속도가 떨어졌습니다. 내일 더 강해져서 돌아오세요.'
           : 'The entity overtook you at the $km km mark. Your pace dropped at $min minutes. Train harder for tomorrow.';
+    }
+  }
+
+  void _addKmSplitsToMap(NaverMapController controller, List<RunPoint> points) {
+    if (points.length < 2) return;
+    double dist = 0;
+    int nextKm = 1;
+    for (int i = 1; i < points.length; i++) {
+      dist += _distanceBetween(
+        points[i - 1].latitude, points[i - 1].longitude,
+        points[i].latitude, points[i].longitude,
+      );
+      if (dist >= nextKm * 1000) {
+        final marker = NMarker(
+          id: 'km_$nextKm',
+          position: NLatLng(points[i].latitude, points[i].longitude),
+          iconTintColor: SRColors.onSurface,
+          size: const Size(18, 18),
+        );
+        marker.setCaption(NOverlayCaption(
+          text: '${nextKm}km',
+          textSize: 10,
+          color: SRColors.onSurface,
+          haloColor: SRColors.background,
+        ));
+        controller.addOverlay(marker);
+        nextKm++;
+      }
     }
   }
 
