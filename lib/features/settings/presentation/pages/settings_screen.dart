@@ -145,7 +145,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
               final prefs = await SharedPreferences.getInstance();
               await prefs.setString('language', value);
               await S.init(value);
-              if (mounted) setState(() {});
+              if (mounted) {
+                setState(() {});
+                // 전체 앱 리빌드를 위해 홈으로 이동
+                Future.delayed(const Duration(milliseconds: 300), () {
+                  if (mounted) context.go('/');
+                });
+              }
             },
           ),
         ),
