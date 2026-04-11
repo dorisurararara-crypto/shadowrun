@@ -26,7 +26,6 @@ class _ResultScreenState extends State<ResultScreen>
     with TickerProviderStateMixin {
   RunModel? _run;
   List<RunPoint> _points = [];
-  RunModel? _shadowRun;
   List<RunPoint> _shadowPoints = [];
   bool _loading = true;
   BannerAd? _bannerAd;
@@ -91,7 +90,6 @@ class _ResultScreenState extends State<ResultScreen>
     _points = await DatabaseHelper.getRunPoints(widget.runId);
 
     if (_run?.shadowRunId != null) {
-      _shadowRun = await DatabaseHelper.getRun(_run!.shadowRunId!);
       _shadowPoints = await DatabaseHelper.getRunPoints(_run!.shadowRunId!);
     }
 
@@ -523,11 +521,12 @@ class _ResultScreenState extends State<ResultScreen>
     final durationMin = (run.durationS / 60).toStringAsFixed(1);
 
     if (!_isChallenge) {
-      return 'New territory mapped. ${run.formattedDistance} covered in $durationMin minutes. The shadow now has your data.';
+      return S.isKo
+          ? '새로운 영역이 기록되었습니다. ${durationMin}분간 ${run.formattedDistance}를 달렸습니다. 도플갱어가 당신의 데이터를 확보했습니다.'
+          : 'New territory mapped. ${run.formattedDistance} covered in $durationMin minutes. The shadow now has your data.';
     }
 
     if (_isWin) {
-      // Calculate closest approach from shadow points
       double closestDist = double.infinity;
       double closestKm = 0;
       double avgLead = 0;
@@ -547,7 +546,6 @@ class _ResultScreenState extends State<ResultScreen>
           );
           final elapsedMs = _points[i].timestampMs - runnerStartMs;
 
-          // Advance shadow to same elapsed time
           while (shadowIdx + 1 < _shadowPoints.length &&
               (_shadowPoints[shadowIdx + 1].timestampMs - shadowStartMs) <= elapsedMs) {
             shadowDist += _distanceBetween(
@@ -568,10 +566,13 @@ class _ResultScreenState extends State<ResultScreen>
         avgLead = count > 0 ? leadSum / count : 0;
       }
 
-      return 'The shadow reached within ${closestDist.isFinite ? closestDist.toInt() : 0} meters at marker ${closestKm.toStringAsFixed(1)} km. '
-          'You maintained an average lead of ${avgLead.toInt()} meters. Strong pace in the final stretch.';
+      final closest = closestDist.isFinite ? closestDist.toInt() : 0;
+      final km = closestKm.toStringAsFixed(1);
+      final lead = avgLead.toInt();
+      return S.isKo
+          ? '도플갱어가 ${km}km 지점에서 ${closest}m까지 접근했습니다. 평균 ${lead}m 앞서 달렸습니다. 마지막 구간에서 강한 페이스를 유지했습니다.'
+          : 'The shadow reached within $closest meters at marker $km km. You maintained an average lead of $lead meters.';
     } else {
-      // Lose case - find overtake point
       double overtakeKm = 0;
       double paceDropMin = 0;
       if (_shadowPoints.isNotEmpty && _points.isNotEmpty) {
@@ -604,8 +605,11 @@ class _ResultScreenState extends State<ResultScreen>
         }
       }
 
-      return 'The entity overtook you at the ${overtakeKm.toStringAsFixed(1)} km mark. '
-          'Your pace dropped below the shadow\'s at ${paceDropMin.toStringAsFixed(1)} minutes. Train harder for tomorrow.';
+      final km = overtakeKm.toStringAsFixed(1);
+      final min = paceDropMin.toStringAsFixed(1);
+      return S.isKo
+          ? '도플갱어가 ${km}km 지점에서 추월했습니다. ${min}분 시점에서 속도가 떨어졌습니다. 내일 더 강해져서 돌아오세요.'
+          : 'The entity overtook you at the $km km mark. Your pace dropped at $min minutes. Train harder for tomorrow.';
     }
   }
 
@@ -668,12 +672,28 @@ class _ResultScreenState extends State<ResultScreen>
 
   Widget _buildBannerAd() {
     if (!_bannerReady || _bannerAd == null) return const SizedBox.shrink();
-    return Container(
-      alignment: Alignment.center,
-      width: _bannerAd!.size.width.toDouble(),
-      height: _bannerAd!.size.height.toDouble(),
-      margin: const EdgeInsets.only(bottom: 16),
-      child: AdWidget(ad: _bannerAd!),
+    return Column(
+      children: [
+        Container(
+          alignment: Alignment.center,
+          width: _bannerAd!.size.width.toDouble(),
+          height: _bannerAd!.size.height.toDouble(),
+          child: AdWidget(ad: _bannerAd!),
+        ),
+        const SizedBox(height: 6),
+        GestureDetector(
+          onTap: () => context.push('/settings'),
+          child: Text(
+            S.proNoAds,
+            style: GoogleFonts.inter(
+              fontSize: 10,
+              color: SRColors.proBadge.withValues(alpha: 0.5),
+              letterSpacing: 0.5,
+            ),
+          ),
+        ),
+        const SizedBox(height: 16),
+      ],
     );
   }
 

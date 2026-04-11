@@ -16,7 +16,17 @@ class PurchaseService {
 
   bool get isPro => _isPro;
 
+  /// 관리자 키 등 외부에서 PRO 활성화 시 호출
+  Future<void> activatePro() async {
+    _isPro = true;
+    await DatabaseHelper.setSetting('is_pro', 'true');
+  }
+
   Future<void> initialize() async {
+    // 저장된 PRO 상태를 항상 먼저 확인
+    final savedPro = await DatabaseHelper.getSetting('is_pro');
+    _isPro = savedPro == 'true';
+
     final available = await _iap.isAvailable();
     if (!available) {
       debugPrint('인앱 결제 사용 불가');
@@ -28,10 +38,6 @@ class PurchaseService {
       _onPurchaseUpdate,
       onError: (error) => debugPrint('구매 스트림 에러: $error'),
     );
-
-    // 저장된 PRO 상태 확인
-    final savedPro = await DatabaseHelper.getSetting('is_pro');
-    _isPro = savedPro == 'true';
   }
 
   void _onPurchaseUpdate(List<PurchaseDetails> purchases) {

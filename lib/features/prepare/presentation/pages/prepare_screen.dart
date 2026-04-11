@@ -553,7 +553,7 @@ class _PrepareScreenState extends State<PrepareScreen>
         final color =
             _countdownValue > 0 ? SRColors.textPrimary : SRColors.runner;
         return Container(
-          color: SRColors.background.withValues(alpha: 0.95),
+          color: SRColors.background,
           child: Center(
             child: Transform.scale(
               scale: _countdownScale.value,

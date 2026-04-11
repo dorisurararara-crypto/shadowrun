@@ -57,7 +57,8 @@ class S {
   static String get start => isKo ? '시작' : 'START';
   static String get gpsSignalGood => isKo ? 'GPS 신호 양호' : 'GPS SIGNAL GOOD';
   static String get searching => isKo ? '검색 중...' : 'SEARCHING...';
-  static String get shadowChallenge => isKo ? '그림자 도전' : 'SHADOW CHALLENGE';
+  static String get shadowChallenge => isKo ? '도플갱어 추격' : 'SHADOW CHASE';
+  static String get vehiclePaused => isKo ? '차량 이동이 감지되어 일시정지합니다' : 'Vehicle detected. Run paused.';
 
   // Result screen
   static String get debrief => isKo ? '결과 보고' : 'DEBRIEF';
@@ -110,4 +111,22 @@ class S {
   // Speed validation
   static String get tooSlow => isKo ? '너무 느려요! 뛰세요!' : 'Too slow! Start running!';
   static String get tooFast => isKo ? '너무 빨라요! 차량 감지' : 'Too fast! Vehicle detected';
+
+  // PRO features
+  static String get proBanner => isKo ? '평생 광고 없이 + 공포 풀해금' : 'No ads forever + Full horror unlock';
+  static String get proNoAds => isKo ? 'PRO 유저는 광고가 표시되지 않습니다' : 'PRO users see no ads';
+  static String get proModeLockedTitle => isKo ? 'PRO 전용 모드' : 'PRO MODE';
+  static String get proModeLockedMsg => isKo
+      ? '지도 중심, 데이터 중심 모드는 PRO 전용입니다.\n업그레이드하여 모든 모드를 잠금 해제하세요.'
+      : 'Map Focus and Data Focus modes require PRO.\nUpgrade to unlock all modes.';
+  static String get proBenefitNoAds => isKo ? '영구 광고 제거' : 'Remove ads forever';
+  static String get proBenefitHorror => isKo ? '공포 레벨 3~5 해금' : 'Unlock horror levels 3-5';
+  static String get proBenefitModes => isKo ? '모든 러닝 모드 해금' : 'Unlock all running modes';
+  static String get proBenefitVoice => isKo ? '음성 선택 (출시 예정)' : 'Voice selection (coming soon)';
+  static String get voiceSelection => isKo ? '음성 선택' : 'Voice Selection';
+  static String get voiceHarry => 'Harry — Fierce Warrior';
+  static String get voiceCallum => 'Callum — Calm Operator';
+  static String get voiceDrill => 'Drill Sergeant — Commander';
+  static String get comingSoon => isKo ? '출시 예정' : 'COMING SOON';
+  static String get upgrade => isKo ? '업그레이드' : 'UPGRADE';
 }

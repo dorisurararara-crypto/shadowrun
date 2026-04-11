@@ -89,7 +89,9 @@ class _HomeScreenState extends State<HomeScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     _buildStatsCard(),
-                    const SizedBox(height: 20),
+                    const SizedBox(height: 16),
+                    if (!PurchaseService().isPro) _buildProBanner(),
+                    if (!PurchaseService().isPro) const SizedBox(height: 16),
                     _buildDailyChallengeCard(),
                     const SizedBox(height: 28),
                     _buildRecentRunsSection(),
@@ -175,7 +177,8 @@ class _HomeScreenState extends State<HomeScreen> {
       builder: (context, snapshot) {
         final used = snapshot.data ?? 0;
         const maxFree = 3;
-        final remaining = (maxFree - used).clamp(0, maxFree);
+        final isPro = PurchaseService().isPro;
+        final remaining = isPro ? maxFree : (maxFree - used).clamp(0, maxFree);
 
         return Container(
           clipBehavior: Clip.antiAlias,
@@ -231,7 +234,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                       const SizedBox(height: 4),
                       Text(
-                        '${S.remaining}: $remaining/$maxFree',
+                        isPro ? '${S.remaining}: ${S.isKo ? "무제한" : "Unlimited"}' : '${S.remaining}: $remaining/$maxFree',
                         style: GoogleFonts.inter(
                           fontSize: 13,
                           fontWeight: FontWeight.w600,
@@ -250,7 +253,6 @@ class _HomeScreenState extends State<HomeScreen> {
                       final success = await AdService().showRewardedAd(
                         onRewarded: () async {
                           // 도전 횟수를 -1로 롤백 (기회 +1)
-                          final db = await DatabaseHelper.database;
                           final count = await DatabaseHelper.getDailyChallengeCount();
                           if (count > 0) {
                             await DatabaseHelper.setSetting(
@@ -417,6 +419,64 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
+  Widget _buildProBanner() {
+    return GestureDetector(
+      onTap: () => context.push('/settings'),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: [
+              SRColors.primaryContainer.withValues(alpha: 0.15),
+              SRColors.proBadge.withValues(alpha: 0.08),
+            ],
+          ),
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: SRColors.primaryContainer.withValues(alpha: 0.2)),
+        ),
+        child: Row(
+          children: [
+            Container(
+              width: 36,
+              height: 36,
+              decoration: BoxDecoration(
+                color: SRColors.proBadge.withValues(alpha: 0.15),
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: Icon(Icons.workspace_premium, color: SRColors.proBadge, size: 20),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'SHADOW RUN PRO',
+                    style: GoogleFonts.spaceGrotesk(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w800,
+                      color: SRColors.proBadge,
+                      letterSpacing: 1,
+                    ),
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    S.proBanner,
+                    style: GoogleFonts.inter(
+                      fontSize: 11,
+                      color: SRColors.onSurface.withValues(alpha: 0.5),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Icon(Icons.chevron_right, color: SRColors.onSurface.withValues(alpha: 0.3), size: 20),
+          ],
+        ),
+      ),
+    );
+  }
+
   Widget _buildBottomButtons() {
     return Container(
       padding: const EdgeInsets.fromLTRB(20, 12, 20, 28),
@@ -466,7 +526,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 onPressed: () async {
                   final count = await DatabaseHelper.getDailyChallengeCount();
                   if (!mounted) return;
-                  if (count >= 3) {
+                  if (count >= 3 && !PurchaseService().isPro) {
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
                         content: Text(

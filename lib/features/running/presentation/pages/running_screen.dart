@@ -5,11 +5,11 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_naver_map/flutter_naver_map.dart';
+import 'package:wakelock_plus/wakelock_plus.dart';
 import 'package:shadowrun/core/theme/app_theme.dart';
 import 'package:shadowrun/core/services/running_service.dart';
 import 'package:shadowrun/core/database/database_helper.dart';
 import 'package:shadowrun/core/services/horror_service.dart';
-import 'package:shadowrun/shared/models/run_model.dart';
 import 'package:shadowrun/core/l10n/app_strings.dart';
 
 class RunningScreen extends StatefulWidget {
@@ -31,9 +31,17 @@ class _RunningScreenState extends State<RunningScreen>
   Timer? _ticker;
   bool _paused = false;
   bool _stopping = false;
-  String _runMode = 'fullmap'; // fullmap, mapcenter, datacenter
+  String _runMode = 'fullmap';
   late AnimationController _vignetteAnim;
   late AnimationController _shadowPingAnim;
+
+  // Jumpscare
+  late AnimationController _jumpscareFlashAnim;
+  late AnimationController _jumpscareShakeAnim;
+  bool _jumpscareTriggered = false;
+
+  // 차량 감지 자동 일시정지
+  int _vehicleDetectCount = 0;
 
   @override
   void initState() {
@@ -53,6 +61,16 @@ class _RunningScreenState extends State<RunningScreen>
       duration: const Duration(milliseconds: 1500),
     )..repeat();
 
+    _jumpscareFlashAnim = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 120),
+    );
+
+    _jumpscareShakeAnim = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 80),
+    );
+
     _startRun();
   }
 
@@ -64,18 +82,27 @@ class _RunningScreenState extends State<RunningScreen>
   }
 
   Future<void> _startRun() async {
+    // 화면 꺼짐 방지
+    WakelockPlus.enable();
+
     await _horrorService.initialize();
     final ok = await _runService.startRun(shadowRunId: widget.shadowRunId);
     if (!ok && mounted) {
+      WakelockPlus.disable();
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('GPS 권한이 필요합니다')),
       );
       context.pop();
       return;
     }
+
+    // 러닝 시작 TTS
+    await _horrorService.playStartTts();
+
     _ticker = Timer.periodic(const Duration(seconds: 1), (_) {
       if (!_paused && mounted) {
         setState(() {});
+        _checkVehicleSpeed();
         _updateHorror();
         _updateMap();
       }
@@ -86,12 +113,46 @@ class _RunningScreenState extends State<RunningScreen>
     if (mounted) setState(() {});
   }
 
+  void _checkVehicleSpeed() {
+    if (_runService.speedWarning == S.tooFast) {
+      _vehicleDetectCount++;
+      if (_vehicleDetectCount >= 3 && !_paused) {
+        _paused = true;
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(S.vehiclePaused),
+            backgroundColor: SRColors.primaryContainer,
+          ),
+        );
+      }
+    } else {
+      _vehicleDetectCount = 0;
+    }
+  }
+
   Future<void> _updateHorror() async {
     if (widget.shadowRunId == null) return;
     final dist = _runService.shadowDistanceM;
     if (!dist.isInfinite) {
       await _horrorService.updateThreat(dist);
+      // 점프스케어 트리거 (시작 5초 후부터)
+      if (_horrorService.currentLevel == ThreatLevel.critical &&
+          !_jumpscareTriggered &&
+          _runService.durationS > 5) {
+        _triggerJumpscare();
+      }
     }
+  }
+
+  void _triggerJumpscare() {
+    _jumpscareTriggered = true;
+    _jumpscareFlashAnim.repeat(reverse: true);
+    _jumpscareShakeAnim.repeat();
+    setState(() {});
+    // 1.5초 후 결과 화면으로 자동 이동
+    Future.delayed(const Duration(milliseconds: 1500), () {
+      if (mounted && !_stopping) _stopRun();
+    });
   }
 
   void _updateMap() {
@@ -106,6 +167,16 @@ class _RunningScreenState extends State<RunningScreen>
       NCameraUpdate.scrollAndZoomTo(target: target),
     );
 
+    // Runner glow circle
+    controller.addOverlay(NCircleOverlay(
+      id: 'runner_glow',
+      center: target,
+      radius: 12,
+      color: SRColors.runner.withValues(alpha: 0.15),
+      outlineColor: SRColors.runner.withValues(alpha: 0.3),
+      outlineWidth: 2,
+    ));
+
     // Runner marker
     controller.addOverlay(NMarker(
       id: 'runner',
@@ -114,7 +185,7 @@ class _RunningScreenState extends State<RunningScreen>
       size: const Size(24, 24),
     ));
 
-    // Runner path polyline
+    // Runner path polyline (두께 증가 4→8)
     final runnerCoords = _runService.points
         .map((p) => NLatLng(p.latitude, p.longitude))
         .toList();
@@ -124,23 +195,34 @@ class _RunningScreenState extends State<RunningScreen>
         coords: runnerCoords,
         color: SRColors.runner.withValues(alpha: 0.8),
         outlineColor: SRColors.runner.withValues(alpha: 0.3),
-        width: 4,
+        width: 8,
       ));
     }
 
-    // Shadow marker
+    // Shadow marker + glow
     final shadowPoint = _runService.currentShadowPoint;
-    debugPrint('SHADOW MAP: shadowPoint=$shadowPoint, shadowIdx=${_runService.currentShadowIndex}, shadowDist=${_runService.shadowDistanceM}');
     if (shadowPoint != null) {
+      final shadowLatLng = NLatLng(shadowPoint.latitude, shadowPoint.longitude);
+
+      // Shadow glow circle (핑 효과)
+      controller.addOverlay(NCircleOverlay(
+        id: 'shadow_glow',
+        center: shadowLatLng,
+        radius: 15,
+        color: SRColors.shadow.withValues(alpha: 0.2),
+        outlineColor: SRColors.shadow.withValues(alpha: 0.5),
+        outlineWidth: 3,
+      ));
+
       controller.addOverlay(NMarker(
         id: 'shadow',
-        position: NLatLng(shadowPoint.latitude, shadowPoint.longitude),
+        position: shadowLatLng,
         iconTintColor: SRColors.shadow,
         size: const Size(24, 24),
       ));
     }
 
-    // Shadow path polyline (only up to current shadow index)
+    // Shadow path polyline (빨간색, 두께 6, 구분되는 스타일)
     final shadowPoints = _runService.shadowPoints;
     final shadowIdx = _runService.currentShadowIndex;
     if (shadowPoints != null && shadowIdx >= 1) {
@@ -152,9 +234,9 @@ class _RunningScreenState extends State<RunningScreen>
         controller.addOverlay(NPathOverlay(
           id: 'shadow_path',
           coords: shadowCoords,
-          color: SRColors.shadow.withValues(alpha: 0.4),
-          outlineColor: Colors.transparent,
-          width: 3,
+          color: SRColors.shadow.withValues(alpha: 0.5),
+          outlineColor: SRColors.shadow.withValues(alpha: 0.2),
+          width: 6,
         ));
       }
     }
@@ -200,7 +282,17 @@ class _RunningScreenState extends State<RunningScreen>
     if (_stopping) return;
     _stopping = true;
     _ticker?.cancel();
+
+    // 웨이크락 해제
+    WakelockPlus.disable();
+
     final result = await _runService.stopRun();
+
+    // 승리 시 TTS 재생
+    if (result != null && result.challengeResult == 'win') {
+      await _horrorService.playSurvivedTts();
+    }
+
     _horrorService.dispose();
 
     if (mounted) {
@@ -220,12 +312,15 @@ class _RunningScreenState extends State<RunningScreen>
 
   @override
   void dispose() {
+    WakelockPlus.disable();
     _ticker?.cancel();
     _runService.removeListener(_onRunUpdate);
     _runService.dispose();
     _pageController.dispose();
     _vignetteAnim.dispose();
     _shadowPingAnim.dispose();
+    _jumpscareFlashAnim.dispose();
+    _jumpscareShakeAnim.dispose();
     super.dispose();
   }
 
@@ -233,18 +328,50 @@ class _RunningScreenState extends State<RunningScreen>
 
   @override
   Widget build(BuildContext context) {
+    Widget content = Scaffold(
+      backgroundColor: SRColors.background,
+      body: _runMode == 'mapcenter'
+          ? _buildModeA()
+          : _runMode == 'datacenter'
+              ? _buildModeB()
+              : _buildModeC(),
+    );
+
+    // 점프스케어 화면 떨림
+    if (_jumpscareTriggered) {
+      final shakeContent = content;
+      content = AnimatedBuilder(
+        listenable: _jumpscareShakeAnim,
+        builder: (context, _) {
+          final dx = sin(_jumpscareShakeAnim.value * pi * 20) * 12;
+          final dy = cos(_jumpscareShakeAnim.value * pi * 16) * 8;
+          return Transform.translate(offset: Offset(dx, dy), child: shakeContent);
+        },
+      );
+    }
+
     return PopScope(
       canPop: false,
       onPopInvokedWithResult: (didPop, _) {
-        if (!didPop) _confirmStop();
+        if (!didPop && !_jumpscareTriggered) _confirmStop();
       },
-      child: Scaffold(
-        backgroundColor: SRColors.background,
-        body: _runMode == 'mapcenter'
-            ? _buildModeA()
-            : _runMode == 'datacenter'
-                ? _buildModeB()
-                : _buildModeC(),
+      child: Stack(
+        children: [
+          content,
+          // 점프스케어 빨간 플래시
+          if (_jumpscareTriggered)
+            AnimatedBuilder(
+              listenable: _jumpscareFlashAnim,
+              builder: (context, _) => IgnorePointer(
+                child: Container(
+                  color: Color.fromRGBO(
+                    255, 0, 0,
+                    0.5 + _jumpscareFlashAnim.value * 0.3,
+                  ),
+                ),
+              ),
+            ),
+        ],
       ),
     );
   }
@@ -470,25 +597,23 @@ class _RunningScreenState extends State<RunningScreen>
     return AnimatedBuilder(
       listenable: _vignetteAnim,
       builder: (context, _) {
-        final pulse = 0.8 + _vignetteAnim.value * 0.2;
+        final pulse = 0.7 + _vignetteAnim.value * 0.3;
         return IgnorePointer(
           child: Container(
             decoration: BoxDecoration(
               boxShadow: [
-                // Inner top/sides vignette
                 BoxShadow(
                   color: const Color(0xFFFF0044)
-                      .withValues(alpha: 0.15 * intensity * pulse),
-                  blurRadius: 150,
-                  spreadRadius: -20,
-                ),
-                // Inner bottom vignette (stronger)
-                BoxShadow(
-                  color: const Color(0xFFFF0044)
-                      .withValues(alpha: 0.3 * intensity * pulse),
-                  blurRadius: 200,
+                      .withValues(alpha: 0.2 * intensity * pulse),
+                  blurRadius: 180,
                   spreadRadius: -10,
-                  offset: const Offset(0, 100),
+                ),
+                BoxShadow(
+                  color: const Color(0xFFFF0044)
+                      .withValues(alpha: 0.4 * intensity * pulse),
+                  blurRadius: 240,
+                  spreadRadius: 0,
+                  offset: const Offset(0, 120),
                 ),
               ],
             ),

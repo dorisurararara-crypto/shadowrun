@@ -20,8 +20,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
   bool _ttsEnabled = true;
   bool _vibrationEnabled = true;
   bool _isPro = false;
+  String _selectedVoice = 'harry';
   bool _loading = true;
-  final int _selectedNavIndex = 2; // settings active
+  final int _selectedNavIndex = 2;
   int _adminTapCount = 0;
   DateTime? _adminFirstTap;
 
@@ -39,6 +40,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
       DatabaseHelper.getSetting('tts_enabled'),
       DatabaseHelper.getSetting('vibration_enabled'),
       DatabaseHelper.getSetting('is_pro'),
+      DatabaseHelper.getSetting('voice'),
     ]);
 
     setState(() {
@@ -48,6 +50,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
       _ttsEnabled = results[3] != 'false';
       _vibrationEnabled = results[4] != 'false';
       _isPro = results[5] == 'true';
+      _selectedVoice = results[6] ?? 'harry';
       _loading = false;
     });
   }
@@ -93,6 +96,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 const SizedBox(height: 24),
                 _buildHorrorSettings(),
                 const SizedBox(height: 24),
+                if (_isPro) _buildProSection(),
+                if (_isPro) const SizedBox(height: 24),
                 _buildProUpgrade(),
                 if (!_isPro) _buildRestorePurchases(),
                 const SizedBox(height: 16),
@@ -102,7 +107,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
     );
   }
 
-  // --- Section header ---
   Widget _sectionHeader(String text) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 12, left: 4),
@@ -134,7 +138,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Run Mode label
               Text(
                 S.runMode,
                 style: GoogleFonts.inter(
@@ -144,18 +147,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 ),
               ),
               const SizedBox(height: 10),
-              // Segmented control
-              _buildSegmentedControl(
-                options: const ['fullmap', 'mapcenter', 'datacenter'],
-                labels: [S.fullMap, S.mapFocus, S.dataFocus],
-                selected: _runMode,
-                onChanged: (value) {
-                  setState(() => _runMode = value);
-                  _save('run_mode', value);
-                },
-              ),
+              _buildRunModeSelector(),
               const SizedBox(height: 24),
-              // Distance Units label
               Text(
                 S.distanceUnits,
                 style: GoogleFonts.inter(
@@ -178,6 +171,76 @@ class _SettingsScreenState extends State<SettingsScreen> {
           ),
         ),
       ],
+    );
+  }
+
+  Widget _buildRunModeSelector() {
+    return Container(
+      padding: const EdgeInsets.all(3),
+      decoration: BoxDecoration(
+        color: SRColors.background,
+        borderRadius: BorderRadius.circular(24),
+      ),
+      child: Row(
+        children: [
+          _runModeOption('fullmap', S.fullMap, false),
+          _runModeOption('mapcenter', S.mapFocus, true),
+          _runModeOption('datacenter', S.dataFocus, true),
+        ],
+      ),
+    );
+  }
+
+  Widget _runModeOption(String value, String label, bool requiresPro) {
+    final isSelected = _runMode == value;
+    final isLocked = requiresPro && !_isPro;
+
+    return Expanded(
+      child: GestureDetector(
+        onTap: () {
+          if (isLocked) {
+            _showProLockDialog(
+              title: S.proModeLockedTitle,
+              message: S.proModeLockedMsg,
+            );
+            return;
+          }
+          setState(() => _runMode = value);
+          _save('run_mode', value);
+        },
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 200),
+          padding: const EdgeInsets.symmetric(vertical: 10),
+          decoration: BoxDecoration(
+            color: isSelected ? const Color(0xFFFF0044) : Colors.transparent,
+            borderRadius: BorderRadius.circular(22),
+          ),
+          child: Center(
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  label,
+                  style: GoogleFonts.inter(
+                    fontSize: 11,
+                    fontWeight: FontWeight.w700,
+                    color: isSelected
+                        ? Colors.white
+                        : isLocked
+                            ? SRColors.onSurface.withValues(alpha: 0.25)
+                            : SRColors.onSurface.withValues(alpha: 0.4),
+                    letterSpacing: 0.5,
+                  ),
+                ),
+                if (isLocked) ...[
+                  const SizedBox(width: 3),
+                  Icon(Icons.lock, size: 10, color: SRColors.onSurface.withValues(alpha: 0.2)),
+                ],
+              ],
+            ),
+          ),
+        ),
+      ),
     );
   }
 
@@ -244,7 +307,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Anxiety Level row
+              // Anxiety Level
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -268,7 +331,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 ],
               ),
               const SizedBox(height: 12),
-              // Slider
               SliderTheme(
                 data: SliderThemeData(
                   activeTrackColor: const Color(0xFFFF0044),
@@ -289,7 +351,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     if (!_isPro && level > 2) {
                       setState(() => _horrorLevel = 2);
                       _save('horror_level', '2');
-                      _showProLockDialog();
+                      _showProLockDialog(
+                        title: 'PRO LOCKED',
+                        message: S.isKo
+                            ? '공포 레벨 3~5는 PRO 전용입니다.\n업그레이드하여 궁극의 공포를 경험하세요.'
+                            : 'Anxiety levels 3-5 require PRO.\nUpgrade to experience ultimate terror.',
+                      );
                       return;
                     }
                     setState(() => _horrorLevel = level);
@@ -322,8 +389,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         if (locked) ...[
                           const SizedBox(width: 2),
                           Icon(Icons.lock, size: 10, color: SRColors.onSurface.withValues(alpha: 0.2)),
-                        ],
-                        if (locked)
                           Padding(
                             padding: const EdgeInsets.only(left: 2),
                             child: Container(
@@ -343,13 +408,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
                               ),
                             ),
                           ),
+                        ],
                       ],
                     );
                   }),
                 ),
               ),
               const SizedBox(height: 24),
-              // Entity Audio (TTS) toggle
+              // Entity Audio toggle
               _SettingsToggle(
                 label: S.entityAudio,
                 subtitle: S.entityAudioDesc,
@@ -370,6 +436,24 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   _save('vibration_enabled', '$v');
                 },
               ),
+              // Voice selection (PRO only)
+              if (_isPro) ...[
+                const SizedBox(height: 20),
+                Container(height: 0.5, color: Colors.white.withValues(alpha: 0.06)),
+                const SizedBox(height: 16),
+                Text(
+                  S.voiceSelection,
+                  style: GoogleFonts.inter(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w600,
+                    color: SRColors.onSurface.withValues(alpha: 0.6),
+                  ),
+                ),
+                const SizedBox(height: 12),
+                _buildVoiceOption('harry', S.voiceHarry, true),
+                _buildVoiceOption('callum', S.voiceCallum, false),
+                _buildVoiceOption('drill', S.voiceDrill, false),
+              ],
             ],
           ),
         ),
@@ -377,28 +461,154 @@ class _SettingsScreenState extends State<SettingsScreen> {
     );
   }
 
-  // --- PRO Upgrade ---
-  Widget _buildProUpgrade() {
-    if (_isPro) {
-      return Container(
-        padding: const EdgeInsets.all(16),
+  Widget _buildVoiceOption(String id, String label, bool available) {
+    final isSelected = _selectedVoice == id;
+    return GestureDetector(
+      onTap: available
+          ? () {
+              setState(() => _selectedVoice = id);
+              _save('voice', id);
+            }
+          : null,
+      child: Container(
+        margin: const EdgeInsets.only(bottom: 8),
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
         decoration: BoxDecoration(
-          color: SRColors.safe.withValues(alpha: 0.1),
-          borderRadius: BorderRadius.circular(24),
-        ),
-        child: Center(
-          child: Text(
-            S.proActivated,
-            style: GoogleFonts.inter(
-              fontSize: 14,
-              fontWeight: FontWeight.w900,
-              color: SRColors.safe,
-              letterSpacing: 3,
-            ),
+          color: isSelected
+              ? const Color(0xFFFF0044).withValues(alpha: 0.1)
+              : SRColors.background,
+          borderRadius: BorderRadius.circular(10),
+          border: Border.all(
+            color: isSelected
+                ? const Color(0xFFFF0044).withValues(alpha: 0.3)
+                : Colors.white.withValues(alpha: 0.05),
           ),
         ),
-      );
-    }
+        child: Row(
+          children: [
+            Container(
+              width: 18,
+              height: 18,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                border: Border.all(
+                  color: isSelected ? const Color(0xFFFF0044) : SRColors.onSurface.withValues(alpha: 0.3),
+                  width: 2,
+                ),
+              ),
+              child: isSelected
+                  ? Center(
+                      child: Container(
+                        width: 8,
+                        height: 8,
+                        decoration: const BoxDecoration(
+                          color: Color(0xFFFF0044),
+                          shape: BoxShape.circle,
+                        ),
+                      ),
+                    )
+                  : null,
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Text(
+                label,
+                style: GoogleFonts.inter(
+                  fontSize: 13,
+                  fontWeight: FontWeight.w600,
+                  color: available
+                      ? SRColors.onSurface
+                      : SRColors.onSurface.withValues(alpha: 0.3),
+                ),
+              ),
+            ),
+            if (!available)
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                decoration: BoxDecoration(
+                  color: SRColors.onSurface.withValues(alpha: 0.08),
+                  borderRadius: BorderRadius.circular(4),
+                ),
+                child: Text(
+                  S.comingSoon,
+                  style: GoogleFonts.inter(
+                    fontSize: 8,
+                    fontWeight: FontWeight.w700,
+                    color: SRColors.onSurface.withValues(alpha: 0.3),
+                    letterSpacing: 0.5,
+                  ),
+                ),
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  // --- PRO Section (when activated) ---
+  Widget _buildProSection() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _sectionHeader('PRO'),
+        Container(
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: SRColors.safe.withValues(alpha: 0.08),
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: SRColors.safe.withValues(alpha: 0.15)),
+          ),
+          child: Column(
+            children: [
+              Row(
+                children: [
+                  Icon(Icons.verified, color: SRColors.safe, size: 20),
+                  const SizedBox(width: 8),
+                  Text(
+                    S.proActivated,
+                    style: GoogleFonts.inter(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w900,
+                      color: SRColors.safe,
+                      letterSpacing: 2,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 12),
+              _proBenefitRow(Icons.block, S.proBenefitNoAds),
+              _proBenefitRow(Icons.psychology, S.proBenefitHorror),
+              _proBenefitRow(Icons.map, S.proBenefitModes),
+              _proBenefitRow(Icons.record_voice_over, S.proBenefitVoice),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _proBenefitRow(IconData icon, String text) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4),
+      child: Row(
+        children: [
+          Icon(icon, size: 16, color: SRColors.safe.withValues(alpha: 0.6)),
+          const SizedBox(width: 10),
+          Text(
+            text,
+            style: GoogleFonts.inter(
+              fontSize: 12,
+              color: SRColors.onSurface.withValues(alpha: 0.6),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // --- PRO Upgrade ---
+  Widget _buildProUpgrade() {
+    if (_isPro) return const SizedBox.shrink();
 
     return Container(
       decoration: BoxDecoration(
@@ -411,53 +621,94 @@ class _SettingsScreenState extends State<SettingsScreen> {
           ),
         ],
       ),
-      child: SizedBox(
-        width: double.infinity,
-        height: 56,
-        child: ElevatedButton(
-          onPressed: () async {
-            final success = await PurchaseService().buyPro();
-            if (!success && mounted) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text('스토어에 연결할 수 없습니다. 앱 출시 후 이용 가능합니다.'),
-                  backgroundColor: SRColors.surface,
+      child: Column(
+        children: [
+          SizedBox(
+            width: double.infinity,
+            height: 56,
+            child: ElevatedButton(
+              onPressed: () async {
+                final success = await PurchaseService().buyPro();
+                if (!success && mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('스토어에 연결할 수 없습니다. 앱 출시 후 이용 가능합니다.'),
+                      backgroundColor: SRColors.surface,
+                    ),
+                  );
+                }
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFFFF0044),
+                foregroundColor: Colors.white,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(28),
                 ),
-              );
-            }
-          },
-          style: ElevatedButton.styleFrom(
-            backgroundColor: const Color(0xFFFF0044),
-            foregroundColor: Colors.white,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(28),
+                elevation: 0,
+              ),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    S.upgradeToPro,
+                    style: GoogleFonts.inter(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w900,
+                      letterSpacing: 3,
+                    ),
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    S.unlockUltimateTerror,
+                    style: GoogleFonts.inter(
+                      fontSize: 9,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.white.withValues(alpha: 0.6),
+                      letterSpacing: 2,
+                    ),
+                  ),
+                ],
+              ),
             ),
-            elevation: 0,
           ),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text(
-                S.upgradeToPro,
-                style: GoogleFonts.inter(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w900,
-                  letterSpacing: 3,
-                ),
-              ),
-              const SizedBox(height: 2),
-              Text(
-                S.unlockUltimateTerror,
-                style: GoogleFonts.inter(
-                  fontSize: 9,
-                  fontWeight: FontWeight.w600,
-                  color: Colors.white.withValues(alpha: 0.6),
-                  letterSpacing: 2,
-                ),
-              ),
-            ],
+          const SizedBox(height: 12),
+          // PRO benefits preview
+          Container(
+            padding: const EdgeInsets.all(14),
+            decoration: BoxDecoration(
+              color: SRColors.card,
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: Colors.white.withValues(alpha: 0.05)),
+            ),
+            child: Column(
+              children: [
+                _proBenefitPreviewRow(Icons.block, S.proBenefitNoAds),
+                _proBenefitPreviewRow(Icons.psychology, S.proBenefitHorror),
+                _proBenefitPreviewRow(Icons.map, S.proBenefitModes),
+                _proBenefitPreviewRow(Icons.record_voice_over, S.proBenefitVoice),
+              ],
+            ),
           ),
-        ),
+        ],
+      ),
+    );
+  }
+
+  Widget _proBenefitPreviewRow(IconData icon, String text) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4),
+      child: Row(
+        children: [
+          Icon(icon, size: 14, color: SRColors.proBadge.withValues(alpha: 0.7)),
+          const SizedBox(width: 10),
+          Text(
+            text,
+            style: GoogleFonts.inter(
+              fontSize: 12,
+              color: SRColors.onSurface.withValues(alpha: 0.5),
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -598,7 +849,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
             onPressed: () async {
               Navigator.pop(ctx);
               if (controller.text == 'ganzinam95') {
-                await DatabaseHelper.setSetting('is_pro', 'true');
+                await PurchaseService().activatePro();
                 setState(() => _isPro = true);
                 if (mounted) {
                   ScaffoldMessenger.of(context).showSnackBar(
@@ -645,7 +896,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     });
   }
 
-  void _showProLockDialog() {
+  void _showProLockDialog({required String title, required String message}) {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
@@ -655,28 +906,41 @@ class _SettingsScreenState extends State<SettingsScreen> {
           children: [
             Icon(Icons.lock, color: SRColors.proBadge, size: 20),
             const SizedBox(width: 8),
-            Text(
-              'PRO LOCKED',
-              style: GoogleFonts.spaceGrotesk(
-                fontSize: 18,
-                fontWeight: FontWeight.w700,
-                color: SRColors.onSurface,
+            Expanded(
+              child: Text(
+                title,
+                style: GoogleFonts.spaceGrotesk(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w700,
+                  color: SRColors.onSurface,
+                ),
               ),
             ),
           ],
         ),
-        content: Text(
-          'Anxiety levels 3-5 require PRO.\nUpgrade to experience ultimate terror.',
-          style: GoogleFonts.inter(
-            color: SRColors.onSurface.withValues(alpha: 0.6),
-            height: 1.5,
-          ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              message,
+              style: GoogleFonts.inter(
+                color: SRColors.onSurface.withValues(alpha: 0.6),
+                height: 1.5,
+              ),
+            ),
+            const SizedBox(height: 16),
+            _proBenefitPreviewRow(Icons.block, S.proBenefitNoAds),
+            _proBenefitPreviewRow(Icons.psychology, S.proBenefitHorror),
+            _proBenefitPreviewRow(Icons.map, S.proBenefitModes),
+            _proBenefitPreviewRow(Icons.record_voice_over, S.proBenefitVoice),
+          ],
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
             child: Text(
-              'CANCEL',
+              S.cancel.toUpperCase(),
               style: GoogleFonts.inter(
                 fontSize: 12,
                 fontWeight: FontWeight.w700,
@@ -688,6 +952,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
           ElevatedButton(
             onPressed: () {
               Navigator.pop(ctx);
+              PurchaseService().buyPro();
             },
             style: ElevatedButton.styleFrom(
               backgroundColor: const Color(0xFFFF0044),
@@ -699,7 +964,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
             ),
             child: Text(
-              'UPGRADE',
+              S.upgrade,
               style: GoogleFonts.inter(
                 fontSize: 12,
                 fontWeight: FontWeight.w800,

@@ -1,20 +1,21 @@
 import 'package:flutter/foundation.dart';
 import 'package:just_audio/just_audio.dart';
-import 'package:flutter_tts/flutter_tts.dart';
 import 'package:vibration/vibration.dart';
+import 'package:shadowrun/core/l10n/app_strings.dart';
 
 enum ThreatLevel { safe, warning, danger, critical }
 
 class HorrorService {
   final AudioPlayer _bgmPlayer = AudioPlayer();
   final AudioPlayer _sfxPlayer = AudioPlayer();
-  final FlutterTts _tts = FlutterTts();
+  final AudioPlayer _ttsPlayer = AudioPlayer();
 
   ThreatLevel _currentLevel = ThreatLevel.safe;
-  int _horrorLevel = 3; // 1~5
+  int _horrorLevel = 3;
   bool _ttsEnabled = true;
   bool _vibrationEnabled = true;
   bool _hasVibrator = false;
+  bool _isDisposed = false;
 
   ThreatLevel get currentLevel => _currentLevel;
 
@@ -26,29 +27,24 @@ class HorrorService {
     _horrorLevel = horrorLevel;
     _ttsEnabled = ttsEnabled;
     _vibrationEnabled = vibrationEnabled;
-    _hasVibrator = await Vibration.hasVibrator() ?? false;
-
-    await _tts.setLanguage('ko-KR');
-    await _tts.setSpeechRate(0.45);
-    await _tts.setPitch(0.8);
+    _hasVibrator = (await Vibration.hasVibrator()) == true;
   }
 
-  /// 도플갱어와의 거리(미터)에 따라 위협 레벨 업데이트
   Future<void> updateThreat(double distanceM) async {
     ThreatLevel newLevel;
     if (distanceM > 200) {
       newLevel = ThreatLevel.safe;
     } else if (distanceM > 100) {
       newLevel = ThreatLevel.warning;
-    } else if (distanceM > 0) {
+    } else if (distanceM >= 0) {
       newLevel = ThreatLevel.danger;
     } else {
-      newLevel = ThreatLevel.critical;
+      newLevel = ThreatLevel.critical; // 음수 = 도플갱어가 앞서감
     }
 
     if (newLevel != _currentLevel) {
       _currentLevel = newLevel;
-      await _onLevelChanged(newLevel, distanceM);
+      await _onLevelChanged(newLevel);
     }
 
     if (_vibrationEnabled && _hasVibrator && _horrorLevel >= 2) {
@@ -56,43 +52,106 @@ class HorrorService {
     }
   }
 
-  Future<void> _onLevelChanged(ThreatLevel level, double distance) async {
+  Future<void> _onLevelChanged(ThreatLevel level) async {
     switch (level) {
       case ThreatLevel.safe:
-        await _stopSfx();
+        await _stopBgm();
         if (_ttsEnabled && _horrorLevel >= 2) {
-          await _speak('좋은 페이스입니다.');
+          await _playTts('tts_safe');
         }
         break;
 
       case ThreatLevel.warning:
         if (_horrorLevel >= 2) {
-          // 심박 효과음은 에셋이 있을 때 재생
-          // await _playSfx('heartbeat_slow.mp3');
+          await _playBgm('heartbeat.mp3');
         }
         if (_ttsEnabled) {
-          await _speak('뒤에서 뭔가 다가옵니다.');
+          await _playTts('tts_warning');
         }
         break;
 
       case ThreatLevel.danger:
         if (_horrorLevel >= 3) {
-          // await _playSfx('breathing_heavy.mp3');
+          await _playBgm('breathing.mp3');
         }
         if (_ttsEnabled) {
-          await _speak('잡히기 직전입니다! 속도를 올리세요!');
+          await _playTts('tts_danger');
         }
         break;
 
       case ThreatLevel.critical:
+        await _stopBgm();
         if (_horrorLevel >= 4) {
-          // await _playSfx('jumpscare.mp3');
+          await _playSfx('jumpscare.mp3');
         }
         if (_ttsEnabled) {
-          await _speak('잡혔습니다.');
+          await _playTts('tts_critical');
         }
         break;
     }
+  }
+
+  Future<void> playStartTts() async {
+    if (_ttsEnabled) {
+      await _playTts('tts_start');
+    }
+  }
+
+  Future<void> playSurvivedTts() async {
+    if (_ttsEnabled) {
+      await _playTts('tts_survived');
+    }
+  }
+
+  Future<void> _playBgm(String filename) async {
+    if (_isDisposed) return;
+    try {
+      await _bgmPlayer.setAsset('assets/audio/$filename');
+      _bgmPlayer.setLoopMode(LoopMode.one);
+      _bgmPlayer.setVolume(0.6);
+      _bgmPlayer.play();
+    } catch (e) {
+      debugPrint('BGM 재생 에러: $e');
+    }
+  }
+
+  Future<void> _playSfx(String filename) async {
+    if (_isDisposed) return;
+    try {
+      await _sfxPlayer.setAsset('assets/audio/$filename');
+      _sfxPlayer.setVolume(1.0);
+      _sfxPlayer.play();
+    } catch (e) {
+      debugPrint('SFX 재생 에러: $e');
+    }
+  }
+
+  Future<void> _playTts(String baseName) async {
+    if (_isDisposed) return;
+    try {
+      String filename;
+      if (!S.isKo) {
+        const hasEnglish = {'tts_safe', 'tts_warning', 'tts_danger', 'tts_critical'};
+        if (hasEnglish.contains(baseName)) {
+          filename = '${baseName}_en.mp3';
+        } else {
+          filename = '$baseName.mp3';
+        }
+      } else {
+        filename = '$baseName.mp3';
+      }
+      await _ttsPlayer.setAsset('assets/audio/$filename');
+      _ttsPlayer.setVolume(1.0);
+      _ttsPlayer.play();
+    } catch (e) {
+      debugPrint('TTS 재생 에러: $e');
+    }
+  }
+
+  Future<void> _stopBgm() async {
+    try {
+      await _bgmPlayer.stop();
+    } catch (_) {}
   }
 
   void _updateVibration(ThreatLevel level) {
@@ -108,42 +167,31 @@ class HorrorService {
         Vibration.vibrate(duration: 300, amplitude: 200);
         break;
       case ThreatLevel.critical:
-        Vibration.vibrate(pattern: [0, 500, 100, 500, 100, 500], intensities: [0, 255, 0, 255, 0, 255]);
+        Vibration.vibrate(
+          pattern: [0, 500, 100, 500, 100, 500],
+          intensities: [0, 255, 0, 255, 0, 255],
+        );
         break;
     }
   }
 
-  Future<void> _speak(String text) async {
-    try {
-      await _tts.speak(text);
-    } catch (e) {
-      debugPrint('TTS 에러: $e');
-    }
-  }
-
-  Future<void> _stopSfx() async {
-    try {
-      await _sfxPlayer.stop();
-    } catch (_) {}
-  }
-
-  /// 위협 레벨에 따른 비네팅 강도 (0.0 ~ 1.0)
   double get vignetteIntensity {
     switch (_currentLevel) {
       case ThreatLevel.safe:
         return 0.0;
       case ThreatLevel.warning:
-        return _horrorLevel >= 2 ? 0.3 : 0.0;
+        return _horrorLevel >= 2 ? 0.4 : 0.0;
       case ThreatLevel.danger:
-        return _horrorLevel >= 3 ? 0.6 : 0.3;
+        return _horrorLevel >= 3 ? 0.7 : 0.3;
       case ThreatLevel.critical:
         return 1.0;
     }
   }
 
   void dispose() {
+    _isDisposed = true;
     _bgmPlayer.dispose();
     _sfxPlayer.dispose();
-    _tts.stop();
+    _ttsPlayer.dispose();
   }
 }
