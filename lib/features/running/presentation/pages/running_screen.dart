@@ -7,6 +7,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_naver_map/flutter_naver_map.dart';
 import 'package:shadowrun/core/theme/app_theme.dart';
 import 'package:shadowrun/core/services/running_service.dart';
+import 'package:shadowrun/core/database/database_helper.dart';
 import 'package:shadowrun/core/services/horror_service.dart';
 import 'package:shadowrun/shared/models/run_model.dart';
 import 'package:shadowrun/core/l10n/app_strings.dart';
@@ -30,6 +31,7 @@ class _RunningScreenState extends State<RunningScreen>
   Timer? _ticker;
   bool _paused = false;
   bool _stopping = false;
+  String _runMode = 'fullmap'; // fullmap, mapcenter, datacenter
   late AnimationController _vignetteAnim;
   late AnimationController _shadowPingAnim;
 
@@ -39,6 +41,7 @@ class _RunningScreenState extends State<RunningScreen>
     _runService = RunningService();
     _horrorService = HorrorService();
     _runService.addListener(_onRunUpdate);
+    _loadRunMode();
 
     _vignetteAnim = AnimationController(
       vsync: this,
@@ -51,6 +54,13 @@ class _RunningScreenState extends State<RunningScreen>
     )..repeat();
 
     _startRun();
+  }
+
+  Future<void> _loadRunMode() async {
+    final mode = await DatabaseHelper.getSetting('run_mode');
+    if (mode != null && mounted) {
+      setState(() => _runMode = mode);
+    }
   }
 
   Future<void> _startRun() async {
@@ -230,44 +240,211 @@ class _RunningScreenState extends State<RunningScreen>
       },
       child: Scaffold(
         backgroundColor: SRColors.background,
-        body: Stack(
+        body: _runMode == 'mapcenter'
+            ? _buildModeA()
+            : _runMode == 'datacenter'
+                ? _buildModeB()
+                : _buildModeC(),
+      ),
+    );
+  }
+
+  // === MODE C: Full Map + Overlay (default) ===
+  Widget _buildModeC() {
+    return Stack(
+      children: [
+        _buildNaverMap(onReady: (c) => _mapController = c),
+        _buildVignetteOverlay(),
+        Positioned(
+          top: MediaQuery.of(context).padding.top + 12,
+          left: 16,
+          child: _buildHudPill(),
+        ),
+        if (widget.shadowRunId != null)
+          Positioned(
+            top: MediaQuery.of(context).padding.top + 12,
+            right: 16,
+            child: _buildDangerBadge(),
+          ),
+        if (_runService.speedWarning != null)
+          Positioned(
+            top: MediaQuery.of(context).padding.top + 60,
+            left: 40,
+            right: 40,
+            child: _buildSpeedWarningBanner(),
+          ),
+        Positioned(left: 0, right: 0, bottom: 0, child: _buildBottomArea()),
+      ],
+    );
+  }
+
+  // === MODE A: Map Center (top 60% map, bottom 40% stats) ===
+  Widget _buildModeA() {
+    return Stack(
+      children: [
+        Column(
           children: [
-            // Full-screen dark map
-            _buildNaverMap(onReady: (c) => _mapController = c),
-            // Red vignette overlay
-            _buildVignetteOverlay(),
-            // Top HUD left: pace + distance
-            Positioned(
-              top: MediaQuery.of(context).padding.top + 12,
-              left: 16,
-              child: _buildHudPill(),
+            // Top 60% map
+            Expanded(
+              flex: 6,
+              child: Stack(
+                children: [
+                  _buildNaverMap(onReady: (c) => _mapController = c),
+                  _buildVignetteOverlay(),
+                  if (_runService.speedWarning != null)
+                    Positioned(
+                      top: MediaQuery.of(context).padding.top + 12,
+                      left: 40, right: 40,
+                      child: _buildSpeedWarningBanner(),
+                    ),
+                ],
+              ),
             ),
-            // Top HUD right: shadow distance badge
-            if (widget.shadowRunId != null)
-              Positioned(
-                top: MediaQuery.of(context).padding.top + 12,
-                right: 16,
-                child: _buildDangerBadge(),
+            // Bottom 40% stats
+            Expanded(
+              flex: 4,
+              child: Container(
+                color: SRColors.background,
+                padding: const EdgeInsets.all(20),
+                child: Column(
+                  children: [
+                    // Stats row
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      children: [
+                        _modeAStat(S.dist, _runService.totalDistanceM >= 1000
+                            ? '${(_runService.totalDistanceM / 1000).toStringAsFixed(2)}km'
+                            : '${_runService.totalDistanceM.toInt()}m'),
+                        _modeAStat(S.pace, _runService.formattedPace),
+                        _modeAStat(S.duration, _runService.formattedDuration),
+                      ],
+                    ),
+                    const SizedBox(height: 16),
+                    if (widget.shadowRunId != null)
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                        decoration: BoxDecoration(
+                          color: SRColors.secondaryContainer.withValues(alpha: 0.3),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Text(
+                          '${S.shadow} ${_formatShadowDistance()}',
+                          style: GoogleFonts.spaceGrotesk(
+                            fontSize: 18, fontWeight: FontWeight.w700, color: SRColors.primaryContainer,
+                          ),
+                        ),
+                      ),
+                    const Spacer(),
+                    _buildControlButtons(),
+                  ],
+                ),
               ),
-            // Speed warning banner
-            if (_runService.speedWarning != null)
-              Positioned(
-                top: MediaQuery.of(context).padding.top + 60,
-                left: 40,
-                right: 40,
-                child: _buildSpeedWarningBanner(),
-              ),
-            // Bottom controls + threat bar
-            Positioned(
-              left: 0,
-              right: 0,
-              bottom: 0,
-              child: _buildBottomArea(),
             ),
           ],
         ),
-      ),
+      ],
     );
+  }
+
+  // === MODE B: Data Center (big pace, mini map) ===
+  Widget _buildModeB() {
+    return Stack(
+      children: [
+        Container(
+          color: SRColors.background,
+          child: SafeArea(
+            child: Padding(
+              padding: const EdgeInsets.all(20),
+              child: Column(
+                children: [
+                  const SizedBox(height: 20),
+                  // Big pace
+                  Text(
+                    S.pace,
+                    style: SRTheme.labelMedium.copyWith(color: SRColors.textMuted),
+                  ),
+                  Text(
+                    _runService.formattedPace,
+                    style: GoogleFonts.spaceGrotesk(
+                      fontSize: 72, fontWeight: FontWeight.w900, color: SRColors.onSurface,
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  // Shadow distance badge
+                  if (widget.shadowRunId != null)
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                      decoration: BoxDecoration(
+                        color: SRColors.secondaryContainer.withValues(alpha: 0.3),
+                        borderRadius: BorderRadius.circular(20),
+                        border: Border.all(color: SRColors.primaryContainer.withValues(alpha: 0.4)),
+                      ),
+                      child: Text(
+                        '${S.shadow} ${_formatShadowDistance()}',
+                        style: GoogleFonts.spaceGrotesk(
+                          fontSize: 16, fontWeight: FontWeight.w700, color: SRColors.primaryContainer,
+                        ),
+                      ),
+                    ),
+                  const SizedBox(height: 24),
+                  // Stats row
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    children: [
+                      _modeAStat(S.dist, _runService.totalDistanceM >= 1000
+                          ? '${(_runService.totalDistanceM / 1000).toStringAsFixed(2)}km'
+                          : '${_runService.totalDistanceM.toInt()}m'),
+                      _modeAStat(S.duration, _runService.formattedDuration),
+                      _modeAStat(S.calories, '${_runService.calories}'),
+                    ],
+                  ),
+                  const Spacer(),
+                  // Mini map
+                  Container(
+                    height: 150,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: SRColors.divider),
+                    ),
+                    clipBehavior: Clip.antiAlias,
+                    child: _buildNaverMap(onReady: (c) => _mapController = c),
+                  ),
+                  const SizedBox(height: 16),
+                  _buildControlButtons(),
+                ],
+              ),
+            ),
+          ),
+        ),
+        _buildVignetteOverlay(),
+        if (_runService.speedWarning != null)
+          Positioned(
+            top: MediaQuery.of(context).padding.top + 12,
+            left: 40, right: 40,
+            child: _buildSpeedWarningBanner(),
+          ),
+      ],
+    );
+  }
+
+  Widget _modeAStat(String label, String value) {
+    return Column(
+      children: [
+        Text(value, style: GoogleFonts.spaceGrotesk(
+          fontSize: 22, fontWeight: FontWeight.w700, color: SRColors.onSurface,
+        )),
+        const SizedBox(height: 4),
+        Text(label, style: SRTheme.labelMedium.copyWith(color: SRColors.textMuted)),
+      ],
+    );
+  }
+
+
+  String _formatShadowDistance() {
+    final dist = _runService.shadowDistanceM;
+    if (dist.isInfinite) return '--';
+    final prefix = dist >= 0 ? '+' : '';
+    return '$prefix${dist.abs().toInt()}m';
   }
 
   Widget _buildNaverMap({required void Function(NaverMapController) onReady}) {
@@ -624,11 +801,6 @@ class _RunningScreenState extends State<RunningScreen>
     );
   }
 
-  String _formatShadowDistance() {
-    final dist = _runService.shadowDistanceM;
-    if (dist.isInfinite) return '---';
-    return '${dist >= 0 ? '+' : ''}${dist.toInt()}m';
-  }
 }
 
 class AnimatedBuilder extends AnimatedWidget {
