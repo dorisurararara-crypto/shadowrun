@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:math';
 import 'package:flutter/foundation.dart';
+import 'package:flutter_tts/flutter_tts.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:shadowrun/shared/models/run_model.dart';
 import 'package:shadowrun/core/database/database_helper.dart';
@@ -22,6 +23,9 @@ class RunningService extends ChangeNotifier {
   int _currentShadowIndex = 0;
   double _currentSpeed = 0;
   double _heading = 0;
+  int _lastAnnouncedKm = 0;
+  final FlutterTts _tts = FlutterTts();
+  bool _ttsReady = false;
 
   // Public getters
   bool get isRunning => _isRunning;
@@ -117,8 +121,20 @@ class RunningService extends ChangeNotifier {
     _totalDistanceM = 0;
     _lastPosition = null;
     _currentShadowIndex = 0;
+    _lastAnnouncedKm = 0;
     _startTime = DateTime.now();
     _isRunning = true;
+
+    // km 스플릿 음성 알림용 TTS 초기화
+    try {
+      await _tts.setLanguage(S.isKo ? 'ko-KR' : 'en-US');
+      await _tts.setSpeechRate(0.5);
+      await _tts.setPitch(1.0);
+      await _tts.setVolume(1.0);
+      _ttsReady = true;
+    } catch (e) {
+      debugPrint('TTS 초기화 실패: $e');
+    }
 
     _positionSub = Geolocator.getPositionStream(
       locationSettings: const LocationSettings(
@@ -142,6 +158,13 @@ class RunningService extends ChangeNotifier {
         _lastPosition!.latitude, _lastPosition!.longitude,
         pos.latitude, pos.longitude,
       );
+    }
+
+    // km 스플릿 음성 알림
+    final currentKm = (_totalDistanceM / 1000).floor();
+    if (currentKm > _lastAnnouncedKm && _ttsReady) {
+      _lastAnnouncedKm = currentKm;
+      _announceKmSplit(currentKm);
     }
 
     _lastPosition = pos;
@@ -213,6 +236,18 @@ class RunningService extends ChangeNotifier {
     );
   }
 
+  void _announceKmSplit(int km) {
+    final paceMin = avgPace.floor();
+    final paceSec = ((avgPace - paceMin) * 60).round();
+    final paceStr = "$paceMin'${paceSec.toString().padLeft(2, '0')}\"";
+
+    final text = S.isKo
+        ? '${km}킬로미터. 페이스 $paceStr'
+        : '$km kilometer. Pace $paceStr';
+
+    _tts.speak(text);
+  }
+
   double _distanceBetweenPoints(double lat1, double lng1, double lat2, double lng2) {
     const earthRadius = 6371000.0;
     final dLat = (lat2 - lat1) * pi / 180;
@@ -225,6 +260,7 @@ class RunningService extends ChangeNotifier {
   @override
   void dispose() {
     _positionSub?.cancel();
+    _tts.stop();
     super.dispose();
   }
 }
