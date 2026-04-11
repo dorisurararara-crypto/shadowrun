@@ -142,7 +142,7 @@ class _RunningScreenState extends State<RunningScreen>
     if (!ok && mounted) {
       WakelockPlus.disable();
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('GPS 권한이 필요합니다')),
+        SnackBar(content: Text(S.gpsRequired)),
       );
       context.pop();
       return;
@@ -397,7 +397,7 @@ class _RunningScreenState extends State<RunningScreen>
         });
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('기록이 너무 짧아 저장되지 않았습니다')),
+          SnackBar(content: Text(S.runTooShort)),
         );
         context.go('/');
       }

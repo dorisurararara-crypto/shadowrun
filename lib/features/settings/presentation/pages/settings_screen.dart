@@ -711,8 +711,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 final success = await PurchaseService().buyPro();
                 if (!success && mounted) {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('스토어에 연결할 수 없습니다. 앱 출시 후 이용 가능합니다.'),
+                    SnackBar(
+                      content: Text(S.storeUnavailable),
                       backgroundColor: SRColors.surface,
                     ),
                   );
@@ -800,8 +800,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
           await PurchaseService().restorePurchases();
           if (mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text('구매 복원을 시도합니다...'),
+              SnackBar(
+                content: Text(S.restoreTrying),
                 backgroundColor: SRColors.surface,
               ),
             );
@@ -879,7 +879,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
         backgroundColor: SRColors.card,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         title: Text(
-          '관리자 키를 입력하세요',
+          S.enterAdminKey,
           style: GoogleFonts.inter(
             fontSize: 16,
             fontWeight: FontWeight.w700,
@@ -922,8 +922,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 setState(() => _isPro = true);
                 if (mounted) {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('PRO 활성화 완료!'),
+                    SnackBar(
+                      content: Text(S.proActivatedMsg),
                       backgroundColor: SRColors.surface,
                     ),
                   );
@@ -931,8 +931,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
               } else {
                 if (mounted) {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('잘못된 키입니다'),
+                    SnackBar(
+                      content: Text(S.wrongKey),
                       backgroundColor: SRColors.surface,
                     ),
                   );

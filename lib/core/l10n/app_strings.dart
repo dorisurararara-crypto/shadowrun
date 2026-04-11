@@ -129,4 +129,15 @@ class S {
   static String get voiceDrill => 'Drill Sergeant — Commander';
   static String get comingSoon => isKo ? '출시 예정' : 'COMING SOON';
   static String get upgrade => isKo ? '업그레이드' : 'UPGRADE';
+
+  // Hardcoded strings (previously Korean-only)
+  static String get storeUnavailable => isKo ? '스토어에 연결할 수 없습니다' : 'Store unavailable';
+  static String get restoreTrying => isKo ? '구매 복원을 시도합니다...' : 'Restoring purchases...';
+  static String get enterAdminKey => isKo ? '관리자 키를 입력하세요' : 'Enter admin key';
+  static String get proActivatedMsg => isKo ? 'PRO 활성화 완료!' : 'PRO activated!';
+  static String get wrongKey => isKo ? '잘못된 키입니다' : 'Wrong key';
+  static String get adLoading => isKo ? '광고를 불러오는 중입니다. 잠시 후 다시 시도해주세요.' : 'Loading ad. Please try again.';
+  static String get runTooShort => isKo ? '기록이 너무 짧아 저장되지 않았습니다' : 'Run too short to save';
+  static String get gpsRequired => isKo ? 'GPS 권한이 필요합니다' : 'GPS permission required';
+  static String get unlimited => isKo ? '무제한' : 'Unlimited';
 }
