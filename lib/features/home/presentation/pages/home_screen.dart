@@ -105,16 +105,16 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget _buildActionButtons() {
     return Row(
       children: [
-        // NEW RUN (Stitch: gradient from-primary to-primary_container, rounded-full, py-4 px-6)
+        // NEW RUN (Stitch: py-4 px-6 rounded-full, h~64)
         Expanded(
           child: SizedBox(
-            height: 56,
+            height: 64,
             child: DecoratedBox(
               decoration: BoxDecoration(
                 gradient: const LinearGradient(
                   colors: [SRColors.primary, SRColors.primaryContainer],
                 ),
-                borderRadius: BorderRadius.circular(28),
+                borderRadius: BorderRadius.circular(32),
                 boxShadow: [
                   BoxShadow(color: SRColors.primaryContainer.withValues(alpha: 0.3), blurRadius: 16, offset: const Offset(0, 4)),
                 ],
@@ -135,10 +135,10 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ),
         const SizedBox(width: 16),
-        // CHALLENGE (Stitch: border border-[#ff5262], text-neutral-300)
+        // CHALLENGE (Stitch: border border-[#ff5262], h~64)
         Expanded(
           child: SizedBox(
-            height: 56,
+            height: 64,
             child: OutlinedButton.icon(
               onPressed: () async {
                 final count = await DatabaseHelper.getDailyChallengeCount();
