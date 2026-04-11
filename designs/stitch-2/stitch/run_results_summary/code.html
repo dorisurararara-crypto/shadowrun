@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&amp;family=Space+Grotesk:wght@300;700;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "on-error": "#690005",
+                    "surface-dim": "#131313",
+                    "on-secondary-fixed-variant": "#920223",
+                    "surface-container-lowest": "#0e0e0e",
+                    "secondary-fixed-dim": "#ffb3b4",
+                    "inverse-surface": "#e5e2e1",
+                    "surface-variant": "#353534",
+                    "on-tertiary-fixed-variant": "#005047",
+                    "secondary-container": "#920223",
+                    "on-primary": "#680016",
+                    "primary": "#ffb3b4",
+                    "inverse-on-surface": "#313030",
+                    "secondary": "#ffb3b4",
+                    "on-tertiary": "#003731",
+                    "surface-container-high": "#2a2a2a",
+                    "primary-fixed-dim": "#ffb3b4",
+                    "outline-variant": "#5e3e3f",
+                    "on-tertiary-fixed": "#00201c",
+                    "outline": "#af8787",
+                    "surface-tint": "#ffb3b4",
+                    "on-surface-variant": "#e9bcbb",
+                    "on-error-container": "#ffdad6",
+                    "on-tertiary-container": "#00302a",
+                    "on-background": "#e5e2e1",
+                    "background": "#131313",
+                    "surface-bright": "#3a3939",
+                    "error": "#ffb4ab",
+                    "tertiary-fixed": "#89f5e3",
+                    "primary-container": "#ff5262",
+                    "on-secondary": "#680016",
+                    "on-primary-fixed-variant": "#920023",
+                    "on-primary-fixed": "#40000a",
+                    "surface-container-low": "#1c1b1b",
+                    "primary-fixed": "#ffdad9",
+                    "tertiary-fixed-dim": "#6bd9c7",
+                    "surface-container": "#201f1f",
+                    "on-surface": "#e5e2e1",
+                    "error-container": "#93000a",
+                    "secondary-fixed": "#ffdad9",
+                    "inverse-primary": "#bf0030",
+                    "tertiary-container": "#2aa192",
+                    "surface": "#131313",
+                    "surface-container-highest": "#353534",
+                    "tertiary": "#6bd9c7",
+                    "on-primary-container": "#5b0012",
+                    "on-secondary-container": "#ff989b",
+                    "on-secondary-fixed": "#40000a"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "fontFamily": {
+                    "headline": ["Space Grotesk"],
+                    "body": ["Inter"],
+                    "label": ["Inter"]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        body {
+            background-color: #0A0A0A;
+            color: #e5e2e1;
+        }
+        .survived-glow {
+            text-shadow: 0 0 20px rgba(0, 255, 136, 0.6), 0 0 40px rgba(0, 255, 136, 0.3);
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="font-body antialiased flex flex-col min-h-screen">
+<!-- Top Navigation Anchor (Manual suppression of default if needed, but here we use it for branding) -->
+<header class="fixed top-0 w-full z-50 bg-[#131313] flex items-center justify-between px-6 h-16 w-full">
+<div class="flex items-center gap-4">
+<span class="material-symbols-outlined text-[#ffb3b4]">arrow_back</span>
+<span class="text-xl font-black tracking-tighter text-[#ffb3b4] font-headline uppercase">SHADOW RUN</span>
+</div>
+<div class="w-8 h-8 rounded-full bg-surface-container-high flex items-center justify-center">
+<span class="material-symbols-outlined text-xs">share</span>
+</div>
+</header>
+<main class="flex-1 mt-16 px-6 pb-32">
+<!-- Status Header -->
+<div class="pt-12 pb-16 flex flex-col items-center justify-center text-center">
+<p class="font-headline text-[10px] tracking-[0.4em] text-tertiary mb-2 uppercase opacity-60">SQUAD STATUS</p>
+<h1 class="font-headline text-6xl font-black tracking-tighter survived-glow text-[#00FF88] uppercase italic">
+                SURVIVED
+            </h1>
+</div>
+<!-- Bento Stats Grid -->
+<div class="grid grid-cols-2 gap-3 mb-8">
+<div class="bg-surface-container-low p-6 rounded-xl border-l-2 border-primary">
+<p class="text-[10px] font-bold text-on-surface-variant tracking-widest uppercase mb-1">Distance</p>
+<p class="font-headline text-2xl font-bold text-on-surface">3.2<span class="text-xs ml-1 font-normal opacity-50 uppercase">km</span></p>
+</div>
+<div class="bg-surface-container-low p-6 rounded-xl">
+<p class="text-[10px] font-bold text-on-surface-variant tracking-widest uppercase mb-1">Duration</p>
+<p class="font-headline text-2xl font-bold text-on-surface">18:42</p>
+</div>
+<div class="bg-surface-container-low p-6 rounded-xl">
+<p class="text-[10px] font-bold text-on-surface-variant tracking-widest uppercase mb-1">Avg Pace</p>
+<p class="font-headline text-2xl font-bold text-on-surface">5'42</p>
+</div>
+<div class="bg-surface-container-low p-6 rounded-xl border-r-2 border-tertiary">
+<p class="text-[10px] font-bold text-on-surface-variant tracking-widest uppercase mb-1">Calories</p>
+<p class="font-headline text-2xl font-bold text-on-surface">245</p>
+</div>
+</div>
+<!-- Map Section -->
+<div class="relative w-full aspect-square rounded-xl overflow-hidden bg-surface-container-low mb-12">
+<div class="absolute inset-0 opacity-40 grayscale contrast-125 mix-blend-luminosity">
+<img alt="Map view" class="w-full h-full object-cover" data-alt="top down dark satellite map view of an urban city grid at night with deep shadows and minimal street lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD6N7E044xjrsU1FR2dPuNW9k_6Fa7iL5j6N_gaf_snROKrWmYW72so-djo9OneR9sHJBFJ0a8pAOAzAj_pyUkg4CoaYV77og2WMpTh4jKBptqpiK13O9fVdK6-AnYY4_QujLY_0HpCQKsFuGVC9DQLIuu7ce_c3QXJx-F0qyRSIpzvtW8ze9t5rdWJgoiznrIwvdz4wz_7Htw3GMMou7bZtNB2hSdx8Wuk5OvgaTtNbb6k0uRe-TO7MjE1q9JA-I-B1Nb0NR2xpDz2"/>
+</div>
+<!-- Route Overlays (SVG) -->
+<svg class="absolute inset-0 w-full h-full p-8" viewbox="0 0 100 100">
+<!-- Red Shadow Path (The Danger) -->
+<path class="opacity-60" d="M 20,80 L 30,70 L 45,75 L 60,50 L 80,45" fill="none" stroke="#ff5262" stroke-dasharray="2 4" stroke-linecap="round" stroke-width="3"></path>
+<!-- Green Run Path (The Runner) -->
+<path class="drop-shadow-[0_0_8px_rgba(0,255,136,0.8)]" d="M 20,80 C 25,75 35,65 40,60 C 45,55 55,50 65,40 C 75,30 85,25 90,10" fill="none" stroke="#00FF88" stroke-linecap="round" stroke-width="4"></path>
+</svg>
+<div class="absolute bottom-4 left-4 bg-background/80 backdrop-blur-md px-3 py-1 rounded-full border border-white/10">
+<p class="text-[8px] font-bold tracking-widest uppercase text-tertiary">Extraction Successful</p>
+</div>
+</div>
+<!-- Action Buttons -->
+<div class="flex flex-col gap-4">
+<button class="w-full h-14 rounded-full bg-gradient-to-br from-[#ffb3b4] to-[#ff5262] text-on-primary-container font-headline font-bold uppercase tracking-widest active:scale-95 transition-transform duration-150">
+                RECORDS
+            </button>
+<button class="w-full h-14 rounded-full border border-outline-variant text-on-surface font-headline font-bold uppercase tracking-widest hover:bg-surface-container-highest transition-colors">
+                SHARE RUN
+            </button>
+</div>
+</main>
+<!-- Bottom Navigation Shell (The Anchor) -->
+<nav class="fixed bottom-0 w-full z-50 pb-safe bg-[#131313]/80 backdrop-blur-xl border-t border-white/5 shadow-[0_-20px_40px_rgba(0,0,0,0.4)] flex justify-around items-center h-20 px-4">
+<div class="flex flex-col items-center justify-center text-[#ffb3b4] bg-gradient-to-br from-[#ffb3b4] to-[#ff5262] text-[#131313] rounded-full px-5 py-1 active:scale-90 transition-transform duration-200">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">history</span>
+<span class="font-['Inter'] text-[10px] font-bold tracking-widest uppercase">RECORDS</span>
+</div>
+<div class="flex flex-col items-center justify-center text-[#e5e2e1]/60 px-5 py-1 hover:text-[#ffb3b4] active:scale-90 transition-transform duration-200">
+<span class="material-symbols-outlined">directions_run</span>
+<span class="font-['Inter'] text-[10px] font-bold tracking-widest uppercase">RUN</span>
+</div>
+<div class="flex flex-col items-center justify-center text-[#e5e2e1]/60 px-5 py-1 hover:text-[#ffb3b4] active:scale-90 transition-transform duration-200">
+<span class="material-symbols-outlined">settings_input_component</span>
+<span class="font-['Inter'] text-[10px] font-bold tracking-widest uppercase">PREP</span>
+</div>
+</nav>
+</body></html>

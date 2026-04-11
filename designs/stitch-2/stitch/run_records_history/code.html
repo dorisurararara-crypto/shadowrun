@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&amp;family=Inter:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "on-error": "#690005",
+                    "surface-dim": "#131313",
+                    "on-secondary-fixed-variant": "#920223",
+                    "surface-container-lowest": "#0e0e0e",
+                    "secondary-fixed-dim": "#ffb3b4",
+                    "inverse-surface": "#e5e2e1",
+                    "surface-variant": "#353534",
+                    "on-tertiary-fixed-variant": "#005047",
+                    "secondary-container": "#920223",
+                    "on-primary": "#680016",
+                    "primary": "#ffb3b4",
+                    "inverse-on-surface": "#313030",
+                    "secondary": "#ffb3b4",
+                    "on-tertiary": "#003731",
+                    "surface-container-high": "#2a2a2a",
+                    "primary-fixed-dim": "#ffb3b4",
+                    "outline-variant": "#5e3e3f",
+                    "on-tertiary-fixed": "#00201c",
+                    "outline": "#af8787",
+                    "surface-tint": "#ffb3b4",
+                    "on-surface-variant": "#e9bcbb",
+                    "on-error-container": "#ffdad6",
+                    "on-tertiary-container": "#00302a",
+                    "on-background": "#e5e2e1",
+                    "background": "#131313",
+                    "surface-bright": "#3a3939",
+                    "error": "#ffb4ab",
+                    "tertiary-fixed": "#89f5e3",
+                    "primary-container": "#ff5262",
+                    "on-secondary": "#680016",
+                    "on-primary-fixed-variant": "#920023",
+                    "on-primary-fixed": "#40000a",
+                    "surface-container-low": "#1c1b1b",
+                    "primary-fixed": "#ffdad9",
+                    "tertiary-fixed-dim": "#6bd9c7",
+                    "surface-container": "#201f1f",
+                    "on-surface": "#e5e2e1",
+                    "error-container": "#93000a",
+                    "secondary-fixed": "#ffdad9",
+                    "inverse-primary": "#bf0030",
+                    "tertiary-container": "#2aa192",
+                    "surface": "#131313",
+                    "surface-container-highest": "#353534",
+                    "tertiary": "#6bd9c7",
+                    "on-primary-container": "#5b0012",
+                    "on-secondary-container": "#ff989b",
+                    "on-secondary-fixed": "#40000a"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "fontFamily": {
+                    "headline": ["Space Grotesk"],
+                    "body": ["Inter"],
+                    "label": ["Inter"]
+            }
+          },
+        }
+      }
+    </script>
+<style>
+        body {
+            background-color: #0A0A0A;
+            color: #e5e2e1;
+            font-family: 'Inter', sans-serif;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .bleed-gradient {
+            background: linear-gradient(135deg, #ffb3b4 0%, #ff5262 100%);
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="flex flex-col min-h-screen max-w-[390px] mx-auto overflow-x-hidden">
+<!-- TopAppBar -->
+<header class="fixed top-0 w-full z-50 bg-[#131313] flex items-center justify-between px-6 h-16 w-full">
+<div class="flex items-center gap-4">
+<button class="text-[#ffb3b4] active:scale-95 duration-150 transition-colors hover:bg-[#353534] p-2 rounded-full">
+<span class="material-symbols-outlined">arrow_back</span>
+</button>
+<h1 class="font-['Space_Grotesk'] tracking-tight uppercase font-bold text-[#ffb3b4] text-xl">RECORDS</h1>
+</div>
+<div class="style_brand_logo text-xl font-black tracking-tighter text-[#ffb3b4]">SHADOW RUN</div>
+</header>
+<!-- Content Canvas -->
+<main class="flex-1 mt-16 mb-20 px-4 pt-4">
+<!-- Tab Navigation -->
+<div class="flex items-center gap-8 px-2 mb-8 border-b border-white/5">
+<button class="pb-3 text-[#ffb3b4] border-b-2 border-[#ff5262] font-headline font-bold text-sm tracking-widest uppercase transition-all">
+                ALL
+            </button>
+<button class="pb-3 text-[#e5e2e1]/40 font-headline font-bold text-sm tracking-widest uppercase hover:text-[#e5e2e1] transition-all">
+                CHALLENGES
+            </button>
+</div>
+<!-- Run Records List -->
+<div class="flex flex-col gap-px bg-white/5 overflow-hidden rounded-xl">
+<!-- Record Card 1 -->
+<div class="bg-[#1c1b1b] p-5 flex items-center justify-between group active:bg-[#353534] transition-colors">
+<div class="flex items-center gap-6">
+<div class="flex flex-col items-center">
+<span class="text-[#e5e2e1]/40 text-[10px] font-bold uppercase tracking-tighter">APR</span>
+<span class="text-2xl font-headline font-bold leading-none">11</span>
+</div>
+<div class="flex flex-col gap-1">
+<div class="flex items-baseline gap-2">
+<span class="text-xl font-headline font-medium text-white">3.2km</span>
+<span class="text-sm font-body text-white/60">18:42</span>
+</div>
+<span class="text-xs font-body text-[#e5e2e1]/40 tracking-wider">5'42/KM</span>
+</div>
+</div>
+<div class="flex flex-col items-end gap-2">
+<span class="px-2 py-0.5 rounded-sm bg-[#2aa192]/20 text-[#6bd9c7] text-[10px] font-bold tracking-widest uppercase">WIN</span>
+<span class="material-symbols-outlined text-[#e5e2e1]/20 text-sm">chevron_right</span>
+</div>
+</div>
+<!-- Record Card 2 -->
+<div class="bg-[#1c1b1b] p-5 flex items-center justify-between group active:bg-[#353534] transition-colors">
+<div class="flex items-center gap-6">
+<div class="flex flex-col items-center">
+<span class="text-[#e5e2e1]/40 text-[10px] font-bold uppercase tracking-tighter">APR</span>
+<span class="text-2xl font-headline font-bold leading-none">09</span>
+</div>
+<div class="flex flex-col gap-1">
+<div class="flex items-baseline gap-2">
+<span class="text-xl font-headline font-medium text-white">5.1km</span>
+<span class="text-sm font-body text-white/60">28:15</span>
+</div>
+<span class="text-xs font-body text-[#e5e2e1]/40 tracking-wider">5'32/KM</span>
+</div>
+</div>
+<div class="flex flex-col items-end gap-2">
+<span class="px-2 py-0.5 rounded-sm bg-[#93000a]/20 text-[#ffb4ab] text-[10px] font-bold tracking-widest uppercase">LOSE</span>
+<span class="material-symbols-outlined text-[#e5e2e1]/20 text-sm">chevron_right</span>
+</div>
+</div>
+<!-- Record Card 3 -->
+<div class="bg-[#1c1b1b] p-5 flex items-center justify-between group active:bg-[#353534] transition-colors">
+<div class="flex items-center gap-6">
+<div class="flex flex-col items-center">
+<span class="text-[#e5e2e1]/40 text-[10px] font-bold uppercase tracking-tighter">APR</span>
+<span class="text-2xl font-headline font-bold leading-none">07</span>
+</div>
+<div class="flex flex-col gap-1">
+<div class="flex items-baseline gap-2">
+<span class="text-xl font-headline font-medium text-white">2.4km</span>
+<span class="text-sm font-body text-white/60">12:10</span>
+</div>
+<span class="text-xs font-body text-[#e5e2e1]/40 tracking-wider">5'04/KM</span>
+</div>
+</div>
+<div class="flex flex-col items-end gap-2">
+<span class="px-2 py-0.5 rounded-sm bg-[#2aa192]/20 text-[#6bd9c7] text-[10px] font-bold tracking-widest uppercase">WIN</span>
+<span class="material-symbols-outlined text-[#e5e2e1]/20 text-sm">chevron_right</span>
+</div>
+</div>
+<!-- Record Card 4 (Standard Run) -->
+<div class="bg-[#1c1b1b] p-5 flex items-center justify-between group active:bg-[#353534] transition-colors">
+<div class="flex items-center gap-6">
+<div class="flex flex-col items-center">
+<span class="text-[#e5e2e1]/40 text-[10px] font-bold uppercase tracking-tighter">APR</span>
+<span class="text-2xl font-headline font-bold leading-none">04</span>
+</div>
+<div class="flex flex-col gap-1">
+<div class="flex items-baseline gap-2">
+<span class="text-xl font-headline font-medium text-white">10.0km</span>
+<span class="text-sm font-body text-white/60">56:40</span>
+</div>
+<span class="text-xs font-body text-[#e5e2e1]/40 tracking-wider">5'40/KM</span>
+</div>
+</div>
+<div class="flex flex-col items-end gap-2">
+<span class="material-symbols-outlined text-[#e5e2e1]/20 text-sm">chevron_right</span>
+</div>
+</div>
+<!-- Record Card 5 -->
+<div class="bg-[#1c1b1b] p-5 flex items-center justify-between group active:bg-[#353534] transition-colors">
+<div class="flex items-center gap-6">
+<div class="flex flex-col items-center">
+<span class="text-[#e5e2e1]/40 text-[10px] font-bold uppercase tracking-tighter">MAR</span>
+<span class="text-2xl font-headline font-bold leading-none">31</span>
+</div>
+<div class="flex flex-col gap-1">
+<div class="flex items-baseline gap-2">
+<span class="text-xl font-headline font-medium text-white">4.2km</span>
+<span class="text-sm font-body text-white/60">24:12</span>
+</div>
+<span class="text-xs font-body text-[#e5e2e1]/40 tracking-wider">5'45/KM</span>
+</div>
+</div>
+<div class="flex flex-col items-end gap-2">
+<span class="px-2 py-0.5 rounded-sm bg-[#93000a]/20 text-[#ffb4ab] text-[10px] font-bold tracking-widest uppercase">LOSE</span>
+<span class="material-symbols-outlined text-[#e5e2e1]/20 text-sm">chevron_right</span>
+</div>
+</div>
+</div>
+<!-- Monthly Insights Bento -->
+<div class="mt-12 grid grid-cols-2 gap-4">
+<div class="col-span-2 bg-gradient-to-br from-[#1c1b1b] to-[#0e0e0e] p-6 rounded-xl border border-white/5">
+<span class="text-[#e5e2e1]/40 text-[10px] font-bold uppercase tracking-widest mb-1 block">Monthly Distance</span>
+<div class="flex items-baseline gap-2">
+<span class="text-4xl font-headline font-black text-[#ffb3b4]">124.8</span>
+<span class="text-lg font-headline font-bold text-[#ffb3b4]/60">KM</span>
+</div>
+<div class="mt-4 h-1 w-full bg-white/5 rounded-full overflow-hidden">
+<div class="h-full bleed-gradient w-[85%]"></div>
+</div>
+<span class="mt-2 text-[10px] font-body text-white/40 block">85% OF YOUR MONTHLY GOAL REACHED</span>
+</div>
+</div>
+</main>
+<!-- BottomNavBar -->
+<nav class="fixed bottom-0 w-full z-50 pb-safe bg-[#131313]/80 backdrop-blur-xl border-t border-white/5 shadow-[0_-20px_40px_rgba(0,0,0,0.4)] flex justify-around items-center h-20 px-4">
+<!-- Records Tab (Active) -->
+<div class="flex flex-col items-center justify-center bg-gradient-to-br from-[#ffb3b4] to-[#ff5262] text-[#131313] rounded-full px-5 py-1 active:scale-90 transition-transform duration-200">
+<span class="material-symbols-outlined">history</span>
+<span class="font-['Inter'] text-[10px] font-bold tracking-widest uppercase">RECORDS</span>
+</div>
+<!-- Run Tab -->
+<div class="flex flex-col items-center justify-center text-[#e5e2e1]/60 px-5 py-1 hover:text-[#ffb3b4] active:scale-90 transition-transform duration-200">
+<span class="material-symbols-outlined">directions_run</span>
+<span class="font-['Inter'] text-[10px] font-bold tracking-widest uppercase">RUN</span>
+</div>
+<!-- Prep Tab -->
+<div class="flex flex-col items-center justify-center text-[#e5e2e1]/60 px-5 py-1 hover:text-[#ffb3b4] active:scale-90 transition-transform duration-200">
+<span class="material-symbols-outlined">settings_input_component</span>
+<span class="font-['Inter'] text-[10px] font-bold tracking-widest uppercase">PREP</span>
+</div>
+</nav>
+</body></html>

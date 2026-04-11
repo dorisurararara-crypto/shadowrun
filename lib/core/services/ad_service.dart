@@ -1,0 +1,101 @@
+import 'package:flutter/foundation.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
+
+class AdService {
+  static final AdService _instance = AdService._();
+  factory AdService() => _instance;
+  AdService._();
+
+  // 개발 중에는 테스트 ID 사용, 출시 시 실제 ID로 전환
+  static const bool _useTestAds = true; // 출시 전 false로 변경
+
+  static const _realBannerId = 'ca-app-pub-8170207135799034/9789728281';
+  static const _realRewardedId = 'ca-app-pub-8170207135799034/7163564942';
+
+  static const _testBannerId = 'ca-app-pub-3940256099942544/6300978111';
+  static const _testRewardedId = 'ca-app-pub-3940256099942544/5224354917';
+
+  static String get _bannerId => _useTestAds ? _testBannerId : _realBannerId;
+  static String get _rewardedId => _useTestAds ? _testRewardedId : _realRewardedId;
+
+  RewardedAd? _rewardedAd;
+  bool _isRewardedAdReady = false;
+
+  bool get isRewardedAdReady => _isRewardedAdReady;
+
+  Future<void> initialize() async {
+    await MobileAds.instance.initialize();
+    loadRewardedAd();
+  }
+
+  /// 보상형 광고 미리 로드
+  void loadRewardedAd() {
+    RewardedAd.load(
+      adUnitId: _rewardedId,
+      request: const AdRequest(),
+      rewardedAdLoadCallback: RewardedAdLoadCallback(
+        onAdLoaded: (ad) {
+          _rewardedAd = ad;
+          _isRewardedAdReady = true;
+          debugPrint('보상형 광고 로드 완료');
+        },
+        onAdFailedToLoad: (error) {
+          _isRewardedAdReady = false;
+          debugPrint('보상형 광고 로드 실패: ${error.message}');
+          // 5초 후 재시도
+          Future.delayed(const Duration(seconds: 5), loadRewardedAd);
+        },
+      ),
+    );
+  }
+
+  /// 보상형 광고 표시 → 성공 시 onRewarded 콜백 실행
+  Future<bool> showRewardedAd({required VoidCallback onRewarded}) async {
+    if (!_isRewardedAdReady || _rewardedAd == null) {
+      debugPrint('보상형 광고가 준비되지 않았습니다');
+      return false;
+    }
+
+    _rewardedAd!.fullScreenContentCallback = FullScreenContentCallback(
+      onAdDismissedFullScreenContent: (ad) {
+        ad.dispose();
+        _isRewardedAdReady = false;
+        loadRewardedAd(); // 다음 광고 미리 로드
+      },
+      onAdFailedToShowFullScreenContent: (ad, error) {
+        ad.dispose();
+        _isRewardedAdReady = false;
+        loadRewardedAd();
+      },
+    );
+
+    _rewardedAd!.show(
+      onUserEarnedReward: (ad, reward) {
+        debugPrint('보상 획득: ${reward.amount} ${reward.type}');
+        onRewarded();
+      },
+    );
+
+    _rewardedAd = null;
+    return true;
+  }
+
+  /// 배너 광고 생성 (결과 화면용)
+  BannerAd createBannerAd({VoidCallback? onLoaded}) {
+    return BannerAd(
+      adUnitId: _bannerId,
+      size: AdSize.banner,
+      request: const AdRequest(),
+      listener: BannerAdListener(
+        onAdLoaded: (ad) {
+          debugPrint('배너 광고 로드 완료');
+          onLoaded?.call();
+        },
+        onAdFailedToLoad: (ad, error) {
+          debugPrint('배너 광고 로드 실패: ${error.message}');
+          ad.dispose();
+        },
+      ),
+    );
+  }
+}

@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>SHADOW RUN - SETTINGS</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700;900&amp;family=Inter:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "surface-variant": "#353534",
+                      "on-primary-fixed": "#40000a",
+                      "tertiary-fixed-dim": "#6bd9c7",
+                      "surface-container-lowest": "#0e0e0e",
+                      "outline-variant": "#5e3e3f",
+                      "surface-tint": "#ffb3b4",
+                      "tertiary-container": "#2aa192",
+                      "surface": "#131313",
+                      "surface-dim": "#131313",
+                      "on-secondary-container": "#ff989b",
+                      "on-surface": "#e5e2e1",
+                      "error-container": "#93000a",
+                      "surface-container-high": "#2a2a2a",
+                      "on-primary-fixed-variant": "#920023",
+                      "inverse-on-surface": "#313030",
+                      "error": "#ffb4ab",
+                      "secondary": "#ffb3b4",
+                      "inverse-primary": "#bf0030",
+                      "on-tertiary-container": "#00302a",
+                      "on-error-container": "#ffdad6",
+                      "surface-container": "#201f1f",
+                      "on-secondary-fixed-variant": "#920223",
+                      "on-secondary": "#680016",
+                      "background": "#0A0A0A",
+                      "surface-bright": "#3a3939",
+                      "on-secondary-fixed": "#40000a",
+                      "on-surface-variant": "#e9bcbb",
+                      "on-primary-container": "#5b0012",
+                      "on-background": "#e5e2e1",
+                      "secondary-fixed": "#ffdad9",
+                      "outline": "#af8787",
+                      "on-tertiary-fixed-variant": "#005047",
+                      "primary-container": "#ff5262",
+                      "surface-container-low": "#161616",
+                      "secondary-fixed-dim": "#ffb3b4",
+                      "on-error": "#690005",
+                      "tertiary-fixed": "#89f5e3",
+                      "primary": "#ffb3b4",
+                      "primary-fixed": "#ffdad9",
+                      "secondary-container": "#920223",
+                      "on-tertiary-fixed": "#00201c",
+                      "tertiary": "#6bd9c7",
+                      "on-tertiary": "#003731",
+                      "surface-container-highest": "#353534",
+                      "primary-fixed-dim": "#ffb3b4",
+                      "on-primary": "#680016",
+                      "inverse-surface": "#e5e2e1"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.25rem",
+                      "lg": "0.5rem",
+                      "xl": "0.75rem",
+                      "full": "9999px"
+              },
+              "fontFamily": {
+                      "headline": ["Space Grotesk"],
+                      "body": ["Inter"],
+                      "label": ["Inter"]
+              }
+            },
+          }
+        }
+      </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            display: inline-block;
+            vertical-align: middle;
+        }
+        body {
+            background-color: #0A0A0A;
+            color: #e5e2e1;
+            font-family: 'Inter', sans-serif;
+            -webkit-font-smoothing: antialiased;
+        }
+      </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="min-h-screen pb-24">
+<!-- TopAppBar -->
+<header class="bg-[#131313] docked full-width top-0 flex items-center justify-between px-6 py-4 w-full sticky z-50">
+<div class="flex items-center gap-4">
+<button class="text-[#ffb3b4] active:scale-95 transition-transform">
+<span class="material-symbols-outlined">arrow_back</span>
+</button>
+<h1 class="font-['Space_Grotesk'] font-bold tracking-tighter uppercase text-[#ffb3b4] text-xl">SETTINGS</h1>
+</div>
+<div class="w-6"></div> <!-- Spacer for symmetry -->
+</header>
+<main class="px-6 py-8 space-y-10 max-w-md mx-auto">
+<!-- Section 1: Running Settings -->
+<section class="space-y-4">
+<h2 class="font-headline text-xs font-bold tracking-[0.2em] text-[#ffb3b4]/60 uppercase ml-1">Running Settings</h2>
+<div class="bg-[#161616] rounded-xl p-6 space-y-8">
+<!-- Run Mode Selector -->
+<div class="space-y-4">
+<label class="text-[10px] font-bold uppercase tracking-widest text-[#e5e2e1]/40">Run Mode</label>
+<div class="grid grid-cols-3 bg-[#0A0A0A] p-1 rounded-full">
+<button class="bg-[#FF0044] text-white text-[10px] font-bold py-2.5 rounded-full transition-all">Full Map</button>
+<button class="text-[#e5e2e1]/40 text-[10px] font-bold py-2.5 hover:text-[#e5e2e1] transition-colors">Map Center</button>
+<button class="text-[#e5e2e1]/40 text-[10px] font-bold py-2.5 hover:text-[#e5e2e1] transition-colors">Data Center</button>
+</div>
+</div>
+<!-- Unit Toggle -->
+<div class="flex items-center justify-between">
+<label class="text-sm font-medium text-[#e5e2e1]">Distance Units</label>
+<div class="flex bg-[#0A0A0A] rounded-lg p-1">
+<button class="px-4 py-1.5 bg-[#FF0044] text-white text-[11px] font-bold rounded-md">km</button>
+<button class="px-4 py-1.5 text-[#e5e2e1]/40 text-[11px] font-bold rounded-md">mi</button>
+</div>
+</div>
+</div>
+</section>
+<!-- Section 2: Horror Settings -->
+<section class="space-y-4">
+<h2 class="font-headline text-xs font-bold tracking-[0.2em] text-[#ffb3b4]/60 uppercase ml-1">Horror Settings</h2>
+<div class="bg-[#161616] rounded-xl p-6 space-y-8">
+<!-- Horror Level Slider -->
+<div class="space-y-6">
+<div class="flex justify-between items-end">
+<label class="text-sm font-medium text-[#e5e2e1]">Anxiety Level</label>
+<span class="text-2xl font-headline font-black text-[#FF0044]">02</span>
+</div>
+<div class="relative pt-2">
+<div class="h-1 w-full bg-[#0A0A0A] rounded-full overflow-hidden flex">
+<div class="h-full bg-[#FF0044]" style="width: 40%;"></div>
+</div>
+<div class="flex justify-between mt-4">
+<span class="text-[10px] font-bold text-[#FF0044]">1</span>
+<span class="text-[10px] font-bold text-[#FF0044]">2</span>
+<div class="flex flex-col items-center gap-1">
+<span class="text-[10px] font-bold text-[#e5e2e1]/20">3</span>
+<span class="material-symbols-outlined text-[12px] text-[#e5e2e1]/20">lock</span>
+<span class="text-[8px] font-black text-[#D4AF37] tracking-tighter">PRO</span>
+</div>
+<div class="flex flex-col items-center gap-1">
+<span class="text-[10px] font-bold text-[#e5e2e1]/20">4</span>
+<span class="material-symbols-outlined text-[12px] text-[#e5e2e1]/20">lock</span>
+<span class="text-[8px] font-black text-[#D4AF37] tracking-tighter">PRO</span>
+</div>
+<div class="flex flex-col items-center gap-1">
+<span class="text-[10px] font-bold text-[#e5e2e1]/20">5</span>
+<span class="material-symbols-outlined text-[12px] text-[#e5e2e1]/20">lock</span>
+<span class="text-[8px] font-black text-[#D4AF37] tracking-tighter">PRO</span>
+</div>
+</div>
+</div>
+</div>
+<!-- TTS Toggle -->
+<div class="flex items-center justify-between">
+<div class="space-y-0.5">
+<label class="text-sm font-medium text-[#e5e2e1]">Entity Audio (TTS)</label>
+<p class="text-[10px] text-[#e5e2e1]/40 uppercase tracking-tight">Whispers behind you during run</p>
+</div>
+<button class="w-12 h-6 bg-[#FF0044] rounded-full relative transition-colors">
+<span class="absolute right-1 top-1 w-4 h-4 bg-white rounded-full"></span>
+</button>
+</div>
+<!-- Vibration Toggle -->
+<div class="flex items-center justify-between border-t border-[#0A0A0A] pt-6">
+<div class="space-y-0.5">
+<label class="text-sm font-medium text-[#e5e2e1]">Haptic Dread</label>
+<p class="text-[10px] text-[#e5e2e1]/40 uppercase tracking-tight">Heartbeat pulses on wrist</p>
+</div>
+<button class="w-12 h-6 bg-[#FF0044] rounded-full relative transition-colors">
+<span class="absolute right-1 top-1 w-4 h-4 bg-white rounded-full"></span>
+</button>
+</div>
+</div>
+</section>
+<!-- Section 3: Purchase -->
+<section class="pt-4">
+<button class="w-full bg-[#FF0044] text-white py-5 rounded-full font-headline font-black text-sm tracking-widest uppercase active:scale-[0.98] transition-transform shadow-[0_10px_30px_rgba(255,0,68,0.2)]">
+                PRO Upgrade
+            </button>
+<p class="text-center mt-6 text-[10px] font-medium text-[#e5e2e1]/30 uppercase tracking-[0.2em]">Unlock ultimate terror</p>
+</section>
+</main>
+<!-- BottomNavBar -->
+<nav class="fixed bottom-0 w-full z-50 bg-[#131313]/80 backdrop-blur-xl flex justify-around items-center px-8 py-4">
+<button class="flex flex-col items-center justify-center text-[#e5e2e1]/40 p-3 hover:text-[#ffb3b4] active:scale-90 transition-all duration-300">
+<span class="material-symbols-outlined">directions_run</span>
+</button>
+<button class="flex flex-col items-center justify-center text-[#e5e2e1]/40 p-3 hover:text-[#ffb3b4] active:scale-90 transition-all duration-300">
+<span class="material-symbols-outlined">monitoring</span>
+</button>
+<button class="flex flex-col items-center justify-center text-[#ffb3b4] bg-[#ff5262]/10 rounded-full p-3 active:scale-90 transition-all duration-300">
+<span class="material-symbols-outlined">settings</span>
+</button>
+<button class="flex flex-col items-center justify-center text-[#e5e2e1]/40 p-3 hover:text-[#ffb3b4] active:scale-90 transition-all duration-300">
+<span class="material-symbols-outlined">security</span>
+</button>
+</nav>
+</body></html>

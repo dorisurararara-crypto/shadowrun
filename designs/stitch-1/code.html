@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>SHADOW RUN | PREPARE</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&amp;family=Space+Grotesk:wght@700;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                "outline": "#af8787",
+                "on-background": "#e5e2e1",
+                "on-error-container": "#ffdad6",
+                "error": "#ffb4ab",
+                "surface-tint": "#ffb3b4",
+                "tertiary-container": "#2aa192",
+                "surface-bright": "#3a3939",
+                "on-primary-fixed-variant": "#920023",
+                "surface-container-high": "#2a2a2a",
+                "on-secondary-fixed-variant": "#920223",
+                "surface-variant": "#353534",
+                "secondary": "#ffb3b4",
+                "secondary-fixed": "#ffdad9",
+                "background": "#131313",
+                "tertiary-fixed-dim": "#6bd9c7",
+                "surface": "#131313",
+                "secondary-fixed-dim": "#ffb3b4",
+                "error-container": "#93000a",
+                "primary-fixed": "#ffdad9",
+                "on-surface-variant": "#e9bcbb",
+                "tertiary": "#6bd9c7",
+                "surface-dim": "#131313",
+                "on-tertiary-container": "#00302a",
+                "on-error": "#690005",
+                "surface-container-low": "#1c1b1b",
+                "inverse-surface": "#e5e2e1",
+                "on-surface": "#e5e2e1",
+                "primary": "#ffb3b4",
+                "on-tertiary-fixed-variant": "#005047",
+                "secondary-container": "#920223",
+                "outline-variant": "#5e3e3f",
+                "primary-container": "#ff5262",
+                "on-primary-fixed": "#40000a",
+                "surface-container-highest": "#353534",
+                "on-secondary": "#680016",
+                "inverse-primary": "#bf0030",
+                "surface-container": "#201f1f",
+                "on-secondary-fixed": "#40000a",
+                "on-secondary-container": "#ff989b",
+                "on-primary-container": "#5b0012",
+                "on-tertiary": "#003731",
+                "inverse-on-surface": "#313030",
+                "surface-container-lowest": "#0e0e0e",
+                "primary-fixed-dim": "#ffb3b4",
+                "tertiary-fixed": "#89f5e3",
+                "on-tertiary-fixed": "#00201c",
+                "on-primary": "#680016"
+            },
+            "borderRadius": {
+                "DEFAULT": "0.25rem",
+                "lg": "0.5rem",
+                "xl": "0.75rem",
+                "full": "9999px"
+            },
+            "fontFamily": {
+                "headline": ["Space Grotesk"],
+                "body": ["Inter"],
+                "label": ["Inter"]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        body {
+            background-color: #0A0A0A;
+            color: #e5e2e1;
+            font-family: 'Inter', sans-serif;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .pulse-glow {
+            box-shadow: 0 0 20px rgba(255, 82, 98, 0.2);
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="flex flex-col min-h-screen overflow-hidden">
+<!-- TopAppBar -->
+<header class="fixed top-0 w-full z-50 bg-[#131313] text-[#ffb3b4] flex items-center px-6 h-16 w-full">
+<div class="flex items-center gap-4">
+<button class="active:scale-95 duration-200 hover:bg-[#1c1b1b] transition-colors p-2 rounded-full">
+<span class="material-symbols-outlined" data-icon="arrow_back">arrow_back</span>
+</button>
+<h1 class="font-['Space_Grotesk'] tracking-tighter uppercase font-bold text-lg">PREPARE FOR RUN</h1>
+</div>
+</header>
+<!-- Main Content Canvas -->
+<main class="flex-grow flex flex-col items-center justify-center px-8 pt-16 pb-32">
+<!-- Asymmetric Background Pattern (Subtle) -->
+<div class="absolute inset-0 pointer-events-none overflow-hidden opacity-10">
+<div class="absolute -top-24 -left-24 w-96 h-96 rounded-full bg-primary-container blur-[120px]"></div>
+</div>
+<!-- Main Run Card -->
+<div class="w-full max-w-sm aspect-[4/5] bg-[#161616] rounded-xl flex flex-col items-center justify-center p-12 text-center border border-white/5 relative group">
+<!-- Asymmetric Data Point -->
+<div class="absolute top-6 right-6">
+<span class="font-['Space_Grotesk'] text-[10px] tracking-widest text-primary opacity-50 uppercase">Session 042</span>
+</div>
+<div class="mb-8 p-6 rounded-full bg-tertiary/10 flex items-center justify-center">
+<span class="material-symbols-outlined text-tertiary text-6xl" data-icon="directions_run">directions_run</span>
+</div>
+<h2 class="font-['Space_Grotesk'] text-4xl font-black text-on-surface tracking-tighter uppercase mb-2">New Run</h2>
+<p class="text-on-surface-variant text-sm font-body max-w-[200px] leading-relaxed">Leave a new record. The shadow watches.</p>
+<!-- Map Preview (Contextual Fragment) -->
+<div class="mt-10 w-full h-24 rounded-lg overflow-hidden grayscale opacity-40 hover:opacity-100 transition-opacity duration-500">
+<img alt="Dark satellite view of city streets at night with neon grid overlays" class="w-full h-full object-cover" data-alt="Dark satellite view of city streets at night with high contrast neon red grid overlays and minimalist topography" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA3zF_k7-bVvI7QLaPg98ujQkZlW9OYEy805ar1HIfMdoINleLJfAkaCj_HYXgGlV4pc19j2RNmG1alxoydQnk0i8P4eh3MRY9jY4TeoFDLl_pGO6Gu3PDOWsn25sx0-jpJWawnsqU1ETHBBhJ8pnHCNOOdj1FevTGcv4Bdg9Sey6PMvJr6_TV6MKswh95xSEeyjyvkB7EsTZ4q5RqUG728ZhmLo-oA2CD8M8KqC7u8qrCnIJ2y_ftcq6UjyK5skvUCkRlmo0Vu_TB-"/>
+</div>
+</div>
+<!-- Status Pill -->
+<div class="mt-8 flex items-center gap-2 px-4 py-2 rounded-full bg-tertiary/10 border border-tertiary/20">
+<span class="material-symbols-outlined text-tertiary text-sm" data-icon="location_on" style="font-variation-settings: 'FILL' 1;">location_on</span>
+<span class="font-['Space_Grotesk'] text-[10px] font-bold tracking-[0.2em] text-tertiary uppercase">GPS Signal Good</span>
+</div>
+<!-- Secondary Stats Grid -->
+<div class="mt-12 grid grid-cols-2 gap-8 w-full max-w-sm">
+<div class="flex flex-col items-start border-l border-primary/20 pl-4">
+<span class="text-[10px] font-bold text-primary tracking-widest uppercase opacity-60 mb-1">Target</span>
+<span class="font-['Space_Grotesk'] text-xl font-bold">5.0 KM</span>
+</div>
+<div class="flex flex-col items-start border-l border-primary/20 pl-4">
+<span class="text-[10px] font-bold text-primary tracking-widest uppercase opacity-60 mb-1">Pace</span>
+<span class="font-['Space_Grotesk'] text-xl font-bold">4:30 /KM</span>
+</div>
+</div>
+</main>
+<!-- BottomNavBar as START Action -->
+<footer class="fixed bottom-0 left-0 w-full z-50 flex justify-center items-center px-8 pb-12 pointer-events-none">
+<div class="w-full max-w-sm pointer-events-auto">
+<button class="flex items-center justify-center w-full h-16 rounded-full bg-gradient-to-br from-[#ffb3b4] to-[#ff5262] text-[#131313] shadow-[0_20px_40px_rgba(0,0,0,0.4)] active:scale-98 transition-transform duration-150 hover:opacity-95 group overflow-hidden relative">
+<!-- Background Pulse Effect -->
+<div class="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-2xl font-bold" data-icon="play_arrow" style="font-variation-settings: 'FILL' 1;">play_arrow</span>
+<span class="font-['Space_Grotesk'] font-black uppercase tracking-[0.3em] text-lg">START</span>
+</div>
+</button>
+</div>
+</footer>
+<!-- Atmosphere Overlay -->
+<div class="fixed inset-0 pointer-events-none border-[16px] border-[#0A0A0A] z-[60]"></div>
+</body></html>

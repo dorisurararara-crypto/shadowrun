@@ -1,0 +1,60 @@
+import 'package:go_router/go_router.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:shadowrun/features/home/presentation/pages/home_screen.dart';
+import 'package:shadowrun/features/prepare/presentation/pages/prepare_screen.dart';
+import 'package:shadowrun/features/running/presentation/pages/running_screen.dart';
+import 'package:shadowrun/features/result/presentation/pages/result_screen.dart';
+import 'package:shadowrun/features/history/presentation/pages/history_screen.dart';
+import 'package:shadowrun/features/settings/presentation/pages/settings_screen.dart';
+import 'package:shadowrun/features/onboarding/presentation/pages/language_select_screen.dart';
+
+GoRouter createRouter(bool languageSelected) => GoRouter(
+  initialLocation: languageSelected ? '/' : '/language',
+  routes: [
+    GoRoute(
+      path: '/language',
+      builder: (context, state) => const LanguageSelectScreen(),
+    ),
+    GoRoute(
+      path: '/',
+      builder: (context, state) => const HomeScreen(),
+    ),
+    GoRoute(
+      path: '/prepare',
+      builder: (context, state) {
+        final shadowRunId = state.extra as int?;
+        return PrepareScreen(shadowRunId: shadowRunId);
+      },
+    ),
+    GoRoute(
+      path: '/running',
+      builder: (context, state) {
+        final shadowRunId = state.extra as int?;
+        return RunningScreen(shadowRunId: shadowRunId);
+      },
+    ),
+    GoRoute(
+      path: '/result',
+      builder: (context, state) {
+        final args = state.extra as Map<String, dynamic>;
+        return ResultScreen(
+          runId: args['runId'] as int,
+          result: args['result'] as String?,
+        );
+      },
+    ),
+    GoRoute(
+      path: '/history',
+      builder: (context, state) => const HistoryScreen(),
+    ),
+    GoRoute(
+      path: '/settings',
+      builder: (context, state) => const SettingsScreen(),
+    ),
+  ],
+);
+
+Future<bool> isLanguageSelected() async {
+  final prefs = await SharedPreferences.getInstance();
+  return prefs.getBool('language_selected') ?? false;
+}

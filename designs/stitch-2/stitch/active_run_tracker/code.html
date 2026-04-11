@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&amp;family=Inter:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          "colors": {
+                  "surface-tint": "#ffb3b4",
+                  "tertiary-container": "#2aa192",
+                  "secondary-container": "#920223",
+                  "background": "#131313",
+                  "on-primary": "#680016",
+                  "surface-variant": "#353534",
+                  "primary-fixed": "#ffdad9",
+                  "on-secondary-container": "#ff989b",
+                  "outline-variant": "#5e3e3f",
+                  "primary-fixed-dim": "#ffb3b4",
+                  "on-tertiary-fixed-variant": "#005047",
+                  "secondary": "#ffb3b4",
+                  "on-background": "#e5e2e1",
+                  "tertiary": "#6bd9c7",
+                  "tertiary-fixed-dim": "#6bd9c7",
+                  "primary": "#ffb3b4",
+                  "on-error": "#690005",
+                  "on-secondary-fixed": "#40000a",
+                  "error": "#ffb4ab",
+                  "on-surface-variant": "#e9bcbb",
+                  "surface-container-lowest": "#0e0e0e",
+                  "inverse-surface": "#e5e2e1",
+                  "surface": "#131313",
+                  "surface-container-highest": "#353534",
+                  "surface-container-low": "#1c1b1b",
+                  "on-primary-fixed": "#40000a",
+                  "inverse-primary": "#bf0030",
+                  "tertiary-fixed": "#89f5e3",
+                  "error-container": "#93000a",
+                  "on-tertiary-fixed": "#00201c",
+                  "surface-container-high": "#2a2a2a",
+                  "primary-container": "#ff5262",
+                  "on-secondary": "#680016",
+                  "surface-container": "#201f1f",
+                  "on-error-container": "#ffdad6",
+                  "on-primary-container": "#5b0012",
+                  "on-tertiary": "#003731",
+                  "on-surface": "#e5e2e1",
+                  "secondary-fixed": "#ffdad9",
+                  "inverse-on-surface": "#313030",
+                  "outline": "#af8787",
+                  "secondary-fixed-dim": "#ffb3b4",
+                  "on-tertiary-container": "#00302a",
+                  "on-primary-fixed-variant": "#920023",
+                  "on-secondary-fixed-variant": "#920223",
+                  "surface-dim": "#131313",
+                  "surface-bright": "#3a3939"
+          },
+          "borderRadius": {
+                  "DEFAULT": "0.25rem",
+                  "lg": "0.5rem",
+                  "xl": "0.75rem",
+                  "full": "9999px"
+          },
+          "fontFamily": {
+                  "headline": ["Space Grotesk"],
+                  "body": ["Inter"],
+                  "label": ["Inter"]
+          }
+        },
+      }
+    }
+  </script>
+<style>
+    .vignette-pulse {
+      box-shadow: inset 0 0 150px rgba(255, 0, 68, 0.15), inset 0 -100px 200px rgba(255, 0, 68, 0.3);
+      pointer-events: none;
+    }
+    .map-grayscale {
+      filter: grayscale(100%) invert(95%) brightness(20%) contrast(150%);
+    }
+    .material-symbols-outlined {
+      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+    }
+  </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-surface font-body overflow-hidden">
+<!-- Map Background -->
+<div class="fixed inset-0 z-0">
+<img alt="dark moody aerial view of urban city grid at night with high contrast and deep shadows" class="w-full h-full object-cover map-grayscale" data-alt="aerial view of dark moody urban city grid at night with heavy contrast deep shadows and high-end noir aesthetic" data-location="New York City" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAgyA18ikuYlrdGTa3s7JG1gC7YZAVtwSsHn6JV0OOttQXPT0HZQn2FzrN5XFX9eFjd8EomXb9yPGICG53ZVo_rgS4nuShQyKYZelHOj_flzvxECfEzMpX2xGbkNnOwn9-oWhaw5KH6xJtFJqGidwZUYFTZ889F-ix-rIm_hWvV05-ZEQI9lU5tCMTXVANYXBSGd9dqaHcUjlRd0shkf7EyPX1ItEtvLdpn6wC4NvQq6zd4RK2cCq9l18-FkvfllJSeZVWhRRIf66Ah"/>
+<div class="absolute inset-0 bg-[#000000]/60"></div>
+<div class="absolute inset-0 vignette-pulse"></div>
+</div>
+<!-- Shared Component: TopAppBar -->
+<header class="fixed top-0 w-full z-50 flex justify-between items-center px-6 py-4 w-full">
+<button class="text-[#ffb3b4] hover:text-[#ff5262] transition-colors scale-95 active:duration-100">
+<span class="material-symbols-outlined">menu</span>
+</button>
+<h1 class="font-space-grotesk tracking-tighter uppercase text-xl font-bold tracking-widest text-[#ffb3b4] drop-shadow-[0_0_10px_rgba(255,0,68,0.5)]">SHADOW RUN</h1>
+<button class="text-[#ffb3b4] hover:text-[#ff5262] transition-colors scale-95 active:duration-100">
+<span class="material-symbols-outlined">warning</span>
+</button>
+</header>
+<!-- HUD: Top Navigation Context -->
+<div class="fixed top-20 left-0 right-0 px-6 flex justify-between items-start z-40">
+<!-- Left HUD: Pace & Distance -->
+<div class="bg-surface-container-low/40 backdrop-blur-md px-5 py-3 rounded-full flex gap-6 border border-white/5 shadow-2xl">
+<div class="flex flex-col">
+<span class="text-[10px] uppercase tracking-[0.2em] font-label text-on-surface-variant/60">PACE</span>
+<span class="font-headline text-lg font-bold text-white tracking-tighter italic">5'42"</span>
+</div>
+<div class="w-[1px] h-8 bg-white/10 self-center"></div>
+<div class="flex flex-col">
+<span class="text-[10px] uppercase tracking-[0.2em] font-label text-on-surface-variant/60">DIST</span>
+<span class="font-headline text-lg font-bold text-white tracking-tighter italic">3.2km</span>
+</div>
+</div>
+<!-- Right HUD: Danger Badge -->
+<div class="bg-secondary-container/80 backdrop-blur-md px-4 py-2 rounded-lg flex items-center gap-2 border border-primary-container/30 shadow-[0_0_20px_rgba(255,82,98,0.4)]">
+<span class="material-symbols-outlined text-[16px] text-white" style="font-variation-settings: 'FILL' 1;">error</span>
+<span class="font-headline text-sm font-bold text-white tracking-widest uppercase">SHADOW -120m</span>
+</div>
+</div>
+<!-- Map Markers (Visual Content) -->
+<div class="absolute inset-0 flex items-center justify-center pointer-events-none">
+<div class="relative w-full h-full">
+<!-- Shadow Tracker (The Pursuit) -->
+<div class="absolute top-[55%] left-[42%] flex flex-col items-center">
+<div class="w-8 h-8 rounded-full bg-primary-container/20 flex items-center justify-center animate-ping absolute opacity-75"></div>
+<div class="w-4 h-4 rounded-full bg-primary-container shadow-[0_0_15px_#ff5262] border-2 border-white/20"></div>
+<span class="mt-2 font-headline text-[10px] text-primary-container font-bold tracking-[0.3em] uppercase">SHADOW</span>
+</div>
+<!-- Player Marker (ME) -->
+<div class="absolute top-[45%] left-[52%] flex flex-col items-center">
+<div class="w-4 h-4 rounded-full bg-[#00FF88] shadow-[0_0_20px_#00FF88] border-2 border-white/20"></div>
+<span class="mt-2 font-headline text-[10px] text-[#00FF88] font-bold tracking-[0.3em] uppercase">ME</span>
+</div>
+</div>
+</div>
+<!-- Bottom HUD: Threat and Controls -->
+<div class="fixed bottom-0 w-full z-40 px-8 pb-12">
+<!-- Controls -->
+<div class="flex justify-center items-center gap-8 mb-8">
+<button class="w-14 h-14 rounded-full bg-surface-container-highest border border-white/10 flex items-center justify-center text-on-surface hover:text-primary transition-all active:scale-90">
+<span class="material-symbols-outlined text-3xl">pause</span>
+</button>
+<button class="w-14 h-14 rounded-full bg-primary-container flex items-center justify-center text-on-primary shadow-[0_0_30px_rgba(255,82,98,0.5)] hover:brightness-110 transition-all active:scale-90">
+<span class="material-symbols-outlined text-3xl" style="font-variation-settings: 'FILL' 1;">stop</span>
+</button>
+</div>
+<!-- Threat Progress Bar -->
+<div class="w-full max-w-md mx-auto">
+<div class="flex justify-between items-end mb-2">
+<span class="font-headline text-[10px] font-bold tracking-[0.2em] text-on-surface-variant/40 uppercase">THREAT LEVEL</span>
+<span class="font-headline text-xs font-bold text-primary-container tracking-tighter">70% PROXIMITY</span>
+</div>
+<div class="h-1.5 w-full bg-white/10 rounded-full overflow-hidden">
+<div class="h-full bg-gradient-to-r from-secondary-container to-primary-container w-[70%] shadow-[0_0_10px_#ff5262]"></div>
+</div>
+</div>
+</div>
+<!-- Shared Component: BottomNavBar -->
+<!-- Automatically Suppressed for focused/task-based screens per "The Destination Rule" -->
+</body></html>
