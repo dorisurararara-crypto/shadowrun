@@ -8,6 +8,9 @@ import 'package:shadowrun/core/theme/app_theme.dart';
 import 'package:shadowrun/core/database/database_helper.dart';
 import 'package:shadowrun/shared/models/run_model.dart';
 import 'package:shadowrun/core/l10n/app_strings.dart';
+import 'package:shadowrun/core/services/ad_service.dart';
+import 'package:shadowrun/core/services/purchase_service.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 
 class ResultScreen extends StatefulWidget {
   final int runId;
@@ -26,6 +29,8 @@ class _ResultScreenState extends State<ResultScreen>
   RunModel? _shadowRun;
   List<RunPoint> _shadowPoints = [];
   bool _loading = true;
+  BannerAd? _bannerAd;
+  bool _bannerReady = false;
 
   late AnimationController _resultAnim;
   late Animation<double> _resultScale;
@@ -68,6 +73,17 @@ class _ResultScreenState extends State<ResultScreen>
     );
 
     _loadData();
+    _loadBannerAd();
+  }
+
+  void _loadBannerAd() {
+    if (PurchaseService().isPro) return; // PRO 유저는 광고 없음
+    _bannerAd = AdService().createBannerAd(
+      onLoaded: () {
+        if (mounted) setState(() => _bannerReady = true);
+      },
+    );
+    _bannerAd!.load();
   }
 
   Future<void> _loadData() async {
@@ -90,6 +106,7 @@ class _ResultScreenState extends State<ResultScreen>
 
   @override
   void dispose() {
+    _bannerAd?.dispose();
     _resultAnim.dispose();
     _glowAnim.dispose();
     _pulseAnim.dispose();
@@ -144,6 +161,7 @@ class _ResultScreenState extends State<ResultScreen>
                     const SizedBox(height: 24),
                     _buildIncidentReport(),
                     const SizedBox(height: 32),
+                    _buildBannerAd(),
                     _buildActions(),
                     const SizedBox(height: 32),
                   ],
@@ -645,6 +663,17 @@ class _ResultScreenState extends State<ResultScreen>
           ),
         ],
       ),
+    );
+  }
+
+  Widget _buildBannerAd() {
+    if (!_bannerReady || _bannerAd == null) return const SizedBox.shrink();
+    return Container(
+      alignment: Alignment.center,
+      width: _bannerAd!.size.width.toDouble(),
+      height: _bannerAd!.size.height.toDouble(),
+      margin: const EdgeInsets.only(bottom: 16),
+      child: AdWidget(ad: _bannerAd!),
     );
   }
 
