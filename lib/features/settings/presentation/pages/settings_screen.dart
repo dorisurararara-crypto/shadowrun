@@ -22,6 +22,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
   bool _isPro = false;
   bool _loading = true;
   final int _selectedNavIndex = 2; // settings active
+  int _adminTapCount = 0;
+  DateTime? _adminFirstTap;
 
   @override
   void initState() {
@@ -228,7 +230,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _sectionHeader(S.horrorSettings),
+        GestureDetector(
+          onTap: _onHorrorHeaderTap,
+          child: _sectionHeader(S.horrorSettings),
+        ),
         Container(
           padding: const EdgeInsets.all(20),
           decoration: BoxDecoration(
@@ -529,6 +534,115 @@ class _SettingsScreenState extends State<SettingsScreen> {
         ],
       ),
     );
+  }
+
+  void _onHorrorHeaderTap() {
+    final now = DateTime.now();
+    if (_adminFirstTap == null || now.difference(_adminFirstTap!).inSeconds > 10) {
+      _adminTapCount = 1;
+      _adminFirstTap = now;
+    } else {
+      _adminTapCount++;
+    }
+    if (_adminTapCount >= 5) {
+      _adminTapCount = 0;
+      _adminFirstTap = null;
+      _showAdminKeyDialog();
+    }
+  }
+
+  void _showAdminKeyDialog() {
+    final controller = TextEditingController();
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: SRColors.card,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        title: Text(
+          '관리자 키를 입력하세요',
+          style: GoogleFonts.inter(
+            fontSize: 16,
+            fontWeight: FontWeight.w700,
+            color: SRColors.onSurface,
+          ),
+        ),
+        content: TextField(
+          controller: controller,
+          obscureText: true,
+          style: GoogleFonts.inter(color: SRColors.onSurface),
+          decoration: InputDecoration(
+            hintText: 'Admin Key',
+            hintStyle: GoogleFonts.inter(color: SRColors.onSurface.withValues(alpha: 0.3)),
+            enabledBorder: UnderlineInputBorder(
+              borderSide: BorderSide(color: SRColors.onSurface.withValues(alpha: 0.2)),
+            ),
+            focusedBorder: const UnderlineInputBorder(
+              borderSide: BorderSide(color: SRColors.primaryContainer),
+            ),
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: Text(
+              'CANCEL',
+              style: GoogleFonts.inter(
+                fontSize: 12,
+                fontWeight: FontWeight.w700,
+                color: SRColors.onSurface.withValues(alpha: 0.4),
+                letterSpacing: 1,
+              ),
+            ),
+          ),
+          ElevatedButton(
+            onPressed: () async {
+              Navigator.pop(ctx);
+              if (controller.text == 'ganzinam95') {
+                await DatabaseHelper.setSetting('is_pro', 'true');
+                setState(() => _isPro = true);
+                if (mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('PRO 활성화 완료!'),
+                      backgroundColor: SRColors.surface,
+                    ),
+                  );
+                }
+              } else {
+                if (mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('잘못된 키입니다'),
+                      backgroundColor: SRColors.surface,
+                    ),
+                  );
+                }
+              }
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: const Color(0xFFFF0044),
+              foregroundColor: Colors.white,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(20),
+              ),
+              elevation: 0,
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+            ),
+            child: Text(
+              'OK',
+              style: GoogleFonts.inter(
+                fontSize: 12,
+                fontWeight: FontWeight.w800,
+                letterSpacing: 1,
+              ),
+            ),
+          ),
+        ],
+      ),
+    ).then((_) {
+      _adminTapCount = 0;
+      _adminFirstTap = null;
+    });
   }
 
   void _showProLockDialog() {

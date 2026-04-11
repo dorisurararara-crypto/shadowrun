@@ -1,9 +1,11 @@
 import 'dart:async';
+import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:flutter_naver_map/flutter_naver_map.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:shadowrun/core/theme/app_theme.dart';
 import 'package:shadowrun/core/database/database_helper.dart';
 import 'package:shadowrun/shared/models/run_model.dart';
@@ -20,6 +22,55 @@ class PrepareScreen extends StatefulWidget {
 
 class _PrepareScreenState extends State<PrepareScreen>
     with TickerProviderStateMixin {
+  static const _challengeQuotesKo = [
+    '과거의 나를 이겨라. 잡히면 끝이다.',
+    '그림자는 절대 잊지 않는다.',
+    '오늘의 나는 어제보다 빠를까?',
+    '뒤를 돌아보지 마라. 이미 쫓고 있다.',
+    '공포를 연료로 바꿔라.',
+    '한 발짝만 느려져도... 끝이다.',
+    '어둠 속에서 들리는 발소리. 네 것이 아니다.',
+    '기록은 거짓말을 하지 않는다.',
+    '지난 나를 넘어서야 살아남는다.',
+    '심장이 터질 것 같아도 멈추지 마라.',
+    '그림자가 웃고 있다. 오늘은 잡을 수 있다고.',
+    '두려움을 즐겨라. 그것이 너의 무기다.',
+    '0.1초가 생사를 가른다.',
+    '도망치는 것이 아니다. 이기는 것이다.',
+    '이 길의 끝에서 기다리는 건... 더 강한 나.',
+  ];
+  static const _challengeQuotesEn = [
+    'Beat your past self. Get caught and it\'s over.',
+    'The shadow never forgets.',
+    'Am I faster than yesterday?',
+    'Don\'t look back. It\'s already chasing you.',
+    'Turn fear into fuel.',
+    'One step slower... and it\'s over.',
+    'Footsteps in the dark. They\'re not yours.',
+    'Records don\'t lie.',
+    'Surpass your past self to survive.',
+    'Even if your heart explodes, don\'t stop.',
+    'The shadow is smiling. It thinks it can catch you today.',
+    'Enjoy the fear. It\'s your weapon.',
+    '0.1 seconds decides life or death.',
+    'You\'re not running away. You\'re winning.',
+    'What awaits at the end... is a stronger you.',
+  ];
+  static const _newRunQuotesKo = [
+    '새로운 기록을 남겨라. 그림자가 지켜본다.',
+    '오늘의 나를 기록하라.',
+    '그림자에게 데이터를 제공하라.',
+    '더 빠르게. 더 멀리. 그림자가 기다린다.',
+    '새로운 도전이 시작된다.',
+  ];
+  static const _newRunQuotesEn = [
+    'Leave a new record. The shadow watches.',
+    'Record today\'s you.',
+    'Feed data to the shadow.',
+    'Faster. Farther. The shadow awaits.',
+    'A new challenge begins.',
+  ];
+
   bool _gpsReady = false;
   Timer? _gpsTimer;
   RunModel? _shadowRun;
@@ -30,6 +81,7 @@ class _PrepareScreenState extends State<PrepareScreen>
   late AnimationController _countdownAnim;
   late Animation<double> _countdownScale;
   late AnimationController _pulseAnim;
+  String _selectedQuote = '';
 
   bool get _isChallenge => widget.shadowRunId != null;
 
@@ -56,7 +108,27 @@ class _PrepareScreenState extends State<PrepareScreen>
       _shadowRun = await DatabaseHelper.getRun(widget.shadowRunId!);
       _shadowPoints = await DatabaseHelper.getRunPoints(widget.shadowRunId!);
     }
+    await _pickRandomQuote();
     if (mounted) setState(() => _loading = false);
+  }
+
+  Future<void> _pickRandomQuote() async {
+    final prefs = await SharedPreferences.getInstance();
+    final quotesKo = _isChallenge ? _challengeQuotesKo : _newRunQuotesKo;
+    final quotesEn = _isChallenge ? _challengeQuotesEn : _newRunQuotesEn;
+    final prefKey = _isChallenge ? 'last_challenge_quote' : 'last_newrun_quote';
+    final lastIndex = prefs.getInt(prefKey) ?? -1;
+    final rng = Random();
+    int index;
+    if (quotesKo.length <= 1) {
+      index = 0;
+    } else {
+      do {
+        index = rng.nextInt(quotesKo.length);
+      } while (index == lastIndex);
+    }
+    await prefs.setInt(prefKey, index);
+    _selectedQuote = S.isKo ? quotesKo[index] : quotesEn[index];
   }
 
   void _startGpsCheck() {
@@ -223,9 +295,7 @@ class _PrepareScreenState extends State<PrepareScreen>
           const SizedBox(height: 10),
           // Subtitle
           Text(
-            _isChallenge
-                ? '과거의 나를 이겨라. 잡히면 끝이다.'
-                : '새로운 기록을 남겨라. 그림자가 지켜본다.',
+            _selectedQuote,
             style: SRTheme.bodyMedium.copyWith(
               color: SRColors.textMuted,
             ),
@@ -336,37 +406,49 @@ class _PrepareScreenState extends State<PrepareScreen>
         borderRadius: BorderRadius.circular(16),
         border: Border.all(color: SRColors.divider),
       ),
-      child: NaverMap(
-        options: NaverMapViewOptions(
-          initialCameraPosition: NCameraPosition(
-            target: NLatLng(centerLat, centerLng),
-            zoom: 15,
+      child: Stack(
+        children: [
+          NaverMap(
+            options: NaverMapViewOptions(
+              initialCameraPosition: NCameraPosition(
+                target: NLatLng(centerLat, centerLng),
+                zoom: 15,
+              ),
+              mapType: NMapType.basic,
+              nightModeEnable: false,
+              scrollGesturesEnable: false,
+              zoomGesturesEnable: false,
+              rotationGesturesEnable: false,
+              tiltGesturesEnable: false,
+              liteModeEnable: true,
+            ),
+            onMapReady: (controller) {
+              final coords =
+                  points.map((p) => NLatLng(p.latitude, p.longitude)).toList();
+              if (coords.length >= 2) {
+                controller.addOverlay(NPathOverlay(
+                  id: 'shadow_route',
+                  coords: coords,
+                  color: const Color(0xFFFF5262),
+                  outlineColor: const Color(0x66FF5262),
+                  width: 4,
+                ));
+                final bounds = NLatLngBounds.from(coords);
+                controller.updateCamera(
+                  NCameraUpdate.fitBounds(bounds, padding: const EdgeInsets.all(40)),
+                );
+              }
+            },
           ),
-          mapType: NMapType.navi,
-          nightModeEnable: true,
-          scrollGesturesEnable: false,
-          zoomGesturesEnable: false,
-          rotationGesturesEnable: false,
-          tiltGesturesEnable: false,
-          liteModeEnable: true,
-        ),
-        onMapReady: (controller) {
-          final coords =
-              points.map((p) => NLatLng(p.latitude, p.longitude)).toList();
-          if (coords.length >= 2) {
-            controller.addOverlay(NPathOverlay(
-              id: 'shadow_route',
-              coords: coords,
-              color: SRColors.primaryContainer,
-              outlineColor: SRColors.secondaryContainer,
-              width: 4,
-            ));
-            final bounds = NLatLngBounds.from(coords);
-            controller.updateCamera(
-              NCameraUpdate.fitBounds(bounds, padding: const EdgeInsets.all(32)),
-            );
-          }
-        },
+          Positioned.fill(
+            child: Container(
+              decoration: BoxDecoration(
+                color: SRColors.background.withValues(alpha: 0.25),
+                borderRadius: BorderRadius.circular(16),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
