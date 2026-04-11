@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:just_audio/just_audio.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:shadowrun/core/theme/app_theme.dart';
 import 'package:shadowrun/core/database/database_helper.dart';
 import 'package:shadowrun/core/services/purchase_service.dart';
@@ -19,7 +20,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
   String _unit = 'km';
   int _horrorLevel = 2;
   bool _ttsEnabled = true;
-  bool _vibrationEnabled = true;
   bool _isPro = false;
   String _selectedVoice = 'harry';
   bool _loading = true;
@@ -41,7 +41,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
       DatabaseHelper.getSetting('unit'),
       DatabaseHelper.getSetting('horror_level'),
       DatabaseHelper.getSetting('tts_enabled'),
-      DatabaseHelper.getSetting('vibration_enabled'),
       DatabaseHelper.getSetting('is_pro'),
       DatabaseHelper.getSetting('voice'),
     ]);
@@ -51,9 +50,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
       _unit = results[1] ?? 'km';
       _horrorLevel = int.tryParse(results[2] ?? '2') ?? 2;
       _ttsEnabled = results[3] != 'false';
-      _vibrationEnabled = results[4] != 'false';
-      _isPro = results[5] == 'true';
-      _selectedVoice = results[6] ?? 'harry';
+      _isPro = results[4] == 'true';
+      _selectedVoice = results[5] ?? 'harry';
       _loading = false;
     });
   }
@@ -95,6 +93,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
           : ListView(
               padding: const EdgeInsets.fromLTRB(20, 20, 20, 40),
               children: [
+                _buildLanguageSettings(),
+                const SizedBox(height: 24),
                 _buildRunningSettings(),
                 const SizedBox(height: 24),
                 _buildHorrorSettings(),
@@ -122,6 +122,34 @@ class _SettingsScreenState extends State<SettingsScreen> {
           letterSpacing: 3,
         ),
       ),
+    );
+  }
+
+  // --- Language ---
+  Widget _buildLanguageSettings() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _sectionHeader(S.isKo ? '언어' : 'LANGUAGE'),
+        Container(
+          padding: const EdgeInsets.all(20),
+          decoration: BoxDecoration(
+            color: SRColors.card,
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: _buildSegmentedControl(
+            options: const ['ko', 'en'],
+            labels: const ['한국어', 'English'],
+            selected: S.isKo ? 'ko' : 'en',
+            onChanged: (value) async {
+              final prefs = await SharedPreferences.getInstance();
+              await prefs.setString('language', value);
+              await S.init(value);
+              if (mounted) setState(() {});
+            },
+          ),
+        ),
+      ],
     );
   }
 
@@ -429,15 +457,39 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 },
               ),
               const SizedBox(height: 8),
-              // Haptic Dread toggle
-              _SettingsToggle(
-                label: S.hapticDread,
-                subtitle: S.hapticDreadDesc,
-                value: _vibrationEnabled,
-                onChanged: (v) {
-                  setState(() => _vibrationEnabled = v);
-                  _save('vibration_enabled', '$v');
-                },
+              // Haptic Dread (추후 구현)
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 6),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(S.hapticDread, style: GoogleFonts.inter(
+                            fontSize: 14, fontWeight: FontWeight.w600,
+                            color: SRColors.onSurface.withValues(alpha: 0.3),
+                          )),
+                          const SizedBox(height: 2),
+                          Text(S.hapticDreadDesc, style: GoogleFonts.inter(
+                            fontSize: 12, color: SRColors.onSurface.withValues(alpha: 0.2),
+                          )),
+                        ],
+                      ),
+                    ),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                      decoration: BoxDecoration(
+                        color: SRColors.onSurface.withValues(alpha: 0.08),
+                        borderRadius: BorderRadius.circular(6),
+                      ),
+                      child: Text(S.comingSoon, style: GoogleFonts.inter(
+                        fontSize: 9, fontWeight: FontWeight.w700,
+                        color: SRColors.onSurface.withValues(alpha: 0.3), letterSpacing: 0.5,
+                      )),
+                    ),
+                  ],
+                ),
               ),
               // Voice selection (PRO only)
               if (_isPro) ...[
