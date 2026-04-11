@@ -16,6 +16,7 @@ class HorrorService {
   bool _vibrationEnabled = true;
   bool _hasVibrator = false;
   bool _isDisposed = false;
+  String _voiceId = 'harry'; // harry, callum, drill
 
   ThreatLevel get currentLevel => _currentLevel;
 
@@ -23,10 +24,12 @@ class HorrorService {
     int horrorLevel = 3,
     bool ttsEnabled = true,
     bool vibrationEnabled = true,
+    String voice = 'harry',
   }) async {
     _horrorLevel = horrorLevel;
     _ttsEnabled = ttsEnabled;
     _vibrationEnabled = vibrationEnabled;
+    _voiceId = voice;
     _hasVibrator = (await Vibration.hasVibrator()) == true;
   }
 
@@ -129,17 +132,23 @@ class HorrorService {
   Future<void> _playTts(String baseName) async {
     if (_isDisposed) return;
     try {
-      String filename;
+      // 언어 분기: 영어 버전이 있는 대사
+      String langBase = baseName;
       if (!S.isKo) {
         const hasEnglish = {'tts_safe', 'tts_warning', 'tts_danger', 'tts_critical'};
         if (hasEnglish.contains(baseName)) {
-          filename = '${baseName}_en.mp3';
-        } else {
-          filename = '$baseName.mp3';
+          langBase = '${baseName}_en';
         }
-      } else {
-        filename = '$baseName.mp3';
       }
+
+      // 음성 분기: harry는 기본 파일명, callum/drill은 접미사
+      String filename;
+      if (_voiceId == 'harry') {
+        filename = '$langBase.mp3';
+      } else {
+        filename = '${langBase}_$_voiceId.mp3';
+      }
+
       await _ttsPlayer.setAsset('assets/audio/$filename');
       _ttsPlayer.setVolume(1.0);
       _ttsPlayer.play();

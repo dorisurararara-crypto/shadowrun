@@ -122,7 +122,7 @@ class S {
   static String get proBenefitNoAds => isKo ? '영구 광고 제거' : 'Remove ads forever';
   static String get proBenefitHorror => isKo ? '공포 레벨 3~5 해금' : 'Unlock horror levels 3-5';
   static String get proBenefitModes => isKo ? '모든 러닝 모드 해금' : 'Unlock all running modes';
-  static String get proBenefitVoice => isKo ? '음성 선택 (출시 예정)' : 'Voice selection (coming soon)';
+  static String get proBenefitVoice => isKo ? '공포 음성 선택 (3종)' : 'Horror voice selection (3 voices)';
   static String get voiceSelection => isKo ? '음성 선택' : 'Voice Selection';
   static String get voiceHarry => 'Harry — Fierce Warrior';
   static String get voiceCallum => 'Callum — Calm Operator';

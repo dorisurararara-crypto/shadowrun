@@ -136,7 +136,8 @@ class _RunningScreenState extends State<RunningScreen>
     // 화면 꺼짐 방지
     WakelockPlus.enable();
 
-    await _horrorService.initialize();
+    final voice = await DatabaseHelper.getSetting('voice') ?? 'harry';
+    await _horrorService.initialize(voice: voice);
     final ok = await _runService.startRun(shadowRunId: widget.shadowRunId);
     if (!ok && mounted) {
       WakelockPlus.disable();

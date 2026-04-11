@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:just_audio/just_audio.dart';
 import 'package:shadowrun/core/theme/app_theme.dart';
 import 'package:shadowrun/core/database/database_helper.dart';
 import 'package:shadowrun/core/services/purchase_service.dart';
@@ -25,6 +26,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
   final int _selectedNavIndex = 2;
   int _adminTapCount = 0;
   DateTime? _adminFirstTap;
+  final AudioPlayer _previewPlayer = AudioPlayer();
+  String? _playingPreview;
 
   @override
   void initState() {
@@ -451,8 +454,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 ),
                 const SizedBox(height: 12),
                 _buildVoiceOption('harry', S.voiceHarry, true),
-                _buildVoiceOption('callum', S.voiceCallum, false),
-                _buildVoiceOption('drill', S.voiceDrill, false),
+                _buildVoiceOption('callum', S.voiceCallum, true),
+                _buildVoiceOption('drill', S.voiceDrill, true),
               ],
             ],
           ),
@@ -461,8 +464,29 @@ class _SettingsScreenState extends State<SettingsScreen> {
     );
   }
 
+  Future<void> _playPreview(String voiceId) async {
+    try {
+      if (_playingPreview == voiceId) {
+        await _previewPlayer.stop();
+        setState(() => _playingPreview = null);
+        return;
+      }
+      setState(() => _playingPreview = voiceId);
+      await _previewPlayer.setAsset('assets/audio/preview/preview_danger_$voiceId.mp3');
+      _previewPlayer.play();
+      _previewPlayer.playerStateStream.listen((state) {
+        if (state.processingState == ProcessingState.completed && mounted) {
+          setState(() => _playingPreview = null);
+        }
+      });
+    } catch (e) {
+      setState(() => _playingPreview = null);
+    }
+  }
+
   Widget _buildVoiceOption(String id, String label, bool available) {
     final isSelected = _selectedVoice == id;
+    final isPlaying = _playingPreview == id;
     return GestureDetector(
       onTap: available
           ? () {
@@ -522,23 +546,27 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 ),
               ),
             ),
-            if (!available)
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+            // 미리듣기 버튼
+            GestureDetector(
+              onTap: () => _playPreview(id),
+              child: Container(
+                width: 32,
+                height: 32,
                 decoration: BoxDecoration(
-                  color: SRColors.onSurface.withValues(alpha: 0.08),
-                  borderRadius: BorderRadius.circular(4),
+                  color: isPlaying
+                      ? const Color(0xFFFF0044).withValues(alpha: 0.2)
+                      : SRColors.onSurface.withValues(alpha: 0.08),
+                  shape: BoxShape.circle,
                 ),
-                child: Text(
-                  S.comingSoon,
-                  style: GoogleFonts.inter(
-                    fontSize: 8,
-                    fontWeight: FontWeight.w700,
-                    color: SRColors.onSurface.withValues(alpha: 0.3),
-                    letterSpacing: 0.5,
-                  ),
+                child: Icon(
+                  isPlaying ? Icons.stop_rounded : Icons.play_arrow_rounded,
+                  size: 18,
+                  color: isPlaying
+                      ? const Color(0xFFFF0044)
+                      : SRColors.onSurface.withValues(alpha: 0.5),
                 ),
               ),
+            ),
           ],
         ),
       ),
