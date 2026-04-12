@@ -1,7 +1,9 @@
+import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class S {
   static String _lang = 'en';
+  static final ValueNotifier<String> languageNotifier = ValueNotifier('en');
 
   static bool get isKo => _lang == 'ko';
 
@@ -9,10 +11,12 @@ class S {
   static Future<void> init([String? langCode]) async {
     if (langCode != null) {
       _lang = langCode;
+      languageNotifier.value = langCode;
       return;
     }
     final prefs = await SharedPreferences.getInstance();
     _lang = prefs.getString('language') ?? 'en';
+    languageNotifier.value = _lang;
   }
 
   // Home screen

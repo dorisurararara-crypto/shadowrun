@@ -46,11 +46,17 @@ class ShadowRunApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp.router(
-      title: 'SHADOW RUN',
-      debugShowCheckedModeBanner: false,
-      theme: SRTheme.dark,
-      routerConfig: createRouter(languageSelected),
+    return ValueListenableBuilder<String>(
+      valueListenable: S.languageNotifier,
+      builder: (context, lang, _) {
+        return MaterialApp.router(
+          key: ValueKey(lang),
+          title: 'SHADOW RUN',
+          debugShowCheckedModeBanner: false,
+          theme: SRTheme.dark,
+          routerConfig: createRouter(languageSelected),
+        );
+      },
     );
   }
 }

@@ -123,7 +123,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 onPressed: () => context.push('/prepare'),
                 icon: const Icon(Icons.directions_run, size: 20),
                 label: Text(S.newRun, style: GoogleFonts.inter(
-                  fontSize: 12, fontWeight: FontWeight.w900, letterSpacing: 3,
+                  fontSize: 18, fontWeight: FontWeight.w900, letterSpacing: 3,
                 )),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.transparent, shadowColor: Colors.transparent,
@@ -153,7 +153,7 @@ class _HomeScreenState extends State<HomeScreen> {
               },
               icon: const Icon(Icons.workspace_premium, size: 20),
               label: Text(S.challenge, style: GoogleFonts.inter(
-                fontSize: 12, fontWeight: FontWeight.w900, letterSpacing: 3, color: SRColors.onSurface.withValues(alpha: 0.7),
+                fontSize: 18, fontWeight: FontWeight.w900, letterSpacing: 3, color: SRColors.onSurface.withValues(alpha: 0.7),
               )),
               style: OutlinedButton.styleFrom(
                 foregroundColor: SRColors.primary,
