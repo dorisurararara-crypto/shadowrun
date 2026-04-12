@@ -309,8 +309,14 @@ class _DateSection extends StatelessWidget {
   String _formatDateHeader(String date) {
     try {
       final dt = DateTime.parse(date);
-      const weekdays = ['MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT', 'SUN'];
-      return '${dt.year}.${dt.month.toString().padLeft(2, '0')}.${dt.day.toString().padLeft(2, '0')} (${weekdays[dt.weekday - 1]})';
+      if (S.isKo) {
+        const weekdaysKo = ['월', '화', '수', '목', '금', '토', '일'];
+        return '${dt.month}월 ${dt.day}일 (${weekdaysKo[dt.weekday - 1]})';
+      } else {
+        const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+        const weekdays = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+        return '${months[dt.month - 1]} ${dt.day} (${weekdays[dt.weekday - 1]})';
+      }
     } catch (_) {
       return date;
     }
@@ -502,6 +508,13 @@ class _HistoryTileState extends State<_HistoryTile>
                           icon: Icons.speed,
                           text: '${run.formattedPace}/km',
                         ),
+                        if (run.location != null && run.location!.isNotEmpty) ...[
+                          const SizedBox(width: 12),
+                          _MetaChip(
+                            icon: Icons.place_outlined,
+                            text: run.location!,
+                          ),
+                        ],
                       ],
                     ),
                   ],

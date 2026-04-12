@@ -8,13 +8,18 @@ import 'package:shadowrun/features/history/presentation/pages/history_screen.dar
 import 'package:shadowrun/features/settings/presentation/pages/settings_screen.dart';
 import 'package:shadowrun/features/analysis/presentation/pages/analysis_screen.dart';
 import 'package:shadowrun/features/onboarding/presentation/pages/language_select_screen.dart';
+import 'package:shadowrun/features/splash/splash_screen.dart';
 
 GoRouter createRouter(bool languageSelected) => GoRouter(
-  initialLocation: languageSelected ? '/' : '/language',
+  initialLocation: languageSelected ? '/splash' : '/language',
   routes: [
     GoRoute(
       path: '/language',
       builder: (context, state) => const LanguageSelectScreen(),
+    ),
+    GoRoute(
+      path: '/splash',
+      builder: (context, state) => const SplashScreen(),
     ),
     GoRoute(
       path: '/',
@@ -37,10 +42,13 @@ GoRouter createRouter(bool languageSelected) => GoRouter(
     GoRoute(
       path: '/result',
       builder: (context, state) {
-        final args = state.extra as Map<String, dynamic>;
+        final args = state.extra as Map<String, dynamic>? ?? {};
+        final runId = args['runId'] as int? ?? 0;
+        final result = args['result'] as String?;
+        if (runId == 0) return const HomeScreen();
         return ResultScreen(
-          runId: args['runId'] as int,
-          result: args['result'] as String?,
+          runId: runId,
+          result: result,
         );
       },
     ),

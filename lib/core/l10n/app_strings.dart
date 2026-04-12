@@ -133,6 +133,16 @@ class S {
   static String get voiceDrill => 'Drill Sergeant — Commander';
   static String get comingSoon => isKo ? '출시 예정' : 'COMING SOON';
   static String get upgrade => isKo ? '업그레이드' : 'UPGRADE';
+  static String get shadowSpeed => isKo ? '그림자 속도' : 'Shadow Speed';
+  static String get shadowSpeedDesc => isKo ? '도플갱어의 추격 속도를 조절합니다' : 'Adjust the doppelganger chase speed';
+  static String get slow => isKo ? '느림' : 'Slow';
+  static String get normal => isKo ? '보통' : 'Normal';
+  static String get fast => isKo ? '빠름' : 'Fast';
+  static String get proBenefitSpeed => isKo ? '그림자 속도 조절' : 'Shadow speed control';
+  static String get freeTrialBanner => isKo ? '7일 무료체험 중' : '7-DAY FREE TRIAL';
+  static String get freeTrialExpired => isKo ? '무료체험이 종료되었습니다' : 'Free trial expired';
+  static String get startFreeTrial => isKo ? '7일 무료체험 시작' : 'START 7-DAY FREE TRIAL';
+  static String get trialDaysLeft => isKo ? '무료체험 남은 일수' : 'Trial days left';
 
   // Hardcoded strings (previously Korean-only)
   static String get storeUnavailable => isKo ? '스토어에 연결할 수 없습니다' : 'Store unavailable';

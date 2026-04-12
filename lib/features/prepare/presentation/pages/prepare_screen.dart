@@ -73,6 +73,7 @@ class _PrepareScreenState extends State<PrepareScreen>
 
   bool _gpsReady = false;
   Timer? _gpsTimer;
+  StreamSubscription<Position>? _gpsSub;
   RunModel? _shadowRun;
   List<RunPoint>? _shadowPoints;
   bool _loading = true;
@@ -132,11 +133,25 @@ class _PrepareScreenState extends State<PrepareScreen>
   }
 
   void _startGpsCheck() {
-    _checkGps();
-    _gpsTimer = Timer.periodic(const Duration(seconds: 2), (_) => _checkGps());
+    _checkGpsOnce();
+    // 스트림으로 GPS 상태 모니터링 (폴링 대신)
+    _gpsSub = Geolocator.getPositionStream(
+      locationSettings: const LocationSettings(
+        accuracy: LocationAccuracy.high,
+        distanceFilter: 0,
+        timeLimit: Duration(seconds: 5),
+      ),
+    ).listen(
+      (pos) {
+        if (mounted) setState(() => _gpsReady = pos.accuracy < 30);
+      },
+      onError: (_) {
+        if (mounted) setState(() => _gpsReady = false);
+      },
+    );
   }
 
-  Future<void> _checkGps() async {
+  Future<void> _checkGpsOnce() async {
     try {
       final serviceEnabled = await Geolocator.isLocationServiceEnabled();
       if (!serviceEnabled) {
@@ -151,15 +166,6 @@ class _PrepareScreenState extends State<PrepareScreen>
           permission == LocationPermission.deniedForever) {
         if (mounted) setState(() => _gpsReady = false);
         return;
-      }
-      final pos = await Geolocator.getCurrentPosition(
-        locationSettings: const LocationSettings(
-          accuracy: LocationAccuracy.high,
-          timeLimit: Duration(seconds: 3),
-        ),
-      );
-      if (mounted) {
-        setState(() => _gpsReady = pos.accuracy < 30);
       }
     } catch (_) {
       if (mounted) setState(() => _gpsReady = false);
@@ -191,6 +197,7 @@ class _PrepareScreenState extends State<PrepareScreen>
   @override
   void dispose() {
     _gpsTimer?.cancel();
+    _gpsSub?.cancel();
     _countdownAnim.dispose();
     _pulseAnim.dispose();
     super.dispose();

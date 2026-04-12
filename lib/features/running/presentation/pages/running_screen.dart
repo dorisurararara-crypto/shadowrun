@@ -133,32 +133,48 @@ class _RunningScreenState extends State<RunningScreen>
   }
 
   Future<void> _startRun() async {
-    // 화면 꺼짐 방지
-    WakelockPlus.enable();
+    try {
+      // 화면 꺼짐 방지
+      WakelockPlus.enable();
 
-    final voice = await DatabaseHelper.getSetting('voice') ?? 'harry';
-    await _horrorService.initialize(voice: voice);
-    final ok = await _runService.startRun(shadowRunId: widget.shadowRunId);
-    if (!ok && mounted) {
-      WakelockPlus.disable();
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(S.gpsRequired)),
+      final voice = await DatabaseHelper.getSetting('voice') ?? 'harry';
+      final speedStr = await DatabaseHelper.getSetting('shadow_speed') ?? '1.0';
+      final shadowSpeed = double.tryParse(speedStr) ?? 1.0;
+      await _horrorService.initialize(voice: voice);
+      final ok = await _runService.startRun(
+        shadowRunId: widget.shadowRunId,
+        shadowSpeedMultiplier: shadowSpeed,
       );
-      context.pop();
-      return;
-    }
-
-    // 러닝 시작 TTS
-    await _horrorService.playStartTts();
-
-    _ticker = Timer.periodic(const Duration(seconds: 1), (_) {
-      if (!_paused && mounted) {
-        setState(() {});
-        _checkVehicleSpeed();
-        _updateHorror();
-        _updateMap();
+      if (!ok && mounted) {
+        WakelockPlus.disable();
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(S.gpsRequired)),
+        );
+        context.pop();
+        return;
       }
-    });
+
+      // 러닝 시작 TTS
+      await _horrorService.playStartTts();
+
+      _ticker = Timer.periodic(const Duration(seconds: 1), (_) {
+        if (!_paused && mounted) {
+          setState(() {});
+          _checkVehicleSpeed();
+          _updateHorror();
+          _updateMap();
+        }
+      });
+    } catch (e) {
+      debugPrint('러닝 시작 에러: $e');
+      if (mounted) {
+        WakelockPlus.disable();
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(S.gpsRequired)),
+        );
+        context.pop();
+      }
+    }
   }
 
   void _onRunUpdate() {
@@ -170,6 +186,7 @@ class _RunningScreenState extends State<RunningScreen>
       _vehicleDetectCount++;
       if (_vehicleDetectCount >= 3 && !_paused) {
         _paused = true;
+        _runService.pauseRun();
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(S.vehiclePaused),
@@ -337,7 +354,14 @@ class _RunningScreenState extends State<RunningScreen>
   }
 
   void _togglePause() {
-    setState(() => _paused = !_paused);
+    setState(() {
+      _paused = !_paused;
+      if (_paused) {
+        _runService.pauseRun();
+      } else {
+        _runService.resumeRun();
+      }
+    });
   }
 
   Future<void> _confirmStop() async {

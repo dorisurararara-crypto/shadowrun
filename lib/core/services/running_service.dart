@@ -5,22 +5,30 @@ import 'package:flutter_tts/flutter_tts.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:shadowrun/shared/models/run_model.dart';
 import 'package:shadowrun/core/database/database_helper.dart';
+import 'package:shadowrun/core/services/geocoding_service.dart';
 import 'package:shadowrun/core/l10n/app_strings.dart';
 
 class RunningService extends ChangeNotifier {
   static const double minSpeedMps = 1.0; // 3.6 km/h
   static const double maxSpeedMps = 8.0; // 28.8 km/h
+  static const int _shadowGracePeriodS = 10; // 시작 후 10초 유예
 
   StreamSubscription<Position>? _positionSub;
   final List<RunPoint> _points = [];
   List<RunPoint>? _shadowPoints;
   int? _shadowRunId;
+  double _shadowSpeedMultiplier = 1.0; // 0.7 ~ 1.3
 
   bool _isRunning = false;
+  bool _isPaused = false;
   DateTime? _startTime;
+  Duration _pausedDuration = Duration.zero;
+  DateTime? _pauseStart;
   double _totalDistanceM = 0;
   Position? _lastPosition;
   int _currentShadowIndex = 0;
+  double _cachedShadowDist = 0;
+  int _cachedShadowIdx = 0;
   double _currentSpeed = 0;
   double _heading = 0;
   int _lastAnnouncedKm = 0;
@@ -29,10 +37,16 @@ class RunningService extends ChangeNotifier {
 
   // Public getters
   bool get isRunning => _isRunning;
+  bool get isPaused => _isPaused;
   List<RunPoint> get points => List.unmodifiable(_points);
   List<RunPoint>? get shadowPoints => _shadowPoints;
   double get totalDistanceM => _totalDistanceM;
-  int get durationS => _startTime == null ? 0 : DateTime.now().difference(_startTime!).inSeconds;
+  int get durationS {
+    if (_startTime == null) return 0;
+    final total = DateTime.now().difference(_startTime!);
+    final activePause = _pauseStart != null ? DateTime.now().difference(_pauseStart!) : Duration.zero;
+    return (total - _pausedDuration - activePause).inSeconds;
+  }
 
   double get avgPace {
     if (_totalDistanceM < 10 || durationS < 1) return 0;
@@ -65,20 +79,28 @@ class RunningService extends ChangeNotifier {
     if (_shadowPoints == null || _lastPosition == null || currentShadowPoint == null) {
       return double.infinity;
     }
-    // 내 총 거리 vs 도플갱어의 해당 시점 거리
     final elapsed = durationS;
-    double shadowDist = 0;
-    int shadowIdx = 0;
+    // 시작 후 유예기간 동안은 안전 거리 반환
+    if (elapsed < _shadowGracePeriodS) {
+      return 200.0;
+    }
+    // 유예기간 이후 도플갱어 시간 계산 (배율 적용)
+    final shadowElapsedS = (elapsed - _shadowGracePeriodS) * _shadowSpeedMultiplier;
+    // 캐시된 인덱스부터 이어서 계산 (O(1) amortized)
+    double shadowDist = _cachedShadowDist;
+    int shadowIdx = _cachedShadowIdx;
     final startMs = _shadowPoints!.first.timestampMs;
-    for (int i = 1; i < _shadowPoints!.length; i++) {
+    for (int i = shadowIdx + 1; i < _shadowPoints!.length; i++) {
       final elapsedMs = _shadowPoints![i].timestampMs - startMs;
-      if (elapsedMs > elapsed * 1000) break;
+      if (elapsedMs > shadowElapsedS * 1000) break;
       shadowDist += _distanceBetweenPoints(
         _shadowPoints![i - 1].latitude, _shadowPoints![i - 1].longitude,
         _shadowPoints![i].latitude, _shadowPoints![i].longitude,
       );
       shadowIdx = i;
     }
+    _cachedShadowDist = shadowDist;
+    _cachedShadowIdx = shadowIdx;
     _currentShadowIndex = shadowIdx;
     return _totalDistanceM - shadowDist;
   }
@@ -99,8 +121,29 @@ class RunningService extends ChangeNotifier {
     return '${m.toString().padLeft(2, '0')}:${sec.toString().padLeft(2, '0')}';
   }
 
+  void pauseRun() {
+    if (!_isPaused) {
+      _isPaused = true;
+      _pauseStart = DateTime.now();
+      notifyListeners();
+    }
+  }
+
+  void resumeRun() {
+    if (_isPaused && _pauseStart != null) {
+      _pausedDuration += DateTime.now().difference(_pauseStart!);
+      _pauseStart = null;
+      _isPaused = false;
+      notifyListeners();
+    }
+  }
+
   /// 러닝 시작
-  Future<bool> startRun({int? shadowRunId}) async {
+  Future<bool> startRun({int? shadowRunId, double shadowSpeedMultiplier = 1.0}) async {
+    // GPS 서비스 활성화 확인
+    final serviceEnabled = await Geolocator.isLocationServiceEnabled();
+    if (!serviceEnabled) return false;
+
     final permission = await Geolocator.checkPermission();
     if (permission == LocationPermission.denied) {
       final req = await Geolocator.requestPermission();
@@ -110,6 +153,7 @@ class RunningService extends ChangeNotifier {
     }
 
     _shadowRunId = shadowRunId;
+    _shadowSpeedMultiplier = shadowSpeedMultiplier;
     if (shadowRunId != null) {
       _shadowPoints = await DatabaseHelper.getRunPoints(shadowRunId);
       debugPrint('SHADOW: loaded ${_shadowPoints?.length ?? 0} points for run $shadowRunId');
@@ -117,11 +161,20 @@ class RunningService extends ChangeNotifier {
       debugPrint('SHADOW: no shadow run (new run mode)');
     }
 
+    // 기존 구독 누수 방지
+    await _positionSub?.cancel();
+    _positionSub = null;
+
     _points.clear();
     _totalDistanceM = 0;
     _lastPosition = null;
     _currentShadowIndex = 0;
+    _cachedShadowDist = 0;
+    _cachedShadowIdx = 0;
     _lastAnnouncedKm = 0;
+    _isPaused = false;
+    _pausedDuration = Duration.zero;
+    _pauseStart = null;
     _startTime = DateTime.now();
     _isRunning = true;
 
@@ -148,7 +201,7 @@ class RunningService extends ChangeNotifier {
   }
 
   void _onPosition(Position pos) {
-    if (!_isRunning) return;
+    if (!_isRunning || _isPaused) return;
 
     _currentSpeed = pos.speed >= 0 ? pos.speed : 0;
     if (pos.heading >= 0) _heading = pos.heading;
@@ -196,6 +249,15 @@ class RunningService extends ChangeNotifier {
       result = shadowDistanceM >= 0 ? 'win' : 'lose';
     }
 
+    // 시작 지점으로 역지오코딩
+    String? location;
+    if (_points.isNotEmpty) {
+      location = await GeocodingService.reverseGeocode(
+        _points.first.latitude,
+        _points.first.longitude,
+      );
+    }
+
     final run = RunModel(
       date: DateTime.now().toIso8601String(),
       distanceM: _totalDistanceM,
@@ -205,22 +267,14 @@ class RunningService extends ChangeNotifier {
       isChallenge: isChallenge,
       challengeResult: result,
       shadowRunId: _shadowRunId,
+      location: location,
     );
 
-    final runId = await DatabaseHelper.insertRun(run);
-    final savedPoints = _points.map((p) => RunPoint(
-      runId: runId,
-      latitude: p.latitude,
-      longitude: p.longitude,
-      timestampMs: p.timestampMs,
-      speedMps: p.speedMps,
-      heartRate: p.heartRate,
-    )).toList();
-    await DatabaseHelper.insertPoints(savedPoints);
-
-    if (isChallenge) {
-      await DatabaseHelper.incrementDailyChallenge();
-    }
+    final runId = await DatabaseHelper.insertRunWithPoints(
+      run,
+      _points,
+      incrementChallenge: isChallenge,
+    );
 
     notifyListeners();
     return RunModel(
@@ -233,6 +287,7 @@ class RunningService extends ChangeNotifier {
       isChallenge: run.isChallenge,
       challengeResult: run.challengeResult,
       shadowRunId: run.shadowRunId,
+      location: run.location,
     );
   }
 

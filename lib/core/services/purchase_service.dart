@@ -9,12 +9,17 @@ class PurchaseService {
   PurchaseService._();
 
   static const _proProductId = 'shadowrun_pro';
+  static const _trialDays = 7;
 
   final InAppPurchase _iap = InAppPurchase.instance;
   StreamSubscription<List<PurchaseDetails>>? _subscription;
   bool _isPro = false;
+  bool _isTrial = false;
+  int _trialDaysLeft = 0;
 
   bool get isPro => _isPro;
+  bool get isTrial => _isTrial;
+  int get trialDaysLeft => _trialDaysLeft;
 
   /// 관리자 키 등 외부에서 PRO 활성화 시 호출
   Future<void> activatePro() async {
@@ -26,6 +31,11 @@ class PurchaseService {
     // 저장된 PRO 상태를 항상 먼저 확인
     final savedPro = await DatabaseHelper.getSetting('is_pro');
     _isPro = savedPro == 'true';
+
+    // 무료체험 확인 (PRO 미구매 시에만)
+    if (!_isPro) {
+      await _checkTrial();
+    }
 
     final available = await _iap.isAvailable();
     if (!available) {
@@ -83,6 +93,41 @@ class PurchaseService {
     } catch (e) {
       debugPrint('구매 실패: $e');
       return false;
+    }
+  }
+
+  /// 무료체험 시작
+  Future<bool> startTrial() async {
+    final existing = await DatabaseHelper.getSetting('trial_start_date');
+    if (existing != null) return false; // 이미 사용함
+    final now = DateTime.now().toIso8601String().substring(0, 10);
+    await DatabaseHelper.setSetting('trial_start_date', now);
+    _isTrial = true;
+    _isPro = true;
+    _trialDaysLeft = _trialDays;
+    return true;
+  }
+
+  Future<void> _checkTrial() async {
+    final startStr = await DatabaseHelper.getSetting('trial_start_date');
+    if (startStr == null) {
+      _isTrial = false;
+      return;
+    }
+    final start = DateTime.tryParse(startStr);
+    if (start == null) {
+      _isTrial = false;
+      return;
+    }
+    final now = DateTime.now();
+    final elapsed = now.difference(start).inDays;
+    if (elapsed < _trialDays) {
+      _isTrial = true;
+      _isPro = true;
+      _trialDaysLeft = _trialDays - elapsed;
+    } else {
+      _isTrial = false;
+      _trialDaysLeft = 0;
     }
   }
 

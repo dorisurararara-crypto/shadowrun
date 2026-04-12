@@ -8,6 +8,7 @@ class RunModel {
   final bool isChallenge;
   final String? challengeResult; // 'win', 'lose', null
   final int? shadowRunId;
+  final String? location;
 
   const RunModel({
     this.id,
@@ -19,6 +20,7 @@ class RunModel {
     this.isChallenge = false,
     this.challengeResult,
     this.shadowRunId,
+    this.location,
   });
 
   Map<String, dynamic> toMap() => {
@@ -31,6 +33,7 @@ class RunModel {
     'is_challenge': isChallenge ? 1 : 0,
     'challenge_result': challengeResult,
     'shadow_run_id': shadowRunId,
+    'location': location,
   };
 
   factory RunModel.fromMap(Map<String, dynamic> map) => RunModel(
@@ -43,9 +46,18 @@ class RunModel {
     isChallenge: (map['is_challenge'] as int?) == 1,
     challengeResult: map['challenge_result'] as String?,
     shadowRunId: map['shadow_run_id'] as int?,
+    location: map['location'] as String?,
   );
 
-  String get formattedDistance {
+  String get formattedDistance => formattedDistanceUnit('km');
+
+  String formattedDistanceUnit(String unit) {
+    if (unit == 'mi') {
+      final miles = distanceM / 1609.344;
+      if (miles >= 0.1) return '${miles.toStringAsFixed(2)}mi';
+      final yards = (distanceM * 1.09361).toInt();
+      return '${yards}yd';
+    }
     if (distanceM >= 1000) {
       return '${(distanceM / 1000).toStringAsFixed(2)}km';
     }
@@ -60,10 +72,38 @@ class RunModel {
     return '${m.toString().padLeft(2, '0')}:${s.toString().padLeft(2, '0')}';
   }
 
-  String get formattedPace {
-    final min = avgPace.floor();
-    final sec = ((avgPace - min) * 60).round();
+  String get formattedPace => formattedPaceUnit('km');
+
+  String formattedPaceUnit(String unit) {
+    final pace = unit == 'mi' ? avgPace * 1.60934 : avgPace;
+    if (pace <= 0 || pace.isInfinite) return "--'--\"";
+    final min = pace.floor();
+    final sec = ((pace - min) * 60).round();
     return "$min'${sec.toString().padLeft(2, '0')}\"";
+  }
+
+  /// 한글 날짜: "4월 12일 토요일" / 영어: "Apr 12, Sat"
+  String formattedDateLocalized(bool isKo) {
+    final dt = DateTime.tryParse(date);
+    if (dt == null) return date;
+
+    if (isKo) {
+      const weekdaysKo = ['월요일', '화요일', '수요일', '목요일', '금요일', '토요일', '일요일'];
+      return '${dt.month}월 ${dt.day}일 ${weekdaysKo[dt.weekday - 1]}';
+    } else {
+      const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+      const weekdays = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+      return '${months[dt.month - 1]} ${dt.day}, ${weekdays[dt.weekday - 1]}';
+    }
+  }
+
+  /// 날짜 + 장소 조합: "4월 12일 토요일 · 마포구"
+  String formattedDateWithLocation(bool isKo) {
+    final dateStr = formattedDateLocalized(isKo);
+    if (location != null && location!.isNotEmpty) {
+      return '$dateStr · $location';
+    }
+    return dateStr;
   }
 }
 

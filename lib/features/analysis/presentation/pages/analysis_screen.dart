@@ -29,6 +29,11 @@ class _AnalysisScreenState extends State<AnalysisScreen> {
   }
 
   Future<void> _loadData() async {
+    final isPro = PurchaseService().isPro;
+    if (!isPro) {
+      if (mounted) setState(() => _loading = false);
+      return;
+    }
     final monthRuns = await DatabaseHelper.getRunsGroupedByDate(_currentMonth);
     final weeklyStats = await DatabaseHelper.getWeeklyStats(8);
     if (mounted) {

@@ -13,7 +13,18 @@ class DatabaseHelper {
 
   static Future<Database> _initDb() async {
     final path = join(await getDatabasesPath(), 'shadowrun.db');
-    return openDatabase(path, version: 1, onCreate: _onCreate);
+    return openDatabase(
+      path,
+      version: 2,
+      onCreate: _onCreate,
+      onUpgrade: _onUpgrade,
+    );
+  }
+
+  static Future<void> _onUpgrade(Database db, int oldVersion, int newVersion) async {
+    if (oldVersion < 2) {
+      await db.execute('ALTER TABLE runs ADD COLUMN location TEXT');
+    }
   }
 
   static Future<void> _onCreate(Database db, int version) async {
@@ -28,6 +39,7 @@ class DatabaseHelper {
         is_challenge INTEGER NOT NULL DEFAULT 0,
         challenge_result TEXT,
         shadow_run_id INTEGER,
+        location TEXT,
         FOREIGN KEY (shadow_run_id) REFERENCES runs(id)
       )
     ''');
@@ -83,6 +95,39 @@ class DatabaseHelper {
     final db = await database;
     await db.delete('run_points', where: 'run_id = ?', whereArgs: [id]);
     await db.delete('runs', where: 'id = ?', whereArgs: [id]);
+  }
+
+  /// 러닝 + 포인트 + 챌린지 카운트를 트랜잭션으로 저장
+  static Future<int> insertRunWithPoints(RunModel run, List<RunPoint> points, {bool incrementChallenge = false}) async {
+    final db = await database;
+    late int runId;
+    await db.transaction((txn) async {
+      runId = await txn.insert('runs', run.toMap());
+      final batch = txn.batch();
+      for (final p in points) {
+        batch.insert('run_points', RunPoint(
+          runId: runId,
+          latitude: p.latitude,
+          longitude: p.longitude,
+          timestampMs: p.timestampMs,
+          speedMps: p.speedMps,
+          heartRate: p.heartRate,
+        ).toMap());
+      }
+      await batch.commit(noResult: true);
+      if (incrementChallenge) {
+        final today = DateTime.now().toIso8601String().substring(0, 10);
+        final savedDate = (await txn.query('settings', where: 'key = ?', whereArgs: ['daily_challenges_date'])).firstOrNull;
+        int count = 0;
+        if (savedDate != null && savedDate['value'] == today) {
+          final countRow = await txn.query('settings', where: 'key = ?', whereArgs: ['daily_challenges']);
+          count = int.tryParse(countRow.firstOrNull?['value'] as String? ?? '0') ?? 0;
+        }
+        await txn.insert('settings', {'key': 'daily_challenges', 'value': '${count + 1}'}, conflictAlgorithm: ConflictAlgorithm.replace);
+        await txn.insert('settings', {'key': 'daily_challenges_date', 'value': today}, conflictAlgorithm: ConflictAlgorithm.replace);
+      }
+    });
+    return runId;
   }
 
   // --- Run Points ---

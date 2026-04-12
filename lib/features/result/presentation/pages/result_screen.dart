@@ -129,7 +129,7 @@ class _ResultScreenState extends State<ResultScreen>
         backgroundColor: SRColors.background,
         body: Center(
           child: Text(
-            '기록을 찾을 수 없습니다',
+            S.isKo ? '기록을 찾을 수 없습니다' : 'Record not found',
             style: SRTheme.bodyMedium,
           ),
         ),

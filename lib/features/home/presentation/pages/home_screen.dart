@@ -394,6 +394,9 @@ class _HomeScreenState extends State<HomeScreen> {
             child: CircularProgressIndicator(color: SRColors.primaryContainer, strokeWidth: 2),
           ));
         }
+        if (snapshot.hasError) {
+          return const SizedBox.shrink();
+        }
 
         final runs = snapshot.data ?? [];
         final recent = runs.take(3).toList();
@@ -537,7 +540,7 @@ class _RunTile extends StatelessWidget {
               Expanded(child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(_formatDate(run.date), style: GoogleFonts.inter(
+                  Text(run.formattedDateWithLocation(S.isKo), style: GoogleFonts.inter(
                     fontSize: 15, fontWeight: FontWeight.w600, color: SRColors.onSurface,
                   )),
                   const SizedBox(height: 4),
@@ -555,14 +558,6 @@ class _RunTile extends StatelessWidget {
     );
   }
 
-  String _formatDate(String isoDate) {
-    try {
-      final dt = DateTime.parse(isoDate);
-      return '${dt.month}/${dt.day} ${dt.hour.toString().padLeft(2, '0')}:${dt.minute.toString().padLeft(2, '0')}';
-    } catch (_) {
-      return isoDate;
-    }
-  }
 }
 
 class _ChallengeBadge extends StatelessWidget {

@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -22,17 +23,26 @@ class _SettingsScreenState extends State<SettingsScreen> {
   bool _ttsEnabled = true;
   bool _isPro = false;
   String _selectedVoice = 'harry';
+  double _shadowSpeed = 1.0;
   bool _loading = true;
   final int _selectedNavIndex = 2;
   int _adminTapCount = 0;
   DateTime? _adminFirstTap;
   final AudioPlayer _previewPlayer = AudioPlayer();
+  StreamSubscription? _previewSub;
   String? _playingPreview;
 
   @override
   void initState() {
     super.initState();
     _loadSettings();
+  }
+
+  @override
+  void dispose() {
+    _previewSub?.cancel();
+    _previewPlayer.dispose();
+    super.dispose();
   }
 
   Future<void> _loadSettings() async {
@@ -43,6 +53,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
       DatabaseHelper.getSetting('tts_enabled'),
       DatabaseHelper.getSetting('is_pro'),
       DatabaseHelper.getSetting('voice'),
+      DatabaseHelper.getSetting('shadow_speed'),
     ]);
 
     setState(() {
@@ -52,6 +63,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
       _ttsEnabled = results[3] != 'false';
       _isPro = results[4] == 'true';
       _selectedVoice = results[5] ?? 'harry';
+      _shadowSpeed = double.tryParse(results[6] ?? '1.0') ?? 1.0;
       _loading = false;
     });
   }
@@ -507,7 +519,97 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 _buildVoiceOption('harry', S.voiceHarry, true),
                 _buildVoiceOption('callum', S.voiceCallum, true),
                 _buildVoiceOption('drill', S.voiceDrill, true),
+                const SizedBox(height: 20),
+                Container(height: 0.5, color: Colors.white.withValues(alpha: 0.06)),
+                const SizedBox(height: 16),
+                _buildShadowSpeedSlider(),
               ],
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildShadowSpeedSlider() {
+    final speedLabel = _shadowSpeed <= 0.75
+        ? S.slow
+        : _shadowSpeed >= 1.15
+            ? S.fast
+            : S.normal;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  S.shadowSpeed,
+                  style: GoogleFonts.inter(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w600,
+                    color: SRColors.onSurface.withValues(alpha: 0.6),
+                  ),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  S.shadowSpeedDesc,
+                  style: GoogleFonts.inter(
+                    fontSize: 11,
+                    color: SRColors.onSurface.withValues(alpha: 0.3),
+                  ),
+                ),
+              ],
+            ),
+            Text(
+              '${(_shadowSpeed * 100).round()}%',
+              style: GoogleFonts.spaceGrotesk(
+                fontSize: 24,
+                fontWeight: FontWeight.w900,
+                color: const Color(0xFFFF0044),
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 12),
+        SliderTheme(
+          data: SliderThemeData(
+            activeTrackColor: const Color(0xFFFF0044),
+            inactiveTrackColor: SRColors.background,
+            thumbColor: const Color(0xFFFF0044),
+            overlayColor: const Color(0xFFFF0044).withValues(alpha: 0.15),
+            trackHeight: 6,
+            thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 8),
+          ),
+          child: Slider(
+            value: _shadowSpeed,
+            min: 0.7,
+            max: 1.3,
+            divisions: 6,
+            onChanged: (value) {
+              setState(() => _shadowSpeed = double.parse(value.toStringAsFixed(1)));
+              _save('shadow_speed', _shadowSpeed.toStringAsFixed(1));
+            },
+          ),
+        ),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 8),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(S.slow, style: GoogleFonts.inter(
+                fontSize: 10, color: SRColors.onSurface.withValues(alpha: 0.3),
+              )),
+              Text(speedLabel, style: GoogleFonts.inter(
+                fontSize: 10, fontWeight: FontWeight.w700,
+                color: const Color(0xFFFF0044).withValues(alpha: 0.6),
+              )),
+              Text(S.fast, style: GoogleFonts.inter(
+                fontSize: 10, color: SRColors.onSurface.withValues(alpha: 0.3),
+              )),
             ],
           ),
         ),
@@ -522,10 +624,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
         setState(() => _playingPreview = null);
         return;
       }
+      _previewSub?.cancel();
       setState(() => _playingPreview = voiceId);
       await _previewPlayer.setAsset('assets/audio/preview/preview_danger_$voiceId.mp3');
       _previewPlayer.play();
-      _previewPlayer.playerStateStream.listen((state) {
+      _previewSub = _previewPlayer.playerStateStream.listen((state) {
         if (state.processingState == ProcessingState.completed && mounted) {
           setState(() => _playingPreview = null);
         }
@@ -626,6 +729,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
   // --- PRO Section (when activated) ---
   Widget _buildProSection() {
+    final purchase = PurchaseService();
+    final isTrial = purchase.isTrial;
+    final daysLeft = purchase.trialDaysLeft;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -644,7 +751,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   Icon(Icons.verified, color: SRColors.safe, size: 20),
                   const SizedBox(width: 8),
                   Text(
-                    S.proActivated,
+                    isTrial ? S.freeTrialBanner : S.proActivated,
                     style: GoogleFonts.inter(
                       fontSize: 14,
                       fontWeight: FontWeight.w900,
@@ -654,14 +761,58 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   ),
                 ],
               ),
+              if (isTrial) ...[
+                const SizedBox(height: 8),
+                Row(
+                  children: [
+                    Icon(Icons.timer_outlined, color: SRColors.safe.withValues(alpha: 0.6), size: 14),
+                    const SizedBox(width: 6),
+                    Text(
+                      '${S.trialDaysLeft}: $daysLeft${S.isKo ? '일' : ' days'}',
+                      style: GoogleFonts.inter(
+                        fontSize: 12,
+                        color: SRColors.safe.withValues(alpha: 0.8),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
               const SizedBox(height: 12),
               _proBenefitRow(Icons.block, S.proBenefitNoAds),
               _proBenefitRow(Icons.psychology, S.proBenefitHorror),
               _proBenefitRow(Icons.map, S.proBenefitModes),
               _proBenefitRow(Icons.record_voice_over, S.proBenefitVoice),
+              _proBenefitRow(Icons.speed, S.proBenefitSpeed),
             ],
           ),
         ),
+        if (isTrial) ...[
+          const SizedBox(height: 12),
+          SizedBox(
+            width: double.infinity,
+            height: 48,
+            child: ElevatedButton(
+              onPressed: () async {
+                final success = await PurchaseService().buyPro();
+                if (!success && mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text(S.storeUnavailable), backgroundColor: SRColors.surface),
+                  );
+                }
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFFFF0044),
+                foregroundColor: Colors.white,
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(28)),
+                elevation: 0,
+              ),
+              child: Text(
+                S.upgradeToPro,
+                style: GoogleFonts.inter(fontSize: 12, fontWeight: FontWeight.w800, letterSpacing: 2),
+              ),
+            ),
+          ),
+        ],
       ],
     );
   }
@@ -750,6 +901,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
               ),
             ),
           ),
+          const SizedBox(height: 10),
+          // 무료체험 버튼
+          _buildFreeTrialButton(),
           const SizedBox(height: 12),
           // PRO benefits preview
           Container(
@@ -765,11 +919,55 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 _proBenefitPreviewRow(Icons.psychology, S.proBenefitHorror),
                 _proBenefitPreviewRow(Icons.map, S.proBenefitModes),
                 _proBenefitPreviewRow(Icons.record_voice_over, S.proBenefitVoice),
+                _proBenefitPreviewRow(Icons.speed, S.proBenefitSpeed),
               ],
             ),
           ),
         ],
       ),
+    );
+  }
+
+  Widget _buildFreeTrialButton() {
+    return FutureBuilder<String?>(
+      future: DatabaseHelper.getSetting('trial_start_date'),
+      builder: (context, snapshot) {
+        final alreadyUsed = snapshot.data != null;
+        if (alreadyUsed) return const SizedBox.shrink();
+        return SizedBox(
+          width: double.infinity,
+          height: 48,
+          child: OutlinedButton(
+            onPressed: () async {
+              final started = await PurchaseService().startTrial();
+              if (started && mounted) {
+                setState(() => _isPro = true);
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(S.freeTrialBanner),
+                    backgroundColor: SRColors.safe,
+                  ),
+                );
+              }
+            },
+            style: OutlinedButton.styleFrom(
+              side: const BorderSide(color: Color(0xFFFF0044), width: 1.5),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(28),
+              ),
+            ),
+            child: Text(
+              S.startFreeTrial,
+              style: GoogleFonts.inter(
+                fontSize: 12,
+                fontWeight: FontWeight.w800,
+                color: const Color(0xFFFF0044),
+                letterSpacing: 2,
+              ),
+            ),
+          ),
+        );
+      },
     );
   }
 

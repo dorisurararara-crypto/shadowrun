@@ -26,8 +26,17 @@ void main() async {
     debugPrint('네이버맵 초기화 실패: $e');
   }
 
-  await AdService().initialize();
-  await PurchaseService().initialize();
+  try {
+    await AdService().initialize();
+  } catch (e) {
+    debugPrint('AdService 초기화 실패: $e');
+  }
+
+  try {
+    await PurchaseService().initialize();
+  } catch (e) {
+    debugPrint('PurchaseService 초기화 실패: $e');
+  }
 
   final langSelected = await isLanguageSelected();
 
