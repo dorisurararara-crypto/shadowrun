@@ -14,6 +14,7 @@ class RunningService extends ChangeNotifier {
   static const double minSpeedMps = 1.0; // 3.6 km/h
   static const double maxSpeedMps = 8.0; // 28.8 km/h
   static const int _shadowGracePeriodS = 10; // 시작 후 10초 유예
+  bool kmSplitTtsEnabled = true; // 마라토너 모드에서는 false (MarathonService가 처리)
 
   StreamSubscription<Position>? _positionSub;
   final List<RunPoint> _points = [];
@@ -146,12 +147,12 @@ class RunningService extends ChangeNotifier {
     final serviceEnabled = await Geolocator.isLocationServiceEnabled();
     if (!serviceEnabled) return false;
 
-    final permission = await Geolocator.checkPermission();
+    var permission = await Geolocator.checkPermission();
     if (permission == LocationPermission.denied) {
-      final req = await Geolocator.requestPermission();
-      if (req == LocationPermission.denied || req == LocationPermission.deniedForever) {
-        return false;
-      }
+      permission = await Geolocator.requestPermission();
+    }
+    if (permission == LocationPermission.denied || permission == LocationPermission.deniedForever) {
+      return false;
     }
 
     _shadowRunId = shadowRunId;
@@ -233,22 +234,14 @@ class RunningService extends ChangeNotifier {
     if (!_isRunning) return;
 
     // 속도는 항상 업데이트 (차량 감지 자동 복귀 위해)
-    double speed = pos.speed >= 0 ? pos.speed : 0;
-    if (speed <= 0 && _lastPosition != null) {
-      final dist = Geolocator.distanceBetween(
-        _lastPosition!.latitude, _lastPosition!.longitude,
-        pos.latitude, pos.longitude,
-      );
-      final timeDiff = pos.timestamp.difference(
-        DateTime.fromMillisecondsSinceEpoch(_points.isNotEmpty ? _points.last.timestampMs : 0),
-      ).inMilliseconds / 1000.0;
-      if (timeDiff > 0) speed = dist / timeDiff;
-    }
-    _currentSpeed = speed;
+    _currentSpeed = pos.speed >= 0 ? pos.speed : 0;
     if (pos.heading >= 0) _heading = pos.heading;
 
-    // 일시정지 중이면 거리/포인트 업데이트 안 함
-    if (_isPaused) return;
+    // 일시정지 중이면 위치만 갱신하고 거리/포인트는 안 함
+    if (_isPaused) {
+      _lastPosition = pos; // 재개 시 첫 거리 계산이 정확하도록
+      return;
+    }
 
     if (_lastPosition != null && isValidSpeed) {
       _totalDistanceM += Geolocator.distanceBetween(
@@ -257,9 +250,9 @@ class RunningService extends ChangeNotifier {
       );
     }
 
-    // km 스플릿 음성 알림
+    // km 스플릿 음성 알림 (마라토너 모드에서는 비활성화)
     final currentKm = (_totalDistanceM / 1000).floor();
-    if (currentKm > _lastAnnouncedKm && _ttsReady) {
+    if (currentKm > _lastAnnouncedKm && _ttsReady && kmSplitTtsEnabled) {
       _lastAnnouncedKm = currentKm;
       _announceKmSplit(currentKm);
     }

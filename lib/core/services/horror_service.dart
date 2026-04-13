@@ -200,7 +200,7 @@ class HorrorService {
 
       await _ttsPlayer.setAsset('assets/audio/$filename');
       _ttsPlayer.setVolume(1.0);
-      _ttsPlayer.play();
+      await _ttsPlayer.play();
     } catch (e) {
       debugPrint('TTS 재생 에러: $e');
     }

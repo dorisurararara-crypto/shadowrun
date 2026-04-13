@@ -44,7 +44,7 @@ class SoloTtsService {
 
       await _ttsPlayer.setAsset('assets/audio/$filename');
       _ttsPlayer.setVolume(1.0);
-      _ttsPlayer.play();
+      await _ttsPlayer.play();
     } catch (e) {
       debugPrint('Solo TTS error: $e');
     }

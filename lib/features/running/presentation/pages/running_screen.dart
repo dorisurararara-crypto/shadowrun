@@ -175,6 +175,11 @@ class _RunningScreenState extends State<RunningScreen>
         await _soloTtsService!.initialize(voice: voice);
       }
 
+      // 마라토너 모드에서는 flutter_tts km 스플릿 비활성화 (MarathonService가 처리)
+      if (widget.runMode == 'marathon') {
+        _runService.kmSplitTtsEnabled = false;
+      }
+
       final ok = await _runService.startRun(
         shadowRunId: widget.shadowRunId,
         shadowSpeedMultiplier: shadowSpeed,
@@ -269,6 +274,7 @@ class _RunningScreenState extends State<RunningScreen>
   }
 
   bool _marathonTtsPlaying = false;
+  double? _previousKmPace; // 이전 km 페이스 추적
 
   Future<void> _updateMarathon() async {
     if (_marathonService == null || _marathonTtsPlaying) return;
@@ -279,16 +285,16 @@ class _RunningScreenState extends State<RunningScreen>
       try {
         // km 마일스톤 TTS
         await _marathonService!.playKmTts(currentKm);
-        // 페이스 피드백 (2km부터, km TTS 후 4초 대기)
+        // 페이스 피드백 (2km부터, km TTS 완료 후)
         if (currentKm >= 2) {
-          await Future.delayed(const Duration(seconds: 4));
           final avgHistorical = await DatabaseHelper.getAveragePace();
           await _marathonService!.playPaceTts(
             _runService.avgPace,
             avgHistorical,
-            null,
+            _previousKmPace,
           );
         }
+        _previousKmPace = _runService.avgPace; // 현재 페이스를 다음 비교용으로 저장
       } finally {
         _marathonTtsPlaying = false;
       }

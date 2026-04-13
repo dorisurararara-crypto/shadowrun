@@ -112,20 +112,6 @@ class _PrepareScreenState extends State<PrepareScreen>
     if (_isChallenge) {
       _shadowRun = await DatabaseHelper.getRun(widget.shadowRunId!);
       _shadowPoints = await DatabaseHelper.getRunPoints(widget.shadowRunId!);
-      // Check if user is near the start point
-      if (_shadowPoints != null && _shadowPoints!.isNotEmpty) {
-        try {
-          final currentPos = await Geolocator.getCurrentPosition();
-          final startPoint = _shadowPoints!.first;
-          final distToStart = Geolocator.distanceBetween(
-            currentPos.latitude, currentPos.longitude,
-            startPoint.latitude, startPoint.longitude,
-          );
-          if (distToStart > 200 && mounted) {
-            _tooFarFromStart = true;
-          }
-        } catch (_) {}
-      }
     }
     await _pickRandomQuote();
     if (mounted) setState(() => _loading = false);
@@ -160,7 +146,22 @@ class _PrepareScreenState extends State<PrepareScreen>
       ),
     ).listen(
       (pos) {
-        if (mounted) setState(() => _gpsReady = pos.accuracy < 50);
+        if (!mounted) return;
+        final gpsOk = pos.accuracy < 50;
+        // 같은 위치 모드: 실시간 출발점 거리 체크
+        bool tooFar = false;
+        if (_isChallenge && _shadowLocationType == 'same' && _shadowPoints != null && _shadowPoints!.isNotEmpty) {
+          final startPoint = _shadowPoints!.first;
+          final distToStart = Geolocator.distanceBetween(
+            pos.latitude, pos.longitude,
+            startPoint.latitude, startPoint.longitude,
+          );
+          tooFar = distToStart > 200;
+        }
+        setState(() {
+          _gpsReady = gpsOk;
+          _tooFarFromStart = tooFar;
+        });
       },
       onError: (_) {
         if (mounted) setState(() => _gpsReady = false);

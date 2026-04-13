@@ -34,9 +34,9 @@ class MarathonService {
   Future<void> playKmTts(int km) async {
     if (!_availableKmMilestones.contains(km)) return;
     if (_playedKmMilestones.contains(km)) return;
-    _playedKmMilestones.add(km);
     final variant = _random.nextInt(_kmVariants) + 1;
-    await _playTts('tts_marathon_${km}km', variant: variant);
+    final success = await _playTts('tts_marathon_${km}km', variant: variant);
+    if (success) _playedKmMilestones.add(km); // 재생 성공 시에만 마킹
   }
 
   Future<void> playPaceTts(
@@ -80,10 +80,9 @@ class MarathonService {
     return 'good';
   }
 
-  Future<void> _playTts(String baseName, {required int variant}) async {
-    if (_isDisposed) return;
+  Future<bool> _playTts(String baseName, {required int variant}) async {
+    if (_isDisposed) return false;
     try {
-      // 언어 분기: 마라톤 파일은 모두 영어 버전 있음
       String langBase;
       if (S.isKo) {
         langBase = '${baseName}_$variant';
@@ -91,7 +90,6 @@ class MarathonService {
         langBase = '${baseName}_en_$variant';
       }
 
-      // 음성 분기: harry는 기본 파일명, callum/drill은 접미사
       String filename;
       if (_voiceId == 'harry') {
         filename = '$langBase.mp3';
@@ -101,9 +99,11 @@ class MarathonService {
 
       await _ttsPlayer.setAsset('assets/audio/$filename');
       _ttsPlayer.setVolume(1.0);
-      _ttsPlayer.play();
+      await _ttsPlayer.play();
+      return true;
     } catch (e) {
       debugPrint('Marathon TTS 재생 에러: $e');
+      return false;
     }
   }
 
