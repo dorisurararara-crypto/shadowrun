@@ -19,8 +19,8 @@ class MarathonService {
   // 각 상황별 변형 개수
   static const int _startVariants = 6;
   static const int _endVariants = 6;
-  static const int _kmVariants = 1;
-  static const int _paceVariants = 1;
+  static const int _kmVariants = 4;
+  static const int _paceVariants = 4;
 
   Future<void> initialize({String voice = 'drill'}) async {
     _voiceId = voice;
@@ -35,7 +35,8 @@ class MarathonService {
     if (!_availableKmMilestones.contains(km)) return;
     if (_playedKmMilestones.contains(km)) return;
     _playedKmMilestones.add(km);
-    await _playTts('tts_marathon_${km}km', variant: _kmVariants);
+    final variant = _random.nextInt(_kmVariants) + 1;
+    await _playTts('tts_marathon_${km}km', variant: variant);
   }
 
   Future<void> playPaceTts(
@@ -48,7 +49,8 @@ class MarathonService {
       avgHistoricalPace,
       previousKmPace,
     );
-    await _playTts('tts_pace_$category', variant: _paceVariants);
+    final variant = _random.nextInt(_paceVariants) + 1;
+    await _playTts('tts_pace_$category', variant: variant);
   }
 
   Future<void> playEndTts() async {

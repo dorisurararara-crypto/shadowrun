@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_tts/flutter_tts.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:geolocator_android/geolocator_android.dart';
+import 'package:geolocator_apple/geolocator_apple.dart';
 import 'package:shadowrun/shared/models/run_model.dart';
 import 'package:shadowrun/core/database/database_helper.dart';
 import 'package:shadowrun/core/services/geocoding_service.dart';
@@ -203,6 +204,15 @@ class RunningService extends ChangeNotifier {
           enableWakeLock: true,
           notificationIcon: AndroidResource(name: 'ic_launcher', defType: 'mipmap'),
         ),
+      );
+    } else if (defaultTargetPlatform == TargetPlatform.iOS) {
+      locationSettings = AppleSettings(
+        accuracy: LocationAccuracy.high,
+        distanceFilter: 5,
+        activityType: ActivityType.fitness,
+        pauseLocationUpdatesAutomatically: false,
+        showBackgroundLocationIndicator: true,
+        allowBackgroundLocationUpdates: true,
       );
     } else {
       locationSettings = const LocationSettings(

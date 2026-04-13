@@ -257,15 +257,19 @@ class _RunningScreenState extends State<RunningScreen>
     }
   }
 
+  bool _marathonTtsPlaying = false;
+
   Future<void> _updateMarathon() async {
-    if (_marathonService == null) return;
+    if (_marathonService == null || _marathonTtsPlaying) return;
     final currentKm = (_runService.totalDistanceM / 1000).floor();
     if (currentKm > _lastMarathonKm) {
       _lastMarathonKm = currentKm;
+      _marathonTtsPlaying = true;
       // km 마일스톤 TTS
       await _marathonService!.playKmTts(currentKm);
-      // 페이스 피드백 (2km부터)
+      // 페이스 피드백 (2km부터, km TTS 후 4초 대기)
       if (currentKm >= 2) {
+        await Future.delayed(const Duration(seconds: 4));
         final avgHistorical = await DatabaseHelper.getAveragePace();
         await _marathonService!.playPaceTts(
           _runService.avgPace,
@@ -273,6 +277,7 @@ class _RunningScreenState extends State<RunningScreen>
           null,
         );
       }
+      _marathonTtsPlaying = false;
     }
   }
 
