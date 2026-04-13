@@ -9,6 +9,7 @@ import 'package:wakelock_plus/wakelock_plus.dart';
 import 'package:shadowrun/core/theme/app_theme.dart';
 import 'package:shadowrun/core/services/running_service.dart';
 import 'package:shadowrun/core/database/database_helper.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:shadowrun/core/services/horror_service.dart';
 import 'package:shadowrun/core/services/marathon_service.dart';
@@ -457,9 +458,9 @@ class _RunningScreenState extends State<RunningScreen>
     for (int i = 1; i < points.length; i++) {
       final p0 = points[i - 1];
       final p1 = points[i];
-      final dx = (p1.latitude - p0.latitude);
-      final dy = (p1.longitude - p0.longitude);
-      dist += sqrt(dx * dx + dy * dy) * 111320; // 대략적 미터 변환
+      dist += Geolocator.distanceBetween(
+        p0.latitude, p0.longitude, p1.latitude, p1.longitude,
+      );
       if (dist >= nextKm * 1000) {
         final marker = NMarker(
           id: 'km_$nextKm',

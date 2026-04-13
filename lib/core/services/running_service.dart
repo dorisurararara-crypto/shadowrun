@@ -268,6 +268,24 @@ class RunningService extends ChangeNotifier {
         _lastPosition!.latitude, _lastPosition!.longitude,
         pos.latitude, pos.longitude,
       );
+
+      // 유효한 속도일 때만 포인트 추가 (거리와 경로 일치)
+      _points.add(RunPoint(
+        runId: 0,
+        latitude: pos.latitude,
+        longitude: pos.longitude,
+        timestampMs: DateTime.now().millisecondsSinceEpoch,
+        speedMps: pos.speed,
+      ));
+    } else if (_lastPosition == null) {
+      // 첫 포인트는 항상 추가 (시작 위치)
+      _points.add(RunPoint(
+        runId: 0,
+        latitude: pos.latitude,
+        longitude: pos.longitude,
+        timestampMs: DateTime.now().millisecondsSinceEpoch,
+        speedMps: pos.speed,
+      ));
     }
 
     // km 스플릿 음성 알림 (마라토너 모드에서는 비활성화)
@@ -278,13 +296,6 @@ class RunningService extends ChangeNotifier {
     }
 
     _lastPosition = pos;
-    _points.add(RunPoint(
-      runId: 0,
-      latitude: pos.latitude,
-      longitude: pos.longitude,
-      timestampMs: DateTime.now().millisecondsSinceEpoch,
-      speedMps: pos.speed,
-    ));
 
     notifyListeners();
 
