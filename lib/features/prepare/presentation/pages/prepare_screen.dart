@@ -10,6 +10,7 @@ import 'package:shadowrun/core/theme/app_theme.dart';
 import 'package:shadowrun/core/database/database_helper.dart';
 import 'package:shadowrun/shared/models/run_model.dart';
 import 'package:shadowrun/core/l10n/app_strings.dart';
+import 'package:shadowrun/core/services/sfx_service.dart';
 
 class PrepareScreen extends StatefulWidget {
   final int? shadowRunId;
@@ -158,10 +159,14 @@ class _PrepareScreenState extends State<PrepareScreen>
           );
           tooFar = distToStart > 200;
         }
+        final wasReady = _gpsReady;
         setState(() {
           _gpsReady = gpsOk;
           _tooFarFromStart = tooFar;
         });
+        if (!wasReady && gpsOk) {
+          SfxService().gpsReady();
+        }
       },
       onError: (_) {
         if (mounted) setState(() => _gpsReady = false);
@@ -195,6 +200,7 @@ class _PrepareScreenState extends State<PrepareScreen>
       _countdownActive = true;
       _countdownValue = 3;
     });
+    SfxService().countdown();
     _countdownAnim.forward(from: 0);
     _runCountdownTick();
   }
@@ -207,6 +213,7 @@ class _PrepareScreenState extends State<PrepareScreen>
         _countdownAnim.forward(from: 0);
         _runCountdownTick();
       } else {
+        SfxService().go();
         if (_isChallenge) {
           context.go('/running', extra: {
             'shadowRunId': widget.shadowRunId,
@@ -647,7 +654,10 @@ class _PrepareScreenState extends State<PrepareScreen>
   Widget _locationOption(String type, String title, String desc, IconData icon) {
     final selected = _shadowLocationType == type;
     return GestureDetector(
-      onTap: () => setState(() => _shadowLocationType = type),
+      onTap: () {
+        SfxService().toggle();
+        setState(() => _shadowLocationType = type);
+      },
       child: Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
@@ -737,7 +747,10 @@ class _PrepareScreenState extends State<PrepareScreen>
   Widget _modeOption(String mode, String title, String desc, IconData icon) {
     final selected = _selectedMode == mode;
     return GestureDetector(
-      onTap: () => setState(() => _selectedMode = mode),
+      onTap: () {
+        SfxService().toggle();
+        setState(() => _selectedMode = mode);
+      },
       child: Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(

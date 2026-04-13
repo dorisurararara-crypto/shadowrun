@@ -16,6 +16,7 @@ import 'package:shadowrun/core/services/marathon_service.dart';
 import 'package:shadowrun/core/services/solo_tts_service.dart';
 import 'package:shadowrun/core/l10n/app_strings.dart';
 import 'package:shadowrun/shared/models/run_model.dart';
+import 'package:shadowrun/core/services/sfx_service.dart';
 
 class RunningScreen extends StatefulWidget {
   final int? shadowRunId;
@@ -253,6 +254,7 @@ class _RunningScreenState extends State<RunningScreen>
         _paused = true;
         _vehiclePaused = true;
         _runService.pauseRun();
+        SfxService().vehicleWarn();
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(S.vehiclePaused),
@@ -295,6 +297,9 @@ class _RunningScreenState extends State<RunningScreen>
       _lastMarathonKm = currentKm;
       _marathonTtsPlaying = true;
       try {
+        // km 마일스톤 SFX
+        SfxService().kmDing();
+        SfxService().whistle();
         // km 마일스톤 TTS
         await _marathonService!.playKmTts(currentKm);
         // 페이스 피드백 (2km부터, km TTS 완료 후)
@@ -484,8 +489,10 @@ class _RunningScreenState extends State<RunningScreen>
     setState(() {
       _paused = !_paused;
       if (_paused) {
+        SfxService().pause();
         _runService.pauseRun();
       } else {
+        SfxService().resume();
         _runService.resumeRun();
       }
     });
@@ -534,6 +541,9 @@ class _RunningScreenState extends State<RunningScreen>
     // 먼저 결과 저장 (앱 킬링 대비)
     final result = await _runService.stopRun();
 
+    // 종료 SFX
+    SfxService().doorClose();
+
     // 스타디움 피날레 (종료 직전 관중 함성)
     if (_stadiumFinaleEnabled && !_jumpscareTriggered) {
       try {
@@ -543,11 +553,13 @@ class _RunningScreenState extends State<RunningScreen>
       } catch (_) {}
     }
 
-    // 모드별 종료 TTS
+    // 모드별 종료 SFX + TTS
     if (widget.runMode == 'doppelganger' && result != null) {
       if (result.challengeResult == 'win') {
+        SfxService().victory();
         await _horrorService.playSurvivedTts();
       } else if (result.challengeResult == 'lose') {
+        SfxService().defeat();
         await _horrorService.playDefeatedTts();
       }
     } else if (widget.runMode == 'marathon') {

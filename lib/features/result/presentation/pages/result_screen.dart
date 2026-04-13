@@ -11,6 +11,7 @@ import 'package:shadowrun/core/l10n/app_strings.dart';
 import 'package:shadowrun/core/services/ad_service.dart';
 import 'package:shadowrun/core/services/purchase_service.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
+import 'package:shadowrun/core/services/sfx_service.dart';
 
 class ResultScreen extends StatefulWidget {
   final int runId;
@@ -71,6 +72,7 @@ class _ResultScreenState extends State<ResultScreen>
       duration: const Duration(milliseconds: 800),
     );
 
+    SfxService().reportOpen();
     _loadData();
     _loadBannerAd();
   }
@@ -795,6 +797,7 @@ class _ResultScreenState extends State<ResultScreen>
 
   void _shareResult() {
     if (_run == null) return;
+    SfxService().share();
     final run = _run!;
     final resultText = _isWin
         ? S.survived

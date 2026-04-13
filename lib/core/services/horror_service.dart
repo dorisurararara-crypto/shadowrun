@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:vibration/vibration.dart';
 import 'package:shadowrun/core/l10n/app_strings.dart';
+import 'package:shadowrun/core/services/sfx_service.dart';
 
 enum ThreatLevel { safe, warning, danger, critical, aheadClose, aheadMid, aheadFar }
 
@@ -55,6 +56,7 @@ class HorrorService {
     // 전환 감지: 앞서 있다가 다시 추격당하기 시작 (히스테리시스 10m 버퍼)
     final isNowAhead = _wasAhead ? distanceM >= 190 : distanceM >= 210;
     if (_wasAhead && !isNowAhead && _ttsEnabled) {
+      SfxService().glassBreak();
       await _playTts('tts_losing_lead');
     }
     _wasAhead = isNowAhead;
@@ -79,6 +81,7 @@ class HorrorService {
         break;
 
       case ThreatLevel.warning:
+        SfxService().alertLow();
         if (_horrorLevel >= 2) {
           await _playBgm('heartbeat.mp3');
         }
@@ -89,6 +92,7 @@ class HorrorService {
         break;
 
       case ThreatLevel.danger:
+        SfxService().alertHigh();
         if (_horrorLevel >= 3) {
           await _playBgm('breathing.mp3');
           // 레벨 5: BGM 볼륨 증가
@@ -110,6 +114,7 @@ class HorrorService {
         break;
 
       case ThreatLevel.aheadClose:
+        SfxService().chainBreak();
         await _stopBgm();
         if (_ttsEnabled) {
           await _playTts('tts_ahead_close');
@@ -117,6 +122,7 @@ class HorrorService {
         break;
 
       case ThreatLevel.aheadMid:
+        SfxService().whoosh();
         await _stopBgm();
         if (_ttsEnabled) {
           await _playTts('tts_ahead_mid');
@@ -124,6 +130,7 @@ class HorrorService {
         break;
 
       case ThreatLevel.aheadFar:
+        SfxService().fanfare();
         await _stopBgm();
         if (_ttsEnabled) {
           await _playTts('tts_ahead_far');

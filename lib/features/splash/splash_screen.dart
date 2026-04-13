@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:shadowrun/core/services/sfx_service.dart';
 
 class SplashScreen extends StatefulWidget {
   final VoidCallback? onComplete;
@@ -23,6 +24,7 @@ class _SplashScreenState extends State<SplashScreen>
     );
     _fadeIn = CurvedAnimation(parent: _controller, curve: Curves.easeIn);
     _controller.forward();
+    SfxService().splash();
 
     Future.delayed(const Duration(milliseconds: 2500), () {
       if (mounted) {

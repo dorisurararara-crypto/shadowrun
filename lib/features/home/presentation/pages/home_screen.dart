@@ -7,6 +7,7 @@ import 'package:shadowrun/shared/models/run_model.dart';
 import 'package:shadowrun/core/services/ad_service.dart';
 import 'package:shadowrun/core/services/purchase_service.dart';
 import 'package:shadowrun/core/l10n/app_strings.dart';
+import 'package:shadowrun/core/services/sfx_service.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -120,7 +121,10 @@ class _HomeScreenState extends State<HomeScreen> {
                 ],
               ),
               child: ElevatedButton.icon(
-                onPressed: () => context.push('/prepare'),
+                onPressed: () {
+                  SfxService().tapNewRun();
+                  context.push('/prepare');
+                },
                 icon: const Icon(Icons.directions_run, size: 20),
                 label: FittedBox(
                   fit: BoxFit.scaleDown,
@@ -152,6 +156,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   );
                   return;
                 }
+                SfxService().tapChallenge();
                 context.push('/prepare', extra: -1);
               },
               icon: const Icon(Icons.workspace_premium, size: 20),
@@ -524,7 +529,10 @@ class _RunTile extends StatelessWidget {
         color: Colors.transparent,
         child: InkWell(
           borderRadius: BorderRadius.circular(12),
-          onTap: () => context.push('/prepare', extra: run.id),
+          onTap: () {
+            SfxService().tapCard();
+            context.push('/prepare', extra: run.id);
+          },
           child: Padding(
             padding: const EdgeInsets.all(20),
             child: Row(children: [

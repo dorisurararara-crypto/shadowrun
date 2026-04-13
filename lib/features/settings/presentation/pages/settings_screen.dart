@@ -8,6 +8,7 @@ import 'package:shadowrun/core/theme/app_theme.dart';
 import 'package:shadowrun/core/database/database_helper.dart';
 import 'package:shadowrun/core/services/purchase_service.dart';
 import 'package:shadowrun/core/l10n/app_strings.dart';
+import 'package:shadowrun/core/services/sfx_service.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
@@ -873,7 +874,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
             child: ElevatedButton(
               onPressed: () async {
                 final success = await PurchaseService().buyPro();
-                if (!success && mounted) {
+                if (success && mounted) {
+                  SfxService().levelup();
+                } else if (!success && mounted) {
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
                       content: Text(S.storeUnavailable),
@@ -955,6 +958,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
             onPressed: () async {
               final started = await PurchaseService().startTrial();
               if (started && mounted) {
+                SfxService().levelup();
                 setState(() => _isPro = true);
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
@@ -1302,7 +1306,14 @@ class _SettingsToggle extends StatelessWidget {
           ),
           Switch(
             value: value,
-            onChanged: onChanged,
+            onChanged: (v) {
+              if (v) {
+                SfxService().switchOn();
+              } else {
+                SfxService().switchOff();
+              }
+              onChanged(v);
+            },
             activeThumbColor: const Color(0xFFFF0044),
             activeTrackColor: const Color(0xFFFF0044).withValues(alpha: 0.3),
             inactiveThumbColor: SRColors.onSurface.withValues(alpha: 0.3),
