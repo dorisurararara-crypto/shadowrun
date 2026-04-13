@@ -10,7 +10,7 @@ import AVFoundation
   ) -> Bool {
     // 백그라운드 오디오 재생 활성화 (TTS + 효과음)
     do {
-      try AVAudioSession.sharedInstance().setCategory(.playback, mode: .default)
+      try AVAudioSession.sharedInstance().setCategory(.playback, mode: .default, options: [.mixWithOthers])
       try AVAudioSession.sharedInstance().setActive(true)
     } catch {
       print("AVAudioSession 설정 실패: \(error)")

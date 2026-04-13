@@ -519,17 +519,17 @@ class _RunningScreenState extends State<RunningScreen>
     // 웨이크락 해제
     WakelockPlus.disable();
 
+    // 먼저 결과 저장 (앱 킬링 대비)
+    final result = await _runService.stopRun();
+
     // 스타디움 피날레 (종료 직전 관중 함성)
     if (_stadiumFinaleEnabled && !_jumpscareTriggered) {
       try {
         await _stadiumPlayer.setAsset('assets/audio/stadium_finale.mp3');
         _stadiumPlayer.setVolume(0.8);
-        _stadiumPlayer.play();
-        await Future.delayed(const Duration(seconds: 3));
+        await _stadiumPlayer.play();
       } catch (_) {}
     }
-
-    final result = await _runService.stopRun();
 
     // 모드별 종료 TTS
     if (widget.runMode == 'doppelganger' && result != null) {
@@ -544,8 +544,6 @@ class _RunningScreenState extends State<RunningScreen>
       await _soloTtsService?.playEndTts();
     }
 
-    // TTS 재생 완료 대기 후 dispose
-    await Future.delayed(const Duration(seconds: 3));
     _horrorService.dispose();
     _marathonService?.dispose();
     _soloTtsService?.dispose();

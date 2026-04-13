@@ -178,7 +178,6 @@ class RunningService extends ChangeNotifier {
     _isPaused = false;
     _pausedDuration = Duration.zero;
     _pauseStart = null;
-    _startTime = DateTime.now();
     _isRunning = true;
 
     // km 스플릿 음성 알림용 TTS 초기화
@@ -222,6 +221,9 @@ class RunningService extends ChangeNotifier {
       );
     }
 
+    // GPS 스트림 시작 직전에 시간 설정 (정확한 러닝 시간 측정)
+    _startTime = DateTime.now();
+
     _positionSub = Geolocator.getPositionStream(
       locationSettings: locationSettings,
     ).listen(_onPosition);
@@ -233,13 +235,26 @@ class RunningService extends ChangeNotifier {
   void _onPosition(Position pos) {
     if (!_isRunning) return;
 
-    // 속도는 항상 업데이트 (차량 감지 자동 복귀 위해)
-    _currentSpeed = pos.speed >= 0 ? pos.speed : 0;
+    // 속도 계산: GPS 속도 우선, 없으면 위치 변화로 추정
+    double speed = pos.speed >= 0 ? pos.speed : 0;
+    if (speed <= 0 && _lastPosition != null) {
+      final d = Geolocator.distanceBetween(
+        _lastPosition!.latitude, _lastPosition!.longitude,
+        pos.latitude, pos.longitude,
+      );
+      final dt = pos.timestamp.difference(
+        DateTime.fromMillisecondsSinceEpoch(
+          _points.isNotEmpty ? _points.last.timestampMs : pos.timestamp.millisecondsSinceEpoch,
+        ),
+      ).inSeconds;
+      if (dt > 0) speed = d / dt;
+    }
+    _currentSpeed = speed;
     if (pos.heading >= 0) _heading = pos.heading;
 
     // 일시정지 중이면 위치만 갱신하고 거리/포인트는 안 함
     if (_isPaused) {
-      _lastPosition = pos; // 재개 시 첫 거리 계산이 정확하도록
+      _lastPosition = pos;
       return;
     }
 
@@ -328,7 +343,7 @@ class RunningService extends ChangeNotifier {
     );
   }
 
-  void _announceKmSplit(int km) {
+  Future<void> _announceKmSplit(int km) async {
     final paceMin = avgPace.floor();
     final paceSec = ((avgPace - paceMin) * 60).round();
     final paceStr = "$paceMin'${paceSec.toString().padLeft(2, '0')}\"";
@@ -337,7 +352,8 @@ class RunningService extends ChangeNotifier {
         ? '${km}킬로미터. 페이스 $paceStr'
         : '$km kilometer. Pace $paceStr';
 
-    _tts.speak(text);
+    await _tts.awaitSpeakCompletion(true);
+    await _tts.speak(text);
   }
 
   double _distanceBetweenPoints(double lat1, double lng1, double lat2, double lng2) {
