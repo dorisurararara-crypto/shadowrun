@@ -193,6 +193,8 @@ class _RunningScreenState extends State<RunningScreen>
         return;
       }
 
+      if (!mounted) return;
+
       // 모드별 시작 TTS
       if (widget.runMode == 'doppelganger') {
         await _horrorService.playStartTts();
@@ -201,6 +203,8 @@ class _RunningScreenState extends State<RunningScreen>
       } else {
         await _soloTtsService?.playStartTts();
       }
+
+      if (!mounted) return;
 
       // GPS 콜백: 백그라운드에서도 동작 (Timer 대신)
       _runService.onPositionUpdate = () {
@@ -577,6 +581,9 @@ class _RunningScreenState extends State<RunningScreen>
     _runService.onPositionUpdate = null;
     _runService.removeListener(_onRunUpdate);
     _runService.dispose();
+    _horrorService.dispose();
+    _marathonService?.dispose();
+    _soloTtsService?.dispose();
     _pageController.dispose();
     _vignetteAnim.dispose();
     _shadowPingAnim.dispose();

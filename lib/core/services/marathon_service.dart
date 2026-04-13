@@ -100,6 +100,10 @@ class MarathonService {
       await _ttsPlayer.setAsset('assets/audio/$filename');
       _ttsPlayer.setVolume(1.0);
       await _ttsPlayer.play();
+      // play()는 재생 시작 시 완료됨 — 실제 끝까지 대기
+      await _ttsPlayer.playerStateStream.firstWhere(
+        (s) => s.processingState == ProcessingState.completed,
+      );
       return true;
     } catch (e) {
       debugPrint('Marathon TTS 재생 에러: $e');

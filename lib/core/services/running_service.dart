@@ -258,6 +258,8 @@ class RunningService extends ChangeNotifier {
     // 일시정지 중이면 위치만 갱신하고 거리/포인트는 안 함
     if (_isPaused) {
       _lastPosition = pos;
+      notifyListeners();
+      onPositionUpdate?.call(); // 차량 감지 자동 복귀 위해 콜백은 호출
       return;
     }
 
