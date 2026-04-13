@@ -216,11 +216,14 @@ class _RunningScreenState extends State<RunningScreen>
     if (mounted) setState(() {});
   }
 
+  bool _vehiclePaused = false; // 차량 감지로 일시정지된 상태
+
   void _checkVehicleSpeed() {
     if (_runService.speedWarning == S.tooFast) {
       _vehicleDetectCount++;
       if (_vehicleDetectCount >= 3 && !_paused) {
         _paused = true;
+        _vehiclePaused = true;
         _runService.pauseRun();
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -231,6 +234,12 @@ class _RunningScreenState extends State<RunningScreen>
       }
     } else {
       _vehicleDetectCount = 0;
+      // 차량 감지로 일시정지된 상태에서 정상 속도로 돌아오면 자동 재개
+      if (_vehiclePaused && _paused) {
+        _paused = false;
+        _vehiclePaused = false;
+        _runService.resumeRun();
+      }
     }
   }
 
@@ -285,15 +294,28 @@ class _RunningScreenState extends State<RunningScreen>
     _updateMapOverlays(_mapController!, target);
   }
 
+  final Set<String> _activeOverlayIds = {};
+
+  void _safeDeleteOverlay(NaverMapController controller, NOverlayType type, String id) {
+    if (_activeOverlayIds.remove('${type.name}:$id')) {
+      try {
+        controller.deleteOverlay(NOverlayInfo(type: type, id: id));
+      } catch (_) {}
+    }
+  }
+
+  void _safeAddOverlay<T extends NAddableOverlay>(NaverMapController controller, T overlay) {
+    _activeOverlayIds.add('${overlay.info.type.name}:${overlay.info.id}');
+    controller.addOverlay(overlay);
+  }
+
   void _clearDynamicOverlays(NaverMapController controller) {
-    try {
-      controller.deleteOverlay(const NOverlayInfo(type: NOverlayType.marker, id: 'runner'));
-      controller.deleteOverlay(const NOverlayInfo(type: NOverlayType.marker, id: 'shadow'));
-      controller.deleteOverlay(const NOverlayInfo(type: NOverlayType.circleOverlay, id: 'runner_glow'));
-      controller.deleteOverlay(const NOverlayInfo(type: NOverlayType.circleOverlay, id: 'shadow_glow'));
-      controller.deleteOverlay(const NOverlayInfo(type: NOverlayType.pathOverlay, id: 'runner_path'));
-      controller.deleteOverlay(const NOverlayInfo(type: NOverlayType.pathOverlay, id: 'shadow_path'));
-    } catch (_) {}
+    _safeDeleteOverlay(controller, NOverlayType.marker, 'runner');
+    _safeDeleteOverlay(controller, NOverlayType.marker, 'shadow');
+    _safeDeleteOverlay(controller, NOverlayType.circleOverlay, 'runner_glow');
+    _safeDeleteOverlay(controller, NOverlayType.circleOverlay, 'shadow_glow');
+    _safeDeleteOverlay(controller, NOverlayType.pathOverlay, 'runner_path');
+    _safeDeleteOverlay(controller, NOverlayType.pathOverlay, 'shadow_path');
   }
 
   void _updateMapOverlays(NaverMapController controller, NLatLng target) {
@@ -305,7 +327,7 @@ class _RunningScreenState extends State<RunningScreen>
     _clearDynamicOverlays(controller);
 
     // Runner glow circle
-    controller.addOverlay(NCircleOverlay(
+    _safeAddOverlay(controller, NCircleOverlay(
       id: 'runner_glow',
       center: target,
       radius: 12,
@@ -326,14 +348,14 @@ class _RunningScreenState extends State<RunningScreen>
     } else {
       runnerMarker.setIconTintColor(SRColors.runner);
     }
-    controller.addOverlay(runnerMarker);
+    _safeAddOverlay(controller, runnerMarker);
 
     // Runner path polyline
     final runnerCoords = _runService.points
         .map((p) => NLatLng(p.latitude, p.longitude))
         .toList();
     if (runnerCoords.length >= 2) {
-      controller.addOverlay(NPathOverlay(
+      _safeAddOverlay(controller, NPathOverlay(
         id: 'runner_path',
         coords: runnerCoords,
         color: SRColors.runner.withValues(alpha: 0.8),
@@ -350,7 +372,7 @@ class _RunningScreenState extends State<RunningScreen>
     if (shadowPoint != null && _isSameLocation) {
       final shadowLatLng = NLatLng(shadowPoint.latitude, shadowPoint.longitude);
 
-      controller.addOverlay(NCircleOverlay(
+      _safeAddOverlay(controller, NCircleOverlay(
         id: 'shadow_glow',
         center: shadowLatLng,
         radius: 15,
@@ -369,7 +391,7 @@ class _RunningScreenState extends State<RunningScreen>
       } else {
         shadowMarker.setIconTintColor(SRColors.shadow);
       }
-      controller.addOverlay(shadowMarker);
+      _safeAddOverlay(controller, shadowMarker);
     }
 
     // Shadow path polyline (같은 장소일 때만)
@@ -381,7 +403,7 @@ class _RunningScreenState extends State<RunningScreen>
           .map((p) => NLatLng(p.latitude, p.longitude))
           .toList();
       if (shadowCoords.length >= 2) {
-        controller.addOverlay(NPathOverlay(
+        _safeAddOverlay(controller, NPathOverlay(
           id: 'shadow_path',
           coords: shadowCoords,
           color: SRColors.shadow.withValues(alpha: 0.5),

@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_tts/flutter_tts.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:geolocator_android/geolocator_android.dart';
 import 'package:shadowrun/shared/models/run_model.dart';
 import 'package:shadowrun/core/database/database_helper.dart';
 import 'package:shadowrun/core/services/geocoding_service.dart';
@@ -189,11 +190,29 @@ class RunningService extends ChangeNotifier {
       debugPrint('TTS 초기화 실패: $e');
     }
 
-    _positionSub = Geolocator.getPositionStream(
-      locationSettings: const LocationSettings(
+    // Android: 포그라운드 서비스로 백그라운드 GPS 유지
+    late LocationSettings locationSettings;
+    if (defaultTargetPlatform == TargetPlatform.android) {
+      locationSettings = AndroidSettings(
         accuracy: LocationAccuracy.high,
         distanceFilter: 5,
-      ),
+        forceLocationManager: false,
+        foregroundNotificationConfig: const ForegroundNotificationConfig(
+          notificationText: 'SHADOW RUN이 러닝을 기록하고 있습니다',
+          notificationTitle: 'SHADOW RUN',
+          enableWakeLock: true,
+          notificationIcon: AndroidResource(name: 'ic_launcher', defType: 'mipmap'),
+        ),
+      );
+    } else {
+      locationSettings = const LocationSettings(
+        accuracy: LocationAccuracy.high,
+        distanceFilter: 5,
+      );
+    }
+
+    _positionSub = Geolocator.getPositionStream(
+      locationSettings: locationSettings,
     ).listen(_onPosition);
 
     notifyListeners();
@@ -203,7 +222,19 @@ class RunningService extends ChangeNotifier {
   void _onPosition(Position pos) {
     if (!_isRunning || _isPaused) return;
 
-    _currentSpeed = pos.speed >= 0 ? pos.speed : 0;
+    // GPS 속도가 없거나 0이면 위치 변화로 속도 추정
+    double speed = pos.speed >= 0 ? pos.speed : 0;
+    if (speed <= 0 && _lastPosition != null) {
+      final dist = Geolocator.distanceBetween(
+        _lastPosition!.latitude, _lastPosition!.longitude,
+        pos.latitude, pos.longitude,
+      );
+      final timeDiff = pos.timestamp.difference(
+        DateTime.fromMillisecondsSinceEpoch(_points.isNotEmpty ? _points.last.timestampMs : 0),
+      ).inMilliseconds / 1000.0;
+      if (timeDiff > 0) speed = dist / timeDiff;
+    }
+    _currentSpeed = speed;
     if (pos.heading >= 0) _heading = pos.heading;
 
     if (_lastPosition != null && isValidSpeed) {

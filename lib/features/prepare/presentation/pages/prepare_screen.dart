@@ -157,11 +157,10 @@ class _PrepareScreenState extends State<PrepareScreen>
       locationSettings: const LocationSettings(
         accuracy: LocationAccuracy.high,
         distanceFilter: 0,
-        timeLimit: Duration(seconds: 5),
       ),
     ).listen(
       (pos) {
-        if (mounted) setState(() => _gpsReady = pos.accuracy < 30);
+        if (mounted) setState(() => _gpsReady = pos.accuracy < 50);
       },
       onError: (_) {
         if (mounted) setState(() => _gpsReady = false);
