@@ -15,7 +15,7 @@ class GeocodingService {
 
     try {
       final url = Uri.parse(
-        'https://naveropenapi.apigw.ntruss.com/map-reversegeocode/v2/gc'
+        'https://maps.apigw.ntruss.com/map-reversegeocode/v2/gc'
         '?coords=$lng,$lat&output=json&orders=legalcode',
       );
 

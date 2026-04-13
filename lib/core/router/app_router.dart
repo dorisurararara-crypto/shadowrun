@@ -35,8 +35,17 @@ GoRouter createRouter(bool languageSelected) => GoRouter(
     GoRoute(
       path: '/running',
       builder: (context, state) {
-        final shadowRunId = state.extra as int?;
-        return RunningScreen(shadowRunId: shadowRunId);
+        final args = state.extra;
+        if (args is int?) {
+          // Legacy: just shadowRunId
+          return RunningScreen(shadowRunId: args);
+        }
+        final map = args as Map<String, dynamic>? ?? {};
+        return RunningScreen(
+          shadowRunId: map['shadowRunId'] as int?,
+          runMode: map['mode'] as String? ?? 'freerun',
+          sameLocation: map['sameLocation'] as bool? ?? true,
+        );
       },
     ),
     GoRoute(

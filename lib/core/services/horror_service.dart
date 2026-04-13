@@ -3,7 +3,7 @@ import 'package:just_audio/just_audio.dart';
 import 'package:vibration/vibration.dart';
 import 'package:shadowrun/core/l10n/app_strings.dart';
 
-enum ThreatLevel { safe, warning, danger, critical }
+enum ThreatLevel { safe, warning, danger, critical, aheadClose, aheadMid, aheadFar }
 
 class HorrorService {
   final AudioPlayer _bgmPlayer = AudioPlayer();
@@ -16,6 +16,7 @@ class HorrorService {
   bool _vibrationEnabled = true;
   bool _hasVibrator = false;
   bool _isDisposed = false;
+  bool _wasAhead = false;
   String _voiceId = 'harry'; // harry, callum, drill
 
   ThreatLevel get currentLevel => _currentLevel;
@@ -35,15 +36,28 @@ class HorrorService {
 
   Future<void> updateThreat(double distanceM) async {
     ThreatLevel newLevel;
-    if (distanceM > 200) {
-      newLevel = ThreatLevel.safe;
-    } else if (distanceM > 100) {
-      newLevel = ThreatLevel.warning;
-    } else if (distanceM >= 0) {
-      newLevel = ThreatLevel.danger;
-    } else {
+    if (distanceM < 0) {
       newLevel = ThreatLevel.critical; // 음수 = 도플갱어가 앞서감
+    } else if (distanceM < 50) {
+      newLevel = ThreatLevel.danger; // 0~50m: 도플갱어 바로 뒤
+    } else if (distanceM < 150) {
+      newLevel = ThreatLevel.warning; // 50~150m: 도플갱어 추격 중
+    } else if (distanceM < 200) {
+      newLevel = ThreatLevel.safe; // 150~200m: 안전권 진입
+    } else if (distanceM < 250) {
+      newLevel = ThreatLevel.aheadClose; // 200~250m: 막 앞서나가기 시작
+    } else if (distanceM < 400) {
+      newLevel = ThreatLevel.aheadMid; // 250~400m: 여유 있는 리드
+    } else {
+      newLevel = ThreatLevel.aheadFar; // 400m+: 압도적 리드
     }
+
+    // 전환 감지: 앞서 있다가 다시 추격당하기 시작
+    final isNowAhead = distanceM >= 200;
+    if (_wasAhead && !isNowAhead && _ttsEnabled) {
+      await _playTts('tts_losing_lead');
+    }
+    _wasAhead = isNowAhead;
 
     if (newLevel != _currentLevel) {
       _currentLevel = newLevel;
@@ -94,6 +108,27 @@ class HorrorService {
           await _playTts('tts_critical');
         }
         break;
+
+      case ThreatLevel.aheadClose:
+        await _stopBgm();
+        if (_ttsEnabled) {
+          await _playTts('tts_ahead_close');
+        }
+        break;
+
+      case ThreatLevel.aheadMid:
+        await _stopBgm();
+        if (_ttsEnabled) {
+          await _playTts('tts_ahead_mid');
+        }
+        break;
+
+      case ThreatLevel.aheadFar:
+        await _stopBgm();
+        if (_ttsEnabled) {
+          await _playTts('tts_ahead_far');
+        }
+        break;
     }
   }
 
@@ -106,6 +141,12 @@ class HorrorService {
   Future<void> playSurvivedTts() async {
     if (_ttsEnabled) {
       await _playTts('tts_survived');
+    }
+  }
+
+  Future<void> playDefeatedTts() async {
+    if (_ttsEnabled) {
+      await _playTts('tts_defeated');
     }
   }
 
@@ -138,7 +179,12 @@ class HorrorService {
       // 언어 분기: 영어 버전이 있는 대사
       String langBase = baseName;
       if (!S.isKo) {
-        const hasEnglish = {'tts_safe', 'tts_warning', 'tts_danger', 'tts_critical'};
+        const hasEnglish = {
+          'tts_safe', 'tts_warning', 'tts_danger', 'tts_critical',
+          'tts_ahead_close', 'tts_ahead_mid', 'tts_ahead_far',
+          'tts_losing_lead', 'tts_defeated',
+          'tts_start', 'tts_survived', 'tts_warning2', 'tts_danger2',
+        };
         if (hasEnglish.contains(baseName)) {
           langBase = '${baseName}_en';
         }
@@ -184,6 +230,10 @@ class HorrorService {
           intensities: [0, 255, 0, 255, 0, 255],
         );
         break;
+      case ThreatLevel.aheadClose:
+      case ThreatLevel.aheadMid:
+      case ThreatLevel.aheadFar:
+        break; // 앞서가는 중엔 진동 없음
     }
   }
 
@@ -199,6 +249,10 @@ class HorrorService {
         return _horrorLevel >= 3 ? 0.7 : 0.3;
       case ThreatLevel.critical:
         return 1.0;
+      case ThreatLevel.aheadClose:
+      case ThreatLevel.aheadMid:
+      case ThreatLevel.aheadFar:
+        return 0.0; // 앞서가는 중엔 비네트 없음
     }
   }
 

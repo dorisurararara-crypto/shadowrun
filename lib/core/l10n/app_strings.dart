@@ -154,4 +154,24 @@ class S {
   static String get runTooShort => isKo ? '기록이 너무 짧아 저장되지 않았습니다' : 'Run too short to save';
   static String get gpsRequired => isKo ? 'GPS 권한이 필요합니다' : 'GPS permission required';
   static String get unlimited => isKo ? '무제한' : 'Unlimited';
+
+  // Running mode selection
+  static String get selectRunMode => isKo ? '러닝 모드 선택' : 'SELECT MODE';
+  static String get modeDoppelganger => isKo ? '도플갱어' : 'DOPPELGANGER';
+  static String get modeMarathoner => isKo ? '전설의 마라토너' : 'LEGENDARY MARATHONER';
+  static String get modeFreeRun => isKo ? '자유 러닝' : 'FREE RUN';
+  static String get modeDoppelgangerDesc => isKo ? '과거의 나와 대결' : 'Race your past self';
+  static String get modeMarathonerDesc => isKo ? '코치와 함께 달리기' : 'Run with a coach';
+  static String get modeFreeRunDesc => isKo ? '자유롭게 기록만' : 'Just run and record';
+  static String get stadiumFinale => isKo ? '스타디움 피날레' : 'Stadium Finale';
+  static String get stadiumFinaleDesc => isKo ? '종료 직전 관중 함성' : 'Crowd cheering near finish';
+  static String get tooFarFromStart => isKo ? '기록한 장소 근처에서 시작해주세요 (200m 이내)' : 'Please start near the recorded location (within 200m)';
+  static String get defeated => isKo ? '패배했습니다' : 'You lost';
+  static String get voiceOnlyMode => isKo ? '음성 모드' : 'VOICE MODE';
+  static String get voiceOnlyDesc => isKo ? '다른 장소 — 음성으로만 제어됩니다' : 'Different location — voice only';
+  static String get runLocation => isKo ? '도전 장소' : 'CHALLENGE LOCATION';
+  static String get sameLocation => isKo ? '같은 위치에서 뛰기' : 'Run at same location';
+  static String get sameLocationDesc => isKo ? '지도에서 도플갱어를 확인할 수 있습니다' : 'See the doppelganger on the map';
+  static String get differentLocation => isKo ? '다른 위치에서 뛰기' : 'Run at different location';
+  static String get differentLocationDesc => isKo ? '음성으로만 도플갱어와 대결합니다' : 'Voice-only doppelganger challenge';
 }

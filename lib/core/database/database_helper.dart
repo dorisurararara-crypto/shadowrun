@@ -188,6 +188,14 @@ class DatabaseHelper {
     };
   }
 
+  static Future<double> getAveragePace() async {
+    final db = await database;
+    final result = await db.rawQuery(
+      'SELECT AVG(avg_pace) as avg FROM runs WHERE avg_pace > 0 AND avg_pace < 30',
+    );
+    return (result.first['avg'] as num?)?.toDouble() ?? 0.0;
+  }
+
   // --- Analysis ---
   static Future<List<RunModel>> getRunsByDateRange(DateTime from, DateTime to) async {
     final db = await database;

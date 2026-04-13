@@ -9,14 +9,19 @@ import 'package:wakelock_plus/wakelock_plus.dart';
 import 'package:shadowrun/core/theme/app_theme.dart';
 import 'package:shadowrun/core/services/running_service.dart';
 import 'package:shadowrun/core/database/database_helper.dart';
+import 'package:just_audio/just_audio.dart';
 import 'package:shadowrun/core/services/horror_service.dart';
+import 'package:shadowrun/core/services/marathon_service.dart';
+import 'package:shadowrun/core/services/solo_tts_service.dart';
 import 'package:shadowrun/core/l10n/app_strings.dart';
 import 'package:shadowrun/shared/models/run_model.dart';
 
 class RunningScreen extends StatefulWidget {
   final int? shadowRunId;
+  final String runMode; // 'doppelganger', 'marathon', 'freerun'
+  final bool sameLocation; // 도플갱어: 같은 장소 vs 다른 장소
 
-  const RunningScreen({super.key, this.shadowRunId});
+  const RunningScreen({super.key, this.shadowRunId, this.runMode = 'freerun', this.sameLocation = true});
 
   @override
   State<RunningScreen> createState() => _RunningScreenState();
@@ -26,7 +31,14 @@ class _RunningScreenState extends State<RunningScreen>
     with TickerProviderStateMixin {
   late final RunningService _runService;
   late final HorrorService _horrorService;
+  MarathonService? _marathonService;
+  SoloTtsService? _soloTtsService;
+  final AudioPlayer _stadiumPlayer = AudioPlayer();
   final PageController _pageController = PageController(initialPage: 0);
+  int _lastMarathonKm = 0;
+  bool _stadiumFinaleEnabled = false;
+  bool _stadiumFinalePlaying = false;
+  late bool _isSameLocation;
   NaverMapController? _mapController;
 
   Timer? _ticker;
@@ -54,6 +66,7 @@ class _RunningScreenState extends State<RunningScreen>
     super.initState();
     _runService = RunningService();
     _horrorService = HorrorService();
+    _isSameLocation = widget.sameLocation;
     _runService.addListener(_onRunUpdate);
     _loadRunMode();
 
@@ -140,7 +153,19 @@ class _RunningScreenState extends State<RunningScreen>
       final voice = await DatabaseHelper.getSetting('voice') ?? 'harry';
       final speedStr = await DatabaseHelper.getSetting('shadow_speed') ?? '1.0';
       final shadowSpeed = double.tryParse(speedStr) ?? 1.0;
+      final stadiumSetting = await DatabaseHelper.getSetting('stadium_finale');
+      _stadiumFinaleEnabled = stadiumSetting != 'false';
       await _horrorService.initialize(voice: voice);
+
+      // 모드별 서비스 초기화
+      if (widget.runMode == 'marathon') {
+        _marathonService = MarathonService();
+        await _marathonService!.initialize(voice: voice);
+      } else if (widget.runMode == 'freerun') {
+        _soloTtsService = SoloTtsService();
+        await _soloTtsService!.initialize(voice: voice);
+      }
+
       final ok = await _runService.startRun(
         shadowRunId: widget.shadowRunId,
         shadowSpeedMultiplier: shadowSpeed,
@@ -154,14 +179,24 @@ class _RunningScreenState extends State<RunningScreen>
         return;
       }
 
-      // 러닝 시작 TTS
-      await _horrorService.playStartTts();
+      // 모드별 시작 TTS
+      if (widget.runMode == 'doppelganger') {
+        await _horrorService.playStartTts();
+      } else if (widget.runMode == 'marathon') {
+        await _marathonService?.playStartTts();
+      } else {
+        await _soloTtsService?.playStartTts();
+      }
 
       _ticker = Timer.periodic(const Duration(seconds: 1), (_) {
         if (!_paused && mounted) {
           setState(() {});
           _checkVehicleSpeed();
-          _updateHorror();
+          if (widget.runMode == 'doppelganger') {
+            _updateHorror();
+          } else if (widget.runMode == 'marathon') {
+            _updateMarathon();
+          }
           _updateMap();
         }
       });
@@ -213,6 +248,25 @@ class _RunningScreenState extends State<RunningScreen>
     }
   }
 
+  Future<void> _updateMarathon() async {
+    if (_marathonService == null) return;
+    final currentKm = (_runService.totalDistanceM / 1000).floor();
+    if (currentKm > _lastMarathonKm) {
+      _lastMarathonKm = currentKm;
+      // km 마일스톤 TTS
+      await _marathonService!.playKmTts(currentKm);
+      // 페이스 피드백 (2km부터)
+      if (currentKm >= 2) {
+        final avgHistorical = await DatabaseHelper.getAveragePace();
+        await _marathonService!.playPaceTts(
+          _runService.avgPace,
+          avgHistorical,
+          null,
+        );
+      }
+    }
+  }
+
   void _triggerJumpscare() {
     _jumpscareTriggered = true;
     _jumpscareFlashAnim.repeat(reverse: true);
@@ -231,10 +285,24 @@ class _RunningScreenState extends State<RunningScreen>
     _updateMapOverlays(_mapController!, target);
   }
 
+  void _clearDynamicOverlays(NaverMapController controller) {
+    try {
+      controller.deleteOverlay(const NOverlayInfo(type: NOverlayType.marker, id: 'runner'));
+      controller.deleteOverlay(const NOverlayInfo(type: NOverlayType.marker, id: 'shadow'));
+      controller.deleteOverlay(const NOverlayInfo(type: NOverlayType.circleOverlay, id: 'runner_glow'));
+      controller.deleteOverlay(const NOverlayInfo(type: NOverlayType.circleOverlay, id: 'shadow_glow'));
+      controller.deleteOverlay(const NOverlayInfo(type: NOverlayType.pathOverlay, id: 'runner_path'));
+      controller.deleteOverlay(const NOverlayInfo(type: NOverlayType.pathOverlay, id: 'shadow_path'));
+    } catch (_) {}
+  }
+
   void _updateMapOverlays(NaverMapController controller, NLatLng target) {
     controller.updateCamera(
       NCameraUpdate.scrollAndZoomTo(target: target),
     );
+
+    // 기존 오버레이 삭제 후 재생성 (addOverlay는 기존 것을 업데이트하지 않음)
+    _clearDynamicOverlays(controller);
 
     // Runner glow circle
     controller.addOverlay(NCircleOverlay(
@@ -277,9 +345,9 @@ class _RunningScreenState extends State<RunningScreen>
     // km 스플릿 마커
     _addKmSplitMarkers(controller, _runService.points);
 
-    // Shadow marker + glow
+    // Shadow marker + glow (같은 장소일 때만 표시)
     final shadowPoint = _runService.currentShadowPoint;
-    if (shadowPoint != null) {
+    if (shadowPoint != null && _isSameLocation) {
       final shadowLatLng = NLatLng(shadowPoint.latitude, shadowPoint.longitude);
 
       controller.addOverlay(NCircleOverlay(
@@ -304,10 +372,10 @@ class _RunningScreenState extends State<RunningScreen>
       controller.addOverlay(shadowMarker);
     }
 
-    // Shadow path polyline
+    // Shadow path polyline (같은 장소일 때만)
     final shadowPoints = _runService.shadowPoints;
     final shadowIdx = _runService.currentShadowIndex;
-    if (shadowPoints != null && shadowIdx >= 1) {
+    if (_isSameLocation && shadowPoints != null && shadowIdx >= 1) {
       final shadowCoords = shadowPoints
           .take(shadowIdx + 1)
           .map((p) => NLatLng(p.latitude, p.longitude))
@@ -404,14 +472,34 @@ class _RunningScreenState extends State<RunningScreen>
     // 웨이크락 해제
     WakelockPlus.disable();
 
+    // 스타디움 피날레 (종료 직전 관중 함성)
+    if (_stadiumFinaleEnabled && !_jumpscareTriggered) {
+      try {
+        await _stadiumPlayer.setAsset('assets/audio/stadium_finale.mp3');
+        _stadiumPlayer.setVolume(0.8);
+        _stadiumPlayer.play();
+        await Future.delayed(const Duration(seconds: 3));
+      } catch (_) {}
+    }
+
     final result = await _runService.stopRun();
 
-    // 승리 시 TTS 재생
-    if (result != null && result.challengeResult == 'win') {
-      await _horrorService.playSurvivedTts();
+    // 모드별 종료 TTS
+    if (widget.runMode == 'doppelganger' && result != null) {
+      if (result.challengeResult == 'win') {
+        await _horrorService.playSurvivedTts();
+      } else if (result.challengeResult == 'lose') {
+        await _horrorService.playDefeatedTts();
+      }
+    } else if (widget.runMode == 'marathon') {
+      await _marathonService?.playEndTts();
+    } else if (widget.runMode == 'freerun') {
+      await _soloTtsService?.playEndTts();
     }
 
     _horrorService.dispose();
+    _marathonService?.dispose();
+    _soloTtsService?.dispose();
 
     if (mounted) {
       if (result != null && result.id != null) {
@@ -439,6 +527,7 @@ class _RunningScreenState extends State<RunningScreen>
     _shadowPingAnim.dispose();
     _jumpscareFlashAnim.dispose();
     _jumpscareShakeAnim.dispose();
+    _stadiumPlayer.dispose();
     super.dispose();
   }
 
@@ -511,9 +600,17 @@ class _RunningScreenState extends State<RunningScreen>
             right: 16,
             child: _buildDangerBadge(),
           ),
-        if (_runService.speedWarning != null)
+        // 음성 모드 배지 (다른 장소에서 도전 중)
+        if (widget.shadowRunId != null && !_isSameLocation)
           Positioned(
             top: MediaQuery.of(context).padding.top + 60,
+            left: 16,
+            right: 16,
+            child: _buildVoiceOnlyBadge(),
+          ),
+        if (_runService.speedWarning != null)
+          Positioned(
+            top: MediaQuery.of(context).padding.top + (_isSameLocation ? 60 : 110),
             left: 40,
             right: 40,
             child: _buildSpeedWarningBanner(),
@@ -858,6 +955,44 @@ class _RunningScreenState extends State<RunningScreen>
     );
   }
 
+  Widget _buildVoiceOnlyBadge() {
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(12),
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 8, sigmaY: 8),
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+          decoration: BoxDecoration(
+            color: SRColors.surfaceContainerLow.withValues(alpha: 0.6),
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: SRColors.primary.withValues(alpha: 0.3)),
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(Icons.headphones, color: SRColors.primary, size: 18),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(S.voiceOnlyMode, style: GoogleFonts.spaceGrotesk(
+                      fontSize: 13, fontWeight: FontWeight.w700, color: SRColors.primary,
+                    )),
+                    Text(S.voiceOnlyDesc, style: GoogleFonts.inter(
+                      fontSize: 10, color: SRColors.textMuted,
+                    )),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
   Widget _buildSpeedWarningBanner() {
     return ClipRRect(
       borderRadius: BorderRadius.circular(12),
@@ -947,6 +1082,15 @@ class _RunningScreenState extends State<RunningScreen>
       case ThreatLevel.critical:
         progress = 1.0;
         levelLabel = '100%';
+      case ThreatLevel.aheadClose:
+        progress = 0.10;
+        levelLabel = '10%';
+      case ThreatLevel.aheadMid:
+        progress = 0.05;
+        levelLabel = '5%';
+      case ThreatLevel.aheadFar:
+        progress = 0.0;
+        levelLabel = '0%';
     }
 
     return Column(

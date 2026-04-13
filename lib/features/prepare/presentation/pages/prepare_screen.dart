@@ -83,8 +83,12 @@ class _PrepareScreenState extends State<PrepareScreen>
   late Animation<double> _countdownScale;
   late AnimationController _pulseAnim;
   String _selectedQuote = '';
+  String _selectedMode = 'marathon'; // 'marathon' or 'freerun'
+  bool _tooFarFromStart = false;
+  String _shadowLocationType = 'same'; // 'same' or 'different'
 
   bool get _isChallenge => widget.shadowRunId != null;
+  bool get _canStart => _gpsReady && !(_tooFarFromStart && _shadowLocationType == 'same');
 
   @override
   void initState() {
@@ -108,6 +112,20 @@ class _PrepareScreenState extends State<PrepareScreen>
     if (_isChallenge) {
       _shadowRun = await DatabaseHelper.getRun(widget.shadowRunId!);
       _shadowPoints = await DatabaseHelper.getRunPoints(widget.shadowRunId!);
+      // Check if user is near the start point
+      if (_shadowPoints != null && _shadowPoints!.isNotEmpty) {
+        try {
+          final currentPos = await Geolocator.getCurrentPosition();
+          final startPoint = _shadowPoints!.first;
+          final distToStart = Geolocator.distanceBetween(
+            currentPos.latitude, currentPos.longitude,
+            startPoint.latitude, startPoint.longitude,
+          );
+          if (distToStart > 200 && mounted) {
+            _tooFarFromStart = true;
+          }
+        } catch (_) {}
+      }
     }
     await _pickRandomQuote();
     if (mounted) setState(() => _loading = false);
@@ -189,7 +207,15 @@ class _PrepareScreenState extends State<PrepareScreen>
         _countdownAnim.forward(from: 0);
         _runCountdownTick();
       } else {
-        context.go('/running', extra: widget.shadowRunId);
+        if (_isChallenge) {
+          context.go('/running', extra: {
+            'shadowRunId': widget.shadowRunId,
+            'mode': 'doppelganger',
+            'sameLocation': _shadowLocationType == 'same',
+          });
+        } else {
+          context.go('/running', extra: {'mode': _selectedMode});
+        }
       }
     });
   }
@@ -228,10 +254,40 @@ class _PrepareScreenState extends State<PrepareScreen>
                                 const SizedBox(height: 16),
                                 _buildShadowStats(),
                                 const SizedBox(height: 16),
-                                _buildMiniMap(),
+                                _buildLocationSelector(),
+                                if (_shadowLocationType == 'same') ...[
+                                  const SizedBox(height: 16),
+                                  _buildMiniMap(),
+                                ],
+                              ],
+                              if (!_isChallenge) ...[
+                                const SizedBox(height: 16),
+                                _buildRunModeSelector(),
                               ],
                               const SizedBox(height: 28),
                               _buildGpsIndicator(),
+                              if (_tooFarFromStart && _shadowLocationType == 'same') ...[
+                                const SizedBox(height: 12),
+                                Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                                  decoration: BoxDecoration(
+                                    color: SRColors.primaryContainer.withValues(alpha: 0.1),
+                                    borderRadius: BorderRadius.circular(12),
+                                    border: Border.all(color: SRColors.primaryContainer.withValues(alpha: 0.3)),
+                                  ),
+                                  child: Row(
+                                    children: [
+                                      Icon(Icons.location_off, color: SRColors.primaryContainer, size: 18),
+                                      const SizedBox(width: 8),
+                                      Expanded(
+                                        child: Text(S.tooFarFromStart, style: GoogleFonts.inter(
+                                          fontSize: 12, color: SRColors.primaryContainer,
+                                        )),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ],
                               const SizedBox(height: 32),
                             ],
                           ),
@@ -520,14 +576,14 @@ class _PrepareScreenState extends State<PrepareScreen>
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(100),
             gradient: LinearGradient(
-              colors: _gpsReady
+              colors: _canStart
                   ? [SRColors.primary, SRColors.primaryContainer]
                   : [
                       SRColors.primary.withValues(alpha: 0.3),
                       SRColors.primaryContainer.withValues(alpha: 0.3),
                     ],
             ),
-            boxShadow: _gpsReady
+            boxShadow: _canStart
                 ? [
                     BoxShadow(
                       color: SRColors.primaryContainer.withValues(alpha: 0.4),
@@ -538,7 +594,7 @@ class _PrepareScreenState extends State<PrepareScreen>
                 : [],
           ),
           child: MaterialButton(
-            onPressed: _gpsReady ? _startCountdown : null,
+            onPressed: _canStart ? _startCountdown : null,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(100),
             ),
@@ -547,11 +603,191 @@ class _PrepareScreenState extends State<PrepareScreen>
               style: GoogleFonts.spaceGrotesk(
                 fontSize: 20,
                 fontWeight: FontWeight.w700,
-                color: _gpsReady ? Colors.white : Colors.white38,
+                color: _canStart ? Colors.white : Colors.white38,
                 letterSpacing: 6,
               ),
             ),
           ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildLocationSelector() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          S.runLocation,
+          style: GoogleFonts.spaceGrotesk(
+            fontSize: 14,
+            fontWeight: FontWeight.w700,
+            color: SRColors.neutral500,
+            letterSpacing: 3,
+          ),
+        ),
+        const SizedBox(height: 12),
+        _locationOption(
+          'same',
+          S.sameLocation,
+          S.sameLocationDesc,
+          Icons.place_rounded,
+        ),
+        const SizedBox(height: 8),
+        _locationOption(
+          'different',
+          S.differentLocation,
+          S.differentLocationDesc,
+          Icons.headphones_rounded,
+        ),
+      ],
+    );
+  }
+
+  Widget _locationOption(String type, String title, String desc, IconData icon) {
+    final selected = _shadowLocationType == type;
+    return GestureDetector(
+      onTap: () => setState(() => _shadowLocationType = type),
+      child: Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: selected
+              ? SRColors.primaryContainer.withValues(alpha: 0.1)
+              : const Color(0xFF161616),
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(
+            color: selected
+                ? SRColors.primaryContainer.withValues(alpha: 0.5)
+                : Colors.white.withValues(alpha: 0.05),
+            width: selected ? 1.5 : 1,
+          ),
+        ),
+        child: Row(
+          children: [
+            Container(
+              width: 44,
+              height: 44,
+              decoration: BoxDecoration(
+                color: selected
+                    ? SRColors.primaryContainer.withValues(alpha: 0.2)
+                    : SRColors.surfaceContainerHighest,
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: Icon(icon,
+                  color: selected ? SRColors.primaryContainer : SRColors.neutral500,
+                  size: 22),
+            ),
+            const SizedBox(width: 16),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(title, style: GoogleFonts.spaceGrotesk(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w700,
+                    color: selected ? SRColors.onSurface : SRColors.onSurface.withValues(alpha: 0.6),
+                  )),
+                  const SizedBox(height: 2),
+                  Text(desc, style: GoogleFonts.inter(
+                    fontSize: 12,
+                    color: SRColors.neutral500,
+                  )),
+                ],
+              ),
+            ),
+            if (selected)
+              Icon(Icons.check_circle, color: SRColors.primaryContainer, size: 22),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildRunModeSelector() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          S.selectRunMode,
+          style: GoogleFonts.spaceGrotesk(
+            fontSize: 14,
+            fontWeight: FontWeight.w700,
+            color: SRColors.neutral500,
+            letterSpacing: 3,
+          ),
+        ),
+        const SizedBox(height: 12),
+        _modeOption(
+          'marathon',
+          S.modeMarathoner,
+          S.modeMarathonerDesc,
+          Icons.emoji_events_rounded,
+        ),
+        const SizedBox(height: 8),
+        _modeOption(
+          'freerun',
+          S.modeFreeRun,
+          S.modeFreeRunDesc,
+          Icons.directions_run_rounded,
+        ),
+      ],
+    );
+  }
+
+  Widget _modeOption(String mode, String title, String desc, IconData icon) {
+    final selected = _selectedMode == mode;
+    return GestureDetector(
+      onTap: () => setState(() => _selectedMode = mode),
+      child: Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: selected
+              ? SRColors.primaryContainer.withValues(alpha: 0.1)
+              : const Color(0xFF161616),
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(
+            color: selected
+                ? SRColors.primaryContainer.withValues(alpha: 0.5)
+                : Colors.white.withValues(alpha: 0.05),
+            width: selected ? 1.5 : 1,
+          ),
+        ),
+        child: Row(
+          children: [
+            Container(
+              width: 44,
+              height: 44,
+              decoration: BoxDecoration(
+                color: selected
+                    ? SRColors.primaryContainer.withValues(alpha: 0.2)
+                    : SRColors.surfaceContainerHighest,
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: Icon(icon,
+                  color: selected ? SRColors.primaryContainer : SRColors.neutral500,
+                  size: 22),
+            ),
+            const SizedBox(width: 16),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(title, style: GoogleFonts.spaceGrotesk(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w700,
+                    color: selected ? SRColors.onSurface : SRColors.onSurface.withValues(alpha: 0.6),
+                  )),
+                  const SizedBox(height: 2),
+                  Text(desc, style: GoogleFonts.inter(
+                    fontSize: 12,
+                    color: SRColors.neutral500,
+                  )),
+                ],
+              ),
+            ),
+            if (selected)
+              Icon(Icons.check_circle, color: SRColors.primaryContainer, size: 22),
+          ],
         ),
       ),
     );

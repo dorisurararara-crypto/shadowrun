@@ -122,9 +122,12 @@ class _HomeScreenState extends State<HomeScreen> {
               child: ElevatedButton.icon(
                 onPressed: () => context.push('/prepare'),
                 icon: const Icon(Icons.directions_run, size: 20),
-                label: Text(S.newRun, style: GoogleFonts.inter(
-                  fontSize: 18, fontWeight: FontWeight.w900, letterSpacing: 3,
-                )),
+                label: FittedBox(
+                  fit: BoxFit.scaleDown,
+                  child: Text(S.newRun, style: GoogleFonts.inter(
+                    fontSize: 18, fontWeight: FontWeight.w900, letterSpacing: 3,
+                  )),
+                ),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.transparent, shadowColor: Colors.transparent,
                   foregroundColor: Colors.black,
@@ -152,9 +155,12 @@ class _HomeScreenState extends State<HomeScreen> {
                 context.push('/prepare', extra: -1);
               },
               icon: const Icon(Icons.workspace_premium, size: 20),
-              label: Text(S.challenge, style: GoogleFonts.inter(
-                fontSize: 18, fontWeight: FontWeight.w900, letterSpacing: 3, color: SRColors.onSurface.withValues(alpha: 0.7),
-              )),
+              label: FittedBox(
+                fit: BoxFit.scaleDown,
+                child: Text(S.challenge, style: GoogleFonts.inter(
+                  fontSize: 18, fontWeight: FontWeight.w900, letterSpacing: 3, color: SRColors.onSurface.withValues(alpha: 0.7),
+                )),
+              ),
               style: OutlinedButton.styleFrom(
                 foregroundColor: SRColors.primary,
                 side: const BorderSide(color: SRColors.primaryContainer),

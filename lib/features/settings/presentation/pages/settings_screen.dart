@@ -21,6 +21,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   String _unit = 'km';
   int _horrorLevel = 2;
   bool _ttsEnabled = true;
+  bool _stadiumFinale = true;
   bool _isPro = false;
   String _selectedVoice = 'harry';
   double _shadowSpeed = 1.0;
@@ -54,6 +55,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
       DatabaseHelper.getSetting('is_pro'),
       DatabaseHelper.getSetting('voice'),
       DatabaseHelper.getSetting('shadow_speed'),
+      DatabaseHelper.getSetting('stadium_finale'),
     ]);
 
     setState(() {
@@ -64,6 +66,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
       _isPro = results[4] == 'true';
       _selectedVoice = results[5] ?? 'harry';
       _shadowSpeed = double.tryParse(results[6] ?? '1.0') ?? 1.0;
+      _stadiumFinale = results[7] != 'false';
       _loading = false;
     });
   }
@@ -465,6 +468,17 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 onChanged: (v) {
                   setState(() => _ttsEnabled = v);
                   _save('tts_enabled', '$v');
+                },
+              ),
+              const SizedBox(height: 8),
+              // Stadium Finale toggle
+              _SettingsToggle(
+                label: S.stadiumFinale,
+                subtitle: S.stadiumFinaleDesc,
+                value: _stadiumFinale,
+                onChanged: (v) {
+                  setState(() => _stadiumFinale = v);
+                  _save('stadium_finale', '$v');
                 },
               ),
               const SizedBox(height: 8),
