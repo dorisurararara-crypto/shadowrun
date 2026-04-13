@@ -155,7 +155,16 @@ class _RunningScreenState extends State<RunningScreen>
       final shadowSpeed = double.tryParse(speedStr) ?? 1.0;
       final stadiumSetting = await DatabaseHelper.getSetting('stadium_finale');
       _stadiumFinaleEnabled = stadiumSetting != 'false';
-      await _horrorService.initialize(voice: voice);
+      final horrorStr = await DatabaseHelper.getSetting('horror_level') ?? '2';
+      final horrorLevel = int.tryParse(horrorStr) ?? 2;
+      final ttsEnabled = (await DatabaseHelper.getSetting('tts_enabled')) != 'false';
+      final vibEnabled = (await DatabaseHelper.getSetting('vibration_enabled')) != 'false';
+      await _horrorService.initialize(
+        voice: voice,
+        horrorLevel: horrorLevel,
+        ttsEnabled: ttsEnabled,
+        vibrationEnabled: vibEnabled,
+      );
 
       // 모드별 서비스 초기화
       if (widget.runMode == 'marathon') {
@@ -265,19 +274,22 @@ class _RunningScreenState extends State<RunningScreen>
     if (currentKm > _lastMarathonKm) {
       _lastMarathonKm = currentKm;
       _marathonTtsPlaying = true;
-      // km 마일스톤 TTS
-      await _marathonService!.playKmTts(currentKm);
-      // 페이스 피드백 (2km부터, km TTS 후 4초 대기)
-      if (currentKm >= 2) {
-        await Future.delayed(const Duration(seconds: 4));
-        final avgHistorical = await DatabaseHelper.getAveragePace();
-        await _marathonService!.playPaceTts(
-          _runService.avgPace,
-          avgHistorical,
-          null,
-        );
+      try {
+        // km 마일스톤 TTS
+        await _marathonService!.playKmTts(currentKm);
+        // 페이스 피드백 (2km부터, km TTS 후 4초 대기)
+        if (currentKm >= 2) {
+          await Future.delayed(const Duration(seconds: 4));
+          final avgHistorical = await DatabaseHelper.getAveragePace();
+          await _marathonService!.playPaceTts(
+            _runService.avgPace,
+            avgHistorical,
+            null,
+          );
+        }
+      } finally {
+        _marathonTtsPlaying = false;
       }
-      _marathonTtsPlaying = false;
     }
   }
 
@@ -524,6 +536,8 @@ class _RunningScreenState extends State<RunningScreen>
       await _soloTtsService?.playEndTts();
     }
 
+    // TTS 재생 완료 대기 후 dispose
+    await Future.delayed(const Duration(seconds: 3));
     _horrorService.dispose();
     _marathonService?.dispose();
     _soloTtsService?.dispose();

@@ -78,5 +78,7 @@
 		<string>SHADOW RUN needs your location to track your running route and calculate the distance from the doppelganger.</string>
 		<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
 		<string>SHADOW RUN needs your location to track your running route even when the app is in the background.</string>
+		<key>NSLocationAlwaysUsageDescription</key>
+		<string>SHADOW RUN needs your location to track your running route even when the app is in the background.</string>
 	</dict>
 </plist>
