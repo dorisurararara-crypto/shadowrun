@@ -16,6 +16,9 @@ class RunningService extends ChangeNotifier {
   static const int _shadowGracePeriodS = 10; // 시작 후 10초 유예
   bool kmSplitTtsEnabled = true; // 마라토너 모드에서는 false (MarathonService가 처리)
 
+  // 백그라운드에서도 동작하는 GPS 콜백 (Timer 대체)
+  void Function()? onPositionUpdate;
+
   StreamSubscription<Position>? _positionSub;
   final List<RunPoint> _points = [];
   List<RunPoint>? _shadowPoints;
@@ -282,6 +285,9 @@ class RunningService extends ChangeNotifier {
     ));
 
     notifyListeners();
+
+    // 백그라운드에서도 동작하는 콜백 호출 (Timer 대체)
+    onPositionUpdate?.call();
   }
 
   /// 러닝 종료 및 저장

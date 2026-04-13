@@ -202,17 +202,24 @@ class _RunningScreenState extends State<RunningScreen>
         await _soloTtsService?.playStartTts();
       }
 
-      _ticker = Timer.periodic(const Duration(seconds: 1), (_) {
+      // GPS 콜백: 백그라운드에서도 동작 (Timer 대신)
+      _runService.onPositionUpdate = () {
         if (!mounted) return;
-        // 차량 감지 체크는 일시정지 중에도 실행 (자동 복귀 위해)
         _checkVehicleSpeed();
         if (!_paused) {
-          setState(() {});
           if (widget.runMode == 'doppelganger') {
             _updateHorror();
           } else if (widget.runMode == 'marathon') {
             _updateMarathon();
           }
+        }
+      };
+
+      // Timer: UI 갱신 + 지도 업데이트만 (화면 켜져 있을 때)
+      _ticker = Timer.periodic(const Duration(seconds: 1), (_) {
+        if (!mounted) return;
+        if (!_paused) {
+          setState(() {});
           _updateMap();
         }
       });
@@ -567,6 +574,7 @@ class _RunningScreenState extends State<RunningScreen>
   void dispose() {
     WakelockPlus.disable();
     _ticker?.cancel();
+    _runService.onPositionUpdate = null;
     _runService.removeListener(_onRunUpdate);
     _runService.dispose();
     _pageController.dispose();
