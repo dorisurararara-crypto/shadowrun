@@ -198,9 +198,11 @@ class _RunningScreenState extends State<RunningScreen>
       }
 
       _ticker = Timer.periodic(const Duration(seconds: 1), (_) {
-        if (!_paused && mounted) {
+        if (!mounted) return;
+        // 차량 감지 체크는 일시정지 중에도 실행 (자동 복귀 위해)
+        _checkVehicleSpeed();
+        if (!_paused) {
           setState(() {});
-          _checkVehicleSpeed();
           if (widget.runMode == 'doppelganger') {
             _updateHorror();
           } else if (widget.runMode == 'marathon') {

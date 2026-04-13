@@ -230,9 +230,9 @@ class RunningService extends ChangeNotifier {
   }
 
   void _onPosition(Position pos) {
-    if (!_isRunning || _isPaused) return;
+    if (!_isRunning) return;
 
-    // GPS 속도가 없거나 0이면 위치 변화로 속도 추정
+    // 속도는 항상 업데이트 (차량 감지 자동 복귀 위해)
     double speed = pos.speed >= 0 ? pos.speed : 0;
     if (speed <= 0 && _lastPosition != null) {
       final dist = Geolocator.distanceBetween(
@@ -246,6 +246,9 @@ class RunningService extends ChangeNotifier {
     }
     _currentSpeed = speed;
     if (pos.heading >= 0) _heading = pos.heading;
+
+    // 일시정지 중이면 거리/포인트 업데이트 안 함
+    if (_isPaused) return;
 
     if (_lastPosition != null && isValidSpeed) {
       _totalDistanceM += Geolocator.distanceBetween(
