@@ -5,6 +5,7 @@ import 'package:shadowrun/core/theme/app_theme.dart';
 import 'package:shadowrun/core/database/database_helper.dart';
 import 'package:shadowrun/shared/models/run_model.dart';
 import 'package:shadowrun/core/l10n/app_strings.dart';
+import 'package:shadowrun/core/services/sfx_service.dart';
 
 class HistoryScreen extends StatefulWidget {
   const HistoryScreen({super.key});
@@ -22,6 +23,7 @@ class _HistoryScreenState extends State<HistoryScreen>
   void initState() {
     super.initState();
     _tabController = TabController(length: 2, vsync: this);
+    _tabController.addListener(() { SfxService().toggle(); });
     _runsFuture = DatabaseHelper.getAllRuns();
   }
 
@@ -103,7 +105,7 @@ class _HistoryScreenState extends State<HistoryScreen>
         scrolledUnderElevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios_new, size: 18, color: SRColors.onSurface),
-          onPressed: () => context.pop(),
+          onPressed: () => context.go('/'),
         ),
         title: Text(
           S.records,
@@ -159,12 +161,18 @@ class _HistoryScreenState extends State<HistoryScreen>
             children: [
               _RunList(
                 runs: allRuns,
-                onTap: (run) => context.push('/prepare', extra: run.id),
+                onTap: (run) {
+                  SfxService().tapCard();
+                  context.push('/prepare', extra: run.id);
+                },
                 onDismiss: _deleteRun,
               ),
               _RunList(
                 runs: challengeRuns,
-                onTap: (run) => context.push('/prepare', extra: run.id),
+                onTap: (run) {
+                  SfxService().tapCard();
+                  context.push('/prepare', extra: run.id);
+                },
                 onDismiss: _deleteRun,
                 emptyMessage: S.noChallengesEmpty,
                 emptySubtitle: S.noChallengesSubtitle,

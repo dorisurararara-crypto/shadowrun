@@ -7,6 +7,7 @@ import 'package:shadowrun/core/database/database_helper.dart';
 import 'package:shadowrun/core/services/purchase_service.dart';
 import 'package:shadowrun/shared/models/run_model.dart';
 import 'package:shadowrun/core/l10n/app_strings.dart';
+import 'package:shadowrun/core/services/sfx_service.dart';
 
 class AnalysisScreen extends StatefulWidget {
   const AnalysisScreen({super.key});
@@ -126,14 +127,14 @@ class _AnalysisScreenState extends State<AnalysisScreen> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               GestureDetector(
-                onTap: () => _changeMonth(-1),
+                onTap: () { SfxService().tapCard(); _changeMonth(-1); },
                 child: const Icon(Icons.chevron_left, color: SRColors.onSurface, size: 24),
               ),
               Text(monthLabel, style: GoogleFonts.spaceGrotesk(
                 fontSize: 16, fontWeight: FontWeight.w700, color: SRColors.onSurface,
               )),
               GestureDetector(
-                onTap: () => _changeMonth(1),
+                onTap: () { SfxService().tapCard(); _changeMonth(1); },
                 child: const Icon(Icons.chevron_right, color: SRColors.onSurface, size: 24),
               ),
             ],
@@ -169,7 +170,7 @@ class _AnalysisScreenState extends State<AnalysisScreen> {
 
                 return Expanded(
                   child: GestureDetector(
-                    onTap: hasRun ? () => setState(() => _selectedDate = isSelected ? null : dateKey) : null,
+                    onTap: hasRun ? () { SfxService().tapCard(); setState(() => _selectedDate = isSelected ? null : dateKey); } : null,
                     child: Container(
                       height: 44,
                       margin: const EdgeInsets.all(1),
@@ -498,9 +499,9 @@ class _AnalysisScreenState extends State<AnalysisScreen> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
-          _navIcon(Icons.directions_run, false, () => context.go('/')),
-          _navIcon(Icons.monitor_heart_outlined, false, () => context.go('/history')),
-          _navIcon(Icons.settings_outlined, false, () => context.go('/settings')),
+          _navIcon(Icons.directions_run, false, () { SfxService().tapCard(); context.go('/'); }),
+          _navIcon(Icons.monitor_heart_outlined, false, () { SfxService().tapCard(); context.go('/history'); }),
+          _navIcon(Icons.settings_outlined, false, () { SfxService().tapCard(); context.go('/settings'); }),
           _navIcon(Icons.analytics_outlined, true, () {}),
         ],
       ),

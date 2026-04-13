@@ -9,18 +9,33 @@ class MarathonService {
 
   String _voiceId = 'drill';
   bool _isDisposed = false;
+  bool _isPlaying = false; // 재생 중 중복 호출 방지
 
   // km 마일스톤 재생 추적
   final Set<int> _playedKmMilestones = {};
+  // 시간 마일스톤 재생 추적
+  final Set<int> _playedTimeMinutes = {};
+  // 마지막 랜덤 TTS 시간 (초)
+  int _lastRandomTtsTime = 0;
 
   // 사용 가능한 km 마일스톤
   static const List<int> _availableKmMilestones = [1, 2, 3, 4, 5, 7, 10, 15, 20];
+  // 시간 마일스톤 (분)
+  static const List<int> _timeMinutes = [5, 10, 15, 20, 30, 40, 50, 60];
 
   // 각 상황별 변형 개수
   static const int _startVariants = 6;
   static const int _endVariants = 6;
   static const int _kmVariants = 4;
   static const int _paceVariants = 4;
+  // 시간별 변형
+  static const Map<int, int> _timeVariants = {5: 2, 10: 2, 15: 2, 20: 2, 30: 2, 40: 1, 50: 1, 60: 1};
+  // 명언/조언
+  static const int _quoteCount = 12;
+  static const int _tipCount = 8;
+  // 랜덤 TTS 간격 (초) — 3~5분
+  static const int _randomIntervalMin = 180;
+  static const int _randomIntervalMax = 300;
 
   Future<void> initialize({String voice = 'drill'}) async {
     _voiceId = voice;
@@ -34,9 +49,10 @@ class MarathonService {
   Future<void> playKmTts(int km) async {
     if (!_availableKmMilestones.contains(km)) return;
     if (_playedKmMilestones.contains(km)) return;
+    if (_isPlaying) return;
     final variant = _random.nextInt(_kmVariants) + 1;
     final success = await _playTts('tts_marathon_${km}km', variant: variant);
-    if (success) _playedKmMilestones.add(km); // 재생 성공 시에만 마킹
+    if (success) _playedKmMilestones.add(km);
   }
 
   Future<void> playPaceTts(
@@ -44,13 +60,46 @@ class MarathonService {
     double avgHistoricalPace,
     double? previousKmPace,
   ) async {
-    final category = _determinePaceCategory(
-      currentPace,
-      avgHistoricalPace,
-      previousKmPace,
-    );
+    if (_isPlaying) return;
+    final category = _determinePaceCategory(currentPace, avgHistoricalPace, previousKmPace);
     final variant = _random.nextInt(_paceVariants) + 1;
     await _playTts('tts_pace_$category', variant: variant);
+  }
+
+  /// 시간 기반 격려 (5분, 10분, ... 60분)
+  Future<void> playTimeTts(int elapsedSeconds) async {
+    if (_isPlaying) return;
+    final minutes = elapsedSeconds ~/ 60;
+    for (final m in _timeMinutes) {
+      if (minutes >= m && !_playedTimeMinutes.contains(m)) {
+        _playedTimeMinutes.add(m);
+        final variants = _timeVariants[m] ?? 1;
+        final variant = _random.nextInt(variants) + 1;
+        await _playTtsSimple('tts_time_${m}min', variant);
+        return;
+      }
+    }
+  }
+
+  /// 랜덤 명언/조언 (3~5분 간격)
+  Future<void> playRandomTts(int elapsedSeconds) async {
+    if (_isPlaying) return;
+    // 최소 2분 후부터
+    if (elapsedSeconds < 120) return;
+    // 간격 체크
+    final interval = _randomIntervalMin + _random.nextInt(_randomIntervalMax - _randomIntervalMin);
+    if (elapsedSeconds - _lastRandomTtsTime < interval) return;
+
+    _lastRandomTtsTime = elapsedSeconds;
+
+    // 50% 명언, 50% 조언
+    if (_random.nextBool()) {
+      final n = _random.nextInt(_quoteCount) + 1;
+      await _playTtsSimple('tts_quote', n);
+    } else {
+      final n = _random.nextInt(_tipCount) + 1;
+      await _playTtsSimple('tts_tip', n);
+    }
   }
 
   Future<void> playEndTts() async {
@@ -63,25 +112,17 @@ class MarathonService {
     double avgHistoricalPace,
     double? previousKmPace,
   ) {
-    // 과거 기록 없으면 비교 불가 → good 반환
     if (avgHistoricalPace <= 0 || currentPace <= 0) return 'good';
-
-    // pace는 min/km — 낮을수록 빠름
-    // fast: 현재 페이스가 평균보다 20%+ 빠름 (값이 20%+ 낮음)
     if (currentPace < avgHistoricalPace * 0.8) return 'fast';
-
-    // veryslow: 현재 페이스가 평균보다 20%+ 느림 (값이 20%+ 높음)
     if (currentPace > avgHistoricalPace * 1.2) return 'veryslow';
-
-    // slow: 이전 km 대비 페이스 하락 (값 증가)
     if (previousKmPace != null && currentPace > previousKmPace) return 'slow';
-
-    // good: 평균의 ±20% 이내이거나 약간 빠름
     return 'good';
   }
 
+  /// km/pace용 (variant 포함 파일명: tts_marathon_1km_1)
   Future<bool> _playTts(String baseName, {required int variant}) async {
-    if (_isDisposed) return false;
+    if (_isDisposed || _isPlaying) return false;
+    _isPlaying = true;
     try {
       String langBase;
       if (S.isKo) {
@@ -100,7 +141,6 @@ class MarathonService {
       await _ttsPlayer.setAsset('assets/audio/$filename');
       _ttsPlayer.setVolume(1.0);
       await _ttsPlayer.play();
-      // 재생 완료 대기 (최대 10초 타임아웃)
       await _ttsPlayer.playerStateStream
           .firstWhere((s) => s.processingState == ProcessingState.completed)
           .timeout(const Duration(seconds: 10), onTimeout: () => _ttsPlayer.playerState);
@@ -108,11 +148,49 @@ class MarathonService {
     } catch (e) {
       debugPrint('Marathon TTS 재생 에러: $e');
       return false;
+    } finally {
+      _isPlaying = false;
+    }
+  }
+
+  /// 명언/조언/시간용 (파일명: tts_quote_1, tts_tip_1, tts_time_5min_1)
+  Future<bool> _playTtsSimple(String baseName, int number) async {
+    if (_isDisposed || _isPlaying) return false;
+    _isPlaying = true;
+    try {
+      String name;
+      if (S.isKo) {
+        name = '${baseName}_$number';
+      } else {
+        name = '${baseName}_en_$number';
+      }
+
+      String filename;
+      if (_voiceId == 'harry') {
+        filename = '$name.mp3';
+      } else {
+        filename = '${name}_$_voiceId.mp3';
+      }
+
+      await _ttsPlayer.setAsset('assets/audio/$filename');
+      _ttsPlayer.setVolume(1.0);
+      await _ttsPlayer.play();
+      await _ttsPlayer.playerStateStream
+          .firstWhere((s) => s.processingState == ProcessingState.completed)
+          .timeout(const Duration(seconds: 10), onTimeout: () => _ttsPlayer.playerState);
+      return true;
+    } catch (e) {
+      debugPrint('Marathon TTS 재생 에러: $e');
+      return false;
+    } finally {
+      _isPlaying = false;
     }
   }
 
   void resetMilestones() {
     _playedKmMilestones.clear();
+    _playedTimeMinutes.clear();
+    _lastRandomTtsTime = 0;
   }
 
   void dispose() {

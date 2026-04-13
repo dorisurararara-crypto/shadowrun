@@ -195,7 +195,10 @@ class _ResultScreenState extends State<ResultScreen>
                 color: SRColors.textPrimary, size: 22),
           ),
           IconButton(
-            onPressed: () => context.go('/'),
+            onPressed: () {
+              SfxService().tapCard();
+              context.go('/');
+            },
             icon: const Icon(Icons.close_rounded,
                 color: SRColors.textPrimary, size: 22),
           ),
@@ -776,7 +779,10 @@ class _ResultScreenState extends State<ResultScreen>
                 ],
               ),
               child: MaterialButton(
-                onPressed: () => context.go('/'),
+                onPressed: () {
+                  SfxService().tapCard();
+                  context.go('/');
+                },
                 shape: const StadiumBorder(),
                 child: Text(
                   S.home,

@@ -158,6 +158,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
             labels: const ['한국어', 'English'],
             selected: S.isKo ? 'ko' : 'en',
             onChanged: (value) async {
+              SfxService().toggle();
               final prefs = await SharedPreferences.getInstance();
               await prefs.setString('language', value);
               await S.init(value);
@@ -209,6 +210,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 labels: const ['km', 'mi'],
                 selected: _unit,
                 onChanged: (value) {
+                  SfxService().toggle();
                   setState(() => _unit = value);
                   _save('unit', value);
                 },
@@ -251,6 +253,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
             );
             return;
           }
+          SfxService().toggle();
           setState(() => _runMode = value);
           _save('run_mode', value);
         },
@@ -405,6 +408,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       );
                       return;
                     }
+                    if (level != _horrorLevel) SfxService().toggle();
                     setState(() => _horrorLevel = level);
                     _save('horror_level', '$level');
                   },
@@ -1049,12 +1053,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
           _NavIcon(
             icon: Icons.directions_run,
             isActive: _selectedNavIndex == 0,
-            onTap: () => context.go('/'),
+            onTap: () { SfxService().tapCard(); context.go('/'); },
           ),
           _NavIcon(
             icon: Icons.monitor_heart_outlined,
             isActive: _selectedNavIndex == 1,
-            onTap: () => context.go('/history'),
+            onTap: () { SfxService().tapCard(); context.go('/history'); },
           ),
           _NavIcon(
             icon: Icons.settings_outlined,
@@ -1064,7 +1068,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
           _NavIcon(
             icon: Icons.analytics_outlined,
             isActive: _selectedNavIndex == 3,
-            onTap: () => context.go('/analysis'),
+            onTap: () { SfxService().tapCard(); context.go('/analysis'); },
           ),
         ],
       ),

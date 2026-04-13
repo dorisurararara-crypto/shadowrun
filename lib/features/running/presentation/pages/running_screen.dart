@@ -287,35 +287,37 @@ class _RunningScreenState extends State<RunningScreen>
     }
   }
 
-  bool _marathonTtsPlaying = false;
   double? _previousKmPace; // 이전 km 페이스 추적
 
   Future<void> _updateMarathon() async {
-    if (_marathonService == null || _marathonTtsPlaying) return;
+    if (_marathonService == null) return;
+    final elapsed = _runService.durationS;
+
+    // km 마일스톤 TTS
     final currentKm = (_runService.totalDistanceM / 1000).floor();
     if (currentKm > _lastMarathonKm) {
       _lastMarathonKm = currentKm;
-      _marathonTtsPlaying = true;
-      try {
-        // km 마일스톤 SFX
-        SfxService().kmDing();
-        SfxService().whistle();
-        // km 마일스톤 TTS
-        await _marathonService!.playKmTts(currentKm);
-        // 페이스 피드백 (2km부터, km TTS 완료 후)
-        if (currentKm >= 2) {
-          final avgHistorical = await DatabaseHelper.getAveragePace();
-          await _marathonService!.playPaceTts(
-            _runService.avgPace,
-            avgHistorical,
-            _previousKmPace,
-          );
-        }
-        _previousKmPace = _runService.avgPace; // 현재 페이스를 다음 비교용으로 저장
-      } finally {
-        _marathonTtsPlaying = false;
+      SfxService().kmDing();
+      SfxService().whistle();
+      await _marathonService!.playKmTts(currentKm);
+      // 페이스 피드백 (2km부터)
+      if (currentKm >= 2) {
+        final avgHistorical = await DatabaseHelper.getAveragePace();
+        await _marathonService!.playPaceTts(
+          _runService.avgPace,
+          avgHistorical,
+          _previousKmPace,
+        );
       }
+      _previousKmPace = _runService.avgPace;
+      return; // km TTS 재생했으면 이번 업데이트에서 추가 TTS 안 함
     }
+
+    // 시간 기반 격려 (5분, 10분, ...)
+    await _marathonService!.playTimeTts(elapsed);
+
+    // 랜덤 명언/조언 (3~5분 간격)
+    await _marathonService!.playRandomTts(elapsed);
   }
 
   void _triggerJumpscare() {

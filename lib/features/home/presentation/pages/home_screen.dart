@@ -57,15 +57,24 @@ class _HomeScreenState extends State<HomeScreen> {
                 const Spacer(),
                 IconButton(
                   icon: const Icon(Icons.calendar_month_outlined, color: SRColors.neutral500, size: 24),
-                  onPressed: () => context.push('/analysis'),
+                  onPressed: () {
+                    SfxService().tapCard();
+                    context.push('/analysis');
+                  },
                 ),
                 IconButton(
                   icon: const Icon(Icons.history, color: SRColors.neutral500, size: 24),
-                  onPressed: () => context.push('/history'),
+                  onPressed: () {
+                    SfxService().tapCard();
+                    context.push('/history');
+                  },
                 ),
                 IconButton(
                   icon: const Icon(Icons.settings_outlined, color: SRColors.neutral500, size: 24),
-                  onPressed: () => context.push('/settings'),
+                  onPressed: () {
+                    SfxService().tapCard();
+                    context.push('/settings');
+                  },
                 ),
               ],
             ),
@@ -250,7 +259,10 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Widget _buildProBanner() {
     return GestureDetector(
-      onTap: () => context.push('/settings'),
+      onTap: () {
+        SfxService().tapCard();
+        context.push('/settings');
+      },
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
         decoration: BoxDecoration(
@@ -359,6 +371,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 padding: const EdgeInsets.only(right: 16),
                 child: GestureDetector(
                   onTap: () async {
+                    SfxService().tapCard();
                     final success = await AdService().showRewardedAd(
                       onRewarded: () async {
                         final count = await DatabaseHelper.getDailyChallengeCount();
@@ -457,7 +470,10 @@ class _HomeScreenState extends State<HomeScreen> {
             if (runs.length > 3) ...[
               const SizedBox(height: 12),
               GestureDetector(
-                onTap: () => context.push('/history'),
+                onTap: () {
+                  SfxService().tapCard();
+                  context.push('/history');
+                },
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
@@ -489,9 +505,9 @@ class _HomeScreenState extends State<HomeScreen> {
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
           _navIcon(Icons.directions_run, true, () {}),
-          _navIcon(Icons.monitor_heart_outlined, false, () => context.push('/history')),
-          _navIcon(Icons.settings_outlined, false, () => context.push('/settings')),
-          _navIcon(Icons.analytics_outlined, false, () => context.push('/analysis')),
+          _navIcon(Icons.monitor_heart_outlined, false, () { SfxService().tapCard(); context.push('/history'); }),
+          _navIcon(Icons.settings_outlined, false, () { SfxService().tapCard(); context.push('/settings'); }),
+          _navIcon(Icons.analytics_outlined, false, () { SfxService().tapCard(); context.push('/analysis'); }),
         ],
       ),
     );
