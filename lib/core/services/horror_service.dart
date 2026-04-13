@@ -52,8 +52,8 @@ class HorrorService {
       newLevel = ThreatLevel.aheadFar; // 400m+: 압도적 리드
     }
 
-    // 전환 감지: 앞서 있다가 다시 추격당하기 시작
-    final isNowAhead = distanceM >= 200;
+    // 전환 감지: 앞서 있다가 다시 추격당하기 시작 (히스테리시스 10m 버퍼)
+    final isNowAhead = _wasAhead ? distanceM >= 190 : distanceM >= 210;
     if (_wasAhead && !isNowAhead && _ttsEnabled) {
       await _playTts('tts_losing_lead');
     }
@@ -201,6 +201,9 @@ class HorrorService {
       await _ttsPlayer.setAsset('assets/audio/$filename');
       _ttsPlayer.setVolume(1.0);
       await _ttsPlayer.play();
+      await _ttsPlayer.playerStateStream
+          .firstWhere((s) => s.processingState == ProcessingState.completed)
+          .timeout(const Duration(seconds: 10), onTimeout: () => _ttsPlayer.playerState);
     } catch (e) {
       debugPrint('TTS 재생 에러: $e');
     }
