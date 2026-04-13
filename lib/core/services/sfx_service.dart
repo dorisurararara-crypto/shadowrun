@@ -6,15 +6,19 @@ class SfxService {
   factory SfxService() => _instance;
   SfxService._();
 
-  final AudioPlayer _player = AudioPlayer();
+  // AudioPlayer 풀 (동시 재생 지원, 겹침 방지)
+  final List<AudioPlayer> _pool = List.generate(3, (_) => AudioPlayer());
+  int _poolIndex = 0;
   bool enabled = true;
 
   Future<void> play(String filename) async {
     if (!enabled) return;
     try {
-      await _player.setAsset('assets/audio/sfx/$filename');
-      _player.setVolume(0.7);
-      _player.play(); // fire-and-forget, don't await
+      final player = _pool[_poolIndex];
+      _poolIndex = (_poolIndex + 1) % _pool.length;
+      await player.setAsset('assets/audio/sfx/$filename');
+      player.setVolume(0.7);
+      player.play();
     } catch (e) {
       debugPrint('SFX error: $e');
     }
@@ -70,6 +74,8 @@ class SfxService {
   Future<void> levelup() => play('sfx_levelup.mp3');
 
   void dispose() {
-    _player.dispose();
+    for (final p in _pool) {
+      p.dispose();
+    }
   }
 }
