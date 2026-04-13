@@ -63,6 +63,9 @@ class MarathonService {
     double avgHistoricalPace,
     double? previousKmPace,
   ) {
+    // 과거 기록 없으면 비교 불가 → good 반환
+    if (avgHistoricalPace <= 0 || currentPace <= 0) return 'good';
+
     // pace는 min/km — 낮을수록 빠름
     // fast: 현재 페이스가 평균보다 20%+ 빠름 (값이 20%+ 낮음)
     if (currentPace < avgHistoricalPace * 0.8) return 'fast';

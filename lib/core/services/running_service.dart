@@ -207,7 +207,7 @@ class RunningService extends ChangeNotifier {
       );
     } else if (defaultTargetPlatform == TargetPlatform.iOS) {
       locationSettings = AppleSettings(
-        accuracy: LocationAccuracy.high,
+        accuracy: LocationAccuracy.bestForNavigation,
         distanceFilter: 5,
         activityType: ActivityType.fitness,
         pauseLocationUpdatesAutomatically: false,
