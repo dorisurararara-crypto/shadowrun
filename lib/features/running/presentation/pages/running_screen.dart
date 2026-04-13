@@ -221,12 +221,17 @@ class _RunningScreenState extends State<RunningScreen>
         }
       };
 
-      // Timer: UI 갱신 + 지도 업데이트만 (화면 켜져 있을 때)
+      // Timer: UI 갱신 + 지도 + 시간 기반 TTS (GPS 멈춰도 동작)
       _ticker = Timer.periodic(const Duration(seconds: 1), (_) {
         if (!mounted) return;
         if (!_paused) {
           setState(() {});
           _updateMap();
+          // 시간 기반 마라토너 TTS (GPS 콜백과 별도로 Timer에서도 호출)
+          if (widget.runMode == 'marathon' && _marathonService != null) {
+            _marathonService!.playTimeTts(_runService.durationS);
+            _marathonService!.playRandomTts(_runService.durationS);
+          }
         }
       });
     } catch (e) {
@@ -546,16 +551,19 @@ class _RunningScreenState extends State<RunningScreen>
     // 종료 SFX
     SfxService().doorClose();
 
-    // 스타디움 피날레 (종료 직전 관중 함성)
+    // 스타디움 피날레 (종료 직전 관중 함성) — 완료 후 TTS 재생
     if (_stadiumFinaleEnabled && !_jumpscareTriggered) {
       try {
         await _stadiumPlayer.setAsset('assets/audio/stadium_finale.mp3');
         _stadiumPlayer.setVolume(0.8);
         await _stadiumPlayer.play();
+        await _stadiumPlayer.playerStateStream
+            .firstWhere((s) => s.processingState == ProcessingState.completed)
+            .timeout(const Duration(seconds: 8), onTimeout: () => _stadiumPlayer.playerState);
       } catch (_) {}
     }
 
-    // 모드별 종료 SFX + TTS
+    // 모드별 종료 SFX + TTS (스타디움 완료 후)
     if (widget.runMode == 'doppelganger' && result != null) {
       if (result.challengeResult == 'win') {
         SfxService().victory();

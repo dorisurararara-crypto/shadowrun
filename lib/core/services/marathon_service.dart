@@ -16,7 +16,7 @@ class MarathonService {
   // 시간 마일스톤 재생 추적
   final Set<int> _playedTimeMinutes = {};
   // 마지막 랜덤 TTS 시간 (초)
-  int _lastRandomTtsTime = 0;
+  int _nextRandomTtsTime = 120; // 최초 2분 후부터
 
   // 사용 가능한 km 마일스톤
   static const List<int> _availableKmMilestones = [1, 2, 3, 4, 5, 7, 10, 15, 20];
@@ -72,10 +72,10 @@ class MarathonService {
     final minutes = elapsedSeconds ~/ 60;
     for (final m in _timeMinutes) {
       if (minutes >= m && !_playedTimeMinutes.contains(m)) {
-        _playedTimeMinutes.add(m);
         final variants = _timeVariants[m] ?? 1;
         final variant = _random.nextInt(variants) + 1;
-        await _playTtsSimple('tts_time_${m}min', variant);
+        final success = await _playTtsSimple('tts_time_${m}min', variant);
+        if (success) _playedTimeMinutes.add(m); // 재생 성공 시에만 마킹
         return;
       }
     }
@@ -84,21 +84,22 @@ class MarathonService {
   /// 랜덤 명언/조언 (3~5분 간격)
   Future<void> playRandomTts(int elapsedSeconds) async {
     if (_isPlaying) return;
-    // 최소 2분 후부터
     if (elapsedSeconds < 120) return;
-    // 간격 체크
-    final interval = _randomIntervalMin + _random.nextInt(_randomIntervalMax - _randomIntervalMin);
-    if (elapsedSeconds - _lastRandomTtsTime < interval) return;
-
-    _lastRandomTtsTime = elapsedSeconds;
+    // 다음 재생 시간이 아직 안 됐으면 스킵
+    if (elapsedSeconds < _nextRandomTtsTime) return;
 
     // 50% 명언, 50% 조언
+    bool success;
     if (_random.nextBool()) {
       final n = _random.nextInt(_quoteCount) + 1;
-      await _playTtsSimple('tts_quote', n);
+      success = await _playTtsSimple('tts_quote', n);
     } else {
       final n = _random.nextInt(_tipCount) + 1;
-      await _playTtsSimple('tts_tip', n);
+      success = await _playTtsSimple('tts_tip', n);
+    }
+    // 재생 성공 시 다음 시간 스케줄 (3~5분 후)
+    if (success) {
+      _nextRandomTtsTime = elapsedSeconds + _randomIntervalMin + _random.nextInt(_randomIntervalMax - _randomIntervalMin);
     }
   }
 
@@ -190,7 +191,7 @@ class MarathonService {
   void resetMilestones() {
     _playedKmMilestones.clear();
     _playedTimeMinutes.clear();
-    _lastRandomTtsTime = 0;
+    _nextRandomTtsTime = 120;
   }
 
   void dispose() {
