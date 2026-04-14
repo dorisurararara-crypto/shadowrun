@@ -22,8 +22,9 @@ class RunningScreen extends StatefulWidget {
   final int? shadowRunId;
   final String runMode; // 'doppelganger', 'marathon', 'freerun'
   final bool sameLocation; // 도플갱어: 같은 장소 vs 다른 장소
+  final int? shoeId;
 
-  const RunningScreen({super.key, this.shadowRunId, this.runMode = 'freerun', this.sameLocation = true});
+  const RunningScreen({super.key, this.shadowRunId, this.runMode = 'freerun', this.sameLocation = true, this.shoeId});
 
   @override
   State<RunningScreen> createState() => _RunningScreenState();
@@ -39,7 +40,6 @@ class _RunningScreenState extends State<RunningScreen>
   final PageController _pageController = PageController(initialPage: 0);
   int _lastMarathonKm = 0;
   bool _stadiumFinaleEnabled = false;
-  bool _stadiumFinalePlaying = false;
   late bool _isSameLocation;
   NaverMapController? _mapController;
 
@@ -57,6 +57,7 @@ class _RunningScreenState extends State<RunningScreen>
 
   // 차량 감지 자동 일시정지
   int _vehicleDetectCount = 0;
+  int _lastAddedKmMarker = 0; // 이미 추가된 km 마커 추적
 
   // 화살표 마커 아이콘
   NOverlayImage? _runnerArrowIcon;
@@ -465,6 +466,8 @@ class _RunningScreenState extends State<RunningScreen>
 
   void _addKmSplitMarkers(NaverMapController controller, List<RunPoint> points) {
     if (points.length < 2 || _kmSplitIcon == null) return;
+    // 이미 추가된 마커는 건너뛰기
+    if (_lastAddedKmMarker >= (_runService.totalDistanceM / 1000).floor()) return;
     double dist = 0;
     int nextKm = 1;
     for (int i = 1; i < points.length; i++) {
@@ -474,19 +477,22 @@ class _RunningScreenState extends State<RunningScreen>
         p0.latitude, p0.longitude, p1.latitude, p1.longitude,
       );
       if (dist >= nextKm * 1000) {
-        final marker = NMarker(
-          id: 'km_$nextKm',
-          position: NLatLng(p1.latitude, p1.longitude),
-          size: const Size(22, 22),
-        );
-        marker.setIcon(_kmSplitIcon!);
-        marker.setCaption(NOverlayCaption(
-          text: '${nextKm}km',
-          textSize: 10,
-          color: SRColors.onSurface,
-          haloColor: SRColors.background,
-        ));
-        controller.addOverlay(marker);
+        if (nextKm > _lastAddedKmMarker) {
+          final marker = NMarker(
+            id: 'km_$nextKm',
+            position: NLatLng(p1.latitude, p1.longitude),
+            size: const Size(22, 22),
+          );
+          marker.setIcon(_kmSplitIcon!);
+          marker.setCaption(NOverlayCaption(
+            text: '${nextKm}km',
+            textSize: 10,
+            color: SRColors.onSurface,
+            haloColor: SRColors.background,
+          ));
+          _safeAddOverlay(controller, marker);
+          _lastAddedKmMarker = nextKm;
+        }
         nextKm++;
       }
     }
@@ -542,45 +548,59 @@ class _RunningScreenState extends State<RunningScreen>
     _stopping = true;
     _ticker?.cancel();
 
+    // GPS 콜백 즉시 해제 (dispose된 서비스 접근 방지)
+    _runService.onPositionUpdate = null;
+
     // 웨이크락 해제
     WakelockPlus.disable();
 
-    // 먼저 결과 저장 (앱 킬링 대비)
-    final result = await _runService.stopRun();
+    RunModel? result;
+    bool hadError = false;
+    try {
+      // 먼저 결과 저장 (앱 킬링 대비)
+      result = await _runService.stopRun();
 
-    // 종료 SFX
-    SfxService().doorClose();
-
-    // 스타디움 피날레 (종료 직전 관중 함성) — 완료 후 TTS 재생
-    if (_stadiumFinaleEnabled && !_jumpscareTriggered) {
-      try {
-        await _stadiumPlayer.setAsset('assets/audio/stadium_finale.mp3');
-        _stadiumPlayer.setVolume(0.8);
-        await _stadiumPlayer.play();
-        await _stadiumPlayer.playerStateStream
-            .firstWhere((s) => s.processingState == ProcessingState.completed)
-            .timeout(const Duration(seconds: 8), onTimeout: () => _stadiumPlayer.playerState);
-      } catch (_) {}
-    }
-
-    // 모드별 종료 SFX + TTS (스타디움 완료 후)
-    if (widget.runMode == 'doppelganger' && result != null) {
-      if (result.challengeResult == 'win') {
-        SfxService().victory();
-        await _horrorService.playSurvivedTts();
-      } else if (result.challengeResult == 'lose') {
-        SfxService().defeat();
-        await _horrorService.playDefeatedTts();
+      // 선택된 러닝화에 거리 기록
+      if (widget.shoeId != null && result != null && result.distanceM > 0) {
+        await DatabaseHelper.addShoeDistance(widget.shoeId!, result.distanceM);
       }
-    } else if (widget.runMode == 'marathon') {
-      await _marathonService?.playEndTts();
-    } else if (widget.runMode == 'freerun') {
-      await _soloTtsService?.playEndTts();
-    }
 
-    _horrorService.dispose();
-    _marathonService?.dispose();
-    _soloTtsService?.dispose();
+      // 종료 SFX
+      SfxService().doorClose();
+
+      // 스타디움 피날레 (종료 직전 관중 함성) — 2초만 재생 후 TTS로 넘어감
+      if (_stadiumFinaleEnabled && !_jumpscareTriggered) {
+        try {
+          await _stadiumPlayer.setAsset('assets/audio/stadium_finale.mp3');
+          _stadiumPlayer.setVolume(0.8);
+          // ignore: unawaited_futures
+          _stadiumPlayer.play().catchError((_) {});
+          await Future.delayed(const Duration(seconds: 2));
+        } catch (_) {}
+      }
+
+      // 모드별 종료 SFX + TTS (스타디움 완료 후)
+      if (widget.runMode == 'doppelganger' && result != null) {
+        if (result.challengeResult == 'win') {
+          SfxService().victory();
+          await _horrorService.playSurvivedTts();
+        } else if (result.challengeResult == 'lose') {
+          SfxService().defeat();
+          await _horrorService.playDefeatedTts();
+        }
+      } else if (widget.runMode == 'marathon') {
+        await _marathonService?.playEndTts();
+      } else if (widget.runMode == 'freerun') {
+        await _soloTtsService?.playEndTts();
+      }
+    } catch (e) {
+      debugPrint('stopRun 에러: $e');
+      hadError = true;
+    } finally {
+      _horrorService.dispose();
+      _marathonService?.dispose();
+      _soloTtsService?.dispose();
+    }
 
     if (mounted) {
       if (result != null && result.id != null) {
@@ -589,9 +609,11 @@ class _RunningScreenState extends State<RunningScreen>
           'result': result.challengeResult,
         });
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(S.runTooShort)),
-        );
+        if (!hadError) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(S.runTooShort)),
+          );
+        }
         context.go('/');
       }
     }
@@ -672,7 +694,11 @@ class _RunningScreenState extends State<RunningScreen>
   Widget _buildModeC() {
     return Stack(
       children: [
-        _buildNaverMap(onReady: (c) => _mapController = c),
+        _buildNaverMap(onReady: (c) {
+                  _mapController = c;
+                  _lastAddedKmMarker = 0;
+                  _activeOverlayIds.clear();
+                }),
         _buildVignetteOverlay(),
         Positioned(
           top: MediaQuery.of(context).padding.top + 12,
@@ -716,7 +742,11 @@ class _RunningScreenState extends State<RunningScreen>
               flex: 6,
               child: Stack(
                 children: [
-                  _buildNaverMap(onReady: (c) => _mapController = c),
+                  _buildNaverMap(onReady: (c) {
+                  _mapController = c;
+                  _lastAddedKmMarker = 0;
+                  _activeOverlayIds.clear();
+                }),
                   _buildVignetteOverlay(),
                   if (_runService.speedWarning != null)
                     Positioned(
@@ -834,7 +864,11 @@ class _RunningScreenState extends State<RunningScreen>
                       border: Border.all(color: SRColors.divider),
                     ),
                     clipBehavior: Clip.antiAlias,
-                    child: _buildNaverMap(onReady: (c) => _mapController = c),
+                    child: _buildNaverMap(onReady: (c) {
+                  _mapController = c;
+                  _lastAddedKmMarker = 0;
+                  _activeOverlayIds.clear();
+                }),
                   ),
                   const SizedBox(height: 16),
                   _buildControlButtons(),

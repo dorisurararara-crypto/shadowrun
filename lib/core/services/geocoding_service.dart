@@ -36,10 +36,11 @@ class GeocodingService {
       final region = results[0]['region'];
       final area1 = region?['area1']?['name'] ?? ''; // 시/도
       final area2 = region?['area2']?['name'] ?? ''; // 구/군
+      final area3 = region?['area3']?['name'] ?? ''; // 동/읍/면
 
       if (area1.isEmpty) return null;
-      if (area2.isEmpty) return area1;
-      return '$area1 $area2';
+      final parts = [area1, if (area2.isNotEmpty) area2, if (area3.isNotEmpty) area3];
+      return parts.join(' ');
     } catch (e) {
       debugPrint('Reverse geocode 에러: $e');
       return null;

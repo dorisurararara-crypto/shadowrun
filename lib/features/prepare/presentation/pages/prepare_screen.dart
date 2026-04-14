@@ -87,6 +87,8 @@ class _PrepareScreenState extends State<PrepareScreen>
   String _selectedMode = 'marathon'; // 'marathon' or 'freerun'
   bool _tooFarFromStart = false;
   String _shadowLocationType = 'same'; // 'same' or 'different'
+  List<Map<String, dynamic>> _shoes = [];
+  int? _selectedShoeId;
 
   bool get _isChallenge => widget.shadowRunId != null;
   bool get _canStart => _gpsReady && !(_tooFarFromStart && _shadowLocationType == 'same');
@@ -114,6 +116,7 @@ class _PrepareScreenState extends State<PrepareScreen>
       _shadowRun = await DatabaseHelper.getRun(widget.shadowRunId!);
       _shadowPoints = await DatabaseHelper.getRunPoints(widget.shadowRunId!);
     }
+    _shoes = await DatabaseHelper.getActiveShoes();
     await _pickRandomQuote();
     if (mounted) setState(() => _loading = false);
   }
@@ -219,9 +222,13 @@ class _PrepareScreenState extends State<PrepareScreen>
             'shadowRunId': widget.shadowRunId,
             'mode': 'doppelganger',
             'sameLocation': _shadowLocationType == 'same',
+            'shoeId': _selectedShoeId,
           });
         } else {
-          context.go('/running', extra: {'mode': _selectedMode});
+          context.go('/running', extra: {
+            'mode': _selectedMode,
+            'shoeId': _selectedShoeId,
+          });
         }
       }
     });
@@ -271,6 +278,7 @@ class _PrepareScreenState extends State<PrepareScreen>
                                 const SizedBox(height: 16),
                                 _buildRunModeSelector(),
                               ],
+                              _buildShoeSelector(),
                               const SizedBox(height: 28),
                               _buildGpsIndicator(),
                               if (_tooFarFromStart && _shadowLocationType == 'same') ...[
@@ -803,6 +811,105 @@ class _PrepareScreenState extends State<PrepareScreen>
           ],
         ),
       ),
+    );
+  }
+
+  Widget _buildShoeSelector() {
+    if (_shoes.isEmpty) return const SizedBox.shrink();
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const SizedBox(height: 16),
+        Row(
+          children: [
+            Text(
+              '러닝화 선택',
+              style: GoogleFonts.spaceGrotesk(
+                fontSize: 14,
+                fontWeight: FontWeight.w700,
+                color: SRColors.neutral500,
+                letterSpacing: 3,
+              ),
+            ),
+            const SizedBox(width: 8),
+            Text(
+              '선택 안 함',
+              style: GoogleFonts.inter(
+                fontSize: 11,
+                color: SRColors.neutral500.withValues(alpha: 0.5),
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 10),
+        SizedBox(
+          height: 40,
+          child: ListView.separated(
+            scrollDirection: Axis.horizontal,
+            itemCount: _shoes.length,
+            separatorBuilder: (_, __) => const SizedBox(width: 8),
+            itemBuilder: (context, index) {
+              final shoe = _shoes[index];
+              final shoeId = shoe['id'] as int;
+              final name = shoe['name'] as String? ?? '러닝화';
+              final totalM = (shoe['total_distance_m'] as num?)?.toDouble() ?? 0;
+              final maxM = (shoe['max_distance_m'] as num?)?.toDouble() ?? 0;
+              final totalKm = totalM / 1000;
+              final isSelected = _selectedShoeId == shoeId;
+              final isNearMax = maxM > 0 && (totalM / maxM) > 0.9;
+
+              final accentColor = isNearMax ? SRColors.warning : SRColors.primaryContainer;
+
+              return GestureDetector(
+                onTap: () {
+                  SfxService().toggle();
+                  setState(() {
+                    _selectedShoeId = isSelected ? null : shoeId;
+                  });
+                },
+                child: AnimatedContainer(
+                  duration: const Duration(milliseconds: 180),
+                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 0),
+                  decoration: BoxDecoration(
+                    color: isSelected
+                        ? accentColor.withValues(alpha: 0.15)
+                        : const Color(0xFF161616),
+                    borderRadius: BorderRadius.circular(100),
+                    border: Border.all(
+                      color: isSelected
+                          ? accentColor.withValues(alpha: 0.7)
+                          : Colors.white.withValues(alpha: 0.08),
+                      width: isSelected ? 1.5 : 1,
+                    ),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      if (isNearMax)
+                        Padding(
+                          padding: const EdgeInsets.only(right: 5),
+                          child: Icon(Icons.warning_amber_rounded,
+                              size: 13, color: SRColors.warning),
+                        ),
+                      Text(
+                        '$name · ${totalKm.toStringAsFixed(0)}km',
+                        style: GoogleFonts.inter(
+                          fontSize: 13,
+                          fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
+                          color: isSelected
+                              ? accentColor
+                              : SRColors.onSurface.withValues(alpha: 0.7),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            },
+          ),
+        ),
+      ],
     );
   }
 

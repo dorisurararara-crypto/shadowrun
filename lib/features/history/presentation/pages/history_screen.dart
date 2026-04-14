@@ -39,6 +39,80 @@ class _HistoryScreenState extends State<HistoryScreen>
     });
   }
 
+  Future<void> _editRunName(RunModel run) async {
+    final controller = TextEditingController(text: run.name ?? '');
+    final saved = await showDialog<String?>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: SRColors.card,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        title: Text(
+          '기록 이름 편집',
+          style: GoogleFonts.spaceGrotesk(
+            fontSize: 18,
+            fontWeight: FontWeight.w700,
+            color: SRColors.onSurface,
+          ),
+        ),
+        content: TextField(
+          controller: controller,
+          autofocus: true,
+          style: GoogleFonts.inter(
+            fontSize: 14,
+            color: SRColors.onSurface,
+          ),
+          decoration: InputDecoration(
+            hintText: '이름 없음',
+            hintStyle: GoogleFonts.inter(
+              fontSize: 14,
+              color: SRColors.onSurface.withValues(alpha: 0.3),
+            ),
+            enabledBorder: UnderlineInputBorder(
+              borderSide: BorderSide(
+                color: SRColors.onSurface.withValues(alpha: 0.2),
+              ),
+            ),
+            focusedBorder: const UnderlineInputBorder(
+              borderSide: BorderSide(color: SRColors.primaryContainer),
+            ),
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, null),
+            child: Text(
+              '취소',
+              style: GoogleFonts.inter(
+                fontSize: 12,
+                fontWeight: FontWeight.w700,
+                color: SRColors.onSurface.withValues(alpha: 0.4),
+                letterSpacing: 1,
+              ),
+            ),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, controller.text.trim()),
+            child: Text(
+              '저장',
+              style: GoogleFonts.inter(
+                fontSize: 12,
+                fontWeight: FontWeight.w700,
+                color: SRColors.primaryContainer,
+                letterSpacing: 1,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+    controller.dispose();
+
+    if (saved != null && run.id != null) {
+      await DatabaseHelper.updateRunName(run.id!, saved);
+      _refresh();
+    }
+  }
+
   Future<void> _deleteRun(RunModel run) async {
     final confirmed = await showDialog<bool>(
       context: context,
@@ -166,6 +240,7 @@ class _HistoryScreenState extends State<HistoryScreen>
                   context.push('/prepare', extra: run.id);
                 },
                 onDismiss: _deleteRun,
+                onEdit: _editRunName,
               ),
               _RunList(
                 runs: challengeRuns,
@@ -174,6 +249,7 @@ class _HistoryScreenState extends State<HistoryScreen>
                   context.push('/prepare', extra: run.id);
                 },
                 onDismiss: _deleteRun,
+                onEdit: _editRunName,
                 emptyMessage: S.noChallengesEmpty,
                 emptySubtitle: S.noChallengesSubtitle,
               ),
@@ -189,6 +265,7 @@ class _RunList extends StatelessWidget {
   final List<RunModel> runs;
   final void Function(RunModel) onTap;
   final Future<void> Function(RunModel) onDismiss;
+  final Future<void> Function(RunModel) onEdit;
   final String emptyMessage;
   final String emptySubtitle;
 
@@ -196,6 +273,7 @@ class _RunList extends StatelessWidget {
     required this.runs,
     required this.onTap,
     required this.onDismiss,
+    required this.onEdit,
     String? emptyMessage,
     String? emptySubtitle,
   })  : emptyMessage = emptyMessage ?? S.noRunsEmpty,
@@ -264,6 +342,7 @@ class _RunList extends StatelessWidget {
           runs: dayRuns,
           onTap: onTap,
           onDismiss: onDismiss,
+          onEdit: onEdit,
           showSwipeHintOnFirst: index == 0,
         );
       },
@@ -276,6 +355,7 @@ class _DateSection extends StatelessWidget {
   final List<RunModel> runs;
   final void Function(RunModel) onTap;
   final Future<void> Function(RunModel) onDismiss;
+  final Future<void> Function(RunModel) onEdit;
   final bool showSwipeHintOnFirst;
 
   const _DateSection({
@@ -283,6 +363,7 @@ class _DateSection extends StatelessWidget {
     required this.runs,
     required this.onTap,
     required this.onDismiss,
+    required this.onEdit,
     this.showSwipeHintOnFirst = false,
   });
 
@@ -307,6 +388,7 @@ class _DateSection extends StatelessWidget {
               run: entry.value,
               onTap: () => onTap(entry.value),
               onDismiss: () => onDismiss(entry.value),
+              onEdit: () => onEdit(entry.value),
               showSwipeHint: showSwipeHintOnFirst && entry.key == 0,
             )),
         const SizedBox(height: 4),
@@ -335,12 +417,14 @@ class _HistoryTile extends StatefulWidget {
   final RunModel run;
   final VoidCallback onTap;
   final VoidCallback onDismiss;
+  final VoidCallback? onEdit;
   final bool showSwipeHint;
 
   const _HistoryTile({
     required this.run,
     required this.onTap,
     required this.onDismiss,
+    this.onEdit,
     this.showSwipeHint = false,
   });
 
@@ -458,6 +542,7 @@ class _HistoryTileState extends State<_HistoryTile>
       child: InkWell(
         borderRadius: BorderRadius.circular(12),
         onTap: widget.onTap,
+        onLongPress: widget.onEdit,
         child: Container(
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
@@ -502,6 +587,20 @@ class _HistoryTileState extends State<_HistoryTile>
                         const SizedBox(width: 8),
                         if (run.isChallenge && run.challengeResult != null)
                           _ChallengeBadge(result: run.challengeResult!),
+                        if (run.name != null && run.name!.isNotEmpty) ...[
+                          const SizedBox(width: 8),
+                          Flexible(
+                            child: Text(
+                              run.name!,
+                              overflow: TextOverflow.ellipsis,
+                              style: GoogleFonts.inter(
+                                fontSize: 12,
+                                fontWeight: FontWeight.w600,
+                                color: SRColors.primaryContainer.withValues(alpha: 0.8),
+                              ),
+                            ),
+                          ),
+                        ],
                       ],
                     ),
                     const SizedBox(height: 4),

@@ -20,6 +20,8 @@ class _HomeScreenState extends State<HomeScreen> {
   late Future<Map<String, dynamic>> _statsFuture;
   late Future<List<RunModel>> _runsFuture;
   late Future<int> _challengeCountFuture;
+  Map<String, dynamic>? _goal;
+  Map<String, dynamic>? _goalProgress;
 
   @override
   void initState() {
@@ -31,6 +33,27 @@ class _HomeScreenState extends State<HomeScreen> {
     _statsFuture = DatabaseHelper.getStats();
     _runsFuture = DatabaseHelper.getAllRuns();
     _challengeCountFuture = DatabaseHelper.getDailyChallengeCount();
+    _loadGoal();
+  }
+
+  Future<void> _loadGoal() async {
+    final goal = await DatabaseHelper.getActiveGoal();
+    if (goal != null) {
+      final progress = await DatabaseHelper.getGoalProgress(goal['period'] as String);
+      if (mounted) {
+        setState(() {
+          _goal = goal;
+          _goalProgress = progress;
+        });
+      }
+    } else {
+      if (mounted) {
+        setState(() {
+          _goal = null;
+          _goalProgress = null;
+        });
+      }
+    }
   }
 
   void _refresh() => setState(() => _loadData());
@@ -94,7 +117,9 @@ class _HomeScreenState extends State<HomeScreen> {
                     _buildActionButtons(),
                     const SizedBox(height: 32),
                     _buildStatsCard(),
-                    const SizedBox(height: 32),
+                    const SizedBox(height: 16),
+                    _buildGoalCard(),
+                    const SizedBox(height: 16),
                     if (!PurchaseService().isPro) _buildProBanner(),
                     if (!PurchaseService().isPro) const SizedBox(height: 32),
                     if (!PurchaseService().isPro) _buildDailyChallengeCard(),
@@ -184,6 +209,83 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ),
       ],
+    );
+  }
+
+  // --- Goal Card ---
+  Widget _buildGoalCard() {
+    if (_goal == null) return const SizedBox.shrink();
+
+    final goal = _goal!;
+    final progress = _goalProgress ?? {};
+
+    final period = goal['period'] as String? ?? 'weekly';
+    final type = goal['type'] as String? ?? 'distance';
+    final targetValue = (goal['target_value'] as num?)?.toDouble() ?? 0.0;
+
+    final isDistance = type == 'distance';
+    final currentValue = isDistance
+        ? ((progress['totalDistanceM'] as num?)?.toDouble() ?? 0.0) / 1000.0
+        : (progress['totalRuns'] as num?)?.toDouble() ?? 0.0;
+
+    final ratio = targetValue > 0 ? (currentValue / targetValue).clamp(0.0, 1.0) : 0.0;
+    final percentage = (ratio * 100).round();
+    final isAchieved = ratio >= 1.0;
+
+    final periodLabel = period == 'weekly' ? '주간 목표' : '월간 목표';
+    final progressText = isDistance
+        ? '${currentValue.toStringAsFixed(1)}km / ${targetValue.toStringAsFixed(0)}km'
+        : '${currentValue.toInt()}회 / ${targetValue.toInt()}회';
+
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: SRColors.surfaceContainerLow,
+        borderRadius: BorderRadius.circular(12),
+        border: isAchieved
+            ? Border.all(color: SRColors.safe.withValues(alpha: 0.5), width: 1.5)
+            : Border.all(color: Colors.white.withValues(alpha: 0.05)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Text(periodLabel.toUpperCase(), style: GoogleFonts.inter(
+                fontSize: 11, fontWeight: FontWeight.w700,
+                color: isAchieved ? SRColors.safe : SRColors.primaryContainer,
+                letterSpacing: 1,
+              )),
+              if (isAchieved) ...[
+                const SizedBox(width: 6),
+                Icon(Icons.check_circle, size: 14, color: SRColors.safe),
+              ],
+              const Spacer(),
+              Text('$percentage%', style: GoogleFonts.spaceGrotesk(
+                fontSize: 16, fontWeight: FontWeight.w700,
+                color: isAchieved ? SRColors.safe : SRColors.onSurface,
+              )),
+            ],
+          ),
+          const SizedBox(height: 8),
+          ClipRRect(
+            borderRadius: BorderRadius.circular(4),
+            child: LinearProgressIndicator(
+              value: ratio,
+              minHeight: 6,
+              backgroundColor: Colors.white.withValues(alpha: 0.08),
+              valueColor: AlwaysStoppedAnimation<Color>(
+                isAchieved ? SRColors.safe : SRColors.primaryContainer,
+              ),
+            ),
+          ),
+          const SizedBox(height: 8),
+          Text(progressText, style: GoogleFonts.inter(
+            fontSize: 13, fontWeight: FontWeight.w500,
+            color: SRColors.onSurface.withValues(alpha: 0.6),
+          )),
+        ],
+      ),
     );
   }
 

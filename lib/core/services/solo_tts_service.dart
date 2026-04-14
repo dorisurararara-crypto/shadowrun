@@ -44,7 +44,8 @@ class SoloTtsService {
 
       await _ttsPlayer.setAsset('assets/audio/$filename');
       _ttsPlayer.setVolume(1.0);
-      await _ttsPlayer.play();
+      // ignore: unawaited_futures
+      _ttsPlayer.play().catchError((_) {});
       await _ttsPlayer.playerStateStream
           .firstWhere((s) => s.processingState == ProcessingState.completed)
           .timeout(const Duration(seconds: 10), onTimeout: () => _ttsPlayer.playerState);
@@ -54,6 +55,7 @@ class SoloTtsService {
   }
 
   void dispose() {
+    if (_isDisposed) return;
     _isDisposed = true;
     _ttsPlayer.dispose();
   }

@@ -34,10 +34,16 @@ class _SettingsScreenState extends State<SettingsScreen> {
   StreamSubscription? _previewSub;
   String? _playingPreview;
 
+  // Shoe & Goal state
+  List<Map<String, dynamic>> _shoes = [];
+  Map<String, dynamic>? _activeGoal;
+
   @override
   void initState() {
     super.initState();
     _loadSettings();
+    _loadShoes();
+    _loadGoal();
   }
 
   @override
@@ -76,6 +82,16 @@ class _SettingsScreenState extends State<SettingsScreen> {
     await DatabaseHelper.setSetting(key, value);
   }
 
+  Future<void> _loadShoes() async {
+    final shoes = await DatabaseHelper.getAllShoes();
+    if (mounted) setState(() => _shoes = shoes);
+  }
+
+  Future<void> _loadGoal() async {
+    final goal = await DatabaseHelper.getActiveGoal();
+    if (mounted) setState(() => _activeGoal = goal);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -112,6 +128,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 _buildLanguageSettings(),
                 const SizedBox(height: 24),
                 _buildRunningSettings(),
+                const SizedBox(height: 24),
+                _buildShoeSettings(),
+                const SizedBox(height: 24),
+                _buildGoalSettings(),
                 const SizedBox(height: 24),
                 _buildHorrorSettings(),
                 const SizedBox(height: 24),
@@ -333,6 +353,701 @@ class _SettingsScreenState extends State<SettingsScreen> {
             ),
           );
         }),
+      ),
+    );
+  }
+
+  // --- Shoe Settings ---
+  Widget _buildShoeSettings() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _sectionHeader('러닝화 관리'),
+        Container(
+          padding: const EdgeInsets.all(20),
+          decoration: BoxDecoration(
+            color: SRColors.card,
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: Colors.white.withValues(alpha: 0.05)),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              if (_shoes.isEmpty)
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 8),
+                  child: Text(
+                    '등록된 러닝화가 없습니다',
+                    style: GoogleFonts.inter(
+                      fontSize: 13,
+                      color: SRColors.onSurface.withValues(alpha: 0.4),
+                    ),
+                  ),
+                )
+              else
+                ...(_shoes.map((shoe) => _buildShoeItem(shoe))),
+              const SizedBox(height: 12),
+              SizedBox(
+                width: double.infinity,
+                child: OutlinedButton.icon(
+                  onPressed: _showAddShoeDialog,
+                  icon: const Icon(Icons.add, size: 16),
+                  label: Text(
+                    '새 러닝화 추가',
+                    style: GoogleFonts.inter(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w600,
+                      letterSpacing: 0.5,
+                    ),
+                  ),
+                  style: OutlinedButton.styleFrom(
+                    foregroundColor: SRColors.primaryContainer,
+                    side: BorderSide(
+                      color: SRColors.primaryContainer.withValues(alpha: 0.5),
+                    ),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    padding: const EdgeInsets.symmetric(vertical: 12),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildShoeItem(Map<String, dynamic> shoe) {
+    final isActive = (shoe['is_active'] as int? ?? 1) == 1;
+    final totalM = (shoe['total_distance_m'] as num? ?? 0).toDouble();
+    final maxM = (shoe['max_distance_m'] as num? ?? 800000).toDouble();
+    final totalKm = totalM / 1000.0;
+    final maxKm = maxM / 1000.0;
+    final ratio = maxM > 0 ? (totalM / maxM).clamp(0.0, 1.0) : 0.0;
+
+    Color progressColor;
+    if (ratio < 0.7) {
+      progressColor = const Color(0xFF4CAF50);
+    } else if (ratio < 0.9) {
+      progressColor = const Color(0xFFFFB300);
+    } else {
+      progressColor = const Color(0xFFFF0044);
+    }
+
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      shoe['name'] as String? ?? '',
+                      style: GoogleFonts.inter(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w700,
+                        color: isActive
+                            ? SRColors.onSurface
+                            : SRColors.onSurface.withValues(alpha: 0.35),
+                        decoration: isActive ? null : TextDecoration.lineThrough,
+                        decorationColor: SRColors.onSurface.withValues(alpha: 0.35),
+                      ),
+                    ),
+                    if ((shoe['brand'] as String?)?.isNotEmpty == true)
+                      Text(
+                        shoe['brand'] as String,
+                        style: GoogleFonts.inter(
+                          fontSize: 11,
+                          color: SRColors.onSurface.withValues(alpha: isActive ? 0.4 : 0.2),
+                        ),
+                      ),
+                  ],
+                ),
+              ),
+              if (isActive)
+                GestureDetector(
+                  onTap: () async {
+                    final id = shoe['id'] as int;
+                    await DatabaseHelper.retireShoe(id);
+                    _loadShoes();
+                  },
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                    decoration: BoxDecoration(
+                      color: SRColors.onSurface.withValues(alpha: 0.08),
+                      borderRadius: BorderRadius.circular(6),
+                    ),
+                    child: Text(
+                      '은퇴',
+                      style: GoogleFonts.inter(
+                        fontSize: 11,
+                        fontWeight: FontWeight.w600,
+                        color: SRColors.onSurface.withValues(alpha: 0.5),
+                      ),
+                    ),
+                  ),
+                )
+              else
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                  decoration: BoxDecoration(
+                    color: SRColors.onSurface.withValues(alpha: 0.04),
+                    borderRadius: BorderRadius.circular(6),
+                  ),
+                  child: Text(
+                    '은퇴됨',
+                    style: GoogleFonts.inter(
+                      fontSize: 11,
+                      fontWeight: FontWeight.w600,
+                      color: SRColors.onSurface.withValues(alpha: 0.2),
+                    ),
+                  ),
+                ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          ClipRRect(
+            borderRadius: BorderRadius.circular(4),
+            child: LinearProgressIndicator(
+              value: ratio,
+              backgroundColor: SRColors.background,
+              valueColor: AlwaysStoppedAnimation<Color>(
+                isActive ? progressColor : progressColor.withValues(alpha: 0.3),
+              ),
+              minHeight: 6,
+            ),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            '${totalKm.toStringAsFixed(1)}km / ${maxKm.toStringAsFixed(0)}km',
+            style: GoogleFonts.inter(
+              fontSize: 11,
+              color: SRColors.onSurface.withValues(alpha: isActive ? 0.45 : 0.25),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showAddShoeDialog() {
+    final nameController = TextEditingController();
+    final brandController = TextEditingController();
+    double maxKm = 800;
+
+    showDialog(
+      context: context,
+      builder: (ctx) => StatefulBuilder(
+        builder: (ctx, setDialogState) => AlertDialog(
+          backgroundColor: SRColors.card,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          title: Text(
+            '새 러닝화 추가',
+            style: GoogleFonts.spaceGrotesk(
+              fontSize: 18,
+              fontWeight: FontWeight.w700,
+              color: SRColors.onSurface,
+            ),
+          ),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              TextField(
+                controller: nameController,
+                style: GoogleFonts.inter(color: SRColors.onSurface),
+                decoration: InputDecoration(
+                  labelText: '이름 *',
+                  labelStyle: GoogleFonts.inter(
+                    color: SRColors.onSurface.withValues(alpha: 0.5),
+                    fontSize: 13,
+                  ),
+                  enabledBorder: UnderlineInputBorder(
+                    borderSide: BorderSide(color: SRColors.onSurface.withValues(alpha: 0.2)),
+                  ),
+                  focusedBorder: const UnderlineInputBorder(
+                    borderSide: BorderSide(color: SRColors.primaryContainer),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 12),
+              TextField(
+                controller: brandController,
+                style: GoogleFonts.inter(color: SRColors.onSurface),
+                decoration: InputDecoration(
+                  labelText: '브랜드 (선택)',
+                  labelStyle: GoogleFonts.inter(
+                    color: SRColors.onSurface.withValues(alpha: 0.5),
+                    fontSize: 13,
+                  ),
+                  enabledBorder: UnderlineInputBorder(
+                    borderSide: BorderSide(color: SRColors.onSurface.withValues(alpha: 0.2)),
+                  ),
+                  focusedBorder: const UnderlineInputBorder(
+                    borderSide: BorderSide(color: SRColors.primaryContainer),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 20),
+              Text(
+                '교체 거리',
+                style: GoogleFonts.inter(
+                  fontSize: 13,
+                  color: SRColors.onSurface.withValues(alpha: 0.5),
+                ),
+              ),
+              const SizedBox(height: 8),
+              DropdownButtonFormField<double>(
+                initialValue: maxKm,
+                dropdownColor: SRColors.surface,
+                style: GoogleFonts.inter(color: SRColors.onSurface, fontSize: 13),
+                decoration: InputDecoration(
+                  enabledBorder: UnderlineInputBorder(
+                    borderSide: BorderSide(color: SRColors.onSurface.withValues(alpha: 0.2)),
+                  ),
+                  focusedBorder: const UnderlineInputBorder(
+                    borderSide: BorderSide(color: SRColors.primaryContainer),
+                  ),
+                  suffixText: 'km',
+                  suffixStyle: GoogleFonts.inter(
+                    color: SRColors.onSurface.withValues(alpha: 0.4),
+                    fontSize: 13,
+                  ),
+                ),
+                items: [500, 600, 700, 800, 900, 1000].map((v) {
+                  return DropdownMenuItem<double>(
+                    value: v.toDouble(),
+                    child: Text('$v'),
+                  );
+                }).toList(),
+                onChanged: (v) {
+                  if (v != null) setDialogState(() => maxKm = v);
+                },
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(ctx),
+              child: Text(
+                '취소',
+                style: GoogleFonts.inter(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w700,
+                  color: SRColors.onSurface.withValues(alpha: 0.4),
+                  letterSpacing: 1,
+                ),
+              ),
+            ),
+            ElevatedButton(
+              onPressed: () async {
+                final name = nameController.text.trim();
+                if (name.isEmpty) return;
+                final brand = brandController.text.trim();
+                await DatabaseHelper.insertShoe(
+                  name,
+                  brand.isEmpty ? null : brand,
+                  maxKm * 1000,
+                );
+                if (ctx.mounted) Navigator.pop(ctx);
+                _loadShoes();
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: SRColors.primaryContainer,
+                foregroundColor: Colors.white,
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                elevation: 0,
+                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+              ),
+              child: Text(
+                '추가',
+                style: GoogleFonts.inter(fontSize: 12, fontWeight: FontWeight.w800, letterSpacing: 1),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  // --- Goal Settings ---
+  Widget _buildGoalSettings() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _sectionHeader('목표 설정'),
+        Container(
+          padding: const EdgeInsets.all(20),
+          decoration: BoxDecoration(
+            color: SRColors.card,
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: Colors.white.withValues(alpha: 0.05)),
+          ),
+          child: _activeGoal != null
+              ? _buildActiveGoalView()
+              : _buildNoGoalView(),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildActiveGoalView() {
+    final goal = _activeGoal!;
+    final type = goal['type'] as String? ?? 'distance';
+    final period = goal['period'] as String? ?? 'weekly';
+    final target = (goal['target_value'] as num? ?? 0).toDouble();
+    final typeLabel = type == 'distance' ? '거리' : '횟수';
+    final periodLabel = period == 'weekly' ? '주간' : '월간';
+    final unit = type == 'distance' ? 'km' : '회';
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            Icon(
+              type == 'distance' ? Icons.straighten : Icons.repeat,
+              size: 18,
+              color: SRColors.primaryContainer,
+            ),
+            const SizedBox(width: 8),
+            Expanded(
+              child: Text(
+                '$periodLabel $typeLabel 목표',
+                style: GoogleFonts.inter(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w700,
+                  color: SRColors.onSurface,
+                ),
+              ),
+            ),
+            GestureDetector(
+              onTap: () => _showGoalDialog(existing: _activeGoal),
+              child: Container(
+                padding: const EdgeInsets.all(6),
+                decoration: BoxDecoration(
+                  color: SRColors.onSurface.withValues(alpha: 0.08),
+                  borderRadius: BorderRadius.circular(6),
+                ),
+                child: Icon(
+                  Icons.edit_outlined,
+                  size: 16,
+                  color: SRColors.onSurface.withValues(alpha: 0.5),
+                ),
+              ),
+            ),
+            const SizedBox(width: 8),
+            GestureDetector(
+              onTap: () async {
+                final id = goal['id'] as int;
+                await DatabaseHelper.deleteGoal(id);
+                _loadGoal();
+              },
+              child: Container(
+                padding: const EdgeInsets.all(6),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFFF0044).withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(6),
+                ),
+                child: const Icon(
+                  Icons.delete_outline,
+                  size: 16,
+                  color: Color(0xFFFF0044),
+                ),
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 12),
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          decoration: BoxDecoration(
+            color: SRColors.primaryContainer.withValues(alpha: 0.08),
+            borderRadius: BorderRadius.circular(10),
+            border: Border.all(
+              color: SRColors.primaryContainer.withValues(alpha: 0.2),
+            ),
+          ),
+          child: Row(
+            children: [
+              Text(
+                type == 'distance'
+                    ? target.toStringAsFixed(0)
+                    : target.toInt().toString(),
+                style: GoogleFonts.spaceGrotesk(
+                  fontSize: 32,
+                  fontWeight: FontWeight.w900,
+                  color: SRColors.primaryContainer,
+                  letterSpacing: -1,
+                ),
+              ),
+              const SizedBox(width: 6),
+              Text(
+                unit,
+                style: GoogleFonts.inter(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w600,
+                  color: SRColors.primaryContainer.withValues(alpha: 0.7),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildNoGoalView() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          '설정된 목표가 없습니다',
+          style: GoogleFonts.inter(
+            fontSize: 13,
+            color: SRColors.onSurface.withValues(alpha: 0.4),
+          ),
+        ),
+        const SizedBox(height: 12),
+        SizedBox(
+          width: double.infinity,
+          child: OutlinedButton.icon(
+            onPressed: () => _showGoalDialog(),
+            icon: const Icon(Icons.add, size: 16),
+            label: Text(
+              '목표 추가',
+              style: GoogleFonts.inter(
+                fontSize: 13,
+                fontWeight: FontWeight.w600,
+                letterSpacing: 0.5,
+              ),
+            ),
+            style: OutlinedButton.styleFrom(
+              foregroundColor: SRColors.primaryContainer,
+              side: BorderSide(
+                color: SRColors.primaryContainer.withValues(alpha: 0.5),
+              ),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10),
+              ),
+              padding: const EdgeInsets.symmetric(vertical: 12),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  void _showGoalDialog({Map<String, dynamic>? existing}) {
+    String selectedType = existing?['type'] as String? ?? 'distance';
+    String selectedPeriod = existing?['period'] as String? ?? 'weekly';
+    final targetController = TextEditingController(
+      text: existing != null
+          ? (existing['target_value'] as num).toStringAsFixed(
+              selectedType == 'distance' ? 0 : 0)
+          : '',
+    );
+
+    showDialog(
+      context: context,
+      builder: (ctx) => StatefulBuilder(
+        builder: (ctx, setDialogState) => AlertDialog(
+          backgroundColor: SRColors.card,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          title: Text(
+            existing != null ? '목표 수정' : '목표 설정',
+            style: GoogleFonts.spaceGrotesk(
+              fontSize: 18,
+              fontWeight: FontWeight.w700,
+              color: SRColors.onSurface,
+            ),
+          ),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                '목표 유형',
+                style: GoogleFonts.inter(
+                  fontSize: 13,
+                  color: SRColors.onSurface.withValues(alpha: 0.5),
+                ),
+              ),
+              const SizedBox(height: 8),
+              Row(
+                children: [
+                  _dialogRadioOption(
+                    label: '거리',
+                    value: 'distance',
+                    groupValue: selectedType,
+                    onChanged: (v) {
+                      setDialogState(() => selectedType = v!);
+                      targetController.clear();
+                    },
+                  ),
+                  const SizedBox(width: 20),
+                  _dialogRadioOption(
+                    label: '횟수',
+                    value: 'count',
+                    groupValue: selectedType,
+                    onChanged: (v) {
+                      setDialogState(() => selectedType = v!);
+                      targetController.clear();
+                    },
+                  ),
+                ],
+              ),
+              const SizedBox(height: 16),
+              Text(
+                '기간',
+                style: GoogleFonts.inter(
+                  fontSize: 13,
+                  color: SRColors.onSurface.withValues(alpha: 0.5),
+                ),
+              ),
+              const SizedBox(height: 8),
+              Row(
+                children: [
+                  _dialogRadioOption(
+                    label: '주간',
+                    value: 'weekly',
+                    groupValue: selectedPeriod,
+                    onChanged: (v) => setDialogState(() => selectedPeriod = v!),
+                  ),
+                  const SizedBox(width: 20),
+                  _dialogRadioOption(
+                    label: '월간',
+                    value: 'monthly',
+                    groupValue: selectedPeriod,
+                    onChanged: (v) => setDialogState(() => selectedPeriod = v!),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 16),
+              TextField(
+                controller: targetController,
+                keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                style: GoogleFonts.inter(color: SRColors.onSurface),
+                decoration: InputDecoration(
+                  labelText: '목표값',
+                  labelStyle: GoogleFonts.inter(
+                    color: SRColors.onSurface.withValues(alpha: 0.5),
+                    fontSize: 13,
+                  ),
+                  suffixText: selectedType == 'distance' ? 'km' : '회',
+                  suffixStyle: GoogleFonts.inter(
+                    color: SRColors.onSurface.withValues(alpha: 0.4),
+                    fontSize: 13,
+                  ),
+                  enabledBorder: UnderlineInputBorder(
+                    borderSide: BorderSide(color: SRColors.onSurface.withValues(alpha: 0.2)),
+                  ),
+                  focusedBorder: const UnderlineInputBorder(
+                    borderSide: BorderSide(color: SRColors.primaryContainer),
+                  ),
+                ),
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(ctx),
+              child: Text(
+                '취소',
+                style: GoogleFonts.inter(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w700,
+                  color: SRColors.onSurface.withValues(alpha: 0.4),
+                  letterSpacing: 1,
+                ),
+              ),
+            ),
+            ElevatedButton(
+              onPressed: () async {
+                final raw = targetController.text.trim();
+                final value = double.tryParse(raw);
+                if (value == null || value <= 0) return;
+                if (existing != null) {
+                  await DatabaseHelper.updateGoal(existing['id'] as int, value);
+                } else {
+                  await DatabaseHelper.insertGoal(selectedType, selectedPeriod, value);
+                }
+                if (ctx.mounted) Navigator.pop(ctx);
+                _loadGoal();
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: SRColors.primaryContainer,
+                foregroundColor: Colors.white,
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                elevation: 0,
+                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+              ),
+              child: Text(
+                '저장',
+                style: GoogleFonts.inter(fontSize: 12, fontWeight: FontWeight.w800, letterSpacing: 1),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _dialogRadioOption<T>({
+    required String label,
+    required T value,
+    required T groupValue,
+    required ValueChanged<T?> onChanged,
+  }) {
+    final isSelected = value == groupValue;
+    return GestureDetector(
+      onTap: () => onChanged(value),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Container(
+            width: 18,
+            height: 18,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              border: Border.all(
+                color: isSelected
+                    ? SRColors.primaryContainer
+                    : SRColors.onSurface.withValues(alpha: 0.3),
+                width: 2,
+              ),
+            ),
+            child: isSelected
+                ? Center(
+                    child: Container(
+                      width: 8,
+                      height: 8,
+                      decoration: BoxDecoration(
+                        color: SRColors.primaryContainer,
+                        shape: BoxShape.circle,
+                      ),
+                    ),
+                  )
+                : null,
+          ),
+          const SizedBox(width: 6),
+          Text(
+            label,
+            style: GoogleFonts.inter(
+              fontSize: 13,
+              fontWeight: FontWeight.w600,
+              color: isSelected
+                  ? SRColors.onSurface
+                  : SRColors.onSurface.withValues(alpha: 0.5),
+            ),
+          ),
+        ],
       ),
     );
   }

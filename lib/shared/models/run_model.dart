@@ -9,6 +9,8 @@ class RunModel {
   final String? challengeResult; // 'win', 'lose', null
   final int? shadowRunId;
   final String? location;
+  final String? name;
+  final int? shoeId;
 
   const RunModel({
     this.id,
@@ -21,6 +23,8 @@ class RunModel {
     this.challengeResult,
     this.shadowRunId,
     this.location,
+    this.name,
+    this.shoeId,
   });
 
   Map<String, dynamic> toMap() => {
@@ -34,6 +38,8 @@ class RunModel {
     'challenge_result': challengeResult,
     'shadow_run_id': shadowRunId,
     'location': location,
+    'name': name,
+    'shoe_id': shoeId,
   };
 
   factory RunModel.fromMap(Map<String, dynamic> map) => RunModel(
@@ -47,6 +53,8 @@ class RunModel {
     challengeResult: map['challenge_result'] as String?,
     shadowRunId: map['shadow_run_id'] as int?,
     location: map['location'] as String?,
+    name: map['name'] as String?,
+    shoeId: map['shoe_id'] as int?,
   );
 
   String get formattedDistance => formattedDistanceUnit('km');
@@ -99,6 +107,9 @@ class RunModel {
 
   /// 날짜 + 장소 조합: "4월 12일 토요일 · 마포구"
   String formattedDateWithLocation(bool isKo) {
+    if (name != null && name!.isNotEmpty) {
+      return name!;
+    }
     final dateStr = formattedDateLocalized(isKo);
     if (location != null && location!.isNotEmpty) {
       return '$dateStr · $location';

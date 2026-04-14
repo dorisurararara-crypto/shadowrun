@@ -18,7 +18,7 @@ class SfxService {
       _poolIndex = (_poolIndex + 1) % _pool.length;
       await player.setAsset('assets/audio/sfx/$filename');
       player.setVolume(0.7);
-      player.play();
+      player.play().catchError((_) {});
     } catch (e) {
       debugPrint('SFX error: $e');
     }

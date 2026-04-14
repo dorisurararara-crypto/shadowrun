@@ -15,7 +15,7 @@ class DatabaseHelper {
     final path = join(await getDatabasesPath(), 'shadowrun.db');
     return openDatabase(
       path,
-      version: 2,
+      version: 3,
       onCreate: _onCreate,
       onUpgrade: _onUpgrade,
     );
@@ -24,6 +24,30 @@ class DatabaseHelper {
   static Future<void> _onUpgrade(Database db, int oldVersion, int newVersion) async {
     if (oldVersion < 2) {
       await db.execute('ALTER TABLE runs ADD COLUMN location TEXT');
+    }
+    if (oldVersion < 3) {
+      await db.execute('ALTER TABLE runs ADD COLUMN name TEXT');
+      await db.execute('ALTER TABLE runs ADD COLUMN shoe_id INTEGER');
+      await db.execute('''
+        CREATE TABLE IF NOT EXISTS shoes (
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          name TEXT NOT NULL,
+          brand TEXT,
+          total_distance_m REAL NOT NULL DEFAULT 0,
+          max_distance_m REAL NOT NULL DEFAULT 1000000,
+          is_active INTEGER NOT NULL DEFAULT 1,
+          created_at TEXT NOT NULL
+        )
+      ''');
+      await db.execute('''
+        CREATE TABLE IF NOT EXISTS goals (
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          type TEXT NOT NULL,
+          period TEXT NOT NULL,
+          target_value REAL NOT NULL,
+          created_at TEXT NOT NULL
+        )
+      ''');
     }
   }
 
@@ -40,6 +64,8 @@ class DatabaseHelper {
         challenge_result TEXT,
         shadow_run_id INTEGER,
         location TEXT,
+        name TEXT,
+        shoe_id INTEGER,
         FOREIGN KEY (shadow_run_id) REFERENCES runs(id)
       )
     ''');
@@ -59,6 +85,26 @@ class DatabaseHelper {
       CREATE TABLE settings (
         key TEXT PRIMARY KEY,
         value TEXT NOT NULL
+      )
+    ''');
+    await db.execute('''
+      CREATE TABLE shoes (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        name TEXT NOT NULL,
+        brand TEXT,
+        total_distance_m REAL NOT NULL DEFAULT 0,
+        max_distance_m REAL NOT NULL DEFAULT 1000000,
+        is_active INTEGER NOT NULL DEFAULT 1,
+        created_at TEXT NOT NULL
+      )
+    ''');
+    await db.execute('''
+      CREATE TABLE goals (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        type TEXT NOT NULL,
+        period TEXT NOT NULL,
+        target_value REAL NOT NULL,
+        created_at TEXT NOT NULL
       )
     ''');
     // 기본 설정
@@ -266,5 +312,98 @@ class DatabaseHelper {
     final today = DateTime.now().toIso8601String().substring(0, 10);
     await setSetting('daily_challenges', '${count + 1}');
     await setSetting('daily_challenges_date', today);
+  }
+
+  // --- Run Name ---
+  static Future<void> updateRunName(int runId, String name) async {
+    final db = await database;
+    await db.update('runs', {'name': name}, where: 'id = ?', whereArgs: [runId]);
+  }
+
+  // --- Shoes ---
+  static Future<int> insertShoe(String name, String? brand, double maxDistanceM) async {
+    final db = await database;
+    return db.insert('shoes', {
+      'name': name,
+      'brand': brand,
+      'total_distance_m': 0,
+      'max_distance_m': maxDistanceM,
+      'is_active': 1,
+      'created_at': DateTime.now().toIso8601String(),
+    });
+  }
+
+  static Future<List<Map<String, dynamic>>> getActiveShoes() async {
+    final db = await database;
+    return db.query('shoes', where: 'is_active = 1', orderBy: 'created_at DESC');
+  }
+
+  static Future<List<Map<String, dynamic>>> getAllShoes() async {
+    final db = await database;
+    return db.query('shoes', orderBy: 'is_active DESC, created_at DESC');
+  }
+
+  static Future<void> addShoeDistance(int shoeId, double distanceM) async {
+    final db = await database;
+    await db.rawUpdate(
+      'UPDATE shoes SET total_distance_m = total_distance_m + ? WHERE id = ?',
+      [distanceM, shoeId],
+    );
+  }
+
+  static Future<void> retireShoe(int shoeId) async {
+    final db = await database;
+    await db.update('shoes', {'is_active': 0}, where: 'id = ?', whereArgs: [shoeId]);
+  }
+
+  static Future<void> deleteShoe(int shoeId) async {
+    final db = await database;
+    await db.delete('shoes', where: 'id = ?', whereArgs: [shoeId]);
+  }
+
+  // --- Goals ---
+  static Future<int> insertGoal(String type, String period, double targetValue) async {
+    final db = await database;
+    return db.insert('goals', {
+      'type': type,
+      'period': period,
+      'target_value': targetValue,
+      'created_at': DateTime.now().toIso8601String(),
+    });
+  }
+
+  static Future<Map<String, dynamic>?> getActiveGoal() async {
+    final db = await database;
+    final results = await db.query('goals', orderBy: 'id DESC', limit: 1);
+    return results.firstOrNull;
+  }
+
+  static Future<void> updateGoal(int id, double targetValue) async {
+    final db = await database;
+    await db.update('goals', {'target_value': targetValue}, where: 'id = ?', whereArgs: [id]);
+  }
+
+  static Future<void> deleteGoal(int id) async {
+    final db = await database;
+    await db.delete('goals', where: 'id = ?', whereArgs: [id]);
+  }
+
+  static Future<Map<String, dynamic>> getGoalProgress(String period) async {
+    final now = DateTime.now();
+    DateTime from;
+    if (period == 'weekly') {
+      from = DateTime(now.year, now.month, now.day - (now.weekday - 1));
+    } else {
+      from = DateTime(now.year, now.month, 1);
+    }
+    final db = await database;
+    final distResult = await db.rawQuery(
+      'SELECT SUM(distance_m) as dist, COUNT(*) as count FROM runs WHERE date >= ?',
+      [from.toIso8601String()],
+    );
+    return {
+      'distance': (distResult.first['dist'] as num?)?.toDouble() ?? 0.0,
+      'runs': (distResult.first['count'] as num?)?.toInt() ?? 0,
+    };
   }
 }

@@ -17,6 +17,7 @@ class HorrorService {
   bool _vibrationEnabled = true;
   bool _hasVibrator = false;
   bool _isDisposed = false;
+  bool _isTtsPlaying = false;
   bool _wasAhead = false;
   String _voiceId = 'harry'; // harry, callum, drill
 
@@ -163,7 +164,7 @@ class HorrorService {
       await _bgmPlayer.setAsset('assets/audio/$filename');
       _bgmPlayer.setLoopMode(LoopMode.one);
       _bgmPlayer.setVolume(0.6);
-      _bgmPlayer.play();
+      _bgmPlayer.play().catchError((_) {});
     } catch (e) {
       debugPrint('BGM 재생 에러: $e');
     }
@@ -174,14 +175,15 @@ class HorrorService {
     try {
       await _sfxPlayer.setAsset('assets/audio/$filename');
       _sfxPlayer.setVolume(1.0);
-      _sfxPlayer.play();
+      _sfxPlayer.play().catchError((_) {});
     } catch (e) {
       debugPrint('SFX 재생 에러: $e');
     }
   }
 
   Future<void> _playTts(String baseName) async {
-    if (_isDisposed) return;
+    if (_isDisposed || _isTtsPlaying) return;
+    _isTtsPlaying = true;
     try {
       // 언어 분기: 영어 버전이 있는 대사
       String langBase = baseName;
@@ -207,12 +209,15 @@ class HorrorService {
 
       await _ttsPlayer.setAsset('assets/audio/$filename');
       _ttsPlayer.setVolume(1.0);
-      await _ttsPlayer.play();
+      // ignore: unawaited_futures
+      _ttsPlayer.play().catchError((_) {}); // 비동기 에러 안전 처리
       await _ttsPlayer.playerStateStream
           .firstWhere((s) => s.processingState == ProcessingState.completed)
           .timeout(const Duration(seconds: 10), onTimeout: () => _ttsPlayer.playerState);
     } catch (e) {
       debugPrint('TTS 재생 에러: $e');
+    } finally {
+      _isTtsPlaying = false;
     }
   }
 
@@ -267,6 +272,7 @@ class HorrorService {
   }
 
   void dispose() {
+    if (_isDisposed) return;
     _isDisposed = true;
     _bgmPlayer.dispose();
     _sfxPlayer.dispose();

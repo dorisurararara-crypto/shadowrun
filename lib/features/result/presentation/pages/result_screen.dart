@@ -88,11 +88,15 @@ class _ResultScreenState extends State<ResultScreen>
   }
 
   Future<void> _loadData() async {
-    _run = await DatabaseHelper.getRun(widget.runId);
-    _points = await DatabaseHelper.getRunPoints(widget.runId);
+    try {
+      _run = await DatabaseHelper.getRun(widget.runId);
+      _points = await DatabaseHelper.getRunPoints(widget.runId);
 
-    if (_run?.shadowRunId != null) {
-      _shadowPoints = await DatabaseHelper.getRunPoints(_run!.shadowRunId!);
+      if (_run?.shadowRunId != null) {
+        _shadowPoints = await DatabaseHelper.getRunPoints(_run!.shadowRunId!);
+      }
+    } catch (e) {
+      debugPrint('결과 데이터 로드 에러: $e');
     }
 
     if (mounted) {
