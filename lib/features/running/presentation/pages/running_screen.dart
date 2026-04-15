@@ -40,7 +40,6 @@ class _RunningScreenState extends State<RunningScreen>
   MarathonService? _marathonService;
   SoloTtsService? _soloTtsService;
   final AudioPlayer _stadiumPlayer = AudioPlayer();
-  final PageController _pageController = PageController(initialPage: 0);
   int _lastMarathonKm = 0;
   bool _stadiumFinaleEnabled = false;
   late bool _isSameLocation;
@@ -676,7 +675,6 @@ class _RunningScreenState extends State<RunningScreen>
     _horrorService.dispose();
     _marathonService?.dispose();
     _soloTtsService?.dispose();
-    _pageController.dispose();
     _vignetteAnim.dispose();
     _shadowPingAnim.dispose();
     _jumpscareFlashAnim.dispose();
@@ -1368,9 +1366,11 @@ class _RunningScreenState extends State<RunningScreen>
             if (_sfxOn) {
               _horrorService.unmuteBgm();
               _marathonService?.unmuteBgm();
+              _soloTtsService?.unmuteBgm();
             } else {
               _horrorService.muteBgm();
               _marathonService?.muteBgm();
+              _soloTtsService?.muteBgm();
             }
           },
           child: Container(

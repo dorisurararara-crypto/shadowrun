@@ -25,6 +25,7 @@ class _SplashScreenState extends State<SplashScreen>
     _fadeIn = CurvedAnimation(parent: _controller, curve: Curves.easeIn);
     _controller.forward();
     SfxService().splash();
+    SfxService().heartbeatSingle();
 
     Future.delayed(const Duration(milliseconds: 2500), () {
       if (mounted) {

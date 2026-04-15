@@ -1,4 +1,8 @@
 class RunModel {
+  static bool _useMiles = false;
+  static void setUnit(String unit) => _useMiles = unit == 'miles' || unit == 'mi';
+  static bool get useMiles => _useMiles;
+
   final int? id;
   final String date;
   final double distanceM;
@@ -57,7 +61,7 @@ class RunModel {
     shoeId: map['shoe_id'] as int?,
   );
 
-  String get formattedDistance => formattedDistanceUnit('km');
+  String get formattedDistance => formattedDistanceUnit(_useMiles ? 'mi' : 'km');
 
   String formattedDistanceUnit(String unit) {
     if (unit == 'mi') {
@@ -80,7 +84,7 @@ class RunModel {
     return '${m.toString().padLeft(2, '0')}:${s.toString().padLeft(2, '0')}';
   }
 
-  String get formattedPace => formattedPaceUnit('km');
+  String get formattedPace => formattedPaceUnit(_useMiles ? 'mi' : 'km');
 
   String formattedPaceUnit(String unit) {
     final pace = unit == 'mi' ? avgPace * 1.60934 : avgPace;

@@ -4,6 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:shadowrun/core/theme/app_theme.dart';
 import 'package:shadowrun/core/l10n/app_strings.dart';
+import 'package:shadowrun/core/services/sfx_service.dart';
 
 class LanguageSelectScreen extends StatelessWidget {
   const LanguageSelectScreen({super.key});
@@ -52,7 +53,7 @@ class LanguageSelectScreen extends StatelessWidget {
                 flag: '🇰🇷',
                 title: '한국어',
                 subtitle: 'Korean',
-                onTap: () => _selectLanguage(context, 'ko'),
+                onTap: () { SfxService().tapCard(); _selectLanguage(context, 'ko'); },
               ),
               const SizedBox(height: 16),
               // English
@@ -60,7 +61,7 @@ class LanguageSelectScreen extends StatelessWidget {
                 flag: '🇺🇸',
                 title: 'English',
                 subtitle: '영어',
-                onTap: () => _selectLanguage(context, 'en'),
+                onTap: () { SfxService().tapCard(); _selectLanguage(context, 'en'); },
               ),
               const Spacer(flex: 2),
             ],

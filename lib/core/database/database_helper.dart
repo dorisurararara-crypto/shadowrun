@@ -391,9 +391,12 @@ class DatabaseHelper {
     return results.firstOrNull;
   }
 
-  static Future<void> updateGoal(int id, double targetValue) async {
+  static Future<void> updateGoal(int id, double targetValue, {String? type, String? period}) async {
     final db = await database;
-    await db.update('goals', {'target_value': targetValue}, where: 'id = ?', whereArgs: [id]);
+    final updates = <String, dynamic>{'target_value': targetValue};
+    if (type != null) updates['type'] = type;
+    if (period != null) updates['period'] = period;
+    await db.update('goals', updates, where: 'id = ?', whereArgs: [id]);
   }
 
   static Future<void> deleteGoal(int id) async {

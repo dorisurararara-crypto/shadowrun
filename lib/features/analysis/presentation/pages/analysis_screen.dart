@@ -67,7 +67,7 @@ class _AnalysisScreenState extends State<AnalysisScreen> {
         scrolledUnderElevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios_new, size: 18, color: SRColors.onSurface),
-          onPressed: () => context.go('/'),
+          onPressed: () { SfxService().tapCard(); context.go('/'); },
         ),
         title: Text(
           S.isKo ? '분석' : 'ANALYSIS',

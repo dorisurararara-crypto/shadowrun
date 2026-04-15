@@ -174,4 +174,46 @@ class S {
   static String get sameLocationDesc => isKo ? '지도에서 도플갱어를 확인할 수 있습니다' : 'See the doppelganger on the map';
   static String get differentLocation => isKo ? '다른 위치에서 뛰기' : 'Run at different location';
   static String get differentLocationDesc => isKo ? '음성으로만 도플갱어와 대결합니다' : 'Voice-only doppelganger challenge';
+
+  // Shoe management
+  static String get shoeManagement => isKo ? '러닝화 관리' : 'SHOE MANAGEMENT';
+  static String get addNewShoe => isKo ? '새 러닝화 추가' : 'Add New Shoe';
+  static String get noShoesRegistered => isKo ? '등록된 러닝화가 없습니다' : 'No shoes registered';
+  static String get shoeName => isKo ? '이름 *' : 'Name *';
+  static String get shoeBrand => isKo ? '브랜드 (선택)' : 'Brand (optional)';
+  static String get shoeMaxDistance => isKo ? '교체 거리' : 'Replacement Distance';
+  static String get shoeRetire => isKo ? '은퇴' : 'Retire';
+  static String get shoeRetired => isKo ? '은퇴됨' : 'Retired';
+
+  // Goal settings
+  static String get goalSettings => isKo ? '목표 설정' : 'GOAL SETTINGS';
+  static String get goalAdd => isKo ? '목표 추가' : 'Add Goal';
+  static String get goalEdit => isKo ? '목표 수정' : 'Edit Goal';
+  static String get goalSet => isKo ? '목표 설정' : 'Set Goal';
+  static String get goalType => isKo ? '목표 유형' : 'Goal Type';
+  static String get goalPeriod => isKo ? '기간' : 'Period';
+  static String get goalValue => isKo ? '목표값' : 'Target';
+  static String get goalNone => isKo ? '설정된 목표가 없습니다' : 'No goal set';
+  static String get goalTypeDistance => isKo ? '거리' : 'Distance';
+  static String get goalTypeCount => isKo ? '횟수' : 'Count';
+  static String get goalPeriodWeekly => isKo ? '주간' : 'Weekly';
+  static String get goalPeriodMonthly => isKo ? '월간' : 'Monthly';
+  static String get save => isKo ? '저장' : 'SAVE';
+  static String get add => isKo ? '추가' : 'ADD';
+
+  // History screen dialogs
+  static String get editRunName => isKo ? '기록 이름 편집' : 'Edit Run Name';
+  static String get runNameHint => isKo ? '이름 없음' : 'No name';
+
+  // Result screen share
+  static String get shareDistanceLabel => isKo ? '거리' : 'Distance';
+  static String get shareDurationLabel => isKo ? '시간' : 'Duration';
+  static String get sharePaceLabel => isKo ? '페이스' : 'Pace';
+  static String get shareCaloriesLabel => isKo ? '칼로리' : 'Calories';
+  static String get shareHashtag => isKo ? '#ShadowRun #도플갱어러닝' : '#ShadowRun #DoppelgangerRun';
+
+  // Profile
+  static String get profilePhotoSet => isKo ? '프로필 사진 설정' : 'Set Profile Photo';
+  static String get profileSavedMsg => isKo ? '프로필 사진이 저장되었습니다' : 'Profile photo saved';
+  static String get goalPeriodLabel => isKo ? '목표' : 'Goal';
 }

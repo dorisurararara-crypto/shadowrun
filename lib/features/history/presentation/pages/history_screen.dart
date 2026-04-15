@@ -53,7 +53,7 @@ class _HistoryScreenState extends State<HistoryScreen>
         backgroundColor: SRColors.card,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         title: Text(
-          '기록 이름 편집',
+          S.editRunName,
           style: GoogleFonts.spaceGrotesk(
             fontSize: 18,
             fontWeight: FontWeight.w700,
@@ -68,7 +68,7 @@ class _HistoryScreenState extends State<HistoryScreen>
             color: SRColors.onSurface,
           ),
           decoration: InputDecoration(
-            hintText: '이름 없음',
+            hintText: S.runNameHint,
             hintStyle: GoogleFonts.inter(
               fontSize: 14,
               color: SRColors.onSurface.withValues(alpha: 0.3),
@@ -87,7 +87,7 @@ class _HistoryScreenState extends State<HistoryScreen>
           TextButton(
             onPressed: () => Navigator.pop(ctx, null),
             child: Text(
-              '취소',
+              S.cancel,
               style: GoogleFonts.inter(
                 fontSize: 12,
                 fontWeight: FontWeight.w700,
@@ -99,7 +99,7 @@ class _HistoryScreenState extends State<HistoryScreen>
           TextButton(
             onPressed: () => Navigator.pop(ctx, controller.text.trim()),
             child: Text(
-              '저장',
+              S.save,
               style: GoogleFonts.inter(
                 fontSize: 12,
                 fontWeight: FontWeight.w700,
@@ -185,7 +185,7 @@ class _HistoryScreenState extends State<HistoryScreen>
         scrolledUnderElevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios_new, size: 18, color: SRColors.onSurface),
-          onPressed: () => context.go('/'),
+          onPressed: () { SfxService().tapCard(); context.go('/'); },
         ),
         title: Text(
           S.records,
@@ -243,6 +243,10 @@ class _HistoryScreenState extends State<HistoryScreen>
                 runs: allRuns,
                 onTap: (run) {
                   SfxService().tapCard();
+                  context.push('/result', extra: {'runId': run.id});
+                },
+                onLongPress: (run) {
+                  SfxService().tapCard();
                   context.push('/prepare', extra: run.id);
                 },
                 onDismiss: _deleteRun,
@@ -251,6 +255,10 @@ class _HistoryScreenState extends State<HistoryScreen>
               _RunList(
                 runs: challengeRuns,
                 onTap: (run) {
+                  SfxService().tapCard();
+                  context.push('/result', extra: {'runId': run.id});
+                },
+                onLongPress: (run) {
                   SfxService().tapCard();
                   context.push('/prepare', extra: run.id);
                 },
@@ -270,6 +278,7 @@ class _HistoryScreenState extends State<HistoryScreen>
 class _RunList extends StatelessWidget {
   final List<RunModel> runs;
   final void Function(RunModel) onTap;
+  final void Function(RunModel)? onLongPress;
   final Future<void> Function(RunModel) onDismiss;
   final Future<void> Function(RunModel) onEdit;
   final String emptyMessage;
@@ -278,6 +287,7 @@ class _RunList extends StatelessWidget {
   _RunList({
     required this.runs,
     required this.onTap,
+    this.onLongPress,
     required this.onDismiss,
     required this.onEdit,
     String? emptyMessage,
@@ -347,6 +357,7 @@ class _RunList extends StatelessWidget {
           dateKey: dateKey,
           runs: dayRuns,
           onTap: onTap,
+          onLongPress: onLongPress,
           onDismiss: onDismiss,
           onEdit: onEdit,
           showSwipeHintOnFirst: index == 0,
@@ -360,6 +371,7 @@ class _DateSection extends StatelessWidget {
   final String dateKey;
   final List<RunModel> runs;
   final void Function(RunModel) onTap;
+  final void Function(RunModel)? onLongPress;
   final Future<void> Function(RunModel) onDismiss;
   final Future<void> Function(RunModel) onEdit;
   final bool showSwipeHintOnFirst;
@@ -368,6 +380,7 @@ class _DateSection extends StatelessWidget {
     required this.dateKey,
     required this.runs,
     required this.onTap,
+    this.onLongPress,
     required this.onDismiss,
     required this.onEdit,
     this.showSwipeHintOnFirst = false,
@@ -393,6 +406,7 @@ class _DateSection extends StatelessWidget {
         ...runs.asMap().entries.map((entry) => _HistoryTile(
               run: entry.value,
               onTap: () => onTap(entry.value),
+              onLongPress: onLongPress != null ? () => onLongPress!(entry.value) : null,
               onDismiss: () => onDismiss(entry.value),
               onEdit: () => onEdit(entry.value),
               showSwipeHint: showSwipeHintOnFirst && entry.key == 0,
@@ -422,6 +436,7 @@ class _DateSection extends StatelessWidget {
 class _HistoryTile extends StatefulWidget {
   final RunModel run;
   final VoidCallback onTap;
+  final VoidCallback? onLongPress;
   final VoidCallback onDismiss;
   final VoidCallback? onEdit;
   final bool showSwipeHint;
@@ -429,6 +444,7 @@ class _HistoryTile extends StatefulWidget {
   const _HistoryTile({
     required this.run,
     required this.onTap,
+    this.onLongPress,
     required this.onDismiss,
     this.onEdit,
     this.showSwipeHint = false,
@@ -542,13 +558,16 @@ class _HistoryTileState extends State<_HistoryTile>
 
   Widget _buildTile() {
     final run = widget.run;
-    return Material(
+    return Tooltip(
+      message: S.isKo ? '길게 누르면 도전 모드로 시작' : 'Long press to challenge',
+      preferBelow: true,
+      child: Material(
       color: SRColors.card,
       borderRadius: BorderRadius.circular(12),
       child: InkWell(
         borderRadius: BorderRadius.circular(12),
         onTap: widget.onTap,
-        onLongPress: widget.onEdit,
+        onLongPress: widget.onLongPress ?? widget.onEdit,
         child: Container(
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
@@ -642,6 +661,7 @@ class _HistoryTileState extends State<_HistoryTile>
           ),
         ),
       ),
+    ),
     );
   }
 }

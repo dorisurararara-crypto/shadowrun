@@ -661,6 +661,10 @@ class _RunTile extends StatelessWidget {
           borderRadius: BorderRadius.circular(12),
           onTap: () {
             SfxService().tapCard();
+            context.push('/result', extra: {'runId': run.id});
+          },
+          onLongPress: () {
+            SfxService().tapCard();
             context.push('/prepare', extra: run.id);
           },
           child: Padding(

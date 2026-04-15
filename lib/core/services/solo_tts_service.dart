@@ -5,6 +5,7 @@ import 'package:shadowrun/core/l10n/app_strings.dart';
 
 class SoloTtsService {
   final AudioPlayer _ttsPlayer = AudioPlayer();
+  final AudioPlayer _bgmPlayer = AudioPlayer();
   bool _isDisposed = false;
   bool _isPlaying = false;
   String _voiceId = 'harry';
@@ -12,7 +13,18 @@ class SoloTtsService {
 
   Future<void> initialize({String voice = 'harry'}) async {
     _voiceId = voice;
+    try {
+      await _bgmPlayer.setAsset('assets/audio/bgm_running_ambient.mp3');
+      _bgmPlayer.setLoopMode(LoopMode.one);
+      _bgmPlayer.setVolume(0.25);
+      _bgmPlayer.play().catchError((_) {});
+    } catch (e) {
+      debugPrint('Solo BGM error: $e');
+    }
   }
+
+  void muteBgm() => _bgmPlayer.setVolume(0);
+  void unmuteBgm() => _bgmPlayer.setVolume(0.25);
 
   Future<void> playStartTts() async {
     final variant = _rng.nextInt(6) + 1;
@@ -63,5 +75,6 @@ class SoloTtsService {
     if (_isDisposed) return;
     _isDisposed = true;
     _ttsPlayer.dispose();
+    _bgmPlayer.dispose();
   }
 }

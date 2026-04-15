@@ -108,7 +108,10 @@ class _ResultScreenState extends State<ResultScreen>
       setState(() => _loading = false);
       _resultAnim.forward();
       Future.delayed(const Duration(milliseconds: 600), () {
-        if (mounted) _statsAnim.forward();
+        if (mounted) {
+          _statsAnim.forward();
+          SfxService().counter();
+        }
       });
     }
   }
@@ -989,12 +992,12 @@ class _ResultScreenState extends State<ResultScreen>
     final text = '''
 SHADOW RUN - $resultText
 
-거리: ${run.formattedDistance}
-시간: ${run.formattedDuration}
-페이스: ${run.formattedPace}
-칼로리: ${run.calories}kcal
+${S.shareDistanceLabel}: ${run.formattedDistance}
+${S.shareDurationLabel}: ${run.formattedDuration}
+${S.sharePaceLabel}: ${run.formattedPace}
+${S.shareCaloriesLabel}: ${run.calories}kcal
 
-#ShadowRun #도플갱어러닝''';
+${S.shareHashtag}''';
     Share.share(text);
   }
 }

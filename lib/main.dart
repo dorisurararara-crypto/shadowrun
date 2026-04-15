@@ -8,6 +8,8 @@ import 'core/router/app_router.dart';
 import 'core/services/ad_service.dart';
 import 'core/services/purchase_service.dart';
 import 'core/l10n/app_strings.dart';
+import 'core/database/database_helper.dart';
+import 'shared/models/run_model.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -62,6 +64,13 @@ void main() async {
     final prefs = await SharedPreferences.getInstance();
     final langCode = prefs.getString('language') ?? 'en';
     await S.init(langCode);
+  }
+
+  try {
+    final unit = await DatabaseHelper.getSetting('unit') ?? 'km';
+    RunModel.setUnit(unit);
+  } catch (e) {
+    debugPrint('Unit 설정 로드 실패: $e');
   }
 
   runApp(ShadowRunApp(languageSelected: langSelected));

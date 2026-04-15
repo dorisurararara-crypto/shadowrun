@@ -169,6 +169,7 @@ class _PrepareScreenState extends State<PrepareScreen>
         });
         if (!wasReady && gpsOk) {
           SfxService().gpsReady();
+          SfxService().powerup();
         }
       },
       onError: (_) {
@@ -181,7 +182,22 @@ class _PrepareScreenState extends State<PrepareScreen>
     try {
       final serviceEnabled = await Geolocator.isLocationServiceEnabled();
       if (!serviceEnabled) {
-        if (mounted) setState(() => _gpsReady = false);
+        if (mounted) {
+          setState(() => _gpsReady = false);
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(S.isKo
+                  ? 'GPS를 켜주세요. 설정 > 위치에서 활성화할 수 있습니다.'
+                  : 'Please enable GPS. Go to Settings > Location.'),
+              backgroundColor: SRColors.primaryContainer,
+              action: SnackBarAction(
+                label: S.isKo ? '설정' : 'Settings',
+                textColor: Colors.white,
+                onPressed: () => Geolocator.openLocationSettings(),
+              ),
+            ),
+          );
+        }
         return;
       }
       var permission = await Geolocator.checkPermission();
@@ -190,7 +206,22 @@ class _PrepareScreenState extends State<PrepareScreen>
       }
       if (permission == LocationPermission.denied ||
           permission == LocationPermission.deniedForever) {
-        if (mounted) setState(() => _gpsReady = false);
+        if (mounted) {
+          setState(() => _gpsReady = false);
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(S.isKo
+                  ? 'GPS 권한이 필요합니다. 설정에서 위치 접근을 허용해주세요.'
+                  : 'GPS permission is required. Please allow location access in Settings.'),
+              backgroundColor: SRColors.primaryContainer,
+              action: SnackBarAction(
+                label: S.isKo ? '설정' : 'Settings',
+                textColor: Colors.white,
+                onPressed: () => Geolocator.openAppSettings(),
+              ),
+            ),
+          );
+        }
         return;
       }
     } catch (_) {

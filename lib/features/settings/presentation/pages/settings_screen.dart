@@ -12,6 +12,7 @@ import 'package:shadowrun/core/database/database_helper.dart';
 import 'package:shadowrun/core/services/purchase_service.dart';
 import 'package:shadowrun/core/l10n/app_strings.dart';
 import 'package:shadowrun/core/services/sfx_service.dart';
+import 'package:shadowrun/shared/models/run_model.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
@@ -51,10 +52,16 @@ class _SettingsScreenState extends State<SettingsScreen> {
     _loadShoes();
     _loadGoal();
     _loadProfileFace();
+    PurchaseService().proNotifier.addListener(_onProChanged);
+  }
+
+  void _onProChanged() {
+    if (mounted) setState(() => _isPro = PurchaseService().isPro);
   }
 
   @override
   void dispose() {
+    PurchaseService().proNotifier.removeListener(_onProChanged);
     _previewSub?.cancel();
     _previewPlayer.dispose();
     super.dispose();
@@ -117,7 +124,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     if (mounted) {
       setState(() => _hasProfileFace = true);
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('프로필 사진이 저장되었습니다')),
+        SnackBar(content: Text(S.profileSavedMsg)),
       );
     }
   }
@@ -142,7 +149,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
         scrolledUnderElevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios_new, size: 18, color: SRColors.onSurface),
-          onPressed: () => context.pop(),
+          onPressed: () { SfxService().tapCard(); context.pop(); },
         ),
         title: Text(
           S.settings,
@@ -413,6 +420,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   SfxService().toggle();
                   setState(() => _unit = value);
                   _save('unit', value);
+                  RunModel.setUnit(value);
                 },
               ),
             ],
@@ -542,7 +550,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _sectionHeader('러닝화 관리'),
+        _sectionHeader(S.shoeManagement),
         Container(
           padding: const EdgeInsets.all(20),
           decoration: BoxDecoration(
@@ -557,7 +565,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 Padding(
                   padding: const EdgeInsets.symmetric(vertical: 8),
                   child: Text(
-                    '등록된 러닝화가 없습니다',
+                    S.noShoesRegistered,
                     style: GoogleFonts.inter(
                       fontSize: 13,
                       color: SRColors.onSurface.withValues(alpha: 0.4),
@@ -573,7 +581,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   onPressed: _showAddShoeDialog,
                   icon: const Icon(Icons.add, size: 16),
                   label: Text(
-                    '새 러닝화 추가',
+                    S.addNewShoe,
                     style: GoogleFonts.inter(
                       fontSize: 13,
                       fontWeight: FontWeight.w600,
@@ -664,7 +672,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       borderRadius: BorderRadius.circular(6),
                     ),
                     child: Text(
-                      '은퇴',
+                      S.shoeRetire,
                       style: GoogleFonts.inter(
                         fontSize: 11,
                         fontWeight: FontWeight.w600,
@@ -681,7 +689,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     borderRadius: BorderRadius.circular(6),
                   ),
                   child: Text(
-                    '은퇴됨',
+                    S.shoeRetired,
                     style: GoogleFonts.inter(
                       fontSize: 11,
                       fontWeight: FontWeight.w600,
@@ -728,7 +736,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
           backgroundColor: SRColors.card,
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
           title: Text(
-            '새 러닝화 추가',
+            S.addNewShoe,
             style: GoogleFonts.spaceGrotesk(
               fontSize: 18,
               fontWeight: FontWeight.w700,
@@ -743,7 +751,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 controller: nameController,
                 style: GoogleFonts.inter(color: SRColors.onSurface),
                 decoration: InputDecoration(
-                  labelText: '이름 *',
+                  labelText: S.shoeName,
                   labelStyle: GoogleFonts.inter(
                     color: SRColors.onSurface.withValues(alpha: 0.5),
                     fontSize: 13,
@@ -761,7 +769,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 controller: brandController,
                 style: GoogleFonts.inter(color: SRColors.onSurface),
                 decoration: InputDecoration(
-                  labelText: '브랜드 (선택)',
+                  labelText: S.shoeBrand,
                   labelStyle: GoogleFonts.inter(
                     color: SRColors.onSurface.withValues(alpha: 0.5),
                     fontSize: 13,
@@ -776,7 +784,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
               ),
               const SizedBox(height: 20),
               Text(
-                '교체 거리',
+                S.shoeMaxDistance,
                 style: GoogleFonts.inter(
                   fontSize: 13,
                   color: SRColors.onSurface.withValues(alpha: 0.5),
@@ -816,7 +824,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
             TextButton(
               onPressed: () => Navigator.pop(ctx),
               child: Text(
-                '취소',
+                S.cancel,
                 style: GoogleFonts.inter(
                   fontSize: 12,
                   fontWeight: FontWeight.w700,
@@ -846,7 +854,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
               ),
               child: Text(
-                '추가',
+                S.add,
                 style: GoogleFonts.inter(fontSize: 12, fontWeight: FontWeight.w800, letterSpacing: 1),
               ),
             ),
@@ -864,7 +872,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _sectionHeader('목표 설정'),
+        _sectionHeader(S.goalSettings),
         Container(
           padding: const EdgeInsets.all(20),
           decoration: BoxDecoration(
@@ -885,9 +893,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
     final type = goal['type'] as String? ?? 'distance';
     final period = goal['period'] as String? ?? 'weekly';
     final target = (goal['target_value'] as num? ?? 0).toDouble();
-    final typeLabel = type == 'distance' ? '거리' : '횟수';
-    final periodLabel = period == 'weekly' ? '주간' : '월간';
-    final unit = type == 'distance' ? 'km' : '회';
+    final typeLabel = type == 'distance' ? S.goalTypeDistance : S.goalTypeCount;
+    final periodLabel = period == 'weekly' ? S.goalPeriodWeekly : S.goalPeriodMonthly;
+    final unit = type == 'distance' ? 'km' : (S.isKo ? '회' : 'runs');
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -991,7 +999,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          '설정된 목표가 없습니다',
+          S.goalNone,
           style: GoogleFonts.inter(
             fontSize: 13,
             color: SRColors.onSurface.withValues(alpha: 0.4),
@@ -1004,7 +1012,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
             onPressed: () => _showGoalDialog(),
             icon: const Icon(Icons.add, size: 16),
             label: Text(
-              '목표 추가',
+              S.goalAdd,
               style: GoogleFonts.inter(
                 fontSize: 13,
                 fontWeight: FontWeight.w600,
@@ -1044,7 +1052,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
           backgroundColor: SRColors.card,
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
           title: Text(
-            existing != null ? '목표 수정' : '목표 설정',
+            existing != null ? S.goalEdit : S.goalSet,
             style: GoogleFonts.spaceGrotesk(
               fontSize: 18,
               fontWeight: FontWeight.w700,
@@ -1056,7 +1064,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                '목표 유형',
+                S.goalType,
                 style: GoogleFonts.inter(
                   fontSize: 13,
                   color: SRColors.onSurface.withValues(alpha: 0.5),
@@ -1066,7 +1074,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
               Row(
                 children: [
                   _dialogRadioOption(
-                    label: '거리',
+                    label: S.goalTypeDistance,
                     value: 'distance',
                     groupValue: selectedType,
                     onChanged: (v) {
@@ -1076,7 +1084,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   ),
                   const SizedBox(width: 20),
                   _dialogRadioOption(
-                    label: '횟수',
+                    label: S.goalTypeCount,
                     value: 'count',
                     groupValue: selectedType,
                     onChanged: (v) {
@@ -1088,7 +1096,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
               ),
               const SizedBox(height: 16),
               Text(
-                '기간',
+                S.goalPeriod,
                 style: GoogleFonts.inter(
                   fontSize: 13,
                   color: SRColors.onSurface.withValues(alpha: 0.5),
@@ -1098,14 +1106,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
               Row(
                 children: [
                   _dialogRadioOption(
-                    label: '주간',
+                    label: S.goalPeriodWeekly,
                     value: 'weekly',
                     groupValue: selectedPeriod,
                     onChanged: (v) => setDialogState(() => selectedPeriod = v!),
                   ),
                   const SizedBox(width: 20),
                   _dialogRadioOption(
-                    label: '월간',
+                    label: S.goalPeriodMonthly,
                     value: 'monthly',
                     groupValue: selectedPeriod,
                     onChanged: (v) => setDialogState(() => selectedPeriod = v!),
@@ -1118,12 +1126,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 keyboardType: const TextInputType.numberWithOptions(decimal: true),
                 style: GoogleFonts.inter(color: SRColors.onSurface),
                 decoration: InputDecoration(
-                  labelText: '목표값',
+                  labelText: S.goalValue,
                   labelStyle: GoogleFonts.inter(
                     color: SRColors.onSurface.withValues(alpha: 0.5),
                     fontSize: 13,
                   ),
-                  suffixText: selectedType == 'distance' ? 'km' : '회',
+                  suffixText: selectedType == 'distance' ? 'km' : (S.isKo ? '회' : 'runs'),
                   suffixStyle: GoogleFonts.inter(
                     color: SRColors.onSurface.withValues(alpha: 0.4),
                     fontSize: 13,
@@ -1142,7 +1150,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
             TextButton(
               onPressed: () => Navigator.pop(ctx),
               child: Text(
-                '취소',
+                S.cancel,
                 style: GoogleFonts.inter(
                   fontSize: 12,
                   fontWeight: FontWeight.w700,
@@ -1157,7 +1165,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 final value = double.tryParse(raw);
                 if (value == null || value <= 0) return;
                 if (existing != null) {
-                  await DatabaseHelper.updateGoal(existing['id'] as int, value);
+                  await DatabaseHelper.updateGoal(
+                    existing['id'] as int,
+                    value,
+                    type: selectedType,
+                    period: selectedPeriod,
+                  );
                 } else {
                   await DatabaseHelper.insertGoal(selectedType, selectedPeriod, value);
                 }
@@ -1172,7 +1185,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
               ),
               child: Text(
-                '저장',
+                S.save,
                 style: GoogleFonts.inter(fontSize: 12, fontWeight: FontWeight.w800, letterSpacing: 1),
               ),
             ),
