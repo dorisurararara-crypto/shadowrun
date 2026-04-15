@@ -1,6 +1,6 @@
 import urllib.request, json, os
 
-API_KEY = 'sk_00bc51e2397013aa4ff2a2c1e6389c01c31cb0ed94b3abed'
+API_KEY = os.environ.get('ELEVENLABS_API_KEY', '')
 VOICE = 'nPczCjzI2devNBz1zQrb'  # Brian - Deep, Resonant
 MODEL = 'eleven_multilingual_v2'
 OUTDIR = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'assets', 'audio')

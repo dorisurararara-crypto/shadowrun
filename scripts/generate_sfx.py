@@ -1,7 +1,7 @@
 """ElevenLabs Sound Effects API로 앱 효과음 31개 생성"""
 import urllib.request, json, os, time
 
-API_KEY = 'sk_00bc51e2397013aa4ff2a2c1e6389c01c31cb0ed94b3abed'
+API_KEY = os.environ.get('ELEVENLABS_API_KEY', '')
 OUTDIR = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'assets', 'audio', 'sfx')
 os.makedirs(OUTDIR, exist_ok=True)
 

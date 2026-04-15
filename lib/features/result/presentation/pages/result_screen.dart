@@ -110,7 +110,7 @@ class _ResultScreenState extends State<ResultScreen>
     if (mounted) {
       setState(() => _loading = false);
       _resultAnim.forward();
-      _playResultBgm();
+      if (_run != null) _playResultBgm();
       Future.delayed(const Duration(milliseconds: 600), () {
         if (mounted) {
           _statsAnim.forward();
