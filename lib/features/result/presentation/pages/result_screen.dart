@@ -437,14 +437,18 @@ class _ResultScreenState extends State<ResultScreen>
           ),
           const SizedBox(height: 10),
           // Map
-          Container(
-            height: 220,
-            margin: const EdgeInsets.fromLTRB(8, 0, 8, 8),
-            clipBehavior: Clip.antiAlias,
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: NaverMap(
+          GestureDetector(
+            onTap: () => _showFullscreenMap(),
+            child: Container(
+              height: 220,
+              margin: const EdgeInsets.fromLTRB(8, 0, 8, 8),
+              clipBehavior: Clip.antiAlias,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Stack(
+                children: [
+                  NaverMap(
               options: NaverMapViewOptions(
                 initialCameraPosition: NCameraPosition(
                   target: NLatLng(centerLat, centerLng),
@@ -520,8 +524,112 @@ class _ResultScreenState extends State<ResultScreen>
                 _addKmSplitsToMap(controller, _points);
               },
             ),
+                  // 확대 힌트 아이콘
+                  Positioned(
+                    right: 8,
+                    bottom: 8,
+                    child: Container(
+                      padding: const EdgeInsets.all(6),
+                      decoration: BoxDecoration(
+                        color: SRColors.background.withValues(alpha: 0.7),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: const Icon(Icons.fullscreen, color: SRColors.onSurface, size: 18),
+                    ),
+                  ),
+                ],
+              ),
+            ),
           ),
         ],
+      ),
+    );
+  }
+
+  void _showFullscreenMap() {
+    if (_points.isEmpty) return;
+    showDialog(
+      context: context,
+      useSafeArea: false,
+      builder: (ctx) => Scaffold(
+        backgroundColor: SRColors.background,
+        appBar: AppBar(
+          backgroundColor: SRColors.surface,
+          elevation: 0,
+          leading: IconButton(
+            icon: const Icon(Icons.close, color: SRColors.onSurface),
+            onPressed: () => Navigator.pop(ctx),
+          ),
+          title: Text(
+            _run?.formattedDistance ?? '',
+            style: GoogleFonts.spaceGrotesk(
+              fontSize: 18,
+              fontWeight: FontWeight.w700,
+              color: SRColors.onSurface,
+            ),
+          ),
+        ),
+        body: NaverMap(
+          options: const NaverMapViewOptions(
+            mapType: NMapType.navi,
+            nightModeEnable: true,
+            scrollGesturesEnable: true,
+            zoomGesturesEnable: true,
+            rotationGesturesEnable: true,
+            tiltGesturesEnable: false,
+          ),
+          onMapReady: (controller) {
+            final runnerCoords = _points
+                .map((p) => NLatLng(p.latitude, p.longitude))
+                .toList();
+            if (runnerCoords.length >= 2) {
+              controller.addOverlay(NPathOverlay(
+                id: 'runner_route',
+                coords: runnerCoords,
+                color: SRColors.runner,
+                outlineColor: SRColors.runner.withValues(alpha: 0.3),
+                width: 5,
+              ));
+            }
+            if (_shadowPoints.length >= 2) {
+              final shadowCoords = _shadowPoints
+                  .map((p) => NLatLng(p.latitude, p.longitude))
+                  .toList();
+              controller.addOverlay(NPathOverlay(
+                id: 'shadow_route',
+                coords: shadowCoords,
+                color: SRColors.shadow,
+                outlineColor: SRColors.shadow.withValues(alpha: 0.3),
+                width: 4,
+              ));
+            }
+            final allCoords = [
+              ...runnerCoords,
+              ..._shadowPoints.map((p) => NLatLng(p.latitude, p.longitude)),
+            ];
+            if (allCoords.length >= 2) {
+              final bounds = NLatLngBounds.from(allCoords);
+              controller.updateCamera(
+                NCameraUpdate.fitBounds(bounds, padding: const EdgeInsets.all(50)),
+              );
+            }
+            if (runnerCoords.isNotEmpty) {
+              controller.addOverlay(NMarker(
+                id: 'start',
+                position: runnerCoords.first,
+                iconTintColor: SRColors.runner,
+                size: const Size(20, 20),
+              ));
+              controller.addOverlay(NMarker(
+                id: 'end',
+                position: runnerCoords.last,
+                iconTintColor: SRColors.textPrimary,
+                size: const Size(20, 20),
+              ));
+            }
+            _addKmSplitsToMap(controller, _points);
+          },
+        ),
       ),
     );
   }

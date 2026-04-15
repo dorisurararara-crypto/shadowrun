@@ -482,17 +482,19 @@ class _PrepareScreenState extends State<PrepareScreen>
     final centerLng =
         points.map((p) => p.longitude).reduce((a, b) => a + b) / points.length;
 
-    return Container(
-      height: 200,
-      width: double.infinity,
-      clipBehavior: Clip.antiAlias,
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: SRColors.divider),
-      ),
-      child: Stack(
-        children: [
-          NaverMap(
+    return GestureDetector(
+      onTap: () => _showFullscreenMap(),
+      child: Container(
+        height: 200,
+        width: double.infinity,
+        clipBehavior: Clip.antiAlias,
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: SRColors.divider),
+        ),
+        child: Stack(
+          children: [
+            NaverMap(
             options: NaverMapViewOptions(
               initialCameraPosition: NCameraPosition(
                 target: NLatLng(centerLat, centerLng),
@@ -532,7 +534,88 @@ class _PrepareScreenState extends State<PrepareScreen>
               ),
             ),
           ),
+          Positioned(
+            right: 8,
+            bottom: 8,
+            child: Container(
+              padding: const EdgeInsets.all(6),
+              decoration: BoxDecoration(
+                color: SRColors.background.withValues(alpha: 0.7),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: const Icon(Icons.fullscreen, color: SRColors.onSurface, size: 18),
+            ),
+          ),
         ],
+      ),
+      ),
+    );
+  }
+
+  void _showFullscreenMap() {
+    if (_shadowPoints == null || _shadowPoints!.isEmpty) return;
+    final points = _shadowPoints!;
+    showDialog(
+      context: context,
+      useSafeArea: false,
+      builder: (ctx) => Scaffold(
+        backgroundColor: SRColors.background,
+        appBar: AppBar(
+          backgroundColor: SRColors.surface,
+          elevation: 0,
+          leading: IconButton(
+            icon: const Icon(Icons.close, color: SRColors.onSurface),
+            onPressed: () => Navigator.pop(ctx),
+          ),
+          title: Text(
+            S.isKo ? '도플갱어 경로' : 'Shadow Route',
+            style: GoogleFonts.spaceGrotesk(
+              fontSize: 18,
+              fontWeight: FontWeight.w700,
+              color: SRColors.onSurface,
+            ),
+          ),
+        ),
+        body: NaverMap(
+          options: const NaverMapViewOptions(
+            mapType: NMapType.navi,
+            nightModeEnable: true,
+            scrollGesturesEnable: true,
+            zoomGesturesEnable: true,
+            rotationGesturesEnable: true,
+            tiltGesturesEnable: false,
+          ),
+          onMapReady: (controller) {
+            final coords = points
+                .map((p) => NLatLng(p.latitude, p.longitude))
+                .toList();
+            if (coords.length >= 2) {
+              controller.addOverlay(NPathOverlay(
+                id: 'shadow_route',
+                coords: coords,
+                color: const Color(0xFFFF5262),
+                outlineColor: const Color(0x66FF5262),
+                width: 5,
+              ));
+              final bounds = NLatLngBounds.from(coords);
+              controller.updateCamera(
+                NCameraUpdate.fitBounds(bounds, padding: const EdgeInsets.all(50)),
+              );
+              controller.addOverlay(NMarker(
+                id: 'start',
+                position: coords.first,
+                iconTintColor: const Color(0xFFFF5262),
+                size: const Size(20, 20),
+              ));
+              controller.addOverlay(NMarker(
+                id: 'end',
+                position: coords.last,
+                iconTintColor: SRColors.onSurface,
+                size: const Size(20, 20),
+              ));
+            }
+          },
+        ),
       ),
     );
   }
