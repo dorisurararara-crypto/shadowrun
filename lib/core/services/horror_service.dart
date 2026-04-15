@@ -2,6 +2,7 @@ import 'dart:math';
 import 'package:flutter/foundation.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:vibration/vibration.dart';
+import 'package:shadowrun/core/l10n/app_strings.dart';
 import 'package:shadowrun/core/services/sfx_service.dart';
 
 enum ThreatLevel { safe, warningFar, warningClose, dangerFar, dangerClose, critical, aheadClose, aheadMid, aheadFar }
@@ -247,12 +248,28 @@ class HorrorService {
     if (_isDisposed || _isTtsPlaying) return;
     _isTtsPlaying = true;
     try {
+      // 영어 분기
+      String langBase = baseName;
+      if (!S.isKo) {
+        // 숫자로 끝나면 tts_ahead_far_1 → tts_ahead_far_en_1
+        // 아니면 tts_start → tts_start_en
+        final lastUnderscore = baseName.lastIndexOf('_');
+        final lastPart = baseName.substring(lastUnderscore + 1);
+        final isNumbered = int.tryParse(lastPart) != null;
+        if (isNumbered) {
+          final prefix = baseName.substring(0, lastUnderscore);
+          langBase = '${prefix}_en_$lastPart';
+        } else {
+          langBase = '${baseName}_en';
+        }
+      }
+
       // 음성 분기: harry는 기본 파일명, callum/drill은 접미사
       String filename;
       if (_voiceId == 'harry') {
-        filename = '$baseName.mp3';
+        filename = '$langBase.mp3';
       } else {
-        filename = '${baseName}_$_voiceId.mp3';
+        filename = '${langBase}_$_voiceId.mp3';
       }
 
       await _ttsPlayer.setAsset('assets/audio/$filename');

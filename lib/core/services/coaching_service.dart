@@ -28,17 +28,18 @@ class CoachingService {
     final allRuns = await DatabaseHelper.getAllRuns();
     final prevRuns = allRuns.where((r) => r.id != currentRun.id).toList();
 
-    // 이번 주/지난 주 기록 분리
-    final now = DateTime.now();
-    final weekStart = now.subtract(Duration(days: now.weekday - 1));
+    // 이번 주/지난 주 기록 분리 (러닝 날짜 기준, 00:00 정규화)
+    final runDate = DateTime.tryParse(currentRun.date) ?? DateTime.now();
+    final weekStart = DateTime(runDate.year, runDate.month, runDate.day - (runDate.weekday - 1));
     final lastWeekStart = weekStart.subtract(const Duration(days: 7));
+    final runEnd = DateTime(runDate.year, runDate.month, runDate.day + 1);
     final thisWeekRuns = allRuns.where((r) {
       final d = DateTime.tryParse(r.date);
-      return d != null && d.isAfter(weekStart);
+      return d != null && !d.isBefore(weekStart) && d.isBefore(runEnd);
     }).toList();
     final lastWeekRuns = allRuns.where((r) {
       final d = DateTime.tryParse(r.date);
-      return d != null && d.isAfter(lastWeekStart) && d.isBefore(weekStart);
+      return d != null && !d.isBefore(lastWeekStart) && d.isBefore(weekStart);
     }).toList();
 
     // 1. 러닝 횟수 마일스톤
@@ -751,9 +752,11 @@ class CoachingService {
 
   static double _quickDistance(double lat1, double lng1, double lat2, double lng2) {
     const r = 6371000.0;
-    final dLat = (lat2 - lat1) * 3.14159 / 180;
-    final dLng = (lng2 - lng1) * 3.14159 / 180;
-    final a = dLat * dLat + dLng * dLng * (lat1 * 3.14159 / 180).abs();
-    return r * a.abs().clamp(0, 1e10) * 0.5;
+    const deg2rad = 3.14159265 / 180;
+    final dLat = (lat2 - lat1) * deg2rad;
+    final dLng = (lng2 - lng1) * deg2rad;
+    final cosLat = cos((lat1 + lat2) / 2 * deg2rad);
+    final x = dLng * cosLat;
+    return r * sqrt(dLat * dLat + x * x);
   }
 }
