@@ -216,4 +216,15 @@ class S {
   static String get profilePhotoSet => isKo ? '프로필 사진 설정' : 'Set Profile Photo';
   static String get profileSavedMsg => isKo ? '프로필 사진이 저장되었습니다' : 'Profile photo saved';
   static String get goalPeriodLabel => isKo ? '목표' : 'Goal';
+
+  // Result screen status subtitles
+  static String get statusEscaped => isKo ? '도플갱어를 따돌렸다' : 'The doppelganger was shaken off';
+  static String get statusCaught => isKo ? '도플갱어에게 잡혔다' : 'Caught by the doppelganger';
+  static String get statusRunComplete => isKo ? '러닝 완료' : 'Run complete';
+  static String get coachAnalysis => isKo ? '코치 분석' : 'COACH ANALYSIS';
+
+  // Prepare screen
+  static String get selectShoe => isKo ? '러닝화 선택' : 'SELECT SHOE';
+  static String get noSelection => isKo ? '선택 안 함' : 'None';
+  static String get shadowRoute => isKo ? '도플갱어 경로' : 'Shadow Route';
 }

@@ -30,6 +30,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   bool _isPro = false;
   String _selectedVoice = 'harry';
   double _shadowSpeed = 1.0;
+  bool _vibrationEnabled = true;
   bool _loading = true;
   final int _selectedNavIndex = 2;
   int _adminTapCount = 0;
@@ -77,6 +78,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
       DatabaseHelper.getSetting('voice'),
       DatabaseHelper.getSetting('shadow_speed'),
       DatabaseHelper.getSetting('stadium_finale'),
+      DatabaseHelper.getSetting('vibration_enabled'),
     ]);
 
     setState(() {
@@ -88,6 +90,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
       _selectedVoice = results[5] ?? 'harry';
       _shadowSpeed = double.tryParse(results[6] ?? '1.0') ?? 1.0;
       _stadiumFinale = results[7] != 'false';
+      _vibrationEnabled = results[8] != 'false';
       _loading = false;
     });
   }
@@ -1400,39 +1403,16 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 },
               ),
               const SizedBox(height: 8),
-              // Haptic Dread (추후 구현)
-              Padding(
-                padding: const EdgeInsets.symmetric(vertical: 6),
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(S.hapticDread, style: GoogleFonts.inter(
-                            fontSize: 14, fontWeight: FontWeight.w600,
-                            color: SRColors.onSurface.withValues(alpha: 0.3),
-                          )),
-                          const SizedBox(height: 2),
-                          Text(S.hapticDreadDesc, style: GoogleFonts.inter(
-                            fontSize: 12, color: SRColors.onSurface.withValues(alpha: 0.2),
-                          )),
-                        ],
-                      ),
-                    ),
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                      decoration: BoxDecoration(
-                        color: SRColors.onSurface.withValues(alpha: 0.08),
-                        borderRadius: BorderRadius.circular(6),
-                      ),
-                      child: Text(S.comingSoon, style: GoogleFonts.inter(
-                        fontSize: 9, fontWeight: FontWeight.w700,
-                        color: SRColors.onSurface.withValues(alpha: 0.3), letterSpacing: 0.5,
-                      )),
-                    ),
-                  ],
-                ),
+              const SizedBox(height: 8),
+              // Haptic Dread toggle
+              _SettingsToggle(
+                label: S.hapticDread,
+                subtitle: S.hapticDreadDesc,
+                value: _vibrationEnabled,
+                onChanged: (v) {
+                  setState(() => _vibrationEnabled = v);
+                  _save('vibration_enabled', '$v');
+                },
               ),
               // Voice selection (PRO only)
               if (_isPro) ...[

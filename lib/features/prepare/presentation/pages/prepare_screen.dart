@@ -599,7 +599,7 @@ class _PrepareScreenState extends State<PrepareScreen>
             onPressed: () => Navigator.pop(ctx),
           ),
           title: Text(
-            S.isKo ? '도플갱어 경로' : 'Shadow Route',
+            S.shadowRoute,
             style: GoogleFonts.spaceGrotesk(
               fontSize: 18,
               fontWeight: FontWeight.w700,
@@ -939,7 +939,7 @@ class _PrepareScreenState extends State<PrepareScreen>
         Row(
           children: [
             Text(
-              '러닝화 선택',
+              S.selectShoe,
               style: GoogleFonts.spaceGrotesk(
                 fontSize: 14,
                 fontWeight: FontWeight.w700,
@@ -949,7 +949,7 @@ class _PrepareScreenState extends State<PrepareScreen>
             ),
             const SizedBox(width: 8),
             Text(
-              '선택 안 함',
+              S.noSelection,
               style: GoogleFonts.inter(
                 fontSize: 11,
                 color: SRColors.neutral500.withValues(alpha: 0.5),

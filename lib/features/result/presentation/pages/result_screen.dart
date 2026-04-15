@@ -169,9 +169,22 @@ class _ResultScreenState extends State<ResultScreen>
       return Scaffold(
         backgroundColor: SRColors.background,
         body: Center(
-          child: Text(
-            S.isKo ? '기록을 찾을 수 없습니다' : 'Record not found',
-            style: SRTheme.bodyMedium,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                S.isKo ? '기록을 찾을 수 없습니다' : 'Record not found',
+                style: SRTheme.bodyMedium,
+              ),
+              const SizedBox(height: 16),
+              TextButton(
+                onPressed: () => context.go('/'),
+                child: Text(
+                  S.isKo ? '홈으로' : 'Go Home',
+                  style: GoogleFonts.inter(color: SRColors.primaryContainer),
+                ),
+              ),
+            ],
           ),
         ),
       );
@@ -311,10 +324,10 @@ class _ResultScreenState extends State<ResultScreen>
                 const SizedBox(height: 4),
                 Text(
                   _isWin
-                      ? '도플갱어를 따돌렸다'
+                      ? S.statusEscaped
                       : _isLose
-                          ? '도플갱어에게 잡혔다'
-                          : '러닝 완료',
+                          ? S.statusCaught
+                          : S.statusRunComplete,
                   style: SRTheme.bodyMedium.copyWith(
                     color: SRColors.textMuted,
                   ),
@@ -783,7 +796,7 @@ class _ResultScreenState extends State<ResultScreen>
           Padding(
             padding: const EdgeInsets.fromLTRB(16, 14, 16, 8),
             child: Text(
-              S.isKo ? '코치 분석' : 'COACH ANALYSIS',
+              S.coachAnalysis,
               style: SRTheme.labelMedium.copyWith(color: SRColors.textMuted),
             ),
           ),

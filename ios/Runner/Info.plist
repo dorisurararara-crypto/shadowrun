@@ -70,7 +70,6 @@
 		<array>
 			<string>audio</string>
 			<string>location</string>
-			<string>fetch</string>
 		</array>
 		<key>UIStatusBarHidden</key>
 		<false/>
@@ -80,5 +79,9 @@
 		<string>SHADOW RUN needs your location to track your running route even when the app is in the background.</string>
 		<key>NSLocationAlwaysUsageDescription</key>
 		<string>SHADOW RUN needs your location to track your running route even when the app is in the background.</string>
+		<key>NSCameraUsageDescription</key>
+		<string>SHADOW RUN needs camera access to take your profile photo for the map marker.</string>
+		<key>NSPhotoLibraryUsageDescription</key>
+		<string>SHADOW RUN needs photo library access to save and load profile photos.</string>
 	</dict>
 </plist>
