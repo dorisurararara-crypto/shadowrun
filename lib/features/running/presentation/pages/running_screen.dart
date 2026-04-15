@@ -115,53 +115,20 @@ class _RunningScreenState extends State<RunningScreen>
       }
     } catch (_) {}
 
-    if (faceFile != null) {
-      if (!mounted) return;
-      _runnerArrowIcon = await NOverlayImage.fromWidget(
-        widget: StickFigureMarker(faceImage: faceFile, size: 48),
-        size: const Size(48, 48),
-        context: context,
-      );
-      if (!mounted) return;
-      _shadowArrowIcon = await NOverlayImage.fromWidget(
-        widget: StickFigureMarker(faceImage: faceFile, isDoppelganger: true, size: 44),
-        size: const Size(44, 44),
-        context: context,
-      );
-      if (!mounted) return;
-    } else {
-      if (!mounted) return;
-      _runnerArrowIcon = await NOverlayImage.fromWidget(
-        widget: Container(
-          width: 32,
-          height: 32,
-          decoration: BoxDecoration(
-            color: SRColors.runner,
-            shape: BoxShape.circle,
-            boxShadow: [BoxShadow(color: SRColors.runner.withValues(alpha: 0.6), blurRadius: 8)],
-          ),
-          child: const Icon(Icons.navigation_rounded, color: Colors.white, size: 18),
-        ),
-        size: const Size(32, 32),
-        context: context,
-      );
-      if (!mounted) return;
-      _shadowArrowIcon = await NOverlayImage.fromWidget(
-        widget: Container(
-          width: 28,
-          height: 28,
-          decoration: BoxDecoration(
-            color: SRColors.shadow,
-            shape: BoxShape.circle,
-            boxShadow: [BoxShadow(color: SRColors.shadow.withValues(alpha: 0.6), blurRadius: 8)],
-          ),
-          child: const Icon(Icons.person_rounded, color: Colors.white, size: 16),
-        ),
-        size: const Size(28, 28),
-        context: context,
-      );
-      if (!mounted) return;
-    }
+    if (!mounted) return;
+    _runnerArrowIcon = await NOverlayImage.fromWidget(
+      widget: StickFigureMarker(faceImage: faceFile, size: 48),
+      size: const Size(48, 48),
+      context: context,
+    );
+    if (!mounted) return;
+    _shadowArrowIcon = await NOverlayImage.fromWidget(
+      widget: StickFigureMarker(faceImage: faceFile, isDoppelganger: true, size: 44),
+      size: const Size(44, 44),
+      context: context,
+    );
+    if (!mounted) return;
+
     _kmSplitIcon = await NOverlayImage.fromWidget(
       widget: Container(
         width: 22,
