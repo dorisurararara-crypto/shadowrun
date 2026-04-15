@@ -12,6 +12,7 @@ import 'package:shadowrun/core/services/ad_service.dart';
 import 'package:shadowrun/core/services/purchase_service.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:shadowrun/core/services/sfx_service.dart';
+import 'package:shadowrun/core/services/coaching_service.dart';
 
 class ResultScreen extends StatefulWidget {
   final int runId;
@@ -31,6 +32,7 @@ class _ResultScreenState extends State<ResultScreen>
   bool _loading = true;
   BannerAd? _bannerAd;
   bool _bannerReady = false;
+  List<CoachingAnalysis> _coaching = [];
 
   late AnimationController _resultAnim;
   late Animation<double> _resultScale;
@@ -94,6 +96,9 @@ class _ResultScreenState extends State<ResultScreen>
 
       if (_run?.shadowRunId != null) {
         _shadowPoints = await DatabaseHelper.getRunPoints(_run!.shadowRunId!);
+      }
+      if (_run != null) {
+        _coaching = await CoachingService.analyze(_run!);
       }
     } catch (e) {
       debugPrint('결과 데이터 로드 에러: $e');
@@ -164,6 +169,8 @@ class _ResultScreenState extends State<ResultScreen>
                     _buildMapSection(),
                     const SizedBox(height: 24),
                     _buildIncidentReport(),
+                    const SizedBox(height: 24),
+                    _buildCoachingSection(),
                     const SizedBox(height: 32),
                     _buildBannerAd(),
                     _buildActions(),
@@ -731,6 +738,63 @@ class _ResultScreenState extends State<ResultScreen>
           ? '도플갱어가 ${km}km 지점에서 추월했습니다. $min분 시점에서 속도가 떨어졌습니다. 내일 더 강해져서 돌아오세요.'
           : 'The entity overtook you at the $km km mark. Your pace dropped at $min minutes. Train harder for tomorrow.';
     }
+  }
+
+  Widget _buildCoachingSection() {
+    if (_coaching.isEmpty) return const SizedBox.shrink();
+    return Container(
+      decoration: BoxDecoration(
+        color: SRColors.cardLight,
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 14, 16, 8),
+            child: Text(
+              S.isKo ? '코치 분석' : 'COACH ANALYSIS',
+              style: SRTheme.labelMedium.copyWith(color: SRColors.textMuted),
+            ),
+          ),
+          ...(_coaching.map((c) => Padding(
+            padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(c.emoji, style: const TextStyle(fontSize: 20)),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        c.title,
+                        style: GoogleFonts.spaceGrotesk(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w700,
+                          color: SRColors.onSurface,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        c.body,
+                        style: GoogleFonts.inter(
+                          fontSize: 12,
+                          color: SRColors.onSurface.withValues(alpha: 0.6),
+                          height: 1.5,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ))),
+          const SizedBox(height: 4),
+        ],
+      ),
+    );
   }
 
   void _addKmSplitsToMap(NaverMapController controller, List<RunPoint> points) {
