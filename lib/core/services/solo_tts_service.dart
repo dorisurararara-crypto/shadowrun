@@ -11,10 +11,17 @@ class SoloTtsService {
   String _voiceId = 'harry';
   final _rng = Random();
 
+  static const _bgmOptions = [
+    'bgm_running_ambient.mp3', 'bgm_running_ambient_v2.mp3',
+    'bgm_running_ambient_v3.mp3', 'bgm_running_ambient_v4.mp3', 'bgm_running_ambient_v5.mp3',
+    'bgm_freerun_zen1.mp3', 'bgm_freerun_zen2.mp3', 'bgm_freerun_zen3.mp3', 'bgm_freerun_zen4.mp3',
+  ];
+
   Future<void> initialize({String voice = 'harry'}) async {
     _voiceId = voice;
     try {
-      await _bgmPlayer.setAsset('assets/audio/bgm_running_ambient.mp3');
+      final bgm = _bgmOptions[_rng.nextInt(_bgmOptions.length)];
+      await _bgmPlayer.setAsset('assets/audio/$bgm');
       _bgmPlayer.setLoopMode(LoopMode.one);
       _bgmPlayer.setVolume(0.25);
       _bgmPlayer.play().catchError((_) {});

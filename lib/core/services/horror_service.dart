@@ -68,16 +68,16 @@ class HorrorService {
     'tts_losing_lead_6', 'tts_losing_lead_7', 'tts_losing_lead_8', 'tts_losing_lead_9', 'tts_losing_lead_10',
   ];
 
-  // 구간별 배경음
-  static const _bgmMap = {
-    ThreatLevel.aheadFar: 'bgm_peaceful.mp3',
-    ThreatLevel.aheadMid: 'bgm_calm_wind.mp3',
-    ThreatLevel.aheadClose: 'bgm_tension_low.mp3',
-    ThreatLevel.safe: 'bgm_dark_ambient.mp3',
-    ThreatLevel.warningFar: 'bgm_chase_far.mp3',
-    ThreatLevel.warningClose: 'bgm_chase_mid.mp3',
-    ThreatLevel.dangerFar: 'bgm_chase_close.mp3',
-    ThreatLevel.dangerClose: 'bgm_chase_critical.mp3',
+  // 구간별 배경음 (3개 변형 중 랜덤)
+  static const _bgmVariants = {
+    ThreatLevel.aheadFar: ['bgm_peaceful.mp3', 'bgm_peaceful_v2.mp3', 'bgm_peaceful_v3.mp3'],
+    ThreatLevel.aheadMid: ['bgm_calm_wind.mp3', 'bgm_calm_wind_v2.mp3', 'bgm_calm_wind_v3.mp3'],
+    ThreatLevel.aheadClose: ['bgm_tension_low.mp3', 'bgm_tension_low_v2.mp3', 'bgm_tension_low_v3.mp3'],
+    ThreatLevel.safe: ['bgm_dark_ambient.mp3', 'bgm_dark_ambient_v2.mp3', 'bgm_dark_ambient_v3.mp3'],
+    ThreatLevel.warningFar: ['bgm_chase_far.mp3', 'bgm_chase_far_v2.mp3', 'bgm_chase_far_v3.mp3'],
+    ThreatLevel.warningClose: ['bgm_chase_mid.mp3', 'bgm_chase_mid_v2.mp3', 'bgm_chase_mid_v3.mp3'],
+    ThreatLevel.dangerFar: ['bgm_chase_close.mp3', 'bgm_chase_close_v2.mp3', 'bgm_chase_close_v3.mp3'],
+    ThreatLevel.dangerClose: ['bgm_chase_critical.mp3', 'bgm_chase_critical_v2.mp3', 'bgm_chase_critical_v3.mp3'],
   };
 
   // 구간별 배경음 볼륨
@@ -161,9 +161,10 @@ class HorrorService {
   }
 
   Future<void> _onLevelChanged(ThreatLevel level) async {
-    // 배경음 변경
-    final bgm = _bgmMap[level];
-    if (bgm != null) {
+    // 배경음 변경 (3개 변형 중 랜덤)
+    final bgmList = _bgmVariants[level];
+    if (bgmList != null && bgmList.isNotEmpty) {
+      final bgm = bgmList[_rng.nextInt(bgmList.length)];
       final vol = _bgmVolume[level] ?? 0.5;
       await _playBgm(bgm, volume: vol);
     } else {

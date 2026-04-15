@@ -46,11 +46,16 @@ class MarathonService {
   static const int _randomIntervalMin = 120;
   static const int _randomIntervalMax = 240;
 
+  static const _bgmOptions = [
+    'bgm_running_ambient.mp3', 'bgm_running_ambient_v2.mp3',
+    'bgm_running_ambient_v3.mp3', 'bgm_running_ambient_v4.mp3', 'bgm_running_ambient_v5.mp3',
+  ];
+
   Future<void> initialize({String voice = 'drill'}) async {
     _voiceId = voice;
-    // 배경음 시작 (새소리 + 러닝 백색소음)
     try {
-      await _bgmPlayer.setAsset('assets/audio/bgm_running_ambient.mp3');
+      final bgm = _bgmOptions[_random.nextInt(_bgmOptions.length)];
+      await _bgmPlayer.setAsset('assets/audio/$bgm');
       _bgmPlayer.setLoopMode(LoopMode.one);
       _bgmPlayer.setVolume(0.25);
       _bgmPlayer.play().catchError((_) {});

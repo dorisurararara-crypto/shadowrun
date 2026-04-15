@@ -13,6 +13,8 @@ import 'package:shadowrun/core/services/purchase_service.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:shadowrun/core/services/sfx_service.dart';
 import 'package:shadowrun/core/services/coaching_service.dart';
+import 'package:just_audio/just_audio.dart';
+import 'dart:math' as math2;
 
 class ResultScreen extends StatefulWidget {
   final int runId;
@@ -32,6 +34,7 @@ class _ResultScreenState extends State<ResultScreen>
   bool _loading = true;
   BannerAd? _bannerAd;
   bool _bannerReady = false;
+  AudioPlayer? _resultBgm;
   List<CoachingAnalysis> _coaching = [];
 
   late AnimationController _resultAnim;
@@ -107,6 +110,7 @@ class _ResultScreenState extends State<ResultScreen>
     if (mounted) {
       setState(() => _loading = false);
       _resultAnim.forward();
+      _playResultBgm();
       Future.delayed(const Duration(milliseconds: 600), () {
         if (mounted) {
           _statsAnim.forward();
@@ -116,8 +120,31 @@ class _ResultScreenState extends State<ResultScreen>
     }
   }
 
+  void _playResultBgm() {
+    try {
+      final rng = math2.Random();
+      String bgm;
+      if (_isWin) {
+        const opts = ['bgm_result_victory1.mp3', 'bgm_result_victory2.mp3', 'bgm_result_victory3.mp3'];
+        bgm = opts[rng.nextInt(opts.length)];
+      } else if (_isLose) {
+        const opts = ['bgm_result_defeat1.mp3', 'bgm_result_defeat2.mp3', 'bgm_result_defeat3.mp3'];
+        bgm = opts[rng.nextInt(opts.length)];
+      } else {
+        const opts = ['bgm_result_normal1.mp3', 'bgm_result_normal2.mp3'];
+        bgm = opts[rng.nextInt(opts.length)];
+      }
+      _resultBgm = AudioPlayer();
+      _resultBgm!.setAsset('assets/audio/$bgm');
+      _resultBgm!.setLoopMode(LoopMode.one);
+      _resultBgm!.setVolume(0.2);
+      _resultBgm!.play().catchError((_) {});
+    } catch (_) {}
+  }
+
   @override
   void dispose() {
+    _resultBgm?.dispose();
     _bannerAd?.dispose();
     _resultAnim.dispose();
     _glowAnim.dispose();
