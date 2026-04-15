@@ -17,6 +17,9 @@ class PurchaseService {
   bool _isTrial = false;
   int _trialDaysLeft = 0;
 
+  /// PRO 상태 변경 알림 (UI 자동 갱신용)
+  final ValueNotifier<bool> proNotifier = ValueNotifier(false);
+
   bool get isPro => _isPro;
   bool get isTrial => _isTrial;
   int get trialDaysLeft => _trialDaysLeft;
@@ -24,6 +27,7 @@ class PurchaseService {
   /// 관리자 키 등 외부에서 PRO 활성화 시 호출
   Future<void> activatePro() async {
     _isPro = true;
+    proNotifier.value = true;
     await DatabaseHelper.setSetting('is_pro', 'true');
   }
 
@@ -66,9 +70,8 @@ class PurchaseService {
   }
 
   Future<void> _verifyAndActivatePro(PurchaseDetails purchase) async {
-    // 로컬 앱에서는 영수증 서버 검증 없이 바로 활성화
-    // 프로덕션에서는 서버 검증 추가 권장
     _isPro = true;
+    proNotifier.value = true;
     await DatabaseHelper.setSetting('is_pro', 'true');
     debugPrint('PRO 활성화 완료');
   }
@@ -105,6 +108,7 @@ class PurchaseService {
     _isTrial = true;
     _isPro = true;
     _trialDaysLeft = _trialDays;
+    proNotifier.value = true;
     return true;
   }
 

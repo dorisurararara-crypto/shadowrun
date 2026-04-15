@@ -80,18 +80,12 @@ class RunningService extends ChangeNotifier {
   }
 
   /// 도플갱어와의 거리 (양수 = 앞서는 중, 음수 = 뒤처지는 중)
-  double get shadowDistanceM {
-    if (_shadowPoints == null || _lastPosition == null || currentShadowPoint == null) {
-      return double.infinity;
-    }
+  /// 도플갱어 위치 업데이트 (GPS 콜백에서 1번만 호출)
+  void updateShadowPosition() {
+    if (_shadowPoints == null || _lastPosition == null) return;
     final elapsed = durationS;
-    // 시작 후 유예기간 동안은 안전 거리 반환
-    if (elapsed < _shadowGracePeriodS) {
-      return 200.0;
-    }
-    // 유예기간 이후 도플갱어 시간 계산 (배율 적용)
+    if (elapsed < _shadowGracePeriodS) return;
     final shadowElapsedS = (elapsed - _shadowGracePeriodS) * _shadowSpeedMultiplier;
-    // 캐시된 인덱스부터 이어서 계산 (O(1) amortized)
     double shadowDist = _cachedShadowDist;
     int shadowIdx = _cachedShadowIdx;
     final startMs = _shadowPoints!.first.timestampMs;
@@ -107,7 +101,15 @@ class RunningService extends ChangeNotifier {
     _cachedShadowDist = shadowDist;
     _cachedShadowIdx = shadowIdx;
     _currentShadowIndex = shadowIdx;
-    return _totalDistanceM - shadowDist;
+  }
+
+  /// 도플갱어와의 거리 (읽기 전용, 몇 번 읽어도 같은 값)
+  double get shadowDistanceM {
+    if (_shadowPoints == null || _lastPosition == null || currentShadowPoint == null) {
+      return double.infinity;
+    }
+    if (durationS < _shadowGracePeriodS) return 200.0;
+    return _totalDistanceM - _cachedShadowDist;
   }
 
   String get formattedPace {

@@ -27,6 +27,17 @@ class _HomeScreenState extends State<HomeScreen> {
   void initState() {
     super.initState();
     _loadData();
+    PurchaseService().proNotifier.addListener(_onProChanged);
+  }
+
+  @override
+  void dispose() {
+    PurchaseService().proNotifier.removeListener(_onProChanged);
+    super.dispose();
+  }
+
+  void _onProChanged() {
+    if (mounted) setState(() {});
   }
 
   void _loadData() {
