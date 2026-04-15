@@ -117,14 +117,14 @@ class _RunningScreenState extends State<RunningScreen>
 
     if (!mounted) return;
     _runnerArrowIcon = await NOverlayImage.fromWidget(
-      widget: StickFigureMarker(faceImage: faceFile, size: 80),
-      size: const Size(80, 80),
+      widget: StickFigureMarker(faceImage: faceFile, size: 64),
+      size: const Size(64, 64),
       context: context,
     );
     if (!mounted) return;
     _shadowArrowIcon = await NOverlayImage.fromWidget(
-      widget: StickFigureMarker(faceImage: faceFile, isDoppelganger: true, size: 72),
-      size: const Size(72, 72),
+      widget: StickFigureMarker(faceImage: faceFile, isDoppelganger: true, size: 56),
+      size: const Size(56, 56),
       context: context,
     );
     if (!mounted) return;
@@ -416,7 +416,7 @@ class _RunningScreenState extends State<RunningScreen>
     final runnerMarker = NMarker(
       id: 'runner',
       position: target,
-      size: const Size(80, 80),
+      size: const Size(64, 64),
       angle: _runService.heading,
     );
     if (_runnerArrowIcon != null) {
@@ -462,7 +462,7 @@ class _RunningScreenState extends State<RunningScreen>
       final shadowMarker = NMarker(
         id: 'shadow',
         position: shadowLatLng,
-        size: const Size(72, 72),
+        size: const Size(56, 56),
       );
       if (_shadowArrowIcon != null) {
         shadowMarker.setIcon(_shadowArrowIcon!);
