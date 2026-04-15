@@ -1,17 +1,18 @@
+import 'dart:math';
 import 'package:flutter/foundation.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:vibration/vibration.dart';
-import 'package:shadowrun/core/l10n/app_strings.dart';
 import 'package:shadowrun/core/services/sfx_service.dart';
 
-enum ThreatLevel { safe, warning, danger, critical, aheadClose, aheadMid, aheadFar }
+enum ThreatLevel { safe, warningFar, warningClose, dangerFar, dangerClose, critical, aheadClose, aheadMid, aheadFar }
 
 class HorrorService {
   final AudioPlayer _bgmPlayer = AudioPlayer();
   final AudioPlayer _sfxPlayer = AudioPlayer();
   final AudioPlayer _ttsPlayer = AudioPlayer();
+  final _rng = Random();
 
-  ThreatLevel _currentLevel = ThreatLevel.safe;
+  ThreatLevel _currentLevel = ThreatLevel.aheadFar;
   int _horrorLevel = 3;
   bool _ttsEnabled = true;
   bool _vibrationEnabled = true;
@@ -19,7 +20,8 @@ class HorrorService {
   bool _isDisposed = false;
   bool _isTtsPlaying = false;
   bool _wasAhead = false;
-  String _voiceId = 'harry'; // harry, callum, drill
+  String _voiceId = 'harry';
+  DateTime? _lastPeriodicTts;
 
   ThreatLevel get currentLevel => _currentLevel;
 
@@ -36,35 +38,98 @@ class HorrorService {
     _hasVibrator = (await Vibration.hasVibrator()) == true;
   }
 
+  // 구간별 TTS 변형 (5개씩)
+  static const _ttsVariants = {
+    ThreatLevel.aheadFar: ['tts_ahead_far_1', 'tts_ahead_far_2', 'tts_ahead_far_3', 'tts_ahead_far_4', 'tts_ahead_far_5'],
+    ThreatLevel.aheadMid: ['tts_ahead_mid_1', 'tts_ahead_mid_2', 'tts_ahead_mid_3', 'tts_ahead_mid_4', 'tts_ahead_mid_5'],
+    ThreatLevel.aheadClose: ['tts_ahead_close_1', 'tts_ahead_close_2', 'tts_ahead_close_3', 'tts_ahead_close_4', 'tts_ahead_close_5'],
+    ThreatLevel.safe: ['tts_safe_1', 'tts_safe_2', 'tts_safe_3', 'tts_safe_4', 'tts_safe_5'],
+    ThreatLevel.warningFar: ['tts_warning_1', 'tts_warning_2', 'tts_warning_3', 'tts_warning_4', 'tts_warning_5'],
+    ThreatLevel.warningClose: ['tts_warning_close_1', 'tts_warning_close_2', 'tts_warning_close_3', 'tts_warning_close_4', 'tts_warning_close_5'],
+    ThreatLevel.dangerFar: ['tts_danger_1', 'tts_danger_2', 'tts_danger_3', 'tts_danger_4', 'tts_danger_5'],
+    ThreatLevel.dangerClose: ['tts_critical_1', 'tts_critical_2', 'tts_critical_3', 'tts_critical_4', 'tts_critical_5'],
+    ThreatLevel.critical: ['tts_critical_1', 'tts_critical_2', 'tts_critical_3', 'tts_critical_4', 'tts_critical_5'],
+  };
+
+  // 리드 잃을 때 변형
+  static const _losingLeadVariants = [
+    'tts_losing_lead_1', 'tts_losing_lead_2', 'tts_losing_lead_3', 'tts_losing_lead_4', 'tts_losing_lead_5',
+  ];
+
+  // 구간별 배경음
+  static const _bgmMap = {
+    ThreatLevel.aheadFar: 'bgm_peaceful.mp3',
+    ThreatLevel.aheadMid: 'bgm_calm_wind.mp3',
+    ThreatLevel.aheadClose: 'bgm_tension_low.mp3',
+    ThreatLevel.safe: 'bgm_dark_ambient.mp3',
+    ThreatLevel.warningFar: 'bgm_chase_far.mp3',
+    ThreatLevel.warningClose: 'bgm_chase_mid.mp3',
+    ThreatLevel.dangerFar: 'bgm_chase_close.mp3',
+    ThreatLevel.dangerClose: 'bgm_chase_critical.mp3',
+  };
+
+  // 구간별 배경음 볼륨
+  static const _bgmVolume = {
+    ThreatLevel.aheadFar: 0.3,
+    ThreatLevel.aheadMid: 0.35,
+    ThreatLevel.aheadClose: 0.4,
+    ThreatLevel.safe: 0.45,
+    ThreatLevel.warningFar: 0.5,
+    ThreatLevel.warningClose: 0.6,
+    ThreatLevel.dangerFar: 0.7,
+    ThreatLevel.dangerClose: 0.8,
+  };
+
+  // 주기적 TTS 간격 (초) — 위험할수록 더 자주
+  static const _periodicInterval = {
+    ThreatLevel.aheadFar: 45,
+    ThreatLevel.aheadMid: 40,
+    ThreatLevel.aheadClose: 35,
+    ThreatLevel.safe: 35,
+    ThreatLevel.warningFar: 30,
+    ThreatLevel.warningClose: 25,
+    ThreatLevel.dangerFar: 20,
+    ThreatLevel.dangerClose: 15,
+  };
+
   Future<void> updateThreat(double distanceM) async {
     ThreatLevel newLevel;
     if (distanceM < 0) {
-      newLevel = ThreatLevel.critical; // 음수 = 도플갱어가 앞서감
+      newLevel = ThreatLevel.critical;
+    } else if (distanceM < 20) {
+      newLevel = ThreatLevel.dangerClose; // 0~20m: 코앞
     } else if (distanceM < 50) {
-      newLevel = ThreatLevel.danger; // 0~50m: 도플갱어 바로 뒤
+      newLevel = ThreatLevel.dangerFar; // 20~50m: 바로 뒤
+    } else if (distanceM < 100) {
+      newLevel = ThreatLevel.warningClose; // 50~100m: 추격 근접
     } else if (distanceM < 150) {
-      newLevel = ThreatLevel.warning; // 50~150m: 도플갱어 추격 중
+      newLevel = ThreatLevel.warningFar; // 100~150m: 추격 중
     } else if (distanceM < 200) {
-      newLevel = ThreatLevel.safe; // 150~200m: 안전권 진입
+      newLevel = ThreatLevel.safe; // 150~200m: 안전권
     } else if (distanceM < 250) {
-      newLevel = ThreatLevel.aheadClose; // 200~250m: 막 앞서나가기 시작
+      newLevel = ThreatLevel.aheadClose; // 200~250m: 막 벗어남
     } else if (distanceM < 400) {
-      newLevel = ThreatLevel.aheadMid; // 250~400m: 여유 있는 리드
+      newLevel = ThreatLevel.aheadMid; // 250~400m: 여유 리드
     } else {
       newLevel = ThreatLevel.aheadFar; // 400m+: 압도적 리드
     }
 
-    // 전환 감지: 앞서 있다가 다시 추격당하기 시작 (히스테리시스 10m 버퍼)
+    // 리드 잃을 때 감지
     final isNowAhead = _wasAhead ? distanceM >= 190 : distanceM >= 210;
     if (_wasAhead && !isNowAhead && _ttsEnabled) {
       SfxService().glassBreak();
-      await _playTts('tts_losing_lead');
+      final variant = _losingLeadVariants[_rng.nextInt(_losingLeadVariants.length)];
+      await _playTts(variant);
     }
     _wasAhead = isNowAhead;
 
     if (newLevel != _currentLevel) {
       _currentLevel = newLevel;
+      _lastPeriodicTts = DateTime.now();
       await _onLevelChanged(newLevel);
+    } else {
+      // 같은 레벨에 머물면 주기적 TTS
+      await _playPeriodicTts(newLevel);
     }
 
     if (_vibrationEnabled && _hasVibrator && _horrorLevel >= 2) {
@@ -72,69 +137,57 @@ class HorrorService {
     }
   }
 
+  Future<void> _playPeriodicTts(ThreatLevel level) async {
+    if (!_ttsEnabled || level == ThreatLevel.critical) return;
+    final interval = _periodicInterval[level] ?? 40;
+    final now = DateTime.now();
+    if (_lastPeriodicTts != null && now.difference(_lastPeriodicTts!).inSeconds < interval) return;
+    _lastPeriodicTts = now;
+    final variants = _ttsVariants[level];
+    if (variants == null || variants.isEmpty) return;
+    await _playTts(variants[_rng.nextInt(variants.length)]);
+  }
+
   Future<void> _onLevelChanged(ThreatLevel level) async {
+    // 배경음 변경
+    final bgm = _bgmMap[level];
+    if (bgm != null) {
+      final vol = _bgmVolume[level] ?? 0.5;
+      await _playBgm(bgm, volume: vol);
+    } else {
+      await _stopBgm();
+    }
+
+    // SFX
     switch (level) {
-      case ThreatLevel.safe:
-        await _stopBgm();
-        if (_ttsEnabled && _horrorLevel >= 2) {
-          await _playTts('tts_safe');
-        }
-        break;
-
-      case ThreatLevel.warning:
+      case ThreatLevel.warningFar:
         SfxService().alertLow();
-        if (_horrorLevel >= 2) {
-          await _playBgm('heartbeat.mp3');
-        }
-        if (_ttsEnabled) {
-          // 레벨 5: 2차 대사 사용
-          await _playTts(_horrorLevel >= 5 ? 'tts_warning2' : 'tts_warning');
-        }
-        break;
-
-      case ThreatLevel.danger:
+      case ThreatLevel.warningClose:
+        SfxService().alertLow();
+      case ThreatLevel.dangerFar:
         SfxService().alertHigh();
-        if (_horrorLevel >= 3) {
-          await _playBgm('breathing.mp3', volume: _horrorLevel >= 5 ? 0.9 : 0.6);
-        }
-        if (_ttsEnabled) {
-          await _playTts(_horrorLevel >= 5 ? 'tts_danger2' : 'tts_danger');
-        }
-        break;
-
+      case ThreatLevel.dangerClose:
+        SfxService().alertHigh();
       case ThreatLevel.critical:
-        await _stopBgm();
         if (_horrorLevel >= 4) {
           await _playSfx(_horrorLevel >= 5 ? 'jumpscare2.mp3' : 'jumpscare.mp3');
         }
-        if (_ttsEnabled) {
-          await _playTts('tts_critical');
-        }
-        break;
-
       case ThreatLevel.aheadClose:
         SfxService().chainBreak();
-        await _stopBgm();
-        if (_ttsEnabled) {
-          await _playTts('tts_ahead_close');
-        }
-        break;
-
       case ThreatLevel.aheadMid:
         SfxService().whoosh();
-        await _stopBgm();
-        if (_ttsEnabled) {
-          await _playTts('tts_ahead_mid');
-        }
-        break;
-
       case ThreatLevel.aheadFar:
         SfxService().fanfare();
-        await _stopBgm();
-        if (_ttsEnabled) {
-          await _playTts('tts_ahead_far');
-        }
+      case ThreatLevel.safe:
         break;
+    }
+
+    // TTS (랜덤 변형)
+    if (_ttsEnabled) {
+      final variants = _ttsVariants[level];
+      if (variants != null && variants.isNotEmpty) {
+        await _playTts(variants[_rng.nextInt(variants.length)]);
+      }
     }
   }
 
@@ -183,32 +236,17 @@ class HorrorService {
     if (_isDisposed || _isTtsPlaying) return;
     _isTtsPlaying = true;
     try {
-      // 언어 분기: 영어 버전이 있는 대사
-      String langBase = baseName;
-      if (!S.isKo) {
-        const hasEnglish = {
-          'tts_safe', 'tts_warning', 'tts_danger', 'tts_critical',
-          'tts_ahead_close', 'tts_ahead_mid', 'tts_ahead_far',
-          'tts_losing_lead', 'tts_defeated',
-          'tts_start', 'tts_survived', 'tts_warning2', 'tts_danger2',
-        };
-        if (hasEnglish.contains(baseName)) {
-          langBase = '${baseName}_en';
-        }
-      }
-
       // 음성 분기: harry는 기본 파일명, callum/drill은 접미사
       String filename;
       if (_voiceId == 'harry') {
-        filename = '$langBase.mp3';
+        filename = '$baseName.mp3';
       } else {
-        filename = '${langBase}_$_voiceId.mp3';
+        filename = '${baseName}_$_voiceId.mp3';
       }
 
       await _ttsPlayer.setAsset('assets/audio/$filename');
       _ttsPlayer.setVolume(1.0);
-      // ignore: unawaited_futures
-      _ttsPlayer.play().catchError((_) {}); // 비동기 에러 안전 처리
+      _ttsPlayer.play().catchError((_) {});
       await _ttsPlayer.playerStateStream
           .firstWhere((s) => s.processingState == ProcessingState.completed)
           .timeout(const Duration(seconds: 10), onTimeout: () => _ttsPlayer.playerState);
@@ -230,24 +268,23 @@ class HorrorService {
     switch (level) {
       case ThreatLevel.safe:
         break;
-      case ThreatLevel.warning:
-        if (_horrorLevel >= 3) {
-          Vibration.vibrate(duration: 100);
-        }
-        break;
-      case ThreatLevel.danger:
+      case ThreatLevel.warningFar:
+        if (_horrorLevel >= 3) Vibration.vibrate(duration: 100);
+      case ThreatLevel.warningClose:
+        Vibration.vibrate(duration: 200, amplitude: 150);
+      case ThreatLevel.dangerFar:
         Vibration.vibrate(duration: 300, amplitude: 200);
-        break;
+      case ThreatLevel.dangerClose:
+        Vibration.vibrate(duration: 400, amplitude: 255);
       case ThreatLevel.critical:
         Vibration.vibrate(
           pattern: [0, 500, 100, 500, 100, 500],
           intensities: [0, 255, 0, 255, 0, 255],
         );
-        break;
       case ThreatLevel.aheadClose:
       case ThreatLevel.aheadMid:
       case ThreatLevel.aheadFar:
-        break; // 앞서가는 중엔 진동 없음
+        break;
     }
   }
 
@@ -255,18 +292,20 @@ class HorrorService {
     switch (_currentLevel) {
       case ThreatLevel.safe:
         return 0.0;
-      case ThreatLevel.warning:
-        if (_horrorLevel >= 5) return 0.5;
-        return _horrorLevel >= 2 ? 0.4 : 0.0;
-      case ThreatLevel.danger:
-        if (_horrorLevel >= 5) return 0.9;
-        return _horrorLevel >= 3 ? 0.7 : 0.3;
+      case ThreatLevel.warningFar:
+        return _horrorLevel >= 2 ? 0.3 : 0.0;
+      case ThreatLevel.warningClose:
+        return _horrorLevel >= 2 ? 0.5 : 0.2;
+      case ThreatLevel.dangerFar:
+        return _horrorLevel >= 3 ? 0.7 : 0.4;
+      case ThreatLevel.dangerClose:
+        return _horrorLevel >= 3 ? 0.9 : 0.6;
       case ThreatLevel.critical:
         return 1.0;
       case ThreatLevel.aheadClose:
       case ThreatLevel.aheadMid:
       case ThreatLevel.aheadFar:
-        return 0.0; // 앞서가는 중엔 비네트 없음
+        return 0.0;
     }
   }
 

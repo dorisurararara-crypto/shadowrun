@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 import 'dart:math';
 import 'dart:ui';
 import 'package:flutter/material.dart';
@@ -6,6 +7,7 @@ import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_naver_map/flutter_naver_map.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:shadowrun/core/theme/app_theme.dart';
 import 'package:shadowrun/core/services/running_service.dart';
 import 'package:shadowrun/core/database/database_helper.dart';
@@ -17,6 +19,7 @@ import 'package:shadowrun/core/services/solo_tts_service.dart';
 import 'package:shadowrun/core/l10n/app_strings.dart';
 import 'package:shadowrun/shared/models/run_model.dart';
 import 'package:shadowrun/core/services/sfx_service.dart';
+import 'package:shadowrun/shared/widgets/stick_figure_marker.dart';
 
 class RunningScreen extends StatefulWidget {
   final int? shadowRunId;
@@ -102,36 +105,63 @@ class _RunningScreenState extends State<RunningScreen>
   }
 
   Future<void> _createMarkerIcons() async {
-    _runnerArrowIcon = await NOverlayImage.fromWidget(
-      widget: Container(
-        width: 32,
-        height: 32,
-        decoration: BoxDecoration(
-          color: SRColors.runner,
-          shape: BoxShape.circle,
-          boxShadow: [BoxShadow(color: SRColors.runner.withValues(alpha: 0.6), blurRadius: 8)],
+    // Load profile face image if exists
+    File? faceFile;
+    try {
+      final dir = await getApplicationDocumentsDirectory();
+      final file = File('${dir.path}/profile_face.png');
+      if (await file.exists()) {
+        faceFile = file;
+      }
+    } catch (_) {}
+
+    if (faceFile != null) {
+      if (!mounted) return;
+      _runnerArrowIcon = await NOverlayImage.fromWidget(
+        widget: StickFigureMarker(faceImage: faceFile, size: 48),
+        size: const Size(48, 48),
+        context: context,
+      );
+      if (!mounted) return;
+      _shadowArrowIcon = await NOverlayImage.fromWidget(
+        widget: StickFigureMarker(faceImage: faceFile, isDoppelganger: true, size: 44),
+        size: const Size(44, 44),
+        context: context,
+      );
+      if (!mounted) return;
+    } else {
+      if (!mounted) return;
+      _runnerArrowIcon = await NOverlayImage.fromWidget(
+        widget: Container(
+          width: 32,
+          height: 32,
+          decoration: BoxDecoration(
+            color: SRColors.runner,
+            shape: BoxShape.circle,
+            boxShadow: [BoxShadow(color: SRColors.runner.withValues(alpha: 0.6), blurRadius: 8)],
+          ),
+          child: const Icon(Icons.navigation_rounded, color: Colors.white, size: 18),
         ),
-        child: const Icon(Icons.navigation_rounded, color: Colors.white, size: 18),
-      ),
-      size: const Size(32, 32),
-      context: context,
-    );
-    if (!mounted) return;
-    _shadowArrowIcon = await NOverlayImage.fromWidget(
-      widget: Container(
-        width: 28,
-        height: 28,
-        decoration: BoxDecoration(
-          color: SRColors.shadow,
-          shape: BoxShape.circle,
-          boxShadow: [BoxShadow(color: SRColors.shadow.withValues(alpha: 0.6), blurRadius: 8)],
+        size: const Size(32, 32),
+        context: context,
+      );
+      if (!mounted) return;
+      _shadowArrowIcon = await NOverlayImage.fromWidget(
+        widget: Container(
+          width: 28,
+          height: 28,
+          decoration: BoxDecoration(
+            color: SRColors.shadow,
+            shape: BoxShape.circle,
+            boxShadow: [BoxShadow(color: SRColors.shadow.withValues(alpha: 0.6), blurRadius: 8)],
+          ),
+          child: const Icon(Icons.person_rounded, color: Colors.white, size: 16),
         ),
-        child: const Icon(Icons.person_rounded, color: Colors.white, size: 16),
-      ),
-      size: const Size(28, 28),
-      context: context,
-    );
-    if (!mounted) return;
+        size: const Size(28, 28),
+        context: context,
+      );
+      if (!mounted) return;
+    }
     _kmSplitIcon = await NOverlayImage.fromWidget(
       widget: Container(
         width: 22,
@@ -1226,12 +1256,18 @@ class _RunningScreenState extends State<RunningScreen>
       case ThreatLevel.safe:
         progress = 0.15;
         levelLabel = '15%';
-      case ThreatLevel.warning:
-        progress = 0.45;
-        levelLabel = '45%';
-      case ThreatLevel.danger:
-        progress = 0.70;
-        levelLabel = '70%';
+      case ThreatLevel.warningFar:
+        progress = 0.35;
+        levelLabel = '35%';
+      case ThreatLevel.warningClose:
+        progress = 0.55;
+        levelLabel = '55%';
+      case ThreatLevel.dangerFar:
+        progress = 0.75;
+        levelLabel = '75%';
+      case ThreatLevel.dangerClose:
+        progress = 0.90;
+        levelLabel = '90%';
       case ThreatLevel.critical:
         progress = 1.0;
         levelLabel = '100%';

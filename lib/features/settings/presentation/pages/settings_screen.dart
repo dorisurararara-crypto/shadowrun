@@ -1,8 +1,11 @@
 import 'dart:async';
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:just_audio/just_audio.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:shadowrun/core/theme/app_theme.dart';
 import 'package:shadowrun/core/database/database_helper.dart';
@@ -38,12 +41,16 @@ class _SettingsScreenState extends State<SettingsScreen> {
   List<Map<String, dynamic>> _shoes = [];
   Map<String, dynamic>? _activeGoal;
 
+  // Profile face
+  bool _hasProfileFace = false;
+
   @override
   void initState() {
     super.initState();
     _loadSettings();
     _loadShoes();
     _loadGoal();
+    _loadProfileFace();
   }
 
   @override
@@ -80,6 +87,39 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
   Future<void> _save(String key, String value) async {
     await DatabaseHelper.setSetting(key, value);
+  }
+
+  Future<void> _loadProfileFace() async {
+    try {
+      final dir = await getApplicationDocumentsDirectory();
+      final file = File('${dir.path}/profile_face.png');
+      final exists = await file.exists();
+      if (mounted) setState(() => _hasProfileFace = exists);
+    } catch (_) {}
+  }
+
+  Future<void> _captureProfileFace() async {
+    final picker = ImagePicker();
+    final photo = await picker.pickImage(
+      source: ImageSource.camera,
+      preferredCameraDevice: CameraDevice.front,
+      maxWidth: 300,
+      maxHeight: 300,
+      imageQuality: 85,
+    );
+    if (photo == null) return;
+
+    final dir = await getApplicationDocumentsDirectory();
+    final savedFile = File('${dir.path}/profile_face.png');
+    await File(photo.path).copy(savedFile.path);
+    await DatabaseHelper.setSetting('has_profile_face', 'true');
+
+    if (mounted) {
+      setState(() => _hasProfileFace = true);
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('프로필 사진이 저장되었습니다')),
+      );
+    }
   }
 
   Future<void> _loadShoes() async {
@@ -126,6 +166,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
               padding: const EdgeInsets.fromLTRB(24, 24, 24, 80),
               children: [
                 _buildLanguageSettings(),
+                const SizedBox(height: 24),
+                _buildProfileSettings(),
                 const SizedBox(height: 24),
                 _buildRunningSettings(),
                 const SizedBox(height: 24),
@@ -183,6 +225,144 @@ class _SettingsScreenState extends State<SettingsScreen> {
               await prefs.setString('language', value);
               await S.init(value);
             },
+          ),
+        ),
+      ],
+    );
+  }
+
+  // --- Profile Settings ---
+  Widget _buildProfileSettings() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _sectionHeader(S.isKo ? '프로필' : 'PROFILE'),
+        Container(
+          padding: const EdgeInsets.all(20),
+          decoration: BoxDecoration(
+            color: SRColors.card,
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: Colors.white.withValues(alpha: 0.05)),
+          ),
+          child: Row(
+            children: [
+              if (_hasProfileFace)
+                FutureBuilder<Directory>(
+                  future: getApplicationDocumentsDirectory(),
+                  builder: (context, snapshot) {
+                    if (!snapshot.hasData) {
+                      return Container(
+                        width: 44,
+                        height: 44,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: SRColors.background,
+                        ),
+                      );
+                    }
+                    final file = File('${snapshot.data!.path}/profile_face.png');
+                    return Container(
+                      width: 44,
+                      height: 44,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        border: Border.all(
+                          color: SRColors.primaryContainer.withValues(alpha: 0.6),
+                          width: 2,
+                        ),
+                        image: DecorationImage(
+                          image: FileImage(file),
+                          fit: BoxFit.cover,
+                        ),
+                      ),
+                    );
+                  },
+                )
+              else
+                Container(
+                  width: 44,
+                  height: 44,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: SRColors.background,
+                    border: Border.all(
+                      color: SRColors.onSurface.withValues(alpha: 0.1),
+                      width: 2,
+                    ),
+                  ),
+                  child: Icon(
+                    Icons.person_outline,
+                    size: 22,
+                    color: SRColors.onSurface.withValues(alpha: 0.3),
+                  ),
+                ),
+              const SizedBox(width: 16),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      S.isKo ? '프로필 사진 설정' : 'Set Profile Photo',
+                      style: GoogleFonts.inter(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w600,
+                        color: SRColors.onSurface,
+                      ),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      S.isKo
+                          ? _hasProfileFace
+                              ? '지도 마커에 내 얼굴 졸라맨이 표시됩니다'
+                              : '셀카를 찍으면 지도 마커가 졸라맨으로 바뀝니다'
+                          : _hasProfileFace
+                              ? 'Your face stick figure appears on the map'
+                              : 'Take a selfie to customize your map marker',
+                      style: GoogleFonts.inter(
+                        fontSize: 12,
+                        color: SRColors.onSurface.withValues(alpha: 0.4),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(width: 12),
+              GestureDetector(
+                onTap: _captureProfileFace,
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                  decoration: BoxDecoration(
+                    color: SRColors.primaryContainer.withValues(alpha: 0.15),
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(
+                      color: SRColors.primaryContainer.withValues(alpha: 0.4),
+                    ),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(
+                        _hasProfileFace ? Icons.camera_alt : Icons.camera_alt_outlined,
+                        size: 14,
+                        color: SRColors.primaryContainer,
+                      ),
+                      const SizedBox(width: 5),
+                      Text(
+                        _hasProfileFace
+                            ? (S.isKo ? '변경' : 'Change')
+                            : (S.isKo ? '촬영' : 'Shoot'),
+                        style: GoogleFonts.inter(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w700,
+                          color: SRColors.primaryContainer,
+                          letterSpacing: 0.5,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
           ),
         ),
       ],
