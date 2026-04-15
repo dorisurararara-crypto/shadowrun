@@ -42,6 +42,7 @@ class _RunningScreenState extends State<RunningScreen>
   bool _stadiumFinaleEnabled = false;
   late bool _isSameLocation;
   NaverMapController? _mapController;
+  NLatLng? _initialPosition; // GPS 기반 초기 카메라 위치
 
   Timer? _ticker;
   bool _paused = false;
@@ -158,6 +159,15 @@ class _RunningScreenState extends State<RunningScreen>
     try {
       // 화면 꺼짐 방지
       WakelockPlus.enable();
+
+      // 현재 GPS 위치로 초기 카메라 설정 (서울 기본값 방지)
+      try {
+        final pos = await Geolocator.getCurrentPosition(
+          locationSettings: const LocationSettings(accuracy: LocationAccuracy.high),
+        ).timeout(const Duration(seconds: 5));
+        _initialPosition = NLatLng(pos.latitude, pos.longitude);
+        if (mounted) setState(() {});
+      } catch (_) {}
 
       final voice = await DatabaseHelper.getSetting('voice') ?? 'harry';
       final speedStr = await DatabaseHelper.getSetting('shadow_speed') ?? '1.0';
@@ -932,12 +942,13 @@ class _RunningScreenState extends State<RunningScreen>
   }
 
   Widget _buildNaverMap({required void Function(NaverMapController) onReady}) {
+    final initialTarget = _initialPosition ?? const NLatLng(37.5665, 126.978);
     return NaverMap(
-      options: const NaverMapViewOptions(
+      options: NaverMapViewOptions(
         mapType: NMapType.navi,
         nightModeEnable: true,
         initialCameraPosition: NCameraPosition(
-          target: NLatLng(37.5665, 126.978),
+          target: initialTarget,
           zoom: 16,
         ),
         scrollGesturesEnable: true,
