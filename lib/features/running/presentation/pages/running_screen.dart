@@ -50,6 +50,8 @@ class _RunningScreenState extends State<RunningScreen>
   Timer? _ticker;
   bool _paused = false;
   bool _stopping = false;
+  bool _ttsOn = true;
+  bool _sfxOn = true;
   String _runMode = 'fullmap';
   late AnimationController _vignetteAnim;
   late AnimationController _shadowPingAnim;
@@ -182,6 +184,14 @@ class _RunningScreenState extends State<RunningScreen>
         vibrationEnabled: vibEnabled,
       );
 
+      // 오디오 토글 초기값 (설정에서 읽어옴)
+      if (mounted) {
+        setState(() {
+          _ttsOn = ttsEnabled;
+          _sfxOn = true;
+        });
+      }
+
       // 모드별 서비스 초기화
       if (widget.runMode == 'marathon') {
         _marathonService = MarathonService();
@@ -242,8 +252,9 @@ class _RunningScreenState extends State<RunningScreen>
           setState(() {});
           _updateMap();
           // 시간 기반 마라토너 TTS (GPS 콜백과 별도로 Timer에서도 호출)
-          if (widget.runMode == 'marathon' && _marathonService != null) {
+          if (widget.runMode == 'marathon' && _marathonService != null && _ttsOn) {
             _marathonService!.playTimeTts(_runService.durationS);
+            _marathonService!.playEncourageTts(_runService.durationS);
             _marathonService!.playRandomTts(_runService.durationS);
           }
         }
@@ -343,7 +354,10 @@ class _RunningScreenState extends State<RunningScreen>
     // 시간 기반 격려 (5분, 10분, ...)
     await _marathonService!.playTimeTts(elapsed);
 
-    // 랜덤 명언/조언 (3~5분 간격)
+    // 시간대별 격려 (1.5~2.5분 간격)
+    await _marathonService!.playEncourageTts(elapsed);
+
+    // 랜덤 명언/조언/팁 (2~4분 간격)
     await _marathonService!.playRandomTts(elapsed);
     } finally {
       _isUpdatingMarathon = false;
@@ -757,6 +771,12 @@ class _RunningScreenState extends State<RunningScreen>
             child: _buildSpeedWarningBanner(),
           ),
         Positioned(left: 0, right: 0, bottom: 0, child: _buildBottomArea()),
+        // 오디오 토글 버튼 (왼쪽 하단, 컨트롤 버튼 위)
+        Positioned(
+          left: 16,
+          bottom: MediaQuery.of(context).padding.bottom + 110,
+          child: _buildAudioControls(),
+        ),
       ],
     );
   }
@@ -822,7 +842,15 @@ class _RunningScreenState extends State<RunningScreen>
                         ),
                       ),
                     const Spacer(),
-                    _buildControlButtons(),
+                    Row(
+                      children: [
+                        _buildAudioControls(),
+                        const Spacer(),
+                        _buildControlButtons(),
+                        const Spacer(),
+                        const SizedBox(width: 36 + 8),
+                      ],
+                    ),
                   ],
                 ),
               ),
@@ -901,7 +929,15 @@ class _RunningScreenState extends State<RunningScreen>
                 }),
                   ),
                   const SizedBox(height: 16),
-                  _buildControlButtons(),
+                  Row(
+                    children: [
+                      _buildAudioControls(),
+                      const Spacer(),
+                      _buildControlButtons(),
+                      const Spacer(),
+                      const SizedBox(width: 36 + 8),
+                    ],
+                  ),
                 ],
               ),
             ),
@@ -1286,6 +1322,66 @@ class _RunningScreenState extends State<RunningScreen>
                   colors: [SRColors.secondaryContainer, SRColors.primaryContainer],
                 ),
               ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildAudioControls() {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        // TTS 토글
+        GestureDetector(
+          onTap: () {
+            setState(() => _ttsOn = !_ttsOn);
+            _horrorService.ttsEnabled = _ttsOn;
+          },
+          child: Container(
+            width: 36,
+            height: 36,
+            decoration: BoxDecoration(
+              color: _ttsOn
+                  ? SRColors.surfaceContainerHighest
+                  : SRColors.surfaceContainerHighest.withValues(alpha: 0.5),
+              shape: BoxShape.circle,
+              border: Border.all(color: SRColors.divider),
+            ),
+            child: Icon(
+              _ttsOn ? Icons.mic : Icons.mic_off,
+              color: _ttsOn ? SRColors.textPrimary : SRColors.textMuted,
+              size: 16,
+            ),
+          ),
+        ),
+        const SizedBox(height: 8),
+        // SFX/BGM 토글
+        GestureDetector(
+          onTap: () {
+            setState(() => _sfxOn = !_sfxOn);
+            SfxService().enabled = _sfxOn;
+            if (_sfxOn) {
+              _horrorService.unmuteBgm();
+            } else {
+              _horrorService.muteBgm();
+            }
+          },
+          child: Container(
+            width: 36,
+            height: 36,
+            decoration: BoxDecoration(
+              color: _sfxOn
+                  ? SRColors.surfaceContainerHighest
+                  : SRColors.surfaceContainerHighest.withValues(alpha: 0.5),
+              shape: BoxShape.circle,
+              border: Border.all(color: SRColors.divider),
+            ),
+            child: Icon(
+              _sfxOn ? Icons.volume_up : Icons.volume_off,
+              color: _sfxOn ? SRColors.textPrimary : SRColors.textMuted,
+              size: 16,
             ),
           ),
         ),

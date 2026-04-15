@@ -25,6 +25,16 @@ class HorrorService {
 
   ThreatLevel get currentLevel => _currentLevel;
 
+  set ttsEnabled(bool value) => _ttsEnabled = value;
+
+  Future<void> muteBgm() async {
+    try { await _bgmPlayer.pause(); } catch (_) {}
+  }
+
+  Future<void> unmuteBgm() async {
+    try { await _bgmPlayer.play(); } catch (_) {}
+  }
+
   Future<void> initialize({
     int horrorLevel = 3,
     bool ttsEnabled = true,
