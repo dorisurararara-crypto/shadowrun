@@ -213,15 +213,23 @@ class MarathonService {
     }
   }
 
+  // 영어 버전이 있는 기존 대사 목록
+  static const _hasEnglishSimple = {
+    'tts_time_5min', 'tts_time_10min', 'tts_time_15min', 'tts_time_20min',
+    'tts_time_30min', 'tts_time_40min', 'tts_time_50min', 'tts_time_60min',
+    'tts_quote', 'tts_tip',
+    'tts_pace_fast', 'tts_pace_slow', 'tts_pace_good', 'tts_pace_veryslow',
+  };
+
   Future<bool> _playTtsSimple(String baseName, int number) async {
     if (_isDisposed || _isPlaying) return false;
     _isPlaying = true;
     try {
       String name;
-      if (S.isKo) {
-        name = '${baseName}_$number';
-      } else {
+      if (!S.isKo && _hasEnglishSimple.contains(baseName)) {
         name = '${baseName}_en_$number';
+      } else {
+        name = '${baseName}_$number';
       }
 
       String filename;

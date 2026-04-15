@@ -222,12 +222,14 @@ class _RunningScreenState extends State<RunningScreen>
       if (!mounted) return;
 
       // 모드별 시작 TTS
-      if (widget.runMode == 'doppelganger') {
-        await _horrorService.playStartTts();
-      } else if (widget.runMode == 'marathon') {
-        await _marathonService?.playStartTts();
-      } else {
-        await _soloTtsService?.playStartTts();
+      if (_ttsOn) {
+        if (widget.runMode == 'doppelganger') {
+          await _horrorService.playStartTts();
+        } else if (widget.runMode == 'marathon') {
+          await _marathonService?.playStartTts();
+        } else {
+          await _soloTtsService?.playStartTts();
+        }
       }
 
       if (!mounted) return;
@@ -612,7 +614,7 @@ class _RunningScreenState extends State<RunningScreen>
       SfxService().doorClose();
 
       // 스타디움 피날레 (종료 직전 관중 함성) — 2초만 재생 후 TTS로 넘어감
-      if (_stadiumFinaleEnabled && !_jumpscareTriggered) {
+      if (_stadiumFinaleEnabled && !_jumpscareTriggered && _sfxOn) {
         try {
           await _stadiumPlayer.setAsset('assets/audio/stadium_finale.mp3');
           _stadiumPlayer.setVolume(0.8);

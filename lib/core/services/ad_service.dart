@@ -6,8 +6,8 @@ class AdService {
   factory AdService() => _instance;
   AdService._();
 
-  // 디버그 빌드면 테스트 ID, 릴리즈 빌드면 실제 ID 자동 전환
-  static const bool _useTestAds = kDebugMode;
+  // 릴리즈 빌드에서만 실제 광고 ID 사용 (디버그/프로필은 테스트 ID)
+  static final bool _useTestAds = !kReleaseMode;
 
   static const _realBannerId = 'ca-app-pub-8170207135799034/9789728281';
   static const _realRewardedId = 'ca-app-pub-8170207135799034/7163564942';
