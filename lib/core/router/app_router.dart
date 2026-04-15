@@ -36,9 +36,9 @@ GoRouter createRouter(bool languageSelected) => GoRouter(
       path: '/running',
       builder: (context, state) {
         final args = state.extra;
-        if (args is int?) {
+        if (args == null || args is int) {
           // Legacy: just shadowRunId
-          return RunningScreen(shadowRunId: args);
+          return RunningScreen(shadowRunId: args as int?);
         }
         final map = args as Map<String, dynamic>? ?? {};
         return RunningScreen(
@@ -51,11 +51,16 @@ GoRouter createRouter(bool languageSelected) => GoRouter(
     ),
     GoRoute(
       path: '/result',
+      redirect: (context, state) {
+        final args = state.extra as Map<String, dynamic>? ?? {};
+        final runId = args['runId'] as int? ?? 0;
+        if (runId == 0) return '/';
+        return null;
+      },
       builder: (context, state) {
         final args = state.extra as Map<String, dynamic>? ?? {};
         final runId = args['runId'] as int? ?? 0;
         final result = args['result'] as String?;
-        if (runId == 0) return const HomeScreen();
         return ResultScreen(
           runId: runId,
           result: result,

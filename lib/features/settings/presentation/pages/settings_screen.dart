@@ -673,7 +673,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
           ],
         ),
       ),
-    );
+    ).then((_) {
+      nameController.dispose();
+      brandController.dispose();
+    });
   }
 
   // --- Goal Settings ---
@@ -996,7 +999,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
           ],
         ),
       ),
-    );
+    ).then((_) {
+      targetController.dispose();
+    });
   }
 
   Widget _dialogRadioOption<T>({
@@ -1676,16 +1681,15 @@ class _SettingsScreenState extends State<SettingsScreen> {
           child: OutlinedButton(
             onPressed: () async {
               final started = await PurchaseService().startTrial();
-              if (started && mounted) {
-                SfxService().levelup();
-                setState(() => _isPro = true);
-                ScaffoldMessenger.of(context).showSnackBar(
+              if (!started || !context.mounted) return;
+              SfxService().levelup();
+              setState(() => _isPro = true);
+              ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
                     content: Text(S.freeTrialBanner),
                     backgroundColor: SRColors.safe,
                   ),
                 );
-              }
             },
             style: OutlinedButton.styleFrom(
               side: const BorderSide(color: Color(0xFFFF0044), width: 1.5),

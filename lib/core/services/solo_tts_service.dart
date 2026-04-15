@@ -6,6 +6,7 @@ import 'package:shadowrun/core/l10n/app_strings.dart';
 class SoloTtsService {
   final AudioPlayer _ttsPlayer = AudioPlayer();
   bool _isDisposed = false;
+  bool _isPlaying = false;
   String _voiceId = 'harry';
   final _rng = Random();
 
@@ -25,6 +26,8 @@ class SoloTtsService {
 
   Future<void> _playTts(String baseName) async {
     if (_isDisposed) return;
+    if (_isPlaying) return;
+    _isPlaying = true;
     try {
       // 언어 분기: 영어는 variant 번호 앞에 _en 삽입
       // 예) tts_start_solo_1 → tts_start_solo_en_1
@@ -51,6 +54,8 @@ class SoloTtsService {
           .timeout(const Duration(seconds: 10), onTimeout: () => _ttsPlayer.playerState);
     } catch (e) {
       debugPrint('Solo TTS error: $e');
+    } finally {
+      _isPlaying = false;
     }
   }
 

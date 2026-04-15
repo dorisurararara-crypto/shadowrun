@@ -84,7 +84,7 @@ class _ResultScreenState extends State<ResultScreen>
         if (mounted) setState(() => _bannerReady = true);
       },
     );
-    _bannerAd!.load();
+    _bannerAd?.load();
   }
 
   Future<void> _loadData() async {
@@ -225,7 +225,7 @@ class _ResultScreenState extends State<ResultScreen>
       statusColor = SRColors.textPrimary;
     }
 
-    return AnimatedBuilder(
+    return _ShadowAnimatedBuilder(
       listenable:
           Listenable.merge([_resultAnim, _isWin ? _glowAnim : _pulseAnim]),
       builder: (context, _) {
@@ -534,7 +534,7 @@ class _ResultScreenState extends State<ResultScreen>
 
     if (!_isChallenge) {
       return S.isKo
-          ? '새로운 영역이 기록되었습니다. ${durationMin}분간 ${run.formattedDistance}를 달렸습니다. 도플갱어가 당신의 데이터를 확보했습니다.'
+          ? '새로운 영역이 기록되었습니다. $durationMin분간 ${run.formattedDistance}를 달렸습니다. 도플갱어가 당신의 데이터를 확보했습니다.'
           : 'New territory mapped. ${run.formattedDistance} covered in $durationMin minutes. The shadow now has your data.';
     }
 
@@ -620,7 +620,7 @@ class _ResultScreenState extends State<ResultScreen>
       final km = overtakeKm.toStringAsFixed(1);
       final min = paceDropMin.toStringAsFixed(1);
       return S.isKo
-          ? '도플갱어가 ${km}km 지점에서 추월했습니다. ${min}분 시점에서 속도가 떨어졌습니다. 내일 더 강해져서 돌아오세요.'
+          ? '도플갱어가 ${km}km 지점에서 추월했습니다. $min분 시점에서 속도가 떨어졌습니다. 내일 더 강해져서 돌아오세요.'
           : 'The entity overtook you at the $km km mark. Your pace dropped at $min minutes. Train harder for tomorrow.';
     }
   }
@@ -827,11 +827,10 @@ SHADOW RUN - $resultText
   }
 }
 
-class AnimatedBuilder extends AnimatedWidget {
+class _ShadowAnimatedBuilder extends AnimatedWidget {
   final Widget Function(BuildContext context, Widget? child) builder;
 
-  const AnimatedBuilder({
-    super.key,
+  const _ShadowAnimatedBuilder({
     required super.listenable,
     required this.builder,
   });

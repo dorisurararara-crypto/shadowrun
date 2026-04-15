@@ -481,7 +481,8 @@ class _HomeScreenState extends State<HomeScreen> {
                         if (mounted) setState(() => _challengeCountFuture = DatabaseHelper.getDailyChallengeCount());
                       },
                     );
-                    if (!success && mounted) {
+                    if (!success) {
+                      if (!context.mounted) return;
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(content: Text(S.adLoading), backgroundColor: SRColors.surface),
                       );

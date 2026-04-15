@@ -1,13 +1,24 @@
+import 'dart:async';
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 import 'package:shadowrun/shared/models/run_model.dart';
 
 class DatabaseHelper {
   static Database? _db;
+  static Completer<Database>? _dbCompleter;
 
   static Future<Database> get database async {
     if (_db != null) return _db!;
-    _db = await _initDb();
+    if (_dbCompleter != null) return _dbCompleter!.future;
+    _dbCompleter = Completer<Database>();
+    try {
+      _db = await _initDb();
+      _dbCompleter!.complete(_db!);
+    } catch (e) {
+      _dbCompleter!.completeError(e);
+      _dbCompleter = null;
+      rethrow;
+    }
     return _db!;
   }
 
@@ -139,8 +150,10 @@ class DatabaseHelper {
 
   static Future<void> deleteRun(int id) async {
     final db = await database;
-    await db.delete('run_points', where: 'run_id = ?', whereArgs: [id]);
-    await db.delete('runs', where: 'id = ?', whereArgs: [id]);
+    await db.transaction((txn) async {
+      await txn.delete('run_points', where: 'run_id = ?', whereArgs: [id]);
+      await txn.delete('runs', where: 'id = ?', whereArgs: [id]);
+    });
   }
 
   /// 러닝 + 포인트 + 챌린지 카운트를 트랜잭션으로 저장

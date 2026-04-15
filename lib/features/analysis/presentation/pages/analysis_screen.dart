@@ -110,7 +110,7 @@ class _AnalysisScreenState extends State<AnalysisScreen> {
     final daysInMonth = DateTime(year, month + 1, 0).day;
     final firstWeekday = DateTime(year, month, 1).weekday; // 1=Mon, 7=Sun
     final monthLabel = S.isKo
-        ? '$year년 ${month}월'
+        ? '$year년 $month월'
         : '${_monthNames[month - 1]} $year';
 
     return Container(
@@ -325,7 +325,7 @@ class _AnalysisScreenState extends State<AnalysisScreen> {
                 leftTitles: AxisTitles(sideTitles: SideTitles(
                   showTitles: true, reservedSize: 32,
                   getTitlesWidget: (value, meta) => Text(
-                    '${value.toStringAsFixed(1)}',
+                    value.toStringAsFixed(1),
                     style: GoogleFonts.inter(fontSize: 9, color: SRColors.onSurface.withValues(alpha: 0.3)),
                   ),
                 )),
@@ -393,7 +393,7 @@ class _AnalysisScreenState extends State<AnalysisScreen> {
                   isCurved: true,
                   color: SRColors.primaryContainer,
                   barWidth: 3,
-                  dotData: FlDotData(show: true, getDotPainter: (spot, _, __, ___) =>
+                  dotData: FlDotData(show: true, getDotPainter: (spot, _, _, _) =>
                     FlDotCirclePainter(radius: 4, color: SRColors.primaryContainer,
                       strokeWidth: 2, strokeColor: SRColors.background)),
                   belowBarData: BarAreaData(

@@ -217,6 +217,7 @@ class _PrepareScreenState extends State<PrepareScreen>
         _runCountdownTick();
       } else {
         SfxService().go();
+        if (!mounted) return;
         if (_isChallenge) {
           context.go('/running', extra: {
             'shadowRunId': widget.shadowRunId,
@@ -537,7 +538,7 @@ class _PrepareScreenState extends State<PrepareScreen>
   }
 
   Widget _buildGpsIndicator() {
-    return AnimatedBuilder(
+    return _ShadowAnimatedBuilder(
       listenable: _pulseAnim,
       builder: (context, child) {
         final opacity = _gpsReady ? 1.0 : 0.4 + _pulseAnim.value * 0.6;
@@ -848,7 +849,7 @@ class _PrepareScreenState extends State<PrepareScreen>
           child: ListView.separated(
             scrollDirection: Axis.horizontal,
             itemCount: _shoes.length,
-            separatorBuilder: (_, __) => const SizedBox(width: 8),
+            separatorBuilder: (_, _) => const SizedBox(width: 8),
             itemBuilder: (context, index) {
               final shoe = _shoes[index];
               final shoeId = shoe['id'] as int;
@@ -914,7 +915,7 @@ class _PrepareScreenState extends State<PrepareScreen>
   }
 
   Widget _buildCountdownOverlay() {
-    return AnimatedBuilder(
+    return _ShadowAnimatedBuilder(
       listenable: _countdownScale,
       builder: (context, child) {
         final label = _countdownValue > 0 ? '$_countdownValue' : 'GO';
@@ -951,11 +952,10 @@ class _PrepareScreenState extends State<PrepareScreen>
   }
 }
 
-class AnimatedBuilder extends AnimatedWidget {
+class _ShadowAnimatedBuilder extends AnimatedWidget {
   final Widget Function(BuildContext context, Widget? child) builder;
 
-  const AnimatedBuilder({
-    super.key,
+  const _ShadowAnimatedBuilder({
     required super.listenable,
     required this.builder,
   });

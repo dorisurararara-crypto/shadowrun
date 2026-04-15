@@ -18,12 +18,18 @@ class _HistoryScreenState extends State<HistoryScreen>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
   late Future<List<RunModel>> _runsFuture;
+  int _previousTabIndex = 0;
 
   @override
   void initState() {
     super.initState();
     _tabController = TabController(length: 2, vsync: this);
-    _tabController.addListener(() { SfxService().toggle(); });
+    _tabController.addListener(() {
+      if (_tabController.index != _previousTabIndex) {
+        _previousTabIndex = _tabController.index;
+        SfxService().toggle();
+      }
+    });
     _runsFuture = DatabaseHelper.getAllRuns();
   }
 

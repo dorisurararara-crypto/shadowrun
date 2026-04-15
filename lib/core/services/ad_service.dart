@@ -20,6 +20,7 @@ class AdService {
 
   RewardedAd? _rewardedAd;
   bool _isRewardedAdReady = false;
+  int _retryCount = 0;
 
   bool get isRewardedAdReady => _isRewardedAdReady;
 
@@ -30,6 +31,7 @@ class AdService {
 
   /// 보상형 광고 미리 로드
   void loadRewardedAd() {
+    if (_retryCount >= 3) return;
     RewardedAd.load(
       adUnitId: _rewardedId,
       request: const AdRequest(),
@@ -37,10 +39,12 @@ class AdService {
         onAdLoaded: (ad) {
           _rewardedAd = ad;
           _isRewardedAdReady = true;
+          _retryCount = 0;
           debugPrint('보상형 광고 로드 완료');
         },
         onAdFailedToLoad: (error) {
           _isRewardedAdReady = false;
+          _retryCount++;
           debugPrint('보상형 광고 로드 실패: ${error.message}');
           // 5초 후 재시도
           Future.delayed(const Duration(seconds: 5), loadRewardedAd);
@@ -53,6 +57,11 @@ class AdService {
   Future<bool> showRewardedAd({required VoidCallback onRewarded}) async {
     if (!_isRewardedAdReady || _rewardedAd == null) {
       debugPrint('보상형 광고가 준비되지 않았습니다');
+      // 재시도 한도 도달 후 사용자가 광고 시청 시도 시 리셋
+      if (_retryCount >= 3) {
+        _retryCount = 0;
+        loadRewardedAd();
+      }
       return false;
     }
 
@@ -60,11 +69,13 @@ class AdService {
       onAdDismissedFullScreenContent: (ad) {
         ad.dispose();
         _isRewardedAdReady = false;
+        _retryCount = 0;
         loadRewardedAd(); // 다음 광고 미리 로드
       },
       onAdFailedToShowFullScreenContent: (ad, error) {
         ad.dispose();
         _isRewardedAdReady = false;
+        _retryCount = 0;
         loadRewardedAd();
       },
     );

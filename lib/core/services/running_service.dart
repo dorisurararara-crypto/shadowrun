@@ -3,8 +3,6 @@ import 'dart:math';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_tts/flutter_tts.dart';
 import 'package:geolocator/geolocator.dart';
-import 'package:geolocator_android/geolocator_android.dart';
-import 'package:geolocator_apple/geolocator_apple.dart';
 import 'package:shadowrun/shared/models/run_model.dart';
 import 'package:shadowrun/core/database/database_helper.dart';
 import 'package:shadowrun/core/services/geocoding_service.dart';
@@ -51,7 +49,8 @@ class RunningService extends ChangeNotifier {
     if (_startTime == null) return 0;
     final total = DateTime.now().difference(_startTime!);
     final activePause = _pauseStart != null ? DateTime.now().difference(_pauseStart!) : Duration.zero;
-    return (total - _pausedDuration - activePause).inSeconds;
+    final result = (total - _pausedDuration - activePause).inSeconds;
+    return result < 0 ? 0 : result;
   }
 
   double get avgPace {
@@ -306,6 +305,7 @@ class RunningService extends ChangeNotifier {
   /// 러닝 종료 및 저장
   Future<RunModel?> stopRun() async {
     _isRunning = false;
+    _tts.stop();
     await _positionSub?.cancel();
     _positionSub = null;
 
@@ -368,7 +368,7 @@ class RunningService extends ChangeNotifier {
     final paceStr = "$paceMin'${paceSec.toString().padLeft(2, '0')}\"";
 
     final text = S.isKo
-        ? '${km}킬로미터. 페이스 $paceStr'
+        ? '$km킬로미터. 페이스 $paceStr'
         : '$km kilometer. Pace $paceStr';
 
     await _tts.awaitSpeakCompletion(true);

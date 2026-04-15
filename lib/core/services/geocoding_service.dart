@@ -3,13 +3,13 @@ import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 
 class GeocodingService {
-  static const _clientId = 'eilr4xtzsr';
-  static const _clientSecret = 'SzYSIGKNkNM0t6XKhhyG5huDAQvVlzqh7zMUcvxl';
+  static const _clientId = String.fromEnvironment('NAVER_CLIENT_ID');
+  static const _clientSecret = String.fromEnvironment('NAVER_CLIENT_SECRET');
 
   /// 좌표 → 지역명 (예: "서울시 마포구")
   static Future<String?> reverseGeocode(double lat, double lng) async {
-    if (_clientSecret.isEmpty) {
-      debugPrint('GeocodingService: Client Secret 미설정');
+    if (_clientId.isEmpty || _clientSecret.isEmpty) {
+      debugPrint('GeocodingService: API 키 미설정');
       return null;
     }
 

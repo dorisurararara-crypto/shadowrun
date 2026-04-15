@@ -10,9 +10,11 @@ class SfxService {
   final List<AudioPlayer> _pool = List.generate(3, (_) => AudioPlayer());
   int _poolIndex = 0;
   bool enabled = true;
+  bool _disposed = false;
 
   Future<void> play(String filename) async {
     if (!enabled) return;
+    if (_disposed) return;
     try {
       final player = _pool[_poolIndex];
       _poolIndex = (_poolIndex + 1) % _pool.length;
@@ -74,6 +76,7 @@ class SfxService {
   Future<void> levelup() => play('sfx_levelup.mp3');
 
   void dispose() {
+    _disposed = true;
     for (final p in _pool) {
       p.dispose();
     }

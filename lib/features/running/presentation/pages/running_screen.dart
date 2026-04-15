@@ -58,6 +58,9 @@ class _RunningScreenState extends State<RunningScreen>
   // 차량 감지 자동 일시정지
   int _vehicleDetectCount = 0;
   int _lastAddedKmMarker = 0; // 이미 추가된 km 마커 추적
+  bool _isUpdatingHorror = false; // GPS 콜백 TTS 중첩 방지
+  bool _isUpdatingMarathon = false;
+  int _lastPathPointCount = 0; // 경로 재생성 최적화
 
   // 화살표 마커 아이콘
   NOverlayImage? _runnerArrowIcon;
@@ -112,6 +115,7 @@ class _RunningScreenState extends State<RunningScreen>
       size: const Size(32, 32),
       context: context,
     );
+    if (!mounted) return;
     _shadowArrowIcon = await NOverlayImage.fromWidget(
       widget: Container(
         width: 28,
@@ -126,6 +130,7 @@ class _RunningScreenState extends State<RunningScreen>
       size: const Size(28, 28),
       context: context,
     );
+    if (!mounted) return;
     _kmSplitIcon = await NOverlayImage.fromWidget(
       widget: Container(
         width: 22,
@@ -139,6 +144,7 @@ class _RunningScreenState extends State<RunningScreen>
       size: const Size(22, 22),
       context: context,
     );
+    if (!mounted) return;
   }
 
   Future<void> _loadRunMode() async {
@@ -261,12 +267,14 @@ class _RunningScreenState extends State<RunningScreen>
         _vehiclePaused = true;
         _runService.pauseRun();
         SfxService().vehicleWarn();
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(S.vehiclePaused),
-            backgroundColor: SRColors.primaryContainer,
-          ),
-        );
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(S.vehiclePaused),
+              backgroundColor: SRColors.primaryContainer,
+            ),
+          );
+        }
       }
     } else {
       _vehicleDetectCount = 0;
@@ -280,23 +288,29 @@ class _RunningScreenState extends State<RunningScreen>
   }
 
   Future<void> _updateHorror() async {
-    if (widget.shadowRunId == null) return;
-    final dist = _runService.shadowDistanceM;
-    if (!dist.isInfinite) {
-      await _horrorService.updateThreat(dist);
-      // 점프스케어 트리거 (시작 5초 후부터)
-      if (_horrorService.currentLevel == ThreatLevel.critical &&
-          !_jumpscareTriggered &&
-          _runService.durationS > 5) {
-        _triggerJumpscare();
+    if (widget.shadowRunId == null || _isUpdatingHorror) return;
+    _isUpdatingHorror = true;
+    try {
+      final dist = _runService.shadowDistanceM;
+      if (!dist.isInfinite) {
+        await _horrorService.updateThreat(dist);
+        if (_horrorService.currentLevel == ThreatLevel.critical &&
+            !_jumpscareTriggered &&
+            _runService.durationS > 5) {
+          _triggerJumpscare();
+        }
       }
+    } finally {
+      _isUpdatingHorror = false;
     }
   }
 
   double? _previousKmPace; // 이전 km 페이스 추적
 
   Future<void> _updateMarathon() async {
-    if (_marathonService == null) return;
+    if (_marathonService == null || _isUpdatingMarathon) return;
+    _isUpdatingMarathon = true;
+    try {
     final elapsed = _runService.durationS;
 
     // km 마일스톤 TTS
@@ -324,6 +338,9 @@ class _RunningScreenState extends State<RunningScreen>
 
     // 랜덤 명언/조언 (3~5분 간격)
     await _marathonService!.playRandomTts(elapsed);
+    } finally {
+      _isUpdatingMarathon = false;
+    }
   }
 
   void _triggerJumpscare() {
@@ -359,22 +376,24 @@ class _RunningScreenState extends State<RunningScreen>
     controller.addOverlay(overlay);
   }
 
-  void _clearDynamicOverlays(NaverMapController controller) {
-    _safeDeleteOverlay(controller, NOverlayType.marker, 'runner');
-    _safeDeleteOverlay(controller, NOverlayType.marker, 'shadow');
-    _safeDeleteOverlay(controller, NOverlayType.circleOverlay, 'runner_glow');
-    _safeDeleteOverlay(controller, NOverlayType.circleOverlay, 'shadow_glow');
-    _safeDeleteOverlay(controller, NOverlayType.pathOverlay, 'runner_path');
-    _safeDeleteOverlay(controller, NOverlayType.pathOverlay, 'shadow_path');
-  }
-
   void _updateMapOverlays(NaverMapController controller, NLatLng target) {
     controller.updateCamera(
       NCameraUpdate.scrollAndZoomTo(target: target),
     );
 
-    // 기존 오버레이 삭제 후 재생성 (addOverlay는 기존 것을 업데이트하지 않음)
-    _clearDynamicOverlays(controller);
+    final currentPointCount = _runService.points.length;
+    final pathChanged = currentPointCount != _lastPathPointCount;
+
+    // 마커/글로우는 매번 업데이트 (위치 변경), 경로는 새 포인트가 추가됐을 때만
+    _safeDeleteOverlay(controller, NOverlayType.marker, 'runner');
+    _safeDeleteOverlay(controller, NOverlayType.marker, 'shadow');
+    _safeDeleteOverlay(controller, NOverlayType.circleOverlay, 'runner_glow');
+    _safeDeleteOverlay(controller, NOverlayType.circleOverlay, 'shadow_glow');
+    if (pathChanged) {
+      _safeDeleteOverlay(controller, NOverlayType.pathOverlay, 'runner_path');
+      _safeDeleteOverlay(controller, NOverlayType.pathOverlay, 'shadow_path');
+      _lastPathPointCount = currentPointCount;
+    }
 
     // Runner glow circle
     _safeAddOverlay(controller, NCircleOverlay(
@@ -400,18 +419,20 @@ class _RunningScreenState extends State<RunningScreen>
     }
     _safeAddOverlay(controller, runnerMarker);
 
-    // Runner path polyline
-    final runnerCoords = _runService.points
-        .map((p) => NLatLng(p.latitude, p.longitude))
-        .toList();
-    if (runnerCoords.length >= 2) {
-      _safeAddOverlay(controller, NPathOverlay(
-        id: 'runner_path',
-        coords: runnerCoords,
-        color: SRColors.runner.withValues(alpha: 0.8),
-        outlineColor: SRColors.runner.withValues(alpha: 0.3),
-        width: 8,
-      ));
+    // Runner path polyline (새 포인트 추가 시에만 재생성)
+    if (pathChanged) {
+      final runnerCoords = _runService.points
+          .map((p) => NLatLng(p.latitude, p.longitude))
+          .toList();
+      if (runnerCoords.length >= 2) {
+        _safeAddOverlay(controller, NPathOverlay(
+          id: 'runner_path',
+          coords: runnerCoords,
+          color: SRColors.runner.withValues(alpha: 0.8),
+          outlineColor: SRColors.runner.withValues(alpha: 0.3),
+          width: 8,
+        ));
+      }
     }
 
     // km 스플릿 마커
@@ -444,22 +465,24 @@ class _RunningScreenState extends State<RunningScreen>
       _safeAddOverlay(controller, shadowMarker);
     }
 
-    // Shadow path polyline (같은 장소일 때만)
-    final shadowPoints = _runService.shadowPoints;
-    final shadowIdx = _runService.currentShadowIndex;
-    if (_isSameLocation && shadowPoints != null && shadowIdx >= 1) {
-      final shadowCoords = shadowPoints
-          .take(shadowIdx + 1)
-          .map((p) => NLatLng(p.latitude, p.longitude))
-          .toList();
-      if (shadowCoords.length >= 2) {
-        _safeAddOverlay(controller, NPathOverlay(
-          id: 'shadow_path',
-          coords: shadowCoords,
-          color: SRColors.shadow.withValues(alpha: 0.5),
+    // Shadow path polyline (같은 장소일 때, 새 포인트 추가 시에만)
+    if (pathChanged) {
+      final shadowPoints = _runService.shadowPoints;
+      final shadowIdx = _runService.currentShadowIndex;
+      if (_isSameLocation && shadowPoints != null && shadowIdx >= 1) {
+        final shadowCoords = shadowPoints
+            .take(shadowIdx + 1)
+            .map((p) => NLatLng(p.latitude, p.longitude))
+            .toList();
+        if (shadowCoords.length >= 2) {
+          _safeAddOverlay(controller, NPathOverlay(
+            id: 'shadow_path',
+            coords: shadowCoords,
+            color: SRColors.shadow.withValues(alpha: 0.5),
           outlineColor: SRColors.shadow.withValues(alpha: 0.2),
           width: 6,
         ));
+      }
       }
     }
   }
@@ -654,7 +677,7 @@ class _RunningScreenState extends State<RunningScreen>
     // 점프스케어 화면 떨림
     if (_jumpscareTriggered) {
       final shakeContent = content;
-      content = AnimatedBuilder(
+      content = _ShadowAnimatedBuilder(
         listenable: _jumpscareShakeAnim,
         builder: (context, _) {
           final dx = sin(_jumpscareShakeAnim.value * pi * 20) * 12;
@@ -674,7 +697,7 @@ class _RunningScreenState extends State<RunningScreen>
           content,
           // 점프스케어 빨간 플래시
           if (_jumpscareTriggered)
-            AnimatedBuilder(
+            _ShadowAnimatedBuilder(
               listenable: _jumpscareFlashAnim,
               builder: (context, _) => IgnorePointer(
                 child: Container(
@@ -928,7 +951,7 @@ class _RunningScreenState extends State<RunningScreen>
 
   Widget _buildVignetteOverlay() {
     final intensity = _horrorService.vignetteIntensity;
-    return AnimatedBuilder(
+    return _ShadowAnimatedBuilder(
       listenable: _vignetteAnim,
       builder: (context, _) {
         final pulse = 0.7 + _vignetteAnim.value * 0.3;
@@ -1036,7 +1059,7 @@ class _RunningScreenState extends State<RunningScreen>
             mainAxisSize: MainAxisSize.min,
             children: [
               // Shadow ping indicator
-              AnimatedBuilder(
+              _ShadowAnimatedBuilder(
                 listenable: _shadowPingAnim,
                 builder: (context, _) {
                   return Container(
@@ -1309,11 +1332,10 @@ class _RunningScreenState extends State<RunningScreen>
 
 }
 
-class AnimatedBuilder extends AnimatedWidget {
+class _ShadowAnimatedBuilder extends AnimatedWidget {
   final Widget Function(BuildContext context, Widget? child) builder;
 
-  const AnimatedBuilder({
-    super.key,
+  const _ShadowAnimatedBuilder({
     required super.listenable,
     required this.builder,
   });

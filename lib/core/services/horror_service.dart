@@ -95,9 +95,7 @@ class HorrorService {
       case ThreatLevel.danger:
         SfxService().alertHigh();
         if (_horrorLevel >= 3) {
-          await _playBgm('breathing.mp3');
-          // 레벨 5: BGM 볼륨 증가
-          _bgmPlayer.setVolume(_horrorLevel >= 5 ? 0.9 : 0.6);
+          await _playBgm('breathing.mp3', volume: _horrorLevel >= 5 ? 0.9 : 0.6);
         }
         if (_ttsEnabled) {
           await _playTts(_horrorLevel >= 5 ? 'tts_danger2' : 'tts_danger');
@@ -158,12 +156,12 @@ class HorrorService {
     }
   }
 
-  Future<void> _playBgm(String filename) async {
+  Future<void> _playBgm(String filename, {double volume = 0.6}) async {
     if (_isDisposed) return;
     try {
       await _bgmPlayer.setAsset('assets/audio/$filename');
       _bgmPlayer.setLoopMode(LoopMode.one);
-      _bgmPlayer.setVolume(0.6);
+      _bgmPlayer.setVolume(volume);
       _bgmPlayer.play().catchError((_) {});
     } catch (e) {
       debugPrint('BGM 재생 에러: $e');
@@ -214,6 +212,7 @@ class HorrorService {
       await _ttsPlayer.playerStateStream
           .firstWhere((s) => s.processingState == ProcessingState.completed)
           .timeout(const Duration(seconds: 10), onTimeout: () => _ttsPlayer.playerState);
+      if (_isDisposed) return;
     } catch (e) {
       debugPrint('TTS 재생 에러: $e');
     } finally {
