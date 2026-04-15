@@ -48,22 +48,23 @@ class HorrorService {
     _hasVibrator = (await Vibration.hasVibrator()) == true;
   }
 
-  // 구간별 TTS 변형 (5개씩)
+  // 구간별 TTS 변형 (10개씩)
   static const _ttsVariants = {
-    ThreatLevel.aheadFar: ['tts_ahead_far_1', 'tts_ahead_far_2', 'tts_ahead_far_3', 'tts_ahead_far_4', 'tts_ahead_far_5'],
-    ThreatLevel.aheadMid: ['tts_ahead_mid_1', 'tts_ahead_mid_2', 'tts_ahead_mid_3', 'tts_ahead_mid_4', 'tts_ahead_mid_5'],
-    ThreatLevel.aheadClose: ['tts_ahead_close_1', 'tts_ahead_close_2', 'tts_ahead_close_3', 'tts_ahead_close_4', 'tts_ahead_close_5'],
-    ThreatLevel.safe: ['tts_safe_1', 'tts_safe_2', 'tts_safe_3', 'tts_safe_4', 'tts_safe_5'],
-    ThreatLevel.warningFar: ['tts_warning_1', 'tts_warning_2', 'tts_warning_3', 'tts_warning_4', 'tts_warning_5'],
-    ThreatLevel.warningClose: ['tts_warning_close_1', 'tts_warning_close_2', 'tts_warning_close_3', 'tts_warning_close_4', 'tts_warning_close_5'],
-    ThreatLevel.dangerFar: ['tts_danger_1', 'tts_danger_2', 'tts_danger_3', 'tts_danger_4', 'tts_danger_5'],
-    ThreatLevel.dangerClose: ['tts_critical_1', 'tts_critical_2', 'tts_critical_3', 'tts_critical_4', 'tts_critical_5'],
-    ThreatLevel.critical: ['tts_critical_1', 'tts_critical_2', 'tts_critical_3', 'tts_critical_4', 'tts_critical_5'],
+    ThreatLevel.aheadFar: ['tts_ahead_far_1', 'tts_ahead_far_2', 'tts_ahead_far_3', 'tts_ahead_far_4', 'tts_ahead_far_5', 'tts_ahead_far_6', 'tts_ahead_far_7', 'tts_ahead_far_8', 'tts_ahead_far_9', 'tts_ahead_far_10'],
+    ThreatLevel.aheadMid: ['tts_ahead_mid_1', 'tts_ahead_mid_2', 'tts_ahead_mid_3', 'tts_ahead_mid_4', 'tts_ahead_mid_5', 'tts_ahead_mid_6', 'tts_ahead_mid_7', 'tts_ahead_mid_8', 'tts_ahead_mid_9', 'tts_ahead_mid_10'],
+    ThreatLevel.aheadClose: ['tts_ahead_close_1', 'tts_ahead_close_2', 'tts_ahead_close_3', 'tts_ahead_close_4', 'tts_ahead_close_5', 'tts_ahead_close_6', 'tts_ahead_close_7', 'tts_ahead_close_8', 'tts_ahead_close_9', 'tts_ahead_close_10'],
+    ThreatLevel.safe: ['tts_safe_1', 'tts_safe_2', 'tts_safe_3', 'tts_safe_4', 'tts_safe_5', 'tts_safe_6', 'tts_safe_7', 'tts_safe_8', 'tts_safe_9', 'tts_safe_10'],
+    ThreatLevel.warningFar: ['tts_warning_1', 'tts_warning_2', 'tts_warning_3', 'tts_warning_4', 'tts_warning_5', 'tts_warning_6', 'tts_warning_7', 'tts_warning_8', 'tts_warning_9', 'tts_warning_10'],
+    ThreatLevel.warningClose: ['tts_warning_close_1', 'tts_warning_close_2', 'tts_warning_close_3', 'tts_warning_close_4', 'tts_warning_close_5', 'tts_warning_close_6', 'tts_warning_close_7', 'tts_warning_close_8', 'tts_warning_close_9', 'tts_warning_close_10'],
+    ThreatLevel.dangerFar: ['tts_danger_1', 'tts_danger_2', 'tts_danger_3', 'tts_danger_4', 'tts_danger_5', 'tts_danger_6', 'tts_danger_7', 'tts_danger_8', 'tts_danger_9', 'tts_danger_10'],
+    ThreatLevel.dangerClose: ['tts_critical_1', 'tts_critical_2', 'tts_critical_3', 'tts_critical_4', 'tts_critical_5', 'tts_critical_6', 'tts_critical_7', 'tts_critical_8', 'tts_critical_9', 'tts_critical_10'],
+    ThreatLevel.critical: ['tts_critical_1', 'tts_critical_2', 'tts_critical_3', 'tts_critical_4', 'tts_critical_5', 'tts_critical_6', 'tts_critical_7', 'tts_critical_8', 'tts_critical_9', 'tts_critical_10'],
   };
 
   // 리드 잃을 때 변형
   static const _losingLeadVariants = [
     'tts_losing_lead_1', 'tts_losing_lead_2', 'tts_losing_lead_3', 'tts_losing_lead_4', 'tts_losing_lead_5',
+    'tts_losing_lead_6', 'tts_losing_lead_7', 'tts_losing_lead_8', 'tts_losing_lead_9', 'tts_losing_lead_10',
   ];
 
   // 구간별 배경음

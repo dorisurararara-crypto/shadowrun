@@ -23,7 +23,7 @@ class CoachingService {
   static String _pick(List<String> list) => list[_rng.nextInt(list.length)];
 
   /// 러닝 결과 분석 → 코칭 피드백 리스트 생성
-  static Future<List<CoachingAnalysis>> analyze(RunModel currentRun) async {
+  static Future<List<CoachingAnalysis>> analyze(RunModel currentRun, {List<RunPoint>? points}) async {
     final results = <CoachingAnalysis>[];
     final allRuns = await DatabaseHelper.getAllRuns();
     final prevRuns = allRuns.where((r) => r.id != currentRun.id).toList();
@@ -99,7 +99,17 @@ class CoachingService {
       results.add(_analyzeCalories(currentRun));
     }
 
-    // 12. 랜덤 팁 (매번 다른 것)
+    // 12. 시간대 분석
+    final r12 = _analyzeTimeOfDay(currentRun);
+    if (r12 != null) results.add(r12);
+
+    // 13. 스플릿 분석 (어느 구간에서 느려졌는지)
+    if (points != null && points.length >= 10 && currentRun.distanceM >= 1000) {
+      final r13 = _analyzeSplits(points);
+      if (r13 != null) results.add(r13);
+    }
+
+    // 14. 랜덤 팁 (매번 다른 것)
     results.add(_getRandomTip());
 
     return results;
@@ -638,4 +648,112 @@ class CoachingService {
     'Load up on carbs the day before a long run. Glycogen loading boosts endurance.',
     'Foam rolling your quads and calves after running reduces next-day soreness.',
   ];
+
+  // ========== 12. 시간대 분석 ==========
+  static CoachingAnalysis? _analyzeTimeOfDay(RunModel current) {
+    final date = DateTime.tryParse(current.date);
+    if (date == null) return null;
+    final hour = date.hour;
+
+    if (hour >= 5 && hour < 8) {
+      return CoachingAnalysis(
+        title: S.isKo ? '새벽 러너!' : 'Early Bird!',
+        body: _pick(S.isKo ? [
+          '새벽에 뛰었네요! 아침 러닝은 하루 종일 에너지를 높여줍니다. 대기 오염도 적고 도로도 한산합니다.',
+          '이른 아침 러닝. 하루를 러닝으로 시작하는 사람은 전체의 상위 3%입니다.',
+        ] : [
+          'Early morning run! Morning running boosts energy all day with less pollution and traffic.',
+          'Starting the day with a run. Only the top 3% do this consistently.',
+        ]),
+        emoji: '🌅',
+        category: 'timeofday',
+      );
+    } else if (hour >= 21 || hour < 5) {
+      return CoachingAnalysis(
+        title: S.isKo ? '야간 러닝!' : 'Night Runner!',
+        body: _pick(S.isKo ? [
+          '밤에 뛰었네요! 야간 러닝은 스트레스 해소에 효과적이지만, 밝은 옷과 반사 장비를 꼭 착용하세요.',
+          '야간 러닝. 주변이 어두우니 밝은 색 옷이나 헤드랜턴을 추천합니다. 안전이 최우선!',
+        ] : [
+          'Night run! Great for stress relief, but wear bright clothes and reflective gear.',
+          'Running after dark. Wear bright colors or a headlamp. Safety first!',
+        ]),
+        emoji: '🌙',
+        category: 'timeofday',
+      );
+    }
+    return null;
+  }
+
+  // ========== 13. 스플릿 분석 ==========
+  static CoachingAnalysis? _analyzeSplits(List<RunPoint> points) {
+    // km별 소요 시간 계산
+    final splits = <int, int>{}; // km -> seconds
+    double dist = 0;
+    int nextKm = 1;
+    int lastMs = points.first.timestampMs;
+
+    for (int i = 1; i < points.length; i++) {
+      final p0 = points[i - 1];
+      final p1 = points[i];
+      dist += _quickDistance(p0.latitude, p0.longitude, p1.latitude, p1.longitude);
+
+      if (dist >= nextKm * 1000) {
+        final splitMs = p1.timestampMs - lastMs;
+        splits[nextKm] = splitMs ~/ 1000;
+        lastMs = p1.timestampMs;
+        nextKm++;
+      }
+    }
+
+    if (splits.length < 2) return null;
+
+    // 가장 빠른/느린 km 찾기
+    int fastestKm = 1, slowestKm = 1;
+    int fastestTime = splits.values.first, slowestTime = splits.values.first;
+    for (final e in splits.entries) {
+      if (e.value < fastestTime) { fastestTime = e.value; fastestKm = e.key; }
+      if (e.value > slowestTime) { slowestTime = e.value; slowestKm = e.key; }
+    }
+
+    final diff = slowestTime - fastestTime;
+    if (diff < 30) {
+      return CoachingAnalysis(
+        title: S.isKo ? '균일한 스플릿!' : 'Even Splits!',
+        body: S.isKo
+            ? '모든 km을 비슷한 속도로 달렸습니다. 균일한 스플릿은 프로 러너의 특징입니다. 대단해요!'
+            : 'You ran each km at a similar pace. Even splits are a mark of pro runners. Impressive!',
+        emoji: '📊',
+        category: 'split',
+      );
+    }
+
+    final fastMin = fastestTime ~/ 60;
+    final fastSec = fastestTime % 60;
+    final slowMin = slowestTime ~/ 60;
+    final slowSec = slowestTime % 60;
+
+    return CoachingAnalysis(
+      title: S.isKo ? '스플릿 분석' : 'Split Analysis',
+      body: _pick(S.isKo ? [
+        '가장 빠른 구간: ${fastestKm}km ($fastMin\'${fastSec.toString().padLeft(2, '0')}"), 가장 느린 구간: ${slowestKm}km ($slowMin\'${slowSec.toString().padLeft(2, '0')}"). $diff초 차이. ${slowestKm > fastestKm ? '후반에 페이스가 떨어졌습니다. 초반에 너무 빨리 나간 건 아닌지 확인해보세요.' : '초반이 느리고 후반에 올렸네요. 네거티브 스플릿은 좋은 전략입니다!'}',
+        '${slowestKm}km 구간에서 가장 느렸습니다 ($slowMin\'${slowSec.toString().padLeft(2, '0')}"). 이 구간에서 무엇이 달랐는지 기억해보세요. 오르막? 바람? 컨디션?',
+        '${fastestKm}km에서 가장 빨랐고, ${slowestKm}km에서 가장 느렸습니다. 차이는 $diff초. 이 차이를 30초 이내로 줄이는 것이 다음 목표입니다.',
+      ] : [
+        'Fastest: km $fastestKm ($fastMin\'${fastSec.toString().padLeft(2, '0')}"), Slowest: km $slowestKm ($slowMin\'${slowSec.toString().padLeft(2, '0')}"). $diff s gap. ${slowestKm > fastestKm ? 'Pace dropped in the second half. Did you go out too fast?' : 'Started slow, finished fast. Negative splits are a great strategy!'}',
+        'Slowest at km $slowestKm ($slowMin\'${slowSec.toString().padLeft(2, '0')}"). What was different? Uphill? Wind? Fatigue?',
+        'Fastest at km $fastestKm, slowest at km $slowestKm. ${diff}s difference. Goal: keep it under 30 seconds.',
+      ]),
+      emoji: '📈',
+      category: 'split',
+    );
+  }
+
+  static double _quickDistance(double lat1, double lng1, double lat2, double lng2) {
+    const r = 6371000.0;
+    final dLat = (lat2 - lat1) * 3.14159 / 180;
+    final dLng = (lng2 - lng1) * 3.14159 / 180;
+    final a = dLat * dLat + dLng * dLng * (lat1 * 3.14159 / 180).abs();
+    return r * a.abs().clamp(0, 1e10) * 0.5;
+  }
 }

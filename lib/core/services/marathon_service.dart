@@ -29,12 +29,15 @@ class MarathonService {
   static const int _tipCount = 8;
 
   // 새 격려 대사 변형 수
-  static const int _earlyVariants = 5;
-  static const int _midVariants = 7;
-  static const int _lateVariants = 7;
-  static const int _newTipVariants = 8;
+  static const int _earlyVariants = 8;
+  static const int _midVariants = 12;
+  static const int _lateVariants = 12;
+  static const int _newTipVariants = 12;
   static const int _newPaceFastVariants = 4;
   static const int _newPaceSlowVariants = 4;
+  // 재미 요소
+  static const int _funfactCount = 10;
+  static const int _athleteCount = 10;
 
   // 격려 간격 (초) — 1.5~2.5분
   static const int _encourageIntervalMin = 90;
@@ -143,17 +146,24 @@ class MarathonService {
     if (elapsedSeconds < _nextRandomTtsTime) return;
 
     bool success;
-    final roll = _random.nextInt(3);
+    final roll = _random.nextInt(5);
     if (roll == 0) {
       final n = _random.nextInt(_quoteCount) + 1;
       success = await _playTtsSimple('tts_quote', n);
     } else if (roll == 1) {
       final n = _random.nextInt(_tipCount) + 1;
       success = await _playTtsSimple('tts_tip', n);
-    } else {
-      // 새 팁 대사
+    } else if (roll == 2) {
       final n = _random.nextInt(_newTipVariants) + 1;
       success = await _playTtsSimple('tts_marathon_tip', n);
+    } else if (roll == 3) {
+      // 재미있는 러닝 팩트
+      final n = _random.nextInt(_funfactCount) + 1;
+      success = await _playTtsSimple('tts_funfact', n);
+    } else {
+      // 유명인 명언
+      final n = _random.nextInt(_athleteCount) + 1;
+      success = await _playTtsSimple('tts_athlete', n);
     }
 
     if (success) {
@@ -219,6 +229,9 @@ class MarathonService {
     'tts_time_30min', 'tts_time_40min', 'tts_time_50min', 'tts_time_60min',
     'tts_quote', 'tts_tip',
     'tts_pace_fast', 'tts_pace_slow', 'tts_pace_good', 'tts_pace_veryslow',
+    'tts_marathon_early', 'tts_marathon_mid', 'tts_marathon_late',
+    'tts_marathon_tip', 'tts_pace_fast_new', 'tts_pace_slow_new',
+    'tts_funfact', 'tts_athlete',
   };
 
   Future<bool> _playTtsSimple(String baseName, int number) async {

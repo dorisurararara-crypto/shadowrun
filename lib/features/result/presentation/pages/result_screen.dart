@@ -98,7 +98,7 @@ class _ResultScreenState extends State<ResultScreen>
         _shadowPoints = await DatabaseHelper.getRunPoints(_run!.shadowRunId!);
       }
       if (_run != null) {
-        _coaching = await CoachingService.analyze(_run!);
+        _coaching = await CoachingService.analyze(_run!, points: _points);
       }
     } catch (e) {
       debugPrint('결과 데이터 로드 에러: $e');
