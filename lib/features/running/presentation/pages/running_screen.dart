@@ -235,6 +235,7 @@ class _RunningScreenState extends State<RunningScreen>
       // GPS 콜백: 백그라운드에서도 동작 (Timer 대신)
       _runService.onPositionUpdate = () {
         if (!mounted) return;
+        _runService.updateShadowPosition();
         _checkVehicleSpeed();
         if (!_paused) {
           if (widget.runMode == 'doppelganger') {
@@ -249,6 +250,7 @@ class _RunningScreenState extends State<RunningScreen>
       _ticker = Timer.periodic(const Duration(seconds: 1), (_) {
         if (!mounted) return;
         if (!_paused) {
+          _runService.updateShadowPosition();
           setState(() {});
           _updateMap();
           // 시간 기반 마라토너 TTS (GPS 콜백과 별도로 Timer에서도 호출)
@@ -337,9 +339,9 @@ class _RunningScreenState extends State<RunningScreen>
       _lastMarathonKm = currentKm;
       SfxService().kmDing();
       SfxService().whistle();
-      await _marathonService!.playKmTts(currentKm);
+      if (_ttsOn) await _marathonService!.playKmTts(currentKm);
       // 페이스 피드백 (2km부터)
-      if (currentKm >= 2) {
+      if (_ttsOn && currentKm >= 2) {
         final avgHistorical = await DatabaseHelper.getAveragePace();
         await _marathonService!.playPaceTts(
           _runService.avgPace,
@@ -348,16 +350,13 @@ class _RunningScreenState extends State<RunningScreen>
         );
       }
       _previousKmPace = _runService.avgPace;
-      return; // km TTS 재생했으면 이번 업데이트에서 추가 TTS 안 함
+      return;
     }
 
-    // 시간 기반 격려 (5분, 10분, ...)
+    if (!_ttsOn) return;
+
     await _marathonService!.playTimeTts(elapsed);
-
-    // 시간대별 격려 (1.5~2.5분 간격)
     await _marathonService!.playEncourageTts(elapsed);
-
-    // 랜덤 명언/조언/팁 (2~4분 간격)
     await _marathonService!.playRandomTts(elapsed);
     } finally {
       _isUpdatingMarathon = false;
@@ -632,9 +631,9 @@ class _RunningScreenState extends State<RunningScreen>
           SfxService().defeat();
           await _horrorService.playDefeatedTts();
         }
-      } else if (widget.runMode == 'marathon') {
+      } else if (widget.runMode == 'marathon' && _ttsOn) {
         await _marathonService?.playEndTts();
-      } else if (widget.runMode == 'freerun') {
+      } else if (widget.runMode == 'freerun' && _ttsOn) {
         await _soloTtsService?.playEndTts();
       }
     } catch (e) {
@@ -665,6 +664,8 @@ class _RunningScreenState extends State<RunningScreen>
 
   @override
   void dispose() {
+    // SFX 토글 상태 리셋 (글로벌 싱글톤이라 복원 필요)
+    SfxService().enabled = true;
     WakelockPlus.disable();
     _ticker?.cancel();
     _runService.onPositionUpdate = null;
@@ -1364,8 +1365,10 @@ class _RunningScreenState extends State<RunningScreen>
             SfxService().enabled = _sfxOn;
             if (_sfxOn) {
               _horrorService.unmuteBgm();
+              _marathonService?.unmuteBgm();
             } else {
               _horrorService.muteBgm();
+              _marathonService?.muteBgm();
             }
           },
           child: Container(

@@ -217,7 +217,12 @@ class MarathonService {
     if (_isDisposed || _isPlaying) return false;
     _isPlaying = true;
     try {
-      String name = '${baseName}_$number';
+      String name;
+      if (S.isKo) {
+        name = '${baseName}_$number';
+      } else {
+        name = '${baseName}_en_$number';
+      }
 
       String filename;
       if (_voiceId == 'harry') {
