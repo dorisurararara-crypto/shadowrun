@@ -168,12 +168,23 @@ class _RunningScreenState extends State<RunningScreen>
       WakelockPlus.enable();
 
       // 현재 GPS 위치로 초기 카메라 설정 (서울 기본값 방지)
+      // 1) 캐시된 마지막 위치를 즉시 적용해 로딩 시간을 줄임
+      // 2) 고정밀 현재 위치가 잡히면 덮어씀
+      try {
+        final lastKnown = await Geolocator.getLastKnownPosition();
+        if (lastKnown != null && mounted) {
+          _initialPosition = NLatLng(lastKnown.latitude, lastKnown.longitude);
+          setState(() {});
+        }
+      } catch (_) {}
       try {
         final pos = await Geolocator.getCurrentPosition(
           locationSettings: const LocationSettings(accuracy: LocationAccuracy.high),
-        ).timeout(const Duration(seconds: 5));
-        _initialPosition = NLatLng(pos.latitude, pos.longitude);
-        if (mounted) setState(() {});
+        ).timeout(const Duration(seconds: 10));
+        if (mounted) {
+          _initialPosition = NLatLng(pos.latitude, pos.longitude);
+          setState(() {});
+        }
       } catch (_) {}
 
       final voice = await DatabaseHelper.getSetting('voice') ?? 'harry';
@@ -632,9 +643,17 @@ class _RunningScreenState extends State<RunningScreen>
       if (_paused) {
         SfxService().pause();
         _runService.pauseRun();
+        _horrorService.muteBgm();
+        _marathonService?.muteBgm();
+        _soloTtsService?.muteBgm();
       } else {
         SfxService().resume();
         _runService.resumeRun();
+        if (_sfxOn) {
+          _horrorService.unmuteBgm();
+          _marathonService?.unmuteBgm();
+          _soloTtsService?.unmuteBgm();
+        }
       }
     });
     // 워치에 일시정지/재개 상태 즉시 전송
@@ -1076,13 +1095,22 @@ class _RunningScreenState extends State<RunningScreen>
   }
 
   Widget _buildNaverMap({required void Function(NaverMapController) onReady}) {
-    final initialTarget = _initialPosition ?? const NLatLng(37.5665, 126.978);
+    // GPS 잡히기 전엔 지도를 그리지 않음 (서울 기본 좌표 노출 방지).
+    // NaverMap의 initialCameraPosition은 최초 생성 시점에만 적용되므로,
+    // _initialPosition 을 얻은 후에야 지도를 build 해야 사용자 위치에서 시작한다.
+    if (_initialPosition == null) {
+      return Container(
+        color: SRColors.background,
+        alignment: Alignment.center,
+        child: const CircularProgressIndicator(strokeWidth: 2),
+      );
+    }
     return NaverMap(
       options: NaverMapViewOptions(
         mapType: NMapType.navi,
         nightModeEnable: true,
         initialCameraPosition: NCameraPosition(
-          target: initialTarget,
+          target: _initialPosition!,
           zoom: 16,
         ),
         scrollGesturesEnable: true,
