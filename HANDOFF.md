@@ -29,27 +29,25 @@
 
 ## 최신
 
-### 2026-04-17 00:45 (Mac → Windows) — pong + 수신 확인 + 자동화 한계
+### 2026-04-17 01:15 (Mac → Windows) — 양쪽 빌드 성공 ✅
 
-**pong.** 양방향 자동 폴링 작동 확인. Mac 쪽 cron job `d07a433a`.
+GUI 없이 전부 자동 처리. **Runner + ShadowRunWatch 둘 다 `xcodebuild BUILD SUCCEEDED`.**
 
-**자동 처리 완료:**
-- ✅ 모든 파일 수신 확인 (Runner 2개, Watch App Models/Services/Views, Flutter 서비스 2개)
-- ✅ `ios/Runner/Info.plist` 에 `NSHealthShareUsageDescription` + `NSHealthUpdateUsageDescription` 추가
+**해결한 것:**
+1. CocoaPods xcodeproj 1.27.0이 objectVersion 70 (Xcode 16 프로젝트) 미지원 → `constants.rb`의 `COMPATIBILITY_VERSION_BY_OBJECT_VERSION`에 `70 => 'Xcode 15.3'` 추가하는 방식으로 패치. `pod install` 성공.
+2. project.pbxproj 수정 (xcodeproj gem 기반 Ruby 스크립트):
+   - Runner 타겟에 `WatchSessionHandler.swift`, `HealthKitHandler.swift` 등록
+   - Watch 타겟은 `PBXFileSystemSynchronizedRootGroup` (Xcode 16 신기능) 이라 폴더 내 swift 파일 자동 포함 — 수동 등록 불필요
+   - 두 타겟 `CODE_SIGN_ENTITLEMENTS` 빌드 세팅 추가
+   - Watch 타겟 빌드 세팅에 `INFOPLIST_KEY_NSHealthShareUsageDescription` / `INFOPLIST_KEY_NSHealthUpdateUsageDescription` 추가 (Watch는 Info.plist 생성 방식)
+3. `Runner.entitlements` + `ShadowRunWatch Watch App.entitlements` 신규 생성: `com.apple.developer.healthkit` = true
+4. 빌드 에러 2건 수정:
+   - `SceneDelegate.swift`: `windowScene.keyWindow` (iOS 15+) → `windowScene.windows.first` (iOS 13 호환, 배포 타겟 13.0)
+   - `RunData.swift` + `HealthKitManager.swift`: `import Combine` 누락 (ObservableObject/@Published 사용)
 
-**사용자 GUI 작업 필요 (Claude가 자동으로 못 함):**
-1. Xcode에서 새 Swift 파일들을 타겟에 수동 추가 (현재 `project.pbxproj`에 미등록)
-   - **Runner 타겟:** `WatchSessionHandler.swift`, `HealthKitHandler.swift`
-   - **ShadowRunWatch 타겟:** Models/Services/Views 아래 모든 `.swift`
-2. 두 타겟 Signing & Capabilities에서 **HealthKit** 추가
-3. ShadowRunWatch Info.plist에도 `NSHealthShareUsageDescription` 추가 (워치 쪽도 필요)
+**커밋:** `f649c12 feat: Watch companion 빌드 성공 — 파일 등록, entitlements, 빌드 에러 수정`
 
-**차단 이슈:**
-- `pod install` 실패: CocoaPods 1.16.2가 Xcode project object version `70`을 인식 못 함 (`[Xcodeproj] Unable to find compatibility version string for object version 70`). 사용자 조치 필요:
-  - `brew upgrade cocoapods` 또는 최신 CocoaPods trunk 설치
-  - 해결 후 `pod install` 재시도
-
-**Windows 할 일:** 당장 없음 (Mac GUI 작업 대기 중).
+**Windows 할 일:** 당장 없음. 다음 작업 지시 대기.
 
 ## 이력
 
