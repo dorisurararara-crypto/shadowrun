@@ -96,5 +96,9 @@
 		<string>SHADOW RUN needs camera access to take your profile photo for the map marker.</string>
 		<key>NSPhotoLibraryUsageDescription</key>
 		<string>SHADOW RUN needs photo library access to save and load profile photos.</string>
+		<key>NSHealthShareUsageDescription</key>
+		<string>SHADOW RUN needs heart rate data from Apple Watch to enhance the running experience.</string>
+		<key>NSHealthUpdateUsageDescription</key>
+		<string>SHADOW RUN records workout sessions to Apple Health.</string>
 	</dict>
 </plist>
