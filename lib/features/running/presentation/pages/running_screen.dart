@@ -51,8 +51,11 @@ class _RunningScreenState extends State<RunningScreen>
   NLatLng? _initialPosition; // GPS 기반 초기 카메라 위치
 
   Timer? _ticker;
+  Timer? _jumpscareDelayTimer;
   bool _paused = false;
   bool _stopping = false;
+  bool _startupCancelled = false;
+  bool _runStarted = false; // _runService.startRun() 성공 후 true. startup 중 워치 명령 방어용.
   bool _ttsOn = true;
   bool _sfxOn = true;
   String _runMode = 'fullmap';
@@ -68,6 +71,8 @@ class _RunningScreenState extends State<RunningScreen>
   int _vehicleDetectCount = 0;
   int _lastAddedKmMarker = 0; // 이미 추가된 km 마커 추적
   bool _isUpdatingHorror = false; // GPS 콜백 TTS 중첩 방지
+  // 마라톤 TTS 공용 lock — km 마일스톤(GPS 콜백)과 시간 기반(1s Timer)이 서로 drop하지 않도록
+  // 하나로 통일. 한 쪽이 실행 중이면 다른 쪽은 다음 tick에 재시도.
   bool _isUpdatingMarathon = false;
   int _lastPathPointCount = 0; // 경로 재생성 최적화
 
@@ -105,11 +110,18 @@ class _RunningScreenState extends State<RunningScreen>
       duration: const Duration(milliseconds: 80),
     );
 
-    _watchConnector.startListening();
+    _healthService.reset();
     _watchConnector.onWatchCommand = _handleWatchCommand;
-    _healthService.requestAuthorization().then((_) {
-      _healthService.startHeartRateStream();
-    });
+    // ignore: unawaited_futures
+    _watchConnector.startListening();
+    () async {
+      final granted = await _healthService.requestAuthorization();
+      // mounted 는 super.dispose() 전까지 true이므로 _startupCancelled 로 dispose 중 판별.
+      if (!mounted || _stopping || _startupCancelled) return;
+      if (granted) {
+        await _healthService.startHeartRateStream();
+      }
+    }();
     _startRun();
     _createMarkerIcons();
   }
@@ -162,62 +174,69 @@ class _RunningScreenState extends State<RunningScreen>
     }
   }
 
+  bool _aborted() => _startupCancelled || _stopping || !mounted;
+
+  Future<void> _fetchInitialPosition() async {
+    // 백그라운드로 초기 카메라 위치 획득. 실패해도 run 시작을 막지 않음.
+    // live GPS 첫 샘플이 _onRunUpdate에서 backfill 하므로 여기 실패는 치명적이지 않음.
+    try {
+      final pos = await Geolocator.getCurrentPosition(
+        locationSettings: const LocationSettings(accuracy: LocationAccuracy.high),
+      ).timeout(const Duration(seconds: 10));
+      if (_aborted() || _initialPosition != null) return;
+      setState(() {
+        _initialPosition = NLatLng(pos.latitude, pos.longitude);
+      });
+    } catch (_) {}
+  }
+
   Future<void> _startRun() async {
     try {
       // 화면 꺼짐 방지
       WakelockPlus.enable();
 
-      // 현재 GPS 위치로 초기 카메라 설정 (서울 기본값 방지)
-      // 1) 캐시된 마지막 위치를 즉시 적용해 로딩 시간을 줄임
-      // 2) 고정밀 현재 위치가 잡히면 덮어씀
-      try {
-        final lastKnown = await Geolocator.getLastKnownPosition();
-        if (lastKnown != null && mounted) {
-          _initialPosition = NLatLng(lastKnown.latitude, lastKnown.longitude);
-          setState(() {});
-        }
-      } catch (_) {}
-      try {
-        final pos = await Geolocator.getCurrentPosition(
-          locationSettings: const LocationSettings(accuracy: LocationAccuracy.high),
-        ).timeout(const Duration(seconds: 10));
-        if (mounted) {
-          _initialPosition = NLatLng(pos.latitude, pos.longitude);
-          setState(() {});
-        }
-      } catch (_) {}
+      // 초기 위치는 백그라운드로 획득 (기록 시작을 블로킹하지 않음).
+      // ignore: unawaited_futures
+      _fetchInitialPosition();
 
       final voice = await DatabaseHelper.getSetting('voice') ?? 'harry';
+      if (_aborted()) return;
       final speedStr = await DatabaseHelper.getSetting('shadow_speed') ?? '1.0';
+      if (_aborted()) return;
       final shadowSpeed = double.tryParse(speedStr) ?? 1.0;
       final stadiumSetting = await DatabaseHelper.getSetting('stadium_finale');
+      if (_aborted()) return;
       _stadiumFinaleEnabled = stadiumSetting != 'false';
       final horrorStr = await DatabaseHelper.getSetting('horror_level') ?? '2';
+      if (_aborted()) return;
       final horrorLevel = int.tryParse(horrorStr) ?? 2;
       final ttsEnabled = (await DatabaseHelper.getSetting('tts_enabled')) != 'false';
+      if (_aborted()) return;
       final vibEnabled = (await DatabaseHelper.getSetting('vibration_enabled')) != 'false';
+      if (_aborted()) return;
       await _horrorService.initialize(
         voice: voice,
         horrorLevel: horrorLevel,
         ttsEnabled: ttsEnabled,
         vibrationEnabled: vibEnabled,
       );
+      if (_aborted()) return;
 
       // 오디오 토글 초기값 (설정에서 읽어옴)
-      if (mounted) {
-        setState(() {
-          _ttsOn = ttsEnabled;
-          _sfxOn = true;
-        });
-      }
+      setState(() {
+        _ttsOn = ttsEnabled;
+        _sfxOn = true;
+      });
 
       // 모드별 서비스 초기화
       if (widget.runMode == 'marathon') {
         _marathonService = MarathonService();
         await _marathonService!.initialize(voice: voice);
+        if (_aborted()) return;
       } else if (widget.runMode == 'freerun') {
         _soloTtsService = SoloTtsService();
         await _soloTtsService!.initialize(voice: voice);
+        if (_aborted()) return;
       }
 
       // 마라토너 모드에서는 flutter_tts km 스플릿 비활성화 (MarathonService가 처리)
@@ -229,16 +248,26 @@ class _RunningScreenState extends State<RunningScreen>
         shadowRunId: widget.shadowRunId,
         shadowSpeedMultiplier: shadowSpeed,
       );
-      if (!ok && mounted) {
+      // startup 중 dispose된 경우 GPS 스트림을 즉시 cancel (누수 방지).
+      // ChangeNotifier dispose() 자체는 widget dispose()에서 한 번만.
+      if (_aborted()) {
+        // ignore: unawaited_futures
+        _runService.abortStartup();
+        return;
+      }
+      if (!ok) {
         WakelockPlus.disable();
+        if (!mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text(S.gpsRequired)),
         );
         context.pop();
         return;
       }
-
-      if (!mounted) return;
+      _runStarted = true;
+      // startup 완료 — 현재 UI 상태를 실제 서비스에 반영.
+      SfxService().enabled = _sfxOn;
+      _syncAudioState();
 
       // 모드별 시작 TTS
       if (_ttsOn) {
@@ -249,14 +278,22 @@ class _RunningScreenState extends State<RunningScreen>
         } else {
           await _soloTtsService?.playStartTts();
         }
+        if (_aborted()) return;
       }
-
-      if (!mounted) return;
 
       // GPS 콜백: 백그라운드에서도 동작 (Timer 대신)
       _runService.onPositionUpdate = () {
-        if (!mounted) return;
+        if (_aborted()) return;
         _runService.updateShadowPosition();
+        // live GPS 첫 샘플에서 초기 카메라 위치 backfill (one-shot 위치 획득 실패 대비)
+        if (_initialPosition == null) {
+          final pos = _runService.currentPosition;
+          if (pos != null) {
+            setState(() {
+              _initialPosition = NLatLng(pos.latitude, pos.longitude);
+            });
+          }
+        }
         _checkVehicleSpeed();
         if (!_paused) {
           if (widget.runMode == 'doppelganger') {
@@ -267,19 +304,17 @@ class _RunningScreenState extends State<RunningScreen>
         }
       };
 
-      // Timer: UI 갱신 + 지도 + 시간 기반 TTS (GPS 멈춰도 동작)
+      // Timer: UI 갱신 + 지도 + 시간 기반 마라톤 TTS (GPS 멈춰도 동작).
+      // km 마일스톤은 GPS 콜백에서만 처리 (거리 정확도 필요).
       _ticker = Timer.periodic(const Duration(seconds: 1), (_) {
-        if (!mounted) return;
+        if (_aborted()) return;
         if (!_paused) {
           _runService.updateShadowPosition();
           setState(() {});
           _updateMap();
           _sendDataToWatch();
-          // 시간 기반 마라토너 TTS (GPS 콜백과 별도로 Timer에서도 호출)
-          if (widget.runMode == 'marathon' && _marathonService != null && _ttsOn) {
-            _marathonService!.playTimeTts(_runService.durationS);
-            _marathonService!.playEncourageTts(_runService.durationS);
-            _marathonService!.playRandomTts(_runService.durationS);
+          if (widget.runMode == 'marathon' && _ttsOn) {
+            _updateMarathonTime();
           }
         }
       });
@@ -300,37 +335,60 @@ class _RunningScreenState extends State<RunningScreen>
   }
 
   void _handleWatchCommand(String command, Map<String, dynamic> data) {
-    switch (command) {
-      case 'toggleTts':
-        setState(() => _ttsOn = !_ttsOn);
-        _horrorService.ttsEnabled = _ttsOn;
-        break;
-      case 'toggleSfx':
-        setState(() => _sfxOn = !_sfxOn);
-        SfxService().enabled = _sfxOn;
-        if (_sfxOn) {
-          _horrorService.unmuteBgm();
-          _marathonService?.unmuteBgm();
-          _soloTtsService?.unmuteBgm();
-        } else {
-          _horrorService.muteBgm();
-          _marathonService?.muteBgm();
-          _soloTtsService?.muteBgm();
-        }
-        break;
-      case 'pause':
-        if (!_paused) _togglePause();
-        break;
-      case 'resume':
-        if (_paused) _togglePause();
-        break;
-      case 'stop':
-        _confirmStop();
-        break;
-      case 'heartRate':
-        final hr = data['heartRate'] as int? ?? 0;
-        _healthService.updateHeartRate(hr);
-        break;
+    if (!mounted || _stopping) return;
+    // startup 완료 전에는 상태 변경 명령을 무시 (stop/heartRate는 허용).
+    // 이후 _runService.startRun()이 UI 상태를 리셋하며 덮어쓰는 경합 방지.
+    if (!_runStarted && command != 'stop' && command != 'heartRate') return;
+    try {
+      switch (command) {
+        case 'toggleTts':
+          setState(() => _ttsOn = !_ttsOn);
+          _horrorService.ttsEnabled = _ttsOn;
+          break;
+        case 'toggleSfx':
+          setState(() => _sfxOn = !_sfxOn);
+          SfxService().enabled = _sfxOn;
+          _syncAudioState();
+          break;
+        case 'pause':
+          if (!_paused) {
+            _vehiclePaused = false;
+            _setPaused(true);
+          }
+          break;
+        case 'resume':
+          if (_paused) {
+            _vehiclePaused = false;
+            _setPaused(false);
+          }
+          break;
+        case 'stop':
+          _confirmStop();
+          break;
+        case 'heartRate':
+          final raw = data['heartRate'];
+          // 0도 전달 — dropout 의미. HealthService 내부에서 유효 범위 검증.
+          final hr = raw is num ? raw.toInt() : int.tryParse('$raw');
+          if (hr != null) _healthService.updateHeartRate(hr);
+          break;
+      }
+    } catch (e) {
+      debugPrint('watch command error: $e');
+    }
+  }
+
+  /// BGM 상태를 현재 _sfxOn/_paused/_stopping 에 맞춰 동기화.
+  /// paused 중이거나 sfx off면 mute, 그 외엔 unmute.
+  void _syncAudioState() {
+    final shouldBgmPlay = _sfxOn && !_paused && !_stopping;
+    if (shouldBgmPlay) {
+      _horrorService.unmuteBgm();
+      _marathonService?.unmuteBgm();
+      _soloTtsService?.unmuteBgm();
+    } else {
+      _horrorService.muteBgm();
+      _marathonService?.muteBgm();
+      _soloTtsService?.muteBgm();
     }
   }
 
@@ -345,7 +403,8 @@ class _RunningScreenState extends State<RunningScreen>
           ? (_runService.durationS / 60) / (_runService.totalDistanceM / 1000)
           : 0,
       calories: _runService.calories,
-      heartRate: _healthService.currentHeartRate > 0 ? _healthService.currentHeartRate : null,
+      // HR 0도 전달 — 워치가 "현재 측정값 없음"을 표시하도록.
+      heartRate: _healthService.currentHeartRate,
       threatLevel: _horrorService.currentLevel.name,
       shadowDistanceM: _runService.shadowDistanceM,
       threatPercent: _getThreatPercent(),
@@ -379,10 +438,9 @@ class _RunningScreenState extends State<RunningScreen>
     if (_runService.speedWarning == S.tooFast) {
       _vehicleDetectCount++;
       if (_vehicleDetectCount >= 3 && !_paused) {
-        _paused = true;
         _vehiclePaused = true;
-        _runService.pauseRun();
         SfxService().vehicleWarn();
+        _setPaused(true);
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
@@ -394,11 +452,10 @@ class _RunningScreenState extends State<RunningScreen>
       }
     } else {
       _vehicleDetectCount = 0;
-      // 차량 감지로 일시정지된 상태에서 정상 속도로 돌아오면 자동 재개
+      // 차량 감지로 일시정지된 상태에서만 자동 재개. 수동 pause는 건드리지 않음.
       if (_vehiclePaused && _paused) {
-        _paused = false;
         _vehiclePaused = false;
-        _runService.resumeRun();
+        _setPaused(false);
       }
     }
   }
@@ -410,6 +467,8 @@ class _RunningScreenState extends State<RunningScreen>
       final dist = _runService.shadowDistanceM;
       if (!dist.isInfinite) {
         await _horrorService.updateThreat(dist);
+        // dispose/stop 사이 race 방지: 애니메이션/서비스 접근 전 재확인
+        if (!mounted || _stopping) return;
         if (_horrorService.currentLevel == ThreatLevel.critical &&
             !_jumpscareTriggered &&
             _runService.durationS > 5) {
@@ -422,50 +481,75 @@ class _RunningScreenState extends State<RunningScreen>
   }
 
   double? _previousKmPace; // 이전 km 페이스 추적
+  final Set<int> _kmSfxPlayed = {}; // km별 SFX(kmDing/whistle) 중복 방지
 
+  /// km 마일스톤 전용 업데이트 (GPS 콜백에서만 호출). 거리 정확도가 필요.
+  /// TTS가 drop되면 _lastMarathonKm가 올라가지 않아 다음 tick에서 재시도됨.
   Future<void> _updateMarathon() async {
     if (_marathonService == null || _isUpdatingMarathon) return;
+    final currentKm = (_runService.totalDistanceM / 1000).floor();
+    if (currentKm <= _lastMarathonKm) return;
     _isUpdatingMarathon = true;
     try {
-    final elapsed = _runService.durationS;
-
-    // km 마일스톤 TTS
-    final currentKm = (_runService.totalDistanceM / 1000).floor();
-    if (currentKm > _lastMarathonKm) {
-      _lastMarathonKm = currentKm;
-      SfxService().kmDing();
-      SfxService().whistle();
-      if (_ttsOn) await _marathonService!.playKmTts(currentKm);
+      // SFX 중복 방지 (TTS drop 재시도 시 한 번만 울리도록)
+      if (_kmSfxPlayed.add(currentKm)) {
+        SfxService().kmDing();
+        SfxService().whistle();
+      }
+      bool kmOk = true;
+      if (_ttsOn) {
+        kmOk = await _marathonService!.playKmTts(currentKm);
+        if (!mounted || _stopping) return;
+        if (!kmOk) {
+          // TTS drop — 다음 tick 재시도 (SFX는 이미 울렸으니 한 번만).
+          // _lastMarathonKm 증가를 막고 즉시 return.
+          return;
+        }
+      }
       // 페이스 피드백 (2km부터)
-      if (_ttsOn && currentKm >= 2) {
+      if (_ttsOn && currentKm >= 2 && !_paused) {
         final avgHistorical = await DatabaseHelper.getAveragePace();
+        if (!mounted || _stopping || _paused || !_ttsOn) return;
         await _marathonService!.playPaceTts(
           _runService.avgPace,
           avgHistorical,
           _previousKmPace,
         );
+        if (!mounted || _stopping) return;
       }
       _previousKmPace = _runService.avgPace;
-      return;
+      _lastMarathonKm = currentKm; // km TTS 성공 확인 후에만 기록
+    } finally {
+      _isUpdatingMarathon = false;
     }
+  }
 
-    if (!_ttsOn) return;
-
-    await _marathonService!.playTimeTts(elapsed);
-    await _marathonService!.playEncourageTts(elapsed);
-    await _marathonService!.playRandomTts(elapsed);
+  /// 시간 기반 마라톤 TTS (1초 Timer에서만 호출). GPS 안 잡혀도 동작해야 함.
+  /// km TTS와 같은 lock을 공유 — 한 쪽 실행 중이면 skip, 다음 tick에 재시도.
+  Future<void> _updateMarathonTime() async {
+    if (_marathonService == null || _isUpdatingMarathon) return;
+    _isUpdatingMarathon = true;
+    try {
+      final elapsed = _runService.durationS;
+      await _marathonService!.playTimeTts(elapsed);
+      if (!mounted || _stopping || _paused || !_ttsOn) return;
+      await _marathonService!.playEncourageTts(elapsed);
+      if (!mounted || _stopping || _paused || !_ttsOn) return;
+      await _marathonService!.playRandomTts(elapsed);
     } finally {
       _isUpdatingMarathon = false;
     }
   }
 
   void _triggerJumpscare() {
+    if (!mounted || _stopping) return;
     _jumpscareTriggered = true;
     _jumpscareFlashAnim.repeat(reverse: true);
     _jumpscareShakeAnim.repeat();
     setState(() {});
-    // 1.5초 후 결과 화면으로 자동 이동
-    Future.delayed(const Duration(milliseconds: 1500), () {
+    // 1.5초 후 결과 화면으로 자동 이동 (dispose 시 취소)
+    _jumpscareDelayTimer?.cancel();
+    _jumpscareDelayTimer = Timer(const Duration(milliseconds: 1500), () {
       if (mounted && !_stopping) _stopRun();
     });
   }
@@ -638,24 +722,25 @@ class _RunningScreenState extends State<RunningScreen>
   }
 
   void _togglePause() {
+    // 수동 토글: 차량 자동 재개 플래그 해제 (이후 vehicle loop이 내 상태를 덮지 않도록).
+    _vehiclePaused = false;
+    _setPaused(!_paused);
+  }
+
+  /// pause/resume 공용 경로. 수동 버튼, 워치 명령, 차량 자동 감지 모두 여기로 모인다.
+  void _setPaused(bool pause) {
+    if (pause == _paused || _stopping) return;
     setState(() {
-      _paused = !_paused;
+      _paused = pause;
       if (_paused) {
         SfxService().pause();
         _runService.pauseRun();
-        _horrorService.muteBgm();
-        _marathonService?.muteBgm();
-        _soloTtsService?.muteBgm();
       } else {
         SfxService().resume();
         _runService.resumeRun();
-        if (_sfxOn) {
-          _horrorService.unmuteBgm();
-          _marathonService?.unmuteBgm();
-          _soloTtsService?.unmuteBgm();
-        }
       }
     });
+    _syncAudioState();
     // 워치에 일시정지/재개 상태 즉시 전송
     _sendDataToWatch();
   }
@@ -699,6 +784,9 @@ class _RunningScreenState extends State<RunningScreen>
 
     // GPS 콜백 즉시 해제 (dispose된 서비스 접근 방지)
     _runService.onPositionUpdate = null;
+
+    // 종료 흐름에서 BGM 뮤트 (end TTS/stadium finale와 겹치지 않도록).
+    _syncAudioState();
 
     // 웨이크락 해제
     WakelockPlus.disable();
@@ -751,7 +839,8 @@ class _RunningScreenState extends State<RunningScreen>
       _soloTtsService?.dispose();
     }
 
-    // 워치에 결과 전송
+    // 워치에 종료 상태 전송 — 결과 있으면 result, 없으면 idle.
+    // (결과 없이 나가면 워치가 이전 running/paused 화면에 멈춰 있음)
     if (result != null) {
       _watchConnector.sendResult(
         distanceM: result.distanceM,
@@ -760,7 +849,10 @@ class _RunningScreenState extends State<RunningScreen>
         calories: result.calories,
         challengeResult: result.challengeResult,
       );
+    } else {
+      _watchConnector.sendIdle();
     }
+    _healthService.reset();
 
     if (mounted) {
       if (result != null && result.id != null) {
@@ -781,13 +873,18 @@ class _RunningScreenState extends State<RunningScreen>
 
   @override
   void dispose() {
-    // 워치 연동 해제 (idle은 보내지 않음 — 워치가 결과 화면을 유지하도록)
+    // 진행 중이던 _startRun 체인 중단 신호
+    _startupCancelled = true;
+    // 워치 연동 해제 + 콜백 끊기 (지연된 워치 이벤트가 dead State에 도달하지 못하도록)
+    _watchConnector.onWatchCommand = null;
     _watchConnector.stopListening();
     _healthService.stopHeartRateStream();
+    _healthService.reset();
     // SFX 토글 상태 리셋 (글로벌 싱글톤이라 복원 필요)
     SfxService().enabled = true;
     WakelockPlus.disable();
     _ticker?.cancel();
+    _jumpscareDelayTimer?.cancel();
     _runService.onPositionUpdate = null;
     _runService.removeListener(_onRunUpdate);
     _runService.dispose();
@@ -1491,15 +1588,7 @@ class _RunningScreenState extends State<RunningScreen>
           onTap: () {
             setState(() => _sfxOn = !_sfxOn);
             SfxService().enabled = _sfxOn;
-            if (_sfxOn) {
-              _horrorService.unmuteBgm();
-              _marathonService?.unmuteBgm();
-              _soloTtsService?.unmuteBgm();
-            } else {
-              _horrorService.muteBgm();
-              _marathonService?.muteBgm();
-              _soloTtsService?.muteBgm();
-            }
+            _syncAudioState();
           },
           child: Container(
             width: 36,

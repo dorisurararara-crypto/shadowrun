@@ -38,6 +38,7 @@ class RunningService extends ChangeNotifier {
   int _lastAnnouncedKm = 0;
   final FlutterTts _tts = FlutterTts();
   bool _ttsReady = false;
+  bool _isDisposed = false;
 
   // Public getters
   bool get isRunning => _isRunning;
@@ -132,7 +133,7 @@ class RunningService extends ChangeNotifier {
     if (!_isPaused) {
       _isPaused = true;
       _pauseStart = DateTime.now();
-      notifyListeners();
+      _safeNotify();
     }
   }
 
@@ -141,19 +142,23 @@ class RunningService extends ChangeNotifier {
       _pausedDuration += DateTime.now().difference(_pauseStart!);
       _pauseStart = null;
       _isPaused = false;
-      notifyListeners();
+      _safeNotify();
     }
   }
 
   /// 러닝 시작
   Future<bool> startRun({int? shadowRunId, double shadowSpeedMultiplier = 1.0}) async {
+    if (_isDisposed) return false;
     // GPS 서비스 활성화 확인
     final serviceEnabled = await Geolocator.isLocationServiceEnabled();
+    if (_isDisposed) return false;
     if (!serviceEnabled) return false;
 
     var permission = await Geolocator.checkPermission();
+    if (_isDisposed) return false;
     if (permission == LocationPermission.denied) {
       permission = await Geolocator.requestPermission();
+      if (_isDisposed) return false;
     }
     if (permission == LocationPermission.denied || permission == LocationPermission.deniedForever) {
       return false;
@@ -163,6 +168,7 @@ class RunningService extends ChangeNotifier {
     _shadowSpeedMultiplier = shadowSpeedMultiplier;
     if (shadowRunId != null) {
       _shadowPoints = await DatabaseHelper.getRunPoints(shadowRunId);
+      if (_isDisposed) return false;
       debugPrint('SHADOW: loaded ${_shadowPoints?.length ?? 0} points for run $shadowRunId');
     } else {
       debugPrint('SHADOW: no shadow run (new run mode)');
@@ -170,6 +176,7 @@ class RunningService extends ChangeNotifier {
 
     // 기존 구독 누수 방지
     await _positionSub?.cancel();
+    if (_isDisposed) return false;
     _positionSub = null;
 
     _points.clear();
@@ -187,13 +194,18 @@ class RunningService extends ChangeNotifier {
     // km 스플릿 음성 알림용 TTS 초기화
     try {
       await _tts.setLanguage(S.isKo ? 'ko-KR' : 'en-US');
+      if (_isDisposed) return false;
       await _tts.setSpeechRate(0.5);
+      if (_isDisposed) return false;
       await _tts.setPitch(1.0);
+      if (_isDisposed) return false;
       await _tts.setVolume(1.0);
+      if (_isDisposed) return false;
       _ttsReady = true;
     } catch (e) {
       debugPrint('TTS 초기화 실패: $e');
     }
+    if (_isDisposed) return false;
 
     // Android: 포그라운드 서비스로 백그라운드 GPS 유지
     late LocationSettings locationSettings;
@@ -228,16 +240,22 @@ class RunningService extends ChangeNotifier {
     // GPS 스트림 시작 직전에 시간 설정 (정확한 러닝 시간 측정)
     _startTime = DateTime.now();
 
+    if (_isDisposed) return false;
     _positionSub = Geolocator.getPositionStream(
       locationSettings: locationSettings,
     ).listen(_onPosition);
 
-    notifyListeners();
+    _safeNotify();
     return true;
   }
 
+  void _safeNotify() {
+    if (_isDisposed) return;
+    notifyListeners();
+  }
+
   void _onPosition(Position pos) {
-    if (!_isRunning) return;
+    if (_isDisposed || !_isRunning) return;
 
     // 속도 계산: GPS 속도 우선, 없으면 위치 변화로 추정
     double speed = pos.speed >= 0 ? pos.speed : 0;
@@ -259,7 +277,7 @@ class RunningService extends ChangeNotifier {
     // 일시정지 중이면 위치만 갱신하고 거리/포인트는 안 함
     if (_isPaused) {
       _lastPosition = pos;
-      notifyListeners();
+      _safeNotify();
       onPositionUpdate?.call(); // 차량 감지 자동 복귀 위해 콜백은 호출
       return;
     }
@@ -298,21 +316,23 @@ class RunningService extends ChangeNotifier {
 
     _lastPosition = pos;
 
-    notifyListeners();
+    _safeNotify();
 
     // 백그라운드에서도 동작하는 콜백 호출 (Timer 대체)
-    onPositionUpdate?.call();
+    if (!_isDisposed) onPositionUpdate?.call();
   }
 
   /// 러닝 종료 및 저장
   Future<RunModel?> stopRun() async {
+    if (_isDisposed) return null;
     _isRunning = false;
     _tts.stop();
     await _positionSub?.cancel();
+    if (_isDisposed) return null;
     _positionSub = null;
 
     if (_points.length < 2 || _totalDistanceM < 10) {
-      notifyListeners();
+      _safeNotify();
       return null;
     }
 
@@ -329,6 +349,7 @@ class RunningService extends ChangeNotifier {
         _points.first.latitude,
         _points.first.longitude,
       );
+      if (_isDisposed) return null;
     }
 
     final run = RunModel(
@@ -348,8 +369,23 @@ class RunningService extends ChangeNotifier {
       _points,
       incrementChallenge: isChallenge,
     );
+    if (_isDisposed) {
+      // DB 저장은 완료됐으니 결과는 반환하되, notify는 skip.
+      return RunModel(
+        id: runId,
+        date: run.date,
+        distanceM: run.distanceM,
+        durationS: run.durationS,
+        avgPace: run.avgPace,
+        calories: run.calories,
+        isChallenge: run.isChallenge,
+        challengeResult: run.challengeResult,
+        shadowRunId: run.shadowRunId,
+        location: run.location,
+      );
+    }
 
-    notifyListeners();
+    _safeNotify();
     return RunModel(
       id: runId,
       date: run.date,
@@ -365,6 +401,7 @@ class RunningService extends ChangeNotifier {
   }
 
   Future<void> _announceKmSplit(int km) async {
+    if (_isDisposed || !_isRunning) return;
     final paceMin = avgPace.floor();
     final paceSec = ((avgPace - paceMin) * 60).round();
     final paceStr = "$paceMin'${paceSec.toString().padLeft(2, '0')}\"";
@@ -374,6 +411,7 @@ class RunningService extends ChangeNotifier {
         : '$km kilometer. Pace $paceStr';
 
     await _tts.awaitSpeakCompletion(true);
+    if (_isDisposed || !_isRunning) return;
     await _tts.speak(text);
   }
 
@@ -386,9 +424,23 @@ class RunningService extends ChangeNotifier {
     return earthRadius * 2 * atan2(sqrt(a), sqrt(1 - a));
   }
 
+  /// startup 중 abort 시 호출: GPS 구독만 정리. dispose()는 widget 쪽에서.
+  Future<void> abortStartup() async {
+    _isRunning = false;
+    onPositionUpdate = null;
+    final sub = _positionSub;
+    _positionSub = null;
+    await sub?.cancel();
+  }
+
   @override
   void dispose() {
+    if (_isDisposed) return;
+    _isDisposed = true;
+    _isRunning = false;
+    onPositionUpdate = null;
     _positionSub?.cancel();
+    _positionSub = null;
     _tts.stop();
     super.dispose();
   }

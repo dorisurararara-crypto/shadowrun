@@ -69,13 +69,19 @@ class MarathonService {
     await _playTts('tts_marathon_start', variant: variant);
   }
 
-  Future<void> playKmTts(int km) async {
-    if (!_availableKmMilestones.contains(km)) return;
-    if (_playedKmMilestones.contains(km)) return;
-    if (_isPlaying) return;
+  /// km 마일스톤 TTS.
+  /// 반환값 의미:
+  /// - true: 이 km 처리됨 (재생 성공/실패 무관, 또는 자산 없음) → 다음 km으로 진행
+  /// - false: 다른 TTS 재생 중이라 지금 drop → 호출자가 다음 tick에서 재시도
+  /// 재생 시도 자체는 1회만 — 파일 missing/타임아웃 등 영구 실패는 무한 retry하지 않음.
+  Future<bool> playKmTts(int km) async {
+    if (_playedKmMilestones.contains(km)) return true;
+    if (!_availableKmMilestones.contains(km)) return true;
+    if (_isPlaying) return false; // drop — retry 가능
+    _playedKmMilestones.add(km); // 재생 시도했으면 마킹 (성공/실패 무관)
     final variant = _random.nextInt(_kmVariants) + 1;
-    final success = await _playTts('tts_marathon_${km}km', variant: variant);
-    if (success) _playedKmMilestones.add(km);
+    await _playTts('tts_marathon_${km}km', variant: variant);
+    return true;
   }
 
   Future<void> playPaceTts(

@@ -12,24 +12,47 @@ class WatchConnectorService {
       EventChannel('com.ganziman.shadowrun/watch_events');
 
   StreamSubscription? _eventSub;
+  Future<void>? _pendingCancel;
+  bool _wantListen = false;
   void Function(String command, Map<String, dynamic> data)? onWatchCommand;
 
   bool get _isIOS => Platform.isIOS;
 
-  void startListening() {
+  Future<void> startListening() async {
     if (!_isIOS) return;
+    _wantListen = true;
+    // 진행 중인 cancel이 있으면 기다린 뒤 재구독 — 빠른 재진입 시 중복 구독 방지.
+    final pending = _pendingCancel;
+    if (pending != null) {
+      await pending;
+    }
+    // cancel 대기 중에 stopListening이 호출됐다면 재구독하지 않음.
+    if (!_wantListen) return;
+    if (_eventSub != null) return;
     _eventSub = _eventChannel.receiveBroadcastStream().listen((event) {
-      if (event is Map) {
+      if (event is! Map) return;
+      try {
         final data = Map<String, dynamic>.from(event);
         final command = data.remove('command') as String? ?? '';
         onWatchCommand?.call(command, data);
+      } catch (_) {
+        // 잘못된 payload 하나로 스트림 전체가 죽지 않도록 방어
       }
-    });
+    }, onError: (Object _) {});
   }
 
-  void stopListening() {
-    _eventSub?.cancel();
+  Future<void> stopListening() async {
+    _wantListen = false;
+    final sub = _eventSub;
     _eventSub = null;
+    if (sub == null) return;
+    final cancel = sub.cancel();
+    _pendingCancel = cancel;
+    try {
+      await cancel;
+    } finally {
+      if (identical(_pendingCancel, cancel)) _pendingCancel = null;
+    }
   }
 
   Future<bool> get isWatchReachable async {
