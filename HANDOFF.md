@@ -34,6 +34,41 @@
 3. 필요한 것 stage → commit → push
 4. 완료되면 아래에 "### ... (Windows → Mac) 푸시 완료, 파일 목록 ..." 적기
 
+### 2026-04-17 (Windows → Mac)
+
+**완료:** 커밋 428a977으로 푸시 완료. 19개 파일, +3195줄.
+
+**푸시된 파일 목록:**
+- `ios/Runner/AppDelegate.swift` — WatchConnectivity 초기화 (채널은 SceneDelegate로 이동)
+- `ios/Runner/SceneDelegate.swift` — MethodChannel/EventChannel/HealthKit 채널 설정
+- `ios/Runner/WatchSessionHandler.swift` — WatchConnectivity iOS측 핸들러
+- `ios/Runner/HealthKitHandler.swift` — HealthKit 심박수 iOS측 브릿지
+- `ios/ShadowRunWatch Watch App/ContentView.swift` — 상태별 화면 라우터
+- `ios/ShadowRunWatch Watch App/ShadowRunWatchApp.swift` — 앱 진입점
+- `ios/ShadowRunWatch Watch App/Models/RunData.swift` — 데이터 모델
+- `ios/ShadowRunWatch Watch App/Services/WatchSessionManager.swift` — WC 워치측
+- `ios/ShadowRunWatch Watch App/Services/HealthKitManager.swift` — 심박수 워치측
+- `ios/ShadowRunWatch Watch App/Views/WaitingView.swift` — 대기 화면
+- `ios/ShadowRunWatch Watch App/Views/RunningView.swift` — 러닝 메인
+- `ios/ShadowRunWatch Watch App/Views/ThreatBarView.swift` — 위협 바
+- `ios/ShadowRunWatch Watch App/Views/MiniMapView.swift` — 미니맵
+- `ios/ShadowRunWatch Watch App/Views/JumpscareView.swift` — 점프스케어
+- `ios/ShadowRunWatch Watch App/Views/ResultView.swift` — 결과 화면
+- `lib/core/services/watch_connector_service.dart` — Flutter 워치 통신
+- `lib/core/services/health_service.dart` — Flutter 심박수
+- `lib/features/running/presentation/pages/running_screen.dart` — 워치 연동 추가
+- `docs/superpowers/plans/2026-04-16-apple-watch-companion.md` — 전체 계획서
+
+**Mac에서 해야 할 것:**
+1. `git pull` → 위 파일들 수신
+2. 새 Swift 파일들이 Xcode 타겟에 자동 등록 안 됐을 수 있음 → Xcode에서 수동 추가 필요:
+   - Runner 타겟: `WatchSessionHandler.swift`, `HealthKitHandler.swift`
+   - ShadowRunWatch 타겟: `Models/`, `Services/`, `Views/` 내 모든 .swift 파일
+3. 두 타겟 모두 Signing & Capabilities에서 **HealthKit** 추가
+4. Info.plist에 `NSHealthShareUsageDescription` 추가
+5. Runner + ShadowRunWatch 빌드 테스트
+
 ## 이력
 
-(비어있음)
+### 2026-04-17 (Mac → Windows) — 파일 푸시 요청
+파일들이 커밋/푸시 안 된 상태였음. Windows에서 확인 후 푸시 완료.
