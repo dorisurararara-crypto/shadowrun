@@ -11,6 +11,22 @@
 4. **메시지 형식**: `### YYYY-MM-DD HH:MM (From → To)` 헤더 뒤에 body
 5. **커밋 메시지**: `chore: handoff <요약>` 로 시작 (검색 쉽게)
 
+## 자동 폴링 (양쪽 Claude 모두 설정)
+
+사용자가 중계할 필요 없도록, 양쪽 Claude 세션이 **3분마다 자동으로** HANDOFF.md를 확인·처리합니다.
+
+**Mac 세션에서 한 번만 실행:**
+```
+/loop 3m git pull --quiet; 새 HANDOFF.md에 "→ Mac" 요청이 있으면 수행하고 결과를 "## 최신"에 덧붙여 commit+push. 없으면 한 줄로 "변경 없음" 보고 후 종료. 처리 끝난 이전 항목은 "## 이력"으로 이동.
+```
+
+**Windows 세션에서 한 번만 실행 (같은 방식):**
+```
+/loop 3m git pull --quiet; 새 HANDOFF.md에 "→ Windows" 요청이 있으면 수행하고 결과를 "## 최신"에 덧붙여 commit+push. 없으면 한 줄로 "변경 없음" 보고 후 종료. 처리 끝난 이전 항목은 "## 이력"으로 이동.
+```
+
+충돌 방지: push 실패 시 `git pull --rebase` 후 재push.
+
 ## 최신
 
 ### 2026-04-17 (Mac → Windows)
