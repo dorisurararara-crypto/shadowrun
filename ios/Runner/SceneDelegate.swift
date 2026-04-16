@@ -9,7 +9,7 @@ class SceneDelegate: FlutterSceneDelegate {
         super.scene(scene, willConnectTo: session, options: connectionOptions)
 
         guard let windowScene = scene as? UIWindowScene,
-              let controller = windowScene.keyWindow?.rootViewController as? FlutterViewController else {
+              let controller = windowScene.windows.first?.rootViewController as? FlutterViewController else {
             return
         }
 

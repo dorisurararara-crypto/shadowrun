@@ -1,4 +1,5 @@
 import Foundation
+import Combine
 
 class RunData: ObservableObject {
     @Published var distanceM: Double = 0
