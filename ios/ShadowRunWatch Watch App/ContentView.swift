@@ -1,24 +1,16 @@
-//
-//  ContentView.swift
-//  ShadowRunWatch Watch App
-//
-//  Created by pc on 4/17/26.
-//
-
 import SwiftUI
 
 struct ContentView: View {
-    var body: some View {
-        VStack {
-            Image(systemName: "globe")
-                .imageScale(.large)
-                .foregroundStyle(.tint)
-            Text("Hello, world!")
-        }
-        .padding()
-    }
-}
+    @ObservedObject var session = WatchSessionManager.shared
 
-#Preview {
-    ContentView()
+    var body: some View {
+        switch session.runState {
+        case .idle:
+            WaitingView()
+        case .running, .paused:
+            RunningView()
+        case .result:
+            ResultView()
+        }
+    }
 }

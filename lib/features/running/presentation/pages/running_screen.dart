@@ -20,6 +20,8 @@ import 'package:shadowrun/core/l10n/app_strings.dart';
 import 'package:shadowrun/shared/models/run_model.dart';
 import 'package:shadowrun/core/services/sfx_service.dart';
 import 'package:shadowrun/shared/widgets/stick_figure_marker.dart';
+import 'package:shadowrun/core/services/watch_connector_service.dart';
+import 'package:shadowrun/core/services/health_service.dart';
 
 class RunningScreen extends StatefulWidget {
   final int? shadowRunId;
@@ -40,6 +42,8 @@ class _RunningScreenState extends State<RunningScreen>
   MarathonService? _marathonService;
   SoloTtsService? _soloTtsService;
   final AudioPlayer _stadiumPlayer = AudioPlayer();
+  final _watchConnector = WatchConnectorService();
+  final _healthService = HealthService();
   int _lastMarathonKm = 0;
   bool _stadiumFinaleEnabled = false;
   late bool _isSameLocation;
@@ -101,6 +105,11 @@ class _RunningScreenState extends State<RunningScreen>
       duration: const Duration(milliseconds: 80),
     );
 
+    _watchConnector.startListening();
+    _watchConnector.onWatchCommand = _handleWatchCommand;
+    _healthService.requestAuthorization().then((_) {
+      _healthService.startHeartRateStream();
+    });
     _startRun();
     _createMarkerIcons();
   }
@@ -254,6 +263,7 @@ class _RunningScreenState extends State<RunningScreen>
           _runService.updateShadowPosition();
           setState(() {});
           _updateMap();
+          _sendDataToWatch();
           // 시간 기반 마라토너 TTS (GPS 콜백과 별도로 Timer에서도 호출)
           if (widget.runMode == 'marathon' && _marathonService != null && _ttsOn) {
             _marathonService!.playTimeTts(_runService.durationS);
@@ -276,6 +286,80 @@ class _RunningScreenState extends State<RunningScreen>
 
   void _onRunUpdate() {
     if (mounted) setState(() {});
+  }
+
+  void _handleWatchCommand(String command, Map<String, dynamic> data) {
+    switch (command) {
+      case 'toggleTts':
+        setState(() => _ttsOn = !_ttsOn);
+        _horrorService.ttsEnabled = _ttsOn;
+        break;
+      case 'toggleSfx':
+        setState(() => _sfxOn = !_sfxOn);
+        SfxService().enabled = _sfxOn;
+        if (_sfxOn) {
+          _horrorService.unmuteBgm();
+          _marathonService?.unmuteBgm();
+          _soloTtsService?.unmuteBgm();
+        } else {
+          _horrorService.muteBgm();
+          _marathonService?.muteBgm();
+          _soloTtsService?.muteBgm();
+        }
+        break;
+      case 'pause':
+        if (!_paused) _togglePause();
+        break;
+      case 'resume':
+        if (_paused) _togglePause();
+        break;
+      case 'stop':
+        _confirmStop();
+        break;
+      case 'heartRate':
+        final hr = data['heartRate'] as int? ?? 0;
+        _healthService.updateHeartRate(hr);
+        break;
+    }
+  }
+
+  void _sendDataToWatch() {
+    final pos = _runService.currentPosition;
+    final shadowPoint = _runService.currentShadowPoint;
+    _watchConnector.sendRunData(
+      runState: _paused ? 'paused' : 'running',
+      distanceM: _runService.totalDistanceM,
+      durationS: _runService.durationS,
+      avgPace: _runService.totalDistanceM > 0
+          ? (_runService.durationS / 60) / (_runService.totalDistanceM / 1000)
+          : 0,
+      calories: _runService.calories,
+      heartRate: _healthService.currentHeartRate > 0 ? _healthService.currentHeartRate : null,
+      threatLevel: _horrorService.currentLevel.name,
+      shadowDistanceM: _runService.shadowDistanceM,
+      threatPercent: _getThreatPercent(),
+      latitude: pos?.latitude,
+      longitude: pos?.longitude,
+      shadowLatitude: shadowPoint?.latitude,
+      shadowLongitude: shadowPoint?.longitude,
+      runMode: widget.runMode,
+      ttsOn: _ttsOn,
+      sfxOn: _sfxOn,
+    );
+  }
+
+  double _getThreatPercent() {
+    switch (_horrorService.currentLevel) {
+      case ThreatLevel.aheadFar: return 0.0;
+      case ThreatLevel.aheadMid: return 0.05;
+      case ThreatLevel.aheadClose: return 0.10;
+      case ThreatLevel.safe: return 0.25;
+      case ThreatLevel.warningFar: return 0.45;
+      case ThreatLevel.warningClose: return 0.60;
+      case ThreatLevel.dangerFar: return 0.75;
+      case ThreatLevel.dangerClose: return 0.90;
+      case ThreatLevel.critical: return 1.0;
+    }
   }
 
   bool _vehiclePaused = false; // 차량 감지로 일시정지된 상태
@@ -553,6 +637,8 @@ class _RunningScreenState extends State<RunningScreen>
         _runService.resumeRun();
       }
     });
+    // 워치에 일시정지/재개 상태 즉시 전송
+    _sendDataToWatch();
   }
 
   Future<void> _confirmStop() async {
@@ -646,6 +732,17 @@ class _RunningScreenState extends State<RunningScreen>
       _soloTtsService?.dispose();
     }
 
+    // 워치에 결과 전송
+    if (result != null) {
+      _watchConnector.sendResult(
+        distanceM: result.distanceM,
+        durationS: result.durationS,
+        avgPace: result.avgPace,
+        calories: result.calories,
+        challengeResult: result.challengeResult,
+      );
+    }
+
     if (mounted) {
       if (result != null && result.id != null) {
         context.go('/result', extra: {
@@ -665,6 +762,9 @@ class _RunningScreenState extends State<RunningScreen>
 
   @override
   void dispose() {
+    // 워치 연동 해제 (idle은 보내지 않음 — 워치가 결과 화면을 유지하도록)
+    _watchConnector.stopListening();
+    _healthService.stopHeartRateStream();
     // SFX 토글 상태 리셋 (글로벌 싱글톤이라 복원 필요)
     SfxService().enabled = true;
     WakelockPlus.disable();
