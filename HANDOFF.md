@@ -29,6 +29,41 @@
 
 ## 최신
 
+### 2026-04-17 03:10 (Windows → Mac) — 라이프사이클 대대적 리팩토링 (bbe3487)
+
+Codex adversarial 리뷰 **12회차**를 CLEAN으로 통과시킨 running_screen.dart 및 관련 서비스 버그픽스 337+/143- 푸시.
+
+**수정 파일:**
+- `lib/features/running/presentation/pages/running_screen.dart` (±275줄)
+- `lib/core/services/running_service.dart` (+_isDisposed 가드, _safeNotify, abortStartup)
+- `lib/core/services/watch_connector_service.dart` (start/stop 직렬화)
+- `lib/core/services/health_service.dart` (_runExclusive 세대 토큰 + reset)
+- `lib/core/services/marathon_service.dart` (playKmTts bool 반환)
+
+**해결된 주요 버그 (카테고리별 요약):**
+1. GPS 10초 대기 **앞**에 있어 첫 10초 거리·시간 **silent data loss** → 초기 위치는 백그라운드, 기록 시작 즉시
+2. NaverMap `initialCameraPosition` 1회성 특성 때문에 `getLastKnownPosition` setState가 stale cache로 지도 빌드 → 정확한 위치 잡힌 후에만 build, live GPS backfill
+3. Pause/resume BGM 상태 꼬임 (paused 중 SFX 토글 시 BGM 울림 등) → `_syncAudioState` 중앙화 (`_sfxOn && !_paused && !_stopping`)
+4. Vehicle auto-pause가 상태머신 우회, 수동 pause와 괴리 → `_setPaused` 공용 경로, `_vehiclePaused` 수동 진입 시 리셋
+5. Watch/Health 라이프사이클 race (auth callback 이후 dispose, HR 캐스팅 throw, setState after unmount) → `_runStarted`/`_startupCancelled` 가드, `num` 방어, `_pendingCancel`/`_wantListen`
+6. `_updateHorror` await 사이 dispose → AnimationController `repeat()` 크래시 방지
+7. Jumpscare `Future.delayed` → 취소 가능한 Timer
+8. 워치 terminal state 안 보내지던 경로 → 결과 없어도 `sendIdle()`
+9. `HealthService.currentHeartRate` 싱글톤 stale → reset, HR 0(dropout) 투명 전달
+10. `RunningService` use-after-dispose → `_isDisposed` 전수 가드 + `abortStartup()`
+11. Marathon TTS 중복 경로 → km(GPS 콜백) / time(1s Timer) 공용 lock, drop vs skip 구분
+
+**검증:**
+- `flutter analyze`: No issues found
+- Codex 12회 반복 검토, 마지막 회차 "CLEAN"
+
+**Mac 할 일:** pull 받고 iOS/실기기 빌드에서 regression 없는지 확인. 특히
+- 러닝 시작 → GPS 잡힌 후 지도 정상 표시
+- 일시정지/재개 → BGM 상태 자연스러운지
+- 차량 감지 중 수동 pause 테스트
+- 점프스케어 발생 → 크래시 없이 결과 화면 전환
+- 워치 pause/resume/stop 명령 동작
+
 ### 2026-04-17 01:15 (Mac → Windows) — 양쪽 빌드 성공 ✅
 
 GUI 없이 전부 자동 처리. **Runner + ShadowRunWatch 둘 다 `xcodebuild BUILD SUCCEEDED`.**
