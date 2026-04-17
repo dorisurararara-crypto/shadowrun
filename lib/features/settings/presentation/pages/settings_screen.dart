@@ -180,29 +180,90 @@ class _SettingsScreenState extends State<SettingsScreen> {
     );
   }
 
-  /// T3 Korean Mystic Settings — 모든 설정 기능 연결 (항목별 핸들러는 순차 확장)
+  /// T3 Korean Mystic Settings — 모든 설정 기능 연결 (PureSettings와 동일 수준)
   Widget _buildMysticLayout(BuildContext context) {
-    return MysticSettingsLayout(
-      userName: _profileDisplayName(),
-      isPro: _isPro,
-      horrorLevel: _horrorLevel,
-      versionLabel: '1.0.0 · 012',
-      onHorrorHeaderTap: _onHorrorHeaderTap,
-      onThemeTap: () => context.push('/settings/theme'),
-      onLanguageToggle: () async {
-        final next = S.isKo ? 'en' : 'ko';
-        final prefs = await SharedPreferences.getInstance();
-        await prefs.setString('language', next);
-        await S.init(next);
-        if (mounted) setState(() {});
+    final themeId = ThemeManager.I.currentId;
+    final themeName = S.isKo ? themeId.displayNameKo : themeId.displayName;
+    final purchase = PurchaseService();
+
+    return FutureBuilder<Directory>(
+      future: getApplicationDocumentsDirectory(),
+      builder: (ctx, snap) {
+        final File? photoFile = (_hasProfileFace && snap.hasData)
+            ? File('${snap.data!.path}/profile_face.png')
+            : null;
+        return FutureBuilder<String?>(
+          future: DatabaseHelper.getSetting('trial_start_date'),
+          builder: (ctx2, trialSnap) {
+            final trialUsed = trialSnap.data != null;
+            return MysticSettingsLayout(
+              // Profile
+              userName: _profileDisplayName(),
+              hasProfilePhoto: _hasProfileFace,
+              profilePhotoFile: photoFile,
+              onProfilePhotoTap: _captureProfileFace,
+
+              // Pro
+              isPro: _isPro,
+              isTrial: purchase.isTrial,
+              trialDaysLeft: purchase.trialDaysLeft,
+              trialAlreadyUsed: trialUsed,
+
+              // Appearance
+              themeDisplayName: themeName,
+              onThemeTap: () => context.push('/settings/theme'),
+              langCode: S.isKo ? 'ko' : 'en',
+              onLangChange: _onLangChange,
+              runMode: _runMode,
+              onRunModeChange: _onPureRunModeChange,
+              unit: _unit,
+              onUnitChange: _onPureUnitChange,
+
+              // Run / Goal
+              shoes: _shoes,
+              onShoesTap: _openShoeManagerMystic,
+              activeGoal: _activeGoal,
+              onGoalEditTap: () => _showGoalDialog(existing: _activeGoal),
+
+              // Audio / Fear
+              ttsEnabled: _ttsEnabled,
+              onTtsToggle: (v) {
+                setState(() => _ttsEnabled = v);
+                _save('tts_enabled', '$v');
+              },
+              sfxEnabled: _stadiumFinale,
+              onSfxToggle: (v) {
+                setState(() => _stadiumFinale = v);
+                _save('stadium_finale', '$v');
+              },
+              hapticEnabled: _vibrationEnabled,
+              onHapticToggle: (v) {
+                setState(() => _vibrationEnabled = v);
+                _save('vibration_enabled', '$v');
+              },
+              voiceId: _selectedVoice,
+              voiceLabel: _voiceDisplayLabel(_selectedVoice),
+              onVoiceTap: _openVoicePickerMystic,
+              horrorLevel: _horrorLevel,
+              onHorrorLevelChange: _onPureHorrorChange,
+              onHorrorHeaderTap: _onHorrorHeaderTap,
+
+              // PRO
+              onProUpgradeTap: _onPureProUpgrade,
+              onStartTrialTap: _onPureStartTrial,
+              onRestorePurchases: _onPureRestore,
+
+              // Support
+              onPrivacyTap: _showPrivacyMystic,
+              onTermsTap: _showTermsMystic,
+
+              // Footer / Nav
+              versionLabel: 'v1.0.0 · build 12',
+              onBack: () => context.go('/'),
+            );
+          },
+        );
       },
-      onVoiceTap: _openVoicePicker,
-      onGoalTap: _openGoalEditor,
-      onProTap: _openProFlow,
-      onPrivacyTap: _openPrivacy,
-      onReviewTap: _openReview,
-      onTermsTap: _openTerms,
-      onBack: () => context.go('/'),
     );
   }
 
@@ -742,53 +803,401 @@ class _SettingsScreenState extends State<SettingsScreen> {
     );
   }
 
-  // 아래 핸들러는 Mystic/Pure Settings Layout에서 호출되는 실제 기능 연결 지점.
-  // TODO(theme-settings): 항목별로 모달/바텀시트 다이얼로그로 기존 Default 설정 위젯을 호출.
-  void _openVoicePicker() {
-    _showMysticInfo(S.isKo ? '음성 설정은 다음 업데이트에서 연결됩니다.' : 'Voice picker wiring pending.');
+  // ---- Mystic bottom sheet wrappers (PRO 구매/체험/복원은 Pure와 동일 핸들러 재사용) ----
+  void _openShoeManagerMystic() {
+    SfxService().tapCard();
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: const Color(0xFF0A0606),
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(2)),
+      ),
+      builder: (ctx) {
+        return StatefulBuilder(
+          builder: (ctx, setSheet) {
+            return DraggableScrollableSheet(
+              initialChildSize: 0.75,
+              minChildSize: 0.5,
+              maxChildSize: 0.95,
+              expand: false,
+              builder: (ctx, scroll) => Padding(
+                padding: const EdgeInsets.fromLTRB(22, 18, 22, 24),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    _mysticSheetHandle(),
+                    const SizedBox(height: 12),
+                    _mysticSheetTitle(hanja: '走', title: S.shoeManagement, en: 'S H O E S'),
+                    const SizedBox(height: 12),
+                    Expanded(
+                      child: ListView(
+                        controller: scroll,
+                        children: [
+                          if (_shoes.isEmpty)
+                            Padding(
+                              padding: const EdgeInsets.symmetric(vertical: 16),
+                              child: Text(
+                                S.noShoesRegistered,
+                                style: GoogleFonts.gowunBatang(
+                                  fontSize: 13,
+                                  color: const Color(0xFFA9A09A),
+                                ),
+                              ),
+                            )
+                          else
+                            ..._shoes.map((s) => Padding(
+                                  padding: const EdgeInsets.only(bottom: 12),
+                                  child: _buildShoeItem(s),
+                                )),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    _mysticSheetPrimaryButton(
+                      label: S.addNewShoe,
+                      onTap: () {
+                        Navigator.pop(ctx);
+                        _showAddShoeDialog();
+                      },
+                    ),
+                  ],
+                ),
+              ),
+            );
+          },
+        );
+      },
+    ).then((_) => _loadShoes());
   }
 
-  void _openGoalEditor() {
-    _showMysticInfo(S.isKo ? '목표 설정은 다음 업데이트에서 연결됩니다.' : 'Goal editor wiring pending.');
+  void _openVoicePickerMystic() {
+    SfxService().tapCard();
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: const Color(0xFF0A0606),
+      isScrollControlled: true,
+      builder: (ctx) {
+        return StatefulBuilder(
+          builder: (ctx, setSheet) {
+            return Padding(
+              padding: EdgeInsets.only(
+                left: 22,
+                right: 22,
+                top: 18,
+                bottom: MediaQuery.of(ctx).viewInsets.bottom + 24,
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  _mysticSheetHandle(),
+                  const SizedBox(height: 12),
+                  _mysticSheetTitle(hanja: '音', title: S.voiceSelection, en: 'V O I C E'),
+                  const SizedBox(height: 10),
+                  if (!_isPro)
+                    Padding(
+                      padding: const EdgeInsets.only(bottom: 12),
+                      child: Text(
+                        S.isKo
+                            ? '음성 선택은 PRO 전용입니다.'
+                            : 'Voice selection is a PRO feature.',
+                        style: GoogleFonts.nanumMyeongjo(
+                          fontSize: 11,
+                          color: const Color(0xFFC42029),
+                          letterSpacing: 0.6,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                    ),
+                  _mysticVoiceRow('harry', S.voiceHarry, setSheet),
+                  _mysticVoiceRow('callum', S.voiceCallum, setSheet),
+                  _mysticVoiceRow('drill', S.voiceDrill, setSheet),
+                ],
+              ),
+            );
+          },
+        );
+      },
+    );
   }
 
-  Future<void> _openProFlow() async {
-    if (_isPro) {
-      _showMysticInfo(S.isKo ? 'PRO 활성 상태입니다.' : 'PRO is active.');
-      return;
-    }
-    final ok = await PurchaseService().buyPro();
-    if (!ok && mounted) {
-      _showMysticInfo(S.isKo ? '구매를 시작할 수 없습니다.' : 'Could not start purchase.');
-    }
+  Widget _mysticVoiceRow(String id, String label, StateSetter setSheet) {
+    final isSelected = _selectedVoice == id;
+    final isPlaying = _playingPreview == id;
+    const bloodDry = Color(0xFF7A0A0E);
+    const bloodFresh = Color(0xFFC42029);
+    const borderInk = Color(0xFF2A1518);
+    const rice = Color(0xFFF0EBE3);
+    const fade = Color(0xFF5A4840);
+    const outline = Color(0xFF7A6858);
+
+    return GestureDetector(
+      behavior: HitTestBehavior.opaque,
+      onTap: () {
+        if (!_isPro) {
+          _showProLockDialog(title: 'PRO LOCKED', message: S.proBenefitVoice);
+          return;
+        }
+        SfxService().tapCard();
+        setState(() => _selectedVoice = id);
+        _save('voice', id);
+        setSheet(() {});
+      },
+      child: Container(
+        margin: const EdgeInsets.only(bottom: 10),
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
+        decoration: BoxDecoration(
+          border: Border.all(
+            color: isSelected ? bloodDry : borderInk,
+            width: 1,
+          ),
+          color: isSelected ? const Color(0x22C42029) : Colors.transparent,
+        ),
+        child: Row(
+          children: [
+            Container(
+              width: 14,
+              height: 14,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                border: Border.all(
+                  color: isSelected ? bloodFresh : outline,
+                  width: 1.5,
+                ),
+              ),
+              child: isSelected
+                  ? const Center(
+                      child: SizedBox(
+                        width: 6,
+                        height: 6,
+                        child: DecoratedBox(
+                          decoration: BoxDecoration(
+                            color: bloodFresh,
+                            shape: BoxShape.circle,
+                          ),
+                        ),
+                      ),
+                    )
+                  : null,
+            ),
+            const SizedBox(width: 14),
+            Expanded(
+              child: Text(
+                label,
+                style: GoogleFonts.nanumMyeongjo(
+                  fontSize: 13,
+                  color: _isPro ? rice : fade,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+            ),
+            GestureDetector(
+              onTap: _isPro
+                  ? () async {
+                      await _playPreview(id);
+                      setSheet(() {});
+                    }
+                  : null,
+              child: Container(
+                width: 30,
+                height: 30,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  border: Border.all(
+                    color: isPlaying ? bloodFresh : outline,
+                    width: 1,
+                  ),
+                ),
+                child: Icon(
+                  isPlaying ? Icons.stop_rounded : Icons.play_arrow_rounded,
+                  size: 16,
+                  color: isPlaying ? bloodFresh : const Color(0xFFA9A09A),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 
-  void _openPrivacy() {
-    _showMysticInfo(S.isKo ? '개인정보 처리방침' : 'Privacy policy');
+  void _showPrivacyMystic() {
+    SfxService().tapCard();
+    _openMysticDocSheet(
+      hanja: '助',
+      title: S.isKo ? '개인정보 처리방침' : 'Privacy Policy',
+      en: 'P R I V A C Y',
+      body: S.isKo
+          ? 'Shadow Run은 러닝 기록과 위치 데이터를 기기 내에만 저장합니다.\n\n'
+              '• 위치: 러닝 중 경로 추적에만 사용되며 외부로 전송되지 않습니다.\n'
+              '• 카메라: 프로필 사진 촬영 시에만 사용됩니다.\n'
+              '• 오디오: 공포 효과음 재생에만 사용됩니다.\n'
+              '• 구매: Apple/Google 결제 시스템을 통해 처리되며, '
+              '앱은 결제 상태만 확인합니다.\n\n'
+              '데이터를 서버에 업로드하지 않으며, 사용자를 추적하지 않습니다.'
+          : 'Shadow Run stores running records and location data only on your device.\n\n'
+              '• Location: used only for path tracking during runs. Never transmitted.\n'
+              '• Camera: only when taking a profile photo.\n'
+              '• Audio: only for horror sound effects.\n'
+              '• Purchases: handled by Apple/Google; we only read entitlement state.\n\n'
+              'We do not upload data or track users.',
+    );
   }
 
-  void _openReview() {
-    _showMysticInfo(S.isKo ? '리뷰 남기기' : 'Leave a review');
+  void _showTermsMystic() {
+    SfxService().tapCard();
+    _openMysticDocSheet(
+      hanja: '助',
+      title: S.isKo ? '이용 약관' : 'Terms of Service',
+      en: 'T E R M S',
+      body: S.isKo
+          ? 'Shadow Run을 사용함으로써 다음에 동의합니다.\n\n'
+              '• 러닝 중에는 주변 교통 및 장애물을 항상 주의하세요.\n'
+              '• 이 앱은 엔터테인먼트 목적이며 의료/운동 조언을 대체하지 않습니다.\n'
+              '• PRO 구독은 Apple/Google 계정에서 언제든 해지할 수 있습니다.\n'
+              '• 무료체험 7일 종료 후에는 자동으로 일반 계정으로 전환됩니다.\n'
+              '• 공포 레벨 3~5는 심박·불안을 유도할 수 있으니 본인 판단하에 사용하세요.'
+          : 'By using Shadow Run you agree to the following.\n\n'
+              '• Always watch for traffic and obstacles while running.\n'
+              '• This app is for entertainment and is not medical advice.\n'
+              '• PRO subscription can be canceled anytime from Apple/Google.\n'
+              '• After the 7-day trial ends, you are switched to the free tier.\n'
+              '• Anxiety levels 3-5 may trigger stress responses — use at your own discretion.',
+    );
   }
 
-  void _openTerms() {
-    _showMysticInfo(S.isKo ? '이용약관' : 'Terms of service');
+  void _openMysticDocSheet({
+    required String hanja,
+    required String title,
+    required String en,
+    required String body,
+  }) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: const Color(0xFF0A0606),
+      isScrollControlled: true,
+      builder: (ctx) => DraggableScrollableSheet(
+        initialChildSize: 0.75,
+        minChildSize: 0.4,
+        maxChildSize: 0.95,
+        expand: false,
+        builder: (ctx, scroll) => Padding(
+          padding: const EdgeInsets.fromLTRB(22, 18, 22, 24),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              _mysticSheetHandle(),
+              const SizedBox(height: 12),
+              _mysticSheetTitle(hanja: hanja, title: title, en: en),
+              const SizedBox(height: 16),
+              Expanded(
+                child: SingleChildScrollView(
+                  controller: scroll,
+                  child: Text(
+                    body,
+                    style: GoogleFonts.gowunBatang(
+                      fontSize: 13,
+                      color: const Color(0xFFF0EBE3),
+                      height: 1.8,
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 16),
+              _mysticSheetPrimaryButton(
+                label: S.isKo ? '닫기' : 'close',
+                onTap: () => Navigator.pop(ctx),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  // ---- Mystic sheet primitives ----
+  Widget _mysticSheetHandle() {
+    return Center(
+      child: Container(
+        width: 36,
+        height: 2,
+        color: const Color(0xFF2A1518),
+      ),
+    );
+  }
+
+  Widget _mysticSheetTitle({required String hanja, required String title, required String en}) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        Text(
+          hanja,
+          style: GoogleFonts.nanumMyeongjo(
+            fontSize: 28,
+            color: const Color(0xFF7A0A0E),
+            fontWeight: FontWeight.w800,
+          ),
+        ),
+        const SizedBox(width: 14),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                title,
+                style: GoogleFonts.nanumMyeongjo(
+                  fontSize: 18,
+                  color: const Color(0xFFF0EBE3),
+                  fontWeight: FontWeight.w800,
+                  letterSpacing: 1.4,
+                ),
+              ),
+              const SizedBox(height: 2),
+              Text(
+                en,
+                style: GoogleFonts.nanumMyeongjo(
+                  fontSize: 9,
+                  color: const Color(0xFF5A4840),
+                  letterSpacing: 3,
+                  fontWeight: FontWeight.w400,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _mysticSheetPrimaryButton({required String label, required VoidCallback onTap}) {
+    return GestureDetector(
+      behavior: HitTestBehavior.opaque,
+      onTap: onTap,
+      child: Container(
+        height: 46,
+        alignment: Alignment.center,
+        decoration: BoxDecoration(
+          border: Border.all(color: const Color(0xFF7A0A0E), width: 1),
+          color: const Color(0x22C42029),
+        ),
+        child: Text(
+          label,
+          style: GoogleFonts.nanumMyeongjo(
+            fontSize: 12,
+            color: const Color(0xFFC42029),
+            fontWeight: FontWeight.w800,
+            letterSpacing: 2.4,
+          ),
+        ),
+      ),
+    );
   }
 
   String _profileDisplayName() {
     // 기존 프로필 이름 필드가 없으므로 기본 라벨 사용.
     return S.isKo ? '도리수라' : 'Shadow';
-  }
-
-  void _showMysticInfo(String msg) {
-    if (!mounted) return;
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(msg),
-        backgroundColor: const Color(0xFF0A0606),
-        duration: const Duration(seconds: 2),
-      ),
-    );
   }
 
   Widget _buildDefaultLayout(BuildContext context) {
