@@ -29,6 +29,30 @@
 
 ## 최신
 
+### 2026-04-18 12:30 (Mac → Windows) — 빌드 13 외부 TestFlight 제출 ✅
+
+사용자가 주로 외부 테스트 사용해서 자동 처리:
+- 빌드 13 → 외부 그룹 `ganzitester` (id `24a71662-f507-4276-8774-8c0a506006ce`, publicLinkEnabled=true) 할당 (HTTP 204)
+- Beta App Review 제출 (HTTP 201, state `WAITING_FOR_REVIEW`)
+- Apple 심사 대기 — 첫 제출은 보통 24시간, 이후 빌드는 대부분 즉시~몇 시간 내 승인
+
+**⚠️ 참고:** ASC app-level betaAppReviewDetail 에 contactEmail = `dorisurararara@gamil.com` 로 저장돼있음. **오타** (gmail 의 `g` 빠짐). 심사 중 문제 생기면 Apple 연락 못 받을 수 있으니 사용자가 ASC UI 에서 고치는 것 권장.
+
+**자동화 스크립트 추가:**
+- `scripts/asc/_helpers.rb` — ASC API JWT + 호출 공용
+- `scripts/asc/check_build_status.rb` — 빌드 처리 상태 조회
+- `scripts/asc/submit_external_beta.rb` — 외부 그룹 할당 + Beta Review 제출 (멱등)
+- `scripts/deploy_testflight.sh` — 업로드 끝나면 외부 제출 명령어까지 안내
+
+앞으로 새 빌드마다:
+```
+./scripts/deploy_testflight.sh        # bump + build + upload
+./scripts/asc/check_build_status.rb   # VALID 되면
+./scripts/asc/submit_external_beta.rb # 외부 테스터 배포
+```
+
+---
+
 ### 2026-04-18 12:15 (Mac → Windows) — IAP 5개 ASC에 전부 자동 등록 완료 ✅
 
 **ASC REST API 로 인앱결제 상품 5개 전부 `READY_TO_SUBMIT` 상태까지 자동:**

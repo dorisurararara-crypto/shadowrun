@@ -32,4 +32,5 @@ xcrun altool --upload-app --type ios -f "$IPA_PATH" \
 
 echo ""
 echo "✓ 업로드 완료. Apple 처리 5~20분 후 TestFlight 반영."
-echo "  빌드 상태 확인: scripts/check_build_status.rb ${new_build}"
+echo "  빌드 상태 확인:        scripts/asc/check_build_status.rb ${new_build}"
+echo "  외부 테스트 제출:      scripts/asc/submit_external_beta.rb ${new_build}"
