@@ -208,13 +208,537 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
   /// T1 Pure Cinematic Settings — 모든 설정 기능 연결
   Widget _buildPureLayout(BuildContext context) {
-    return PureSettingsLayout(
-      userName: _profileDisplayName(),
-      isPro: _isPro,
-      horrorLevel: _horrorLevel,
-      onHorrorHeaderTap: _onHorrorHeaderTap,
-      onThemeTap: () => context.push('/settings/theme'),
-      onBack: () => context.go('/'),
+    final themeId = ThemeManager.I.currentId;
+    final themeName = S.isKo ? themeId.displayNameKo : themeId.displayName;
+    final purchase = PurchaseService();
+
+    return FutureBuilder<Directory>(
+      future: getApplicationDocumentsDirectory(),
+      builder: (ctx, snap) {
+        final File? photoFile = (_hasProfileFace && snap.hasData)
+            ? File('${snap.data!.path}/profile_face.png')
+            : null;
+        return FutureBuilder<String?>(
+          future: DatabaseHelper.getSetting('trial_start_date'),
+          builder: (ctx2, trialSnap) {
+            final trialUsed = trialSnap.data != null;
+            return PureSettingsLayout(
+              // Profile
+              userName: _profileDisplayName(),
+              hasProfilePhoto: _hasProfileFace,
+              profilePhotoFile: photoFile,
+              onProfilePhotoTap: _captureProfileFace,
+
+              // Pro
+              isPro: _isPro,
+              isTrial: purchase.isTrial,
+              trialDaysLeft: purchase.trialDaysLeft,
+              trialAlreadyUsed: trialUsed,
+
+              // Appearance
+              themeDisplayName: themeName,
+              onThemeTap: () => context.push('/settings/theme'),
+              langCode: S.isKo ? 'ko' : 'en',
+              onLangChange: _onLangChange,
+              runMode: _runMode,
+              onRunModeChange: _onPureRunModeChange,
+              unit: _unit,
+              onUnitChange: _onPureUnitChange,
+
+              // Run / Goal
+              shoes: _shoes,
+              onShoesTap: _openShoeManager,
+              activeGoal: _activeGoal,
+              onGoalEditTap: () => _showGoalDialog(existing: _activeGoal),
+
+              // Audio / Fear
+              ttsEnabled: _ttsEnabled,
+              onTtsToggle: (v) {
+                setState(() => _ttsEnabled = v);
+                _save('tts_enabled', '$v');
+              },
+              sfxEnabled: _stadiumFinale,
+              onSfxToggle: (v) {
+                setState(() => _stadiumFinale = v);
+                _save('stadium_finale', '$v');
+              },
+              hapticEnabled: _vibrationEnabled,
+              onHapticToggle: (v) {
+                setState(() => _vibrationEnabled = v);
+                _save('vibration_enabled', '$v');
+              },
+              voiceId: _selectedVoice,
+              voiceLabel: _voiceDisplayLabel(_selectedVoice),
+              onVoiceTap: _openPureVoicePicker,
+              horrorLevel: _horrorLevel,
+              onHorrorLevelChange: _onPureHorrorChange,
+              onHorrorHeaderTap: _onHorrorHeaderTap,
+
+              // PRO
+              onProUpgradeTap: _onPureProUpgrade,
+              onStartTrialTap: _onPureStartTrial,
+              onRestorePurchases: _onPureRestore,
+
+              // Support
+              onPrivacyTap: _openPrivacyBottomSheet,
+              onTermsTap: _openTermsBottomSheet,
+
+              // Footer / Nav
+              versionLabel: 'v1.0.0 · build 12',
+              onBack: () => context.go('/'),
+            );
+          },
+        );
+      },
+    );
+  }
+
+  // ---- Pure Cinematic handlers ----
+  Future<void> _onLangChange(String code) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('language', code);
+    await S.init(code);
+    if (mounted) setState(() {});
+  }
+
+  void _onPureRunModeChange(String v) {
+    final locked = v != 'fullmap' && !_isPro;
+    if (locked) {
+      _showProLockDialog(title: S.proModeLockedTitle, message: S.proModeLockedMsg);
+      return;
+    }
+    setState(() => _runMode = v);
+    _save('run_mode', v);
+  }
+
+  void _onPureUnitChange(String v) {
+    setState(() => _unit = v);
+    _save('unit', v);
+    RunModel.setUnit(v);
+  }
+
+  void _onPureHorrorChange(int level) {
+    if (!_isPro && level > 2) {
+      setState(() => _horrorLevel = 2);
+      _save('horror_level', '2');
+      _showProLockDialog(
+        title: 'PRO LOCKED',
+        message: S.isKo
+            ? '공포 레벨 3~5는 PRO 전용입니다.\n업그레이드하여 궁극의 공포를 경험하세요.'
+            : 'Anxiety levels 3-5 require PRO.\nUpgrade to experience ultimate terror.',
+      );
+      return;
+    }
+    if (level != _horrorLevel) SfxService().toggle();
+    setState(() => _horrorLevel = level);
+    _save('horror_level', '$level');
+  }
+
+  Future<void> _onPureProUpgrade() async {
+    if (_isPro && !PurchaseService().isTrial) {
+      _showPureToast(S.isKo ? 'PRO 활성 상태입니다.' : 'PRO is active.');
+      return;
+    }
+    final ok = await PurchaseService().buyPro();
+    if (!ok && mounted) {
+      _showPureToast(S.storeUnavailable);
+    } else if (ok && mounted) {
+      SfxService().levelup();
+    }
+  }
+
+  Future<void> _onPureStartTrial() async {
+    final started = await PurchaseService().startTrial();
+    if (!started || !mounted) return;
+    SfxService().levelup();
+    setState(() => _isPro = true);
+    _showPureToast(S.freeTrialBanner);
+  }
+
+  Future<void> _onPureRestore() async {
+    await PurchaseService().restorePurchases();
+    if (mounted) _showPureToast(S.restoreTrying);
+  }
+
+  String _voiceDisplayLabel(String id) {
+    switch (id) {
+      case 'callum':
+        return S.voiceCallum.split(' — ').first;
+      case 'drill':
+        return 'Drill Sergeant';
+      case 'harry':
+      default:
+        return 'Harry';
+    }
+  }
+
+  void _showPureToast(String msg) {
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(msg),
+        backgroundColor: const Color(0xFF0A0606),
+        duration: const Duration(seconds: 2),
+      ),
+    );
+  }
+
+  // ---- Pure Cinematic modal bottom sheets ----
+  void _openShoeManager() {
+    SfxService().tapCard();
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: const Color(0xFF0A0A0A),
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(2)),
+      ),
+      builder: (ctx) {
+        return StatefulBuilder(
+          builder: (ctx, setSheet) {
+            return DraggableScrollableSheet(
+              initialChildSize: 0.75,
+              minChildSize: 0.5,
+              maxChildSize: 0.95,
+              expand: false,
+              builder: (ctx, scroll) => Padding(
+                padding: const EdgeInsets.fromLTRB(24, 18, 24, 24),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    _pureSheetHandle(),
+                    const SizedBox(height: 12),
+                    _pureSheetTitle(S.shoeManagement, 'shoes'),
+                    const SizedBox(height: 12),
+                    Expanded(
+                      child: ListView(
+                        controller: scroll,
+                        children: [
+                          if (_shoes.isEmpty)
+                            Padding(
+                              padding: const EdgeInsets.symmetric(vertical: 16),
+                              child: Text(
+                                S.noShoesRegistered,
+                                style: GoogleFonts.notoSerifKr(
+                                  fontSize: 13,
+                                  color: const Color(0xFF9A9A9A),
+                                ),
+                              ),
+                            )
+                          else
+                            ..._shoes.map((s) => Padding(
+                                  padding: const EdgeInsets.only(bottom: 12),
+                                  child: _buildShoeItem(s),
+                                )),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    _pureSheetPrimaryButton(
+                      label: S.addNewShoe,
+                      onTap: () {
+                        Navigator.pop(ctx);
+                        _showAddShoeDialog();
+                      },
+                    ),
+                  ],
+                ),
+              ),
+            );
+          },
+        );
+      },
+    ).then((_) => _loadShoes());
+  }
+
+  void _openPureVoicePicker() {
+    SfxService().tapCard();
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: const Color(0xFF0A0A0A),
+      isScrollControlled: true,
+      builder: (ctx) {
+        return StatefulBuilder(
+          builder: (ctx, setSheet) {
+            return Padding(
+              padding: EdgeInsets.only(
+                left: 24,
+                right: 24,
+                top: 18,
+                bottom: MediaQuery.of(ctx).viewInsets.bottom + 24,
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  _pureSheetHandle(),
+                  const SizedBox(height: 12),
+                  _pureSheetTitle(S.voiceSelection, 'voice of shadow'),
+                  const SizedBox(height: 8),
+                  if (!_isPro)
+                    Padding(
+                      padding: const EdgeInsets.only(bottom: 12),
+                      child: Text(
+                        S.isKo
+                            ? '음성 선택은 PRO 전용입니다.'
+                            : 'Voice selection is a PRO feature.',
+                        style: GoogleFonts.playfairDisplay(
+                          fontSize: 11,
+                          color: const Color(0xFFC83030),
+                          fontStyle: FontStyle.italic,
+                          letterSpacing: 0.6,
+                        ),
+                      ),
+                    ),
+                  _pureVoiceRow('harry', S.voiceHarry, setSheet),
+                  _pureVoiceRow('callum', S.voiceCallum, setSheet),
+                  _pureVoiceRow('drill', S.voiceDrill, setSheet),
+                ],
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
+
+  Widget _pureVoiceRow(String id, String label, StateSetter setSheet) {
+    final isSelected = _selectedVoice == id;
+    final isPlaying = _playingPreview == id;
+    return GestureDetector(
+      behavior: HitTestBehavior.opaque,
+      onTap: () {
+        if (!_isPro) {
+          _showProLockDialog(title: 'PRO LOCKED', message: S.proBenefitVoice);
+          return;
+        }
+        SfxService().tapCard();
+        setState(() => _selectedVoice = id);
+        _save('voice', id);
+        setSheet(() {});
+      },
+      child: Container(
+        margin: const EdgeInsets.only(bottom: 10),
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
+        decoration: BoxDecoration(
+          border: Border.all(
+            color: isSelected ? const Color(0xFF8B0000) : const Color(0x14F5F5F5),
+            width: 1,
+          ),
+          color: isSelected ? const Color(0x14C83030) : Colors.transparent,
+        ),
+        child: Row(
+          children: [
+            Container(
+              width: 14,
+              height: 14,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                border: Border.all(
+                  color: isSelected ? const Color(0xFFC83030) : const Color(0xFF5A5A5E),
+                  width: 1.5,
+                ),
+              ),
+              child: isSelected
+                  ? const Center(
+                      child: SizedBox(
+                        width: 6,
+                        height: 6,
+                        child: DecoratedBox(
+                          decoration: BoxDecoration(
+                            color: Color(0xFFC83030),
+                            shape: BoxShape.circle,
+                          ),
+                        ),
+                      ),
+                    )
+                  : null,
+            ),
+            const SizedBox(width: 14),
+            Expanded(
+              child: Text(
+                label,
+                style: GoogleFonts.notoSerifKr(
+                  fontSize: 13,
+                  color: _isPro ? const Color(0xFFF5F5F5) : const Color(0xFF5A5A5E),
+                ),
+              ),
+            ),
+            GestureDetector(
+              onTap: _isPro
+                  ? () async {
+                      await _playPreview(id);
+                      setSheet(() {});
+                    }
+                  : null,
+              child: Container(
+                width: 30,
+                height: 30,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  border: Border.all(
+                    color: isPlaying ? const Color(0xFFC83030) : const Color(0xFF5A5A5E),
+                    width: 1,
+                  ),
+                ),
+                child: Icon(
+                  isPlaying ? Icons.stop_rounded : Icons.play_arrow_rounded,
+                  size: 16,
+                  color: isPlaying ? const Color(0xFFC83030) : const Color(0xFF9A9A9A),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _openPrivacyBottomSheet() {
+    SfxService().tapCard();
+    _openPureDocSheet(
+      title: S.isKo ? '개인정보 처리방침' : 'Privacy Policy',
+      body: S.isKo
+          ? 'Shadow Run은 러닝 기록과 위치 데이터를 기기 내에만 저장합니다.\n\n'
+              '• 위치: 러닝 중 경로 추적에만 사용되며 외부로 전송되지 않습니다.\n'
+              '• 카메라: 프로필 사진 촬영 시에만 사용됩니다.\n'
+              '• 오디오: 공포 효과음 재생에만 사용됩니다.\n'
+              '• 구매: Apple/Google 결제 시스템을 통해 처리되며, '
+              '앱은 결제 상태만 확인합니다.\n\n'
+              '데이터를 서버에 업로드하지 않으며, 사용자를 추적하지 않습니다.'
+          : 'Shadow Run stores running records and location data only on your device.\n\n'
+              '• Location: used only for path tracking during runs. Never transmitted.\n'
+              '• Camera: only when taking a profile photo.\n'
+              '• Audio: only for horror sound effects.\n'
+              '• Purchases: handled by Apple/Google; we only read entitlement state.\n\n'
+              'We do not upload data or track users.',
+    );
+  }
+
+  void _openTermsBottomSheet() {
+    SfxService().tapCard();
+    _openPureDocSheet(
+      title: S.isKo ? '이용 약관' : 'Terms of Service',
+      body: S.isKo
+          ? 'Shadow Run을 사용함으로써 다음에 동의합니다.\n\n'
+              '• 러닝 중에는 주변 교통 및 장애물을 항상 주의하세요.\n'
+              '• 이 앱은 엔터테인먼트 목적이며 의료/운동 조언을 대체하지 않습니다.\n'
+              '• PRO 구독은 Apple/Google 계정에서 언제든 해지할 수 있습니다.\n'
+              '• 무료체험 7일 종료 후에는 자동으로 일반 계정으로 전환됩니다.\n'
+              '• 공포 레벨 3~5는 심박·불안을 유도할 수 있으니 본인 판단하에 사용하세요.'
+          : 'By using Shadow Run you agree to the following.\n\n'
+              '• Always watch for traffic and obstacles while running.\n'
+              '• This app is for entertainment and is not medical advice.\n'
+              '• PRO subscription can be canceled anytime from Apple/Google.\n'
+              '• After the 7-day trial ends, you are switched to the free tier.\n'
+              '• Anxiety levels 3-5 may trigger stress responses — use at your own discretion.',
+    );
+  }
+
+  void _openPureDocSheet({required String title, required String body}) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: const Color(0xFF0A0A0A),
+      isScrollControlled: true,
+      builder: (ctx) => DraggableScrollableSheet(
+        initialChildSize: 0.75,
+        minChildSize: 0.4,
+        maxChildSize: 0.95,
+        expand: false,
+        builder: (ctx, scroll) => Padding(
+          padding: const EdgeInsets.fromLTRB(24, 18, 24, 24),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              _pureSheetHandle(),
+              const SizedBox(height: 12),
+              _pureSheetTitle(title, 'document'),
+              const SizedBox(height: 16),
+              Expanded(
+                child: SingleChildScrollView(
+                  controller: scroll,
+                  child: Text(
+                    body,
+                    style: GoogleFonts.notoSerifKr(
+                      fontSize: 13,
+                      color: const Color(0xFFF5F5F5),
+                      height: 1.7,
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 16),
+              _pureSheetPrimaryButton(
+                label: S.isKo ? '닫기' : 'close',
+                onTap: () => Navigator.pop(ctx),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  // ---- Pure sheet primitives ----
+  Widget _pureSheetHandle() {
+    return Center(
+      child: Container(
+        width: 36,
+        height: 2,
+        color: const Color(0xFF3A3A3E),
+      ),
+    );
+  }
+
+  Widget _pureSheetTitle(String title, String sub) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          title,
+          style: GoogleFonts.playfairDisplay(
+            fontSize: 22,
+            color: const Color(0xFFF5F5F5),
+            fontStyle: FontStyle.italic,
+            fontWeight: FontWeight.w900,
+          ),
+        ),
+        const SizedBox(height: 4),
+        Text(
+          sub,
+          style: GoogleFonts.playfairDisplay(
+            fontSize: 10,
+            color: const Color(0xFFC83030),
+            letterSpacing: 3.0,
+            fontStyle: FontStyle.italic,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _pureSheetPrimaryButton({required String label, required VoidCallback onTap}) {
+    return GestureDetector(
+      behavior: HitTestBehavior.opaque,
+      onTap: onTap,
+      child: Container(
+        height: 46,
+        alignment: Alignment.center,
+        decoration: BoxDecoration(
+          border: Border.all(color: const Color(0xFF8B0000), width: 1),
+          color: const Color(0x14C83030),
+        ),
+        child: Text(
+          label,
+          style: GoogleFonts.playfairDisplay(
+            fontSize: 12,
+            color: const Color(0xFFC83030),
+            fontStyle: FontStyle.italic,
+            fontWeight: FontWeight.w700,
+            letterSpacing: 2.4,
+          ),
+        ),
+      ),
     );
   }
 
