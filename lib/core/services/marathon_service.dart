@@ -2,6 +2,7 @@ import 'dart:math';
 import 'package:flutter/foundation.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:shadowrun/core/l10n/app_strings.dart';
+import 'package:shadowrun/core/services/bgm_preferences.dart';
 
 class MarathonService {
   final AudioPlayer _ttsPlayer = AudioPlayer();
@@ -53,14 +54,38 @@ class MarathonService {
 
   Future<void> initialize({String voice = 'drill'}) async {
     _voiceId = voice;
+    final prefs = BgmPreferences.I;
+    // 사용자가 BGM off 또는 외부 음악 모드면 재생 안 함.
+    if (!prefs.enabled.value || prefs.externalMusicMode.value) {
+      return;
+    }
     try {
       final bgm = _bgmOptions[_random.nextInt(_bgmOptions.length)];
       await _bgmPlayer.setAsset('assets/audio/$bgm');
       _bgmPlayer.setLoopMode(LoopMode.one);
-      _bgmPlayer.setVolume(0.25);
+      _bgmPlayer.setVolume(prefs.effectiveVolume(0.25));
       _bgmPlayer.play().catchError((_) {});
+
+      // 사용자가 볼륨 바꾸면 실시간 반영.
+      prefs.volume.addListener(_onVolumeChanged);
+      prefs.enabled.addListener(_onEnabledChanged);
     } catch (e) {
       debugPrint('Marathon BGM 에러: $e');
+    }
+  }
+
+  void _onVolumeChanged() {
+    if (_isDisposed) return;
+    _bgmPlayer.setVolume(BgmPreferences.I.effectiveVolume(0.25));
+  }
+
+  void _onEnabledChanged() {
+    if (_isDisposed) return;
+    final on = BgmPreferences.I.enabled.value && !BgmPreferences.I.externalMusicMode.value;
+    if (on) {
+      _bgmPlayer.play().catchError((_) {});
+    } else {
+      _bgmPlayer.pause().catchError((_) {});
     }
   }
 
@@ -300,6 +325,8 @@ class MarathonService {
   void dispose() {
     if (_isDisposed) return;
     _isDisposed = true;
+    BgmPreferences.I.volume.removeListener(_onVolumeChanged);
+    BgmPreferences.I.enabled.removeListener(_onEnabledChanged);
     _ttsPlayer.dispose();
     _bgmPlayer.dispose();
   }

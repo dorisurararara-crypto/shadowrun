@@ -4,6 +4,7 @@ import 'package:just_audio/just_audio.dart';
 import 'package:vibration/vibration.dart';
 import 'package:shadowrun/core/l10n/app_strings.dart';
 import 'package:shadowrun/core/services/sfx_service.dart';
+import 'package:shadowrun/core/services/bgm_preferences.dart';
 
 enum ThreatLevel { safe, warningFar, warningClose, dangerFar, dangerClose, critical, aheadClose, aheadMid, aheadFar }
 
@@ -224,10 +225,16 @@ class HorrorService {
 
   Future<void> _playBgm(String filename, {double volume = 0.6}) async {
     if (_isDisposed) return;
+    // BGM preferences 반영 — 사용자가 off 했으면 재생 자체 생략.
+    final prefs = BgmPreferences.I;
+    if (!prefs.enabled.value || prefs.externalMusicMode.value) {
+      try { await _bgmPlayer.stop(); } catch (_) {}
+      return;
+    }
     try {
       await _bgmPlayer.setAsset('assets/audio/$filename');
       _bgmPlayer.setLoopMode(LoopMode.one);
-      _bgmPlayer.setVolume(volume);
+      _bgmPlayer.setVolume(prefs.effectiveVolume(volume));
       _bgmPlayer.play().catchError((_) {});
     } catch (e) {
       debugPrint('BGM 재생 에러: $e');

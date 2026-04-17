@@ -911,18 +911,6 @@ class PureSettingsLayout extends StatelessWidget {
               height: 1.7,
             ),
           ),
-          const SizedBox(height: 4),
-          Text(
-            S.isKo ? '× 7회 탭하여 잠금해제' : 'tap × 7 to unlock',
-            textAlign: TextAlign.center,
-            style: GoogleFonts.playfairDisplay(
-              fontSize: 10.5,
-              color: _inkGhost,
-              fontStyle: FontStyle.italic,
-              fontWeight: FontWeight.w400,
-              letterSpacing: 1.0,
-            ),
-          ),
         ],
       ),
     );

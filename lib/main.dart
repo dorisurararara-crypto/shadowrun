@@ -8,6 +8,7 @@ import 'core/theme/theme_manager.dart';
 import 'core/router/app_router.dart';
 import 'core/services/ad_service.dart';
 import 'core/services/purchase_service.dart';
+import 'core/services/bgm_preferences.dart';
 import 'core/l10n/app_strings.dart';
 import 'core/database/database_helper.dart';
 import 'shared/models/run_model.dart';
@@ -63,6 +64,12 @@ void main() async {
     await ThemeManager.I.loadSaved();
   } catch (e) {
     debugPrint('ThemeManager 로드 실패: $e');
+  }
+
+  try {
+    await BgmPreferences.I.loadSaved();
+  } catch (e) {
+    debugPrint('BgmPreferences 로드 실패: $e');
   }
 
   final langSelected = await isLanguageSelected();

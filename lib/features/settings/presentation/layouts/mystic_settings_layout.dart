@@ -900,28 +900,6 @@ class MysticSettingsLayout extends StatelessWidget {
     return Column(
       children: [
         Text(
-          '影 × 七 回',
-          textAlign: TextAlign.center,
-          style: GoogleFonts.nanumMyeongjo(
-            fontSize: 13,
-            color: _fade,
-            letterSpacing: 8,
-            fontWeight: FontWeight.w400,
-          ),
-        ),
-        const SizedBox(height: 6),
-        Text(
-          S.isKo ? '× 7회 탭하여 잠금해제' : 'tap × 7 to unlock',
-          textAlign: TextAlign.center,
-          style: GoogleFonts.gowunBatang(
-            fontSize: 10,
-            color: _fade,
-            letterSpacing: 1.6,
-            fontWeight: FontWeight.w400,
-          ),
-        ),
-        const SizedBox(height: 14),
-        Text(
           versionLabel,
           textAlign: TextAlign.center,
           style: GoogleFonts.nanumMyeongjo(
