@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:math' as math;
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 import 'package:shadowrun/shared/models/run_model.dart';
@@ -26,7 +27,7 @@ class DatabaseHelper {
     final path = join(await getDatabasesPath(), 'shadowrun.db');
     return openDatabase(
       path,
-      version: 3,
+      version: 4,
       onCreate: _onCreate,
       onUpgrade: _onUpgrade,
     );
@@ -60,6 +61,11 @@ class DatabaseHelper {
         )
       ''');
     }
+    if (oldVersion < 4) {
+      // 최종 그림자 간격(m) — 양수=앞섬, 음수=뒤처짐.
+      // 기존 레코드는 NULL 유지(표시부에서 fallback 계산).
+      await db.execute('ALTER TABLE runs ADD COLUMN final_shadow_gap_m REAL');
+    }
   }
 
   static Future<void> _onCreate(Database db, int version) async {
@@ -77,6 +83,7 @@ class DatabaseHelper {
         location TEXT,
         name TEXT,
         shoe_id INTEGER,
+        final_shadow_gap_m REAL,
         FOREIGN KEY (shadow_run_id) REFERENCES runs(id)
       )
     ''');
@@ -305,6 +312,281 @@ class DatabaseHelper {
       });
     }
     return result;
+  }
+
+  // --- Personal Records ---
+  /// 개인 최고 기록: 1km / 5km / 최장거리 / 최장 탈출 시간
+  /// - 1K/5K 는 해당 거리 이상 달린 러닝 중 avg_pace 최고(=작은 값)
+  /// - bestDistanceM: 단일 러닝 최장
+  /// - bestEscapeS: is_challenge && challenge_result='win' 중 duration_s 최대
+  static Future<Map<String, dynamic>> getPersonalRecords() async {
+    final db = await database;
+    final best1K = Sqflite.firstIntValue(
+      await db.rawQuery("SELECT MIN(avg_pace) FROM runs WHERE distance_m >= 1000 AND avg_pace > 0"),
+    );
+    final best5K = Sqflite.firstIntValue(
+      await db.rawQuery("SELECT MIN(avg_pace) FROM runs WHERE distance_m >= 5000 AND avg_pace > 0"),
+    );
+    final bestDistRow = await db.rawQuery("SELECT MAX(distance_m) as m FROM runs");
+    final bestDistanceM = (bestDistRow.first['m'] as num?)?.toDouble() ?? 0.0;
+    final bestEscapeRow = await db.rawQuery(
+      "SELECT MAX(duration_s) as s FROM runs WHERE is_challenge = 1 AND challenge_result = 'win'",
+    );
+    final bestEscapeS = (bestEscapeRow.first['s'] as num?)?.toInt() ?? 0;
+    return {
+      'best1KPace': best1K?.toDouble() ?? 0.0,
+      'best5KPace': best5K?.toDouble() ?? 0.0,
+      'bestDistanceM': bestDistanceM,
+      'bestEscapeS': bestEscapeS,
+    };
+  }
+
+  /// 도플갱어 전적: 총 도전 횟수, 승, 패, 승률, 평균 탈출 거리
+  static Future<Map<String, dynamic>> getDoppelgangerStats() async {
+    final db = await database;
+    final total = Sqflite.firstIntValue(
+      await db.rawQuery("SELECT COUNT(*) FROM runs WHERE is_challenge = 1"),
+    ) ?? 0;
+    final wins = Sqflite.firstIntValue(
+      await db.rawQuery("SELECT COUNT(*) FROM runs WHERE is_challenge = 1 AND challenge_result = 'win'"),
+    ) ?? 0;
+    final losses = Sqflite.firstIntValue(
+      await db.rawQuery("SELECT COUNT(*) FROM runs WHERE is_challenge = 1 AND challenge_result = 'lose'"),
+    ) ?? 0;
+    final avgEscapeRow = await db.rawQuery(
+      "SELECT AVG(distance_m) as m FROM runs WHERE is_challenge = 1 AND challenge_result = 'win'",
+    );
+    final avgEscapeM = (avgEscapeRow.first['m'] as num?)?.toDouble() ?? 0.0;
+    final winRate = total > 0 ? wins / total : 0.0;
+    return {
+      'total': total,
+      'wins': wins,
+      'losses': losses,
+      'winRate': winRate,
+      'avgEscapeM': avgEscapeM,
+    };
+  }
+
+  /// 연속 러닝 streak (달린 날짜 기준). 오늘 또는 어제까지 연속으로 1회 이상 달린 일수.
+  static Future<Map<String, dynamic>> getStreakInfo() async {
+    final db = await database;
+    final rows = await db.rawQuery(
+      "SELECT DISTINCT substr(date, 1, 10) as d FROM runs ORDER BY d DESC",
+    );
+    final dates = rows.map((r) => r['d'] as String).toSet();
+    final today = DateTime.now();
+    String fmt(DateTime d) => d.toIso8601String().substring(0, 10);
+
+    int current = 0;
+    // 오늘 또는 어제부터 역순으로 연속 일수 계산
+    DateTime cursor = today;
+    if (!dates.contains(fmt(cursor))) {
+      cursor = cursor.subtract(const Duration(days: 1));
+    }
+    while (dates.contains(fmt(cursor))) {
+      current++;
+      cursor = cursor.subtract(const Duration(days: 1));
+    }
+
+    // 최장 streak: 모든 날짜 탐색
+    int longest = 0;
+    int run = 0;
+    DateTime? prev;
+    final sorted = dates.toList()..sort();
+    for (final s in sorted) {
+      final d = DateTime.parse(s);
+      if (prev != null && d.difference(prev).inDays == 1) {
+        run++;
+      } else {
+        run = 1;
+      }
+      if (run > longest) longest = run;
+      prev = d;
+    }
+
+    final lastRunDate = sorted.isNotEmpty ? sorted.last : null;
+    return {
+      'current': current,
+      'longest': longest,
+      'lastRunDate': lastRunDate,
+    };
+  }
+
+  /// 히트맵 달력용 — 최근 N일의 날짜별 거리 맵 (yyyy-MM-dd → meters).
+  static Future<Map<String, double>> getDailyDistanceMap(int days) async {
+    final db = await database;
+    final from = DateTime.now().subtract(Duration(days: days - 1));
+    final fromIso = DateTime(from.year, from.month, from.day).toIso8601String();
+    final rows = await db.rawQuery(
+      "SELECT substr(date, 1, 10) as d, SUM(distance_m) as m FROM runs WHERE date >= ? GROUP BY d",
+      [fromIso],
+    );
+    final map = <String, double>{};
+    for (final r in rows) {
+      map[r['d'] as String] = (r['m'] as num?)?.toDouble() ?? 0.0;
+    }
+    return map;
+  }
+
+  /// 1km splits — run_points 를 순회하며 누적 거리 1km 단위로 끊어 split time 계산.
+  /// 반환: [{ km: 1, seconds: 345 }, { km: 2, seconds: 360 }, ...]
+  static Future<List<Map<String, dynamic>>> getSplits(int runId) async {
+    final points = await getRunPoints(runId);
+    if (points.length < 2) return [];
+    final splits = <Map<String, dynamic>>[];
+    double accumM = 0;
+    int kmIndex = 1;
+    int? kmStartMs = points.first.timestampMs;
+    for (int i = 1; i < points.length; i++) {
+      final prev = points[i - 1];
+      final cur = points[i];
+      final segM = _haversineM(prev.latitude, prev.longitude, cur.latitude, cur.longitude);
+      accumM += segM;
+      while (accumM >= kmIndex * 1000) {
+        final startMs = kmStartMs ?? cur.timestampMs;
+        final elapsed = ((cur.timestampMs - startMs) / 1000).round();
+        splits.add({'km': kmIndex, 'seconds': elapsed});
+        kmStartMs = cur.timestampMs;
+        kmIndex++;
+      }
+    }
+    return splits;
+  }
+
+  /// 페이스 분포 — easy (>6:30/km), chase (5:00~6:30), sprint (<5:00) 각 구간에서 보낸 초.
+  /// GPS speed 필드가 0/null 이면 인접 포인트 delta 로 fallback 계산 (에뮬/일부 단말 대응).
+  static Future<Map<String, int>> getPaceDistribution(int runId) async {
+    final points = await getRunPoints(runId);
+    if (points.length < 2) return {'easy': 0, 'chase': 0, 'sprint': 0};
+    int easy = 0, chase = 0, sprint = 0;
+    for (int i = 1; i < points.length; i++) {
+      final prev = points[i - 1];
+      final cur = points[i];
+      final dtS = (cur.timestampMs - prev.timestampMs) / 1000;
+      if (dtS <= 0 || dtS > 10) continue; // GPS 끊김 구간 제외
+      double speed = cur.speedMps > 0 ? cur.speedMps : 0;
+      // speed 0 fallback: 위치 delta / 시간
+      if (speed <= 0) {
+        final dM = _haversineM(prev.latitude, prev.longitude, cur.latitude, cur.longitude);
+        if (dM > 0 && dtS > 0) speed = dM / dtS;
+      }
+      if (speed < 0.3) continue; // 정지 상태
+      final paceMinPerKm = 1000 / (speed * 60);
+      if (paceMinPerKm > 6.5) {
+        easy += dtS.round();
+      } else if (paceMinPerKm >= 5.0) {
+        chase += dtS.round();
+      } else {
+        sprint += dtS.round();
+      }
+    }
+    return {'easy': easy, 'chase': chase, 'sprint': sprint};
+  }
+
+  static double _haversineM(double lat1, double lon1, double lat2, double lon2) {
+    const r = 6371000.0;
+    final dLat = (lat2 - lat1) * math.pi / 180;
+    final dLon = (lon2 - lon1) * math.pi / 180;
+    final a = math.sin(dLat / 2) * math.sin(dLat / 2) +
+        math.cos(lat1 * math.pi / 180) * math.cos(lat2 * math.pi / 180) *
+        math.sin(dLon / 2) * math.sin(dLon / 2);
+    return 2 * r * math.asin(math.sqrt(a).clamp(0.0, 1.0));
+  }
+
+  /// 전체 누적 거리(m) — 레벨 시스템 기준.
+  static Future<double> getTotalLifetimeDistance() async {
+    final db = await database;
+    final row = await db.rawQuery('SELECT SUM(distance_m) as m FROM runs');
+    return (row.first['m'] as num?)?.toDouble() ?? 0.0;
+  }
+
+  /// 최근 12개월 월별 거리 — NRC 스타일 막대/선 그래프용.
+  /// 반환: [{'monthStart': DateTime, 'distance': double(m), 'runs': int}]
+  static Future<List<Map<String, dynamic>>> getMonthlyDistanceLast12() async {
+    final db = await database;
+    final now = DateTime.now();
+    final result = <Map<String, dynamic>>[];
+    for (int i = 11; i >= 0; i--) {
+      final monthStart = DateTime(now.year, now.month - i, 1);
+      final nextMonth = DateTime(now.year, now.month - i + 1, 1);
+      final rows = await db.rawQuery(
+        'SELECT SUM(distance_m) as m, COUNT(*) as c FROM runs WHERE date >= ? AND date < ?',
+        [monthStart.toIso8601String(), nextMonth.toIso8601String()],
+      );
+      final r = rows.first;
+      result.add({
+        'monthStart': monthStart,
+        'distance': (r['m'] as num?)?.toDouble() ?? 0.0,
+        'runs': (r['c'] as num?)?.toInt() ?? 0,
+      });
+    }
+    return result;
+  }
+
+  /// 러닝 모드별 요약 — freerun / marathon / doppelganger(challenge) 카테고리.
+  /// 러닝 기록에 run_mode 컬럼이 없으면 is_challenge / name 기반으로 추정.
+  /// 반환: { 'doppelganger': {runs: N, distanceM: X}, 'freerun': {...}, 'marathon': {...} }
+  static Future<Map<String, Map<String, dynamic>>> getRunsByMode() async {
+    final db = await database;
+    final all = await db.query('runs');
+    final out = <String, Map<String, dynamic>>{
+      'doppelganger': {'runs': 0, 'distanceM': 0.0},
+      'freerun': {'runs': 0, 'distanceM': 0.0},
+      'marathon': {'runs': 0, 'distanceM': 0.0},
+    };
+    for (final r in all) {
+      final isChallenge = (r['is_challenge'] as int? ?? 0) == 1;
+      final name = (r['name'] as String? ?? '').toLowerCase();
+      final dist = (r['distance_m'] as num?)?.toDouble() ?? 0.0;
+      String key;
+      if (isChallenge) {
+        key = 'doppelganger';
+      } else if (name.contains('marathon') || name.contains('마라톤') || name.contains('legend') || name.contains('전설')) {
+        key = 'marathon';
+      } else {
+        key = 'freerun';
+      }
+      out[key]!['runs'] = (out[key]!['runs'] as int) + 1;
+      out[key]!['distanceM'] = (out[key]!['distanceM'] as double) + dist;
+    }
+    return out;
+  }
+
+  /// 배지 획득 평가 — DB 상태를 스캔해서 달성한 배지 id 리스트 반환.
+  /// BadgeDefs 테이블 없이 상수 기반으로 관리 (출시 시점 셋).
+  static Future<Set<String>> getEarnedBadges() async {
+    final db = await database;
+    final stats = await getStats();
+    final dopp = await getDoppelgangerStats();
+    final streak = await getStreakInfo();
+    final longestRun = Sqflite.firstIntValue(
+      await db.rawQuery('SELECT CAST(MAX(distance_m) AS INTEGER) FROM runs'),
+    ) ?? 0;
+
+    final out = <String>{};
+    // 거리 마일스톤 (단일 러닝 최장)
+    if (longestRun >= 1000) out.add('dist_1k');
+    if (longestRun >= 5000) out.add('dist_5k');
+    if (longestRun >= 10000) out.add('dist_10k');
+    if (longestRun >= 21097) out.add('dist_half');
+    if (longestRun >= 42195) out.add('dist_full');
+    // 누적 거리
+    final totalKm = ((stats['totalDistanceM'] as double?) ?? 0) / 1000;
+    if (totalKm >= 50) out.add('total_50k');
+    if (totalKm >= 200) out.add('total_200k');
+    if (totalKm >= 500) out.add('total_500k');
+    // 도플갱어 승
+    final wins = (dopp['wins'] as int?) ?? 0;
+    if (wins >= 1) out.add('dopp_first_win');
+    if (wins >= 10) out.add('dopp_10_wins');
+    if (wins >= 50) out.add('dopp_50_wins');
+    // streak
+    final longest = (streak['longest'] as int?) ?? 0;
+    if (longest >= 3) out.add('streak_3');
+    if (longest >= 7) out.add('streak_7');
+    if (longest >= 30) out.add('streak_30');
+    if (longest >= 100) out.add('streak_100');
+    return out;
   }
 
   // --- Daily Challenge Limit ---

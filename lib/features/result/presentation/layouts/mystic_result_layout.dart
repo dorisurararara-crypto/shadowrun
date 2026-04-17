@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:shadowrun/core/services/sfx_service.dart';
+import 'package:shadowrun/features/history/presentation/widgets/analytics_overview.dart';
+import 'package:shadowrun/features/result/presentation/widgets/result_detail_section.dart';
 
 /// 한국 민속 호러(T3) 테마의 러닝 결과 화면.
 ///
@@ -34,6 +36,9 @@ class MysticResultLayout extends StatelessWidget {
   final VoidCallback? onShare;
   final VoidCallback? onRestart;
 
+  /// DB에서 splits/페이스 분포를 읽을 runId. null이면 상세 섹션 생략.
+  final int? runId;
+
   const MysticResultLayout({
     super.key,
     required this.isWin,
@@ -48,6 +53,7 @@ class MysticResultLayout extends StatelessWidget {
     this.onClose,
     this.onShare,
     this.onRestart,
+    this.runId,
   });
 
   static const _ink = Color(0xFF050302);
@@ -163,8 +169,11 @@ class MysticResultLayout extends StatelessWidget {
                         const SizedBox(height: 18),
                         _buildStatsRow(),
                         _buildDoubleRule(),
-                        const SizedBox(height: 22),
-                        _buildChartSection(),
+                        // 자유러닝(도플갱어 없음)은 그림자 차트 숨김.
+                        if (isWin != null) ...[
+                          const SizedBox(height: 22),
+                          _buildChartSection(),
+                        ],
                         const SizedBox(height: 26),
                         Center(
                           child: Text(
@@ -179,6 +188,21 @@ class MysticResultLayout extends StatelessWidget {
                         ),
                         const SizedBox(height: 14),
                         _buildDetailList(),
+                        if (runId != null)
+                          ResultDetailSection(
+                            runId: runId!,
+                            palette: const AnalyticsPalette(
+                              card: Color(0xFF0D0607),
+                              border: _borderInk,
+                              text: _rice,
+                              muted: _outline,
+                              fade: _fade,
+                              accent: _bloodFresh,
+                              danger: _bloodFresh,
+                              numFamily: 'Nanum Myeongjo',
+                              bodyFamily: 'Gowun Batang',
+                            ),
+                          ),
                         const SizedBox(height: 28),
                         _buildActions(context),
                         const SizedBox(height: 16),

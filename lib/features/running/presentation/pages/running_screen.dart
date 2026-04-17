@@ -13,9 +13,11 @@ import 'package:shadowrun/core/services/running_service.dart';
 import 'package:shadowrun/core/database/database_helper.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:just_audio/just_audio.dart';
+import 'package:shadowrun/core/services/home_bgm_service.dart';
 import 'package:shadowrun/core/services/horror_service.dart';
 import 'package:shadowrun/core/services/marathon_service.dart';
 import 'package:shadowrun/core/services/solo_tts_service.dart';
+import 'package:shadowrun/core/services/tts_line_bank.dart';
 import 'package:shadowrun/core/l10n/app_strings.dart';
 import 'package:shadowrun/shared/models/run_model.dart';
 import 'package:shadowrun/core/services/sfx_service.dart';
@@ -95,7 +97,10 @@ class _RunningScreenState extends State<RunningScreen>
     _horrorService = HorrorService();
     _isSameLocation = widget.sameLocation;
     _runService.addListener(_onRunUpdate);
+    _wireTtsLineBank();
     _loadRunMode();
+    // 러닝 화면 진입 — 홈/메뉴 BGM 정지 (러닝 BGM은 MarathonService/HorrorService가 담당)
+    HomeBgmService.I.stop();
 
     _vignetteAnim = AnimationController(
       vsync: this,
@@ -383,6 +388,28 @@ class _RunningScreenState extends State<RunningScreen>
 
   void _onRunUpdate() {
     if (mounted) setState(() {});
+  }
+
+  /// TtsLineBank 훅 — marathon/freerun 에서만 사용.
+  /// doppelganger 는 horror_service 가 TTS 전담 (중복 방지).
+  void _wireTtsLineBank() {
+    if (widget.runMode == 'doppelganger') return;
+    final mode = widget.runMode; // 'marathon' or 'freerun'
+    _runService.onMilestoneKm = (km) {
+      if (!_ttsOn) return;
+      String? cat;
+      if (km == 1) {
+        cat = 'milestone_1k';
+      } else if (km == 5) {
+        cat = 'milestone_5k';
+      }
+      if (cat == null) return;
+      TtsLineBank.I.play(mode: mode, category: cat);
+    };
+    _runService.onPaceCategory = (cat) {
+      if (!_ttsOn) return;
+      TtsLineBank.I.play(mode: mode, category: cat);
+    };
   }
 
   void _handleWatchCommand(String command, Map<String, dynamic> data) {
@@ -937,6 +964,8 @@ class _RunningScreenState extends State<RunningScreen>
     _ticker?.cancel();
     _jumpscareDelayTimer?.cancel();
     _runService.onPositionUpdate = null;
+    _runService.onMilestoneKm = null;
+    _runService.onPaceCategory = null;
     _runService.removeListener(_onRunUpdate);
     _runService.dispose();
     _horrorService.dispose();
@@ -947,6 +976,8 @@ class _RunningScreenState extends State<RunningScreen>
     _jumpscareFlashAnim.dispose();
     _jumpscareShakeAnim.dispose();
     _stadiumPlayer.dispose();
+    // 러닝 화면 종료 — 홈/메뉴 BGM 재개
+    HomeBgmService.I.startForCurrentTheme();
     super.dispose();
   }
 

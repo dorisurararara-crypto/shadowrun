@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:shadowrun/core/l10n/app_strings.dart';
 
 /// T1 Pure Cinematic 테마의 러닝 중 화면.
 ///
@@ -74,10 +75,11 @@ class PureRunningLayout extends StatelessWidget {
   /// 도플갱어까지의 거리 표시. 양수 = 뒤(behind), 음수 = 앞(ahead · 위험).
   /// 미지/미시작 시 '--'.
   ({String num, String unit, String narr, bool danger}) _shadowDisplay() {
+    final isKo = S.isKo;
     if (!isChallenge || shadowGapM.isInfinite || shadowGapM.isNaN) {
       return (
         num: '--',
-        unit: 'meters · solo run',
+        unit: isKo ? '미터 · 혼자 달리기' : 'meters · solo run',
         narr: '오늘은 혼자 달린다.',
         danger: false,
       );
@@ -87,14 +89,14 @@ class PureRunningLayout extends StatelessWidget {
     if (behind) {
       return (
         num: absVal.toString(),
-        unit: 'meters · behind you',
+        unit: isKo ? '미터 · 뒤에 있다' : 'meters · behind you',
         narr: '그는 점점 가까워지고 있다.',
         danger: false,
       );
     }
     return (
       num: absVal.toString(),
-      unit: 'meters · ahead · 위험',
+      unit: isKo ? '미터 · 앞서 있다 · 위험' : 'meters · ahead · danger',
       narr: '그가 당신을 앞섰다.',
       danger: true,
     );
@@ -158,9 +160,10 @@ class PureRunningLayout extends StatelessWidget {
 
   // === Chasing 배너 ===
   Widget _buildChasingBar() {
+    final isKo = S.isKo;
     final label = isPaused
-        ? 'PAUSED'
-        : (isChallenge ? 'CHASING' : 'LIVE');
+        ? (isKo ? '일시정지' : 'PAUSED')
+        : (isChallenge ? (isKo ? '추격 중' : 'CHASING') : (isKo ? '진행 중' : 'LIVE'));
     return Container(
       margin: const EdgeInsets.fromLTRB(28, 12, 28, 0),
       padding: const EdgeInsets.symmetric(vertical: 10),
@@ -177,13 +180,20 @@ class PureRunningLayout extends StatelessWidget {
           const SizedBox(width: 10),
           Text(
             label,
-            style: GoogleFonts.playfairDisplay(
-              fontSize: 11,
-              fontStyle: FontStyle.italic,
-              fontWeight: FontWeight.w700,
-              color: _redSub,
-              letterSpacing: 5,
-            ),
+            style: isKo
+                ? GoogleFonts.notoSerifKr(
+                    fontSize: 11,
+                    fontWeight: FontWeight.w700,
+                    color: _redSub,
+                    letterSpacing: 5,
+                  )
+                : GoogleFonts.playfairDisplay(
+                    fontSize: 11,
+                    fontStyle: FontStyle.italic,
+                    fontWeight: FontWeight.w700,
+                    color: _redSub,
+                    letterSpacing: 5,
+                  ),
           ),
           const SizedBox(width: 10),
           const _BlinkingDot(color: _redSub, size: 7),
@@ -200,44 +210,59 @@ class PureRunningLayout extends StatelessWidget {
         children: [
           // Episode tag
           Text(
-            'Distance from the Doppelgänger',
-            style: GoogleFonts.playfairDisplay(
-              fontSize: 11,
-              fontStyle: FontStyle.italic,
-              color: _inkFade,
-              letterSpacing: 3.5,
-              fontWeight: FontWeight.w400,
-            ),
+            S.isKo ? '도플갱어와의 거리' : 'Distance from the Doppelgänger',
+            style: S.isKo
+                ? GoogleFonts.notoSerifKr(
+                    fontSize: 11,
+                    color: _inkFade,
+                    letterSpacing: 3.5,
+                    fontWeight: FontWeight.w500,
+                  )
+                : GoogleFonts.playfairDisplay(
+                    fontSize: 11,
+                    fontStyle: FontStyle.italic,
+                    color: _inkFade,
+                    letterSpacing: 3.5,
+                    fontWeight: FontWeight.w400,
+                  ),
             textAlign: TextAlign.center,
           ),
           const SizedBox(height: 10),
-          // 거대 숫자 — Playfair Italic, 140px, red glow
+          // 거대 숫자 — Playfair Italic. 3자리 숫자가 아래 unit 라인과 겹치지 않게
+          // fontSize 140 → 108, height 0.9 → 1.0, glow blur 축소, letterSpacing 0.
           Text(
             shadow.num,
             style: GoogleFonts.playfairDisplay(
-              fontSize: 140,
+              fontSize: 108,
               fontStyle: FontStyle.italic,
               fontWeight: FontWeight.w400,
               color: _ink,
-              height: 0.9,
-              letterSpacing: -6,
+              height: 1.0,
+              letterSpacing: -3,
               shadows: const [
-                Shadow(color: Color(0x668B0000), blurRadius: 40),
-                Shadow(color: Color(0x338B0000), blurRadius: 80),
+                Shadow(color: Color(0x668B0000), blurRadius: 24),
+                Shadow(color: Color(0x338B0000), blurRadius: 48),
               ],
             ),
           ),
-          const SizedBox(height: 4),
+          const SizedBox(height: 10),
           // meters · behind you
           Text(
             shadow.unit,
-            style: GoogleFonts.playfairDisplay(
-              fontSize: 16,
-              fontStyle: FontStyle.italic,
-              color: _redSub,
-              letterSpacing: 1.2,
-              fontWeight: FontWeight.w400,
-            ),
+            style: S.isKo
+                ? GoogleFonts.notoSerifKr(
+                    fontSize: 15,
+                    color: _redSub,
+                    letterSpacing: 1.2,
+                    fontWeight: FontWeight.w500,
+                  )
+                : GoogleFonts.playfairDisplay(
+                    fontSize: 16,
+                    fontStyle: FontStyle.italic,
+                    color: _redSub,
+                    letterSpacing: 1.2,
+                    fontWeight: FontWeight.w400,
+                  ),
           ),
           const SizedBox(height: 10),
           // 나레이션 — 노토 세리프 KR
@@ -317,11 +342,11 @@ class PureRunningLayout extends StatelessWidget {
       ),
       child: Row(
         children: [
-          Expanded(child: _statCell(label: 'ELAPSED', value: timeStr, unit: '')),
+          Expanded(child: _statCell(label: S.isKo ? '시간' : 'ELAPSED', value: timeStr, unit: '')),
           Container(width: 1, height: 36, color: _hair),
-          Expanded(child: _statCell(label: 'DISTANCE', value: dist.value, unit: dist.unit)),
+          Expanded(child: _statCell(label: S.isKo ? '거리' : 'DISTANCE', value: dist.value, unit: dist.unit)),
           Container(width: 1, height: 36, color: _hair),
-          Expanded(child: _statCell(label: 'PACE /KM', value: paceText, unit: '')),
+          Expanded(child: _statCell(label: S.isKo ? '페이스 /KM' : 'PACE /KM', value: paceText, unit: '')),
         ],
       ),
     );
@@ -364,13 +389,20 @@ class PureRunningLayout extends StatelessWidget {
           const SizedBox(height: 8),
           Text(
             label,
-            style: GoogleFonts.playfairDisplay(
-              fontSize: 9.5,
-              fontStyle: FontStyle.italic,
-              color: _inkFade,
-              letterSpacing: 3,
-              fontWeight: FontWeight.w400,
-            ),
+            style: S.isKo
+                ? GoogleFonts.notoSerifKr(
+                    fontSize: 9.5,
+                    color: _inkFade,
+                    letterSpacing: 3,
+                    fontWeight: FontWeight.w500,
+                  )
+                : GoogleFonts.playfairDisplay(
+                    fontSize: 9.5,
+                    fontStyle: FontStyle.italic,
+                    color: _inkFade,
+                    letterSpacing: 3,
+                    fontWeight: FontWeight.w400,
+                  ),
           ),
         ],
       ),
@@ -427,14 +459,21 @@ class PureRunningLayout extends StatelessWidget {
                   ),
                   child: Center(
                     child: Text(
-                      'STOP THE FILM',
-                      style: GoogleFonts.playfairDisplay(
-                        fontSize: 12,
-                        fontStyle: FontStyle.italic,
-                        color: _inkDim,
-                        letterSpacing: 5,
-                        fontWeight: FontWeight.w400,
-                      ),
+                      S.isKo ? '필름 정지' : 'STOP THE FILM',
+                      style: S.isKo
+                          ? GoogleFonts.notoSerifKr(
+                              fontSize: 12,
+                              color: _inkDim,
+                              letterSpacing: 5,
+                              fontWeight: FontWeight.w500,
+                            )
+                          : GoogleFonts.playfairDisplay(
+                              fontSize: 12,
+                              fontStyle: FontStyle.italic,
+                              color: _inkDim,
+                              letterSpacing: 5,
+                              fontWeight: FontWeight.w400,
+                            ),
                     ),
                   ),
                 ),

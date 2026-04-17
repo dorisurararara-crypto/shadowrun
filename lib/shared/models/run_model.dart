@@ -15,6 +15,8 @@ class RunModel {
   final String? location;
   final String? name;
   final int? shoeId;
+  /// 도플갱어 모드 최종 간격(m). 양수=앞섬(승리), 음수=뒤처짐(잡힘). 비도전 모드 null.
+  final double? finalShadowGapM;
 
   const RunModel({
     this.id,
@@ -29,6 +31,7 @@ class RunModel {
     this.location,
     this.name,
     this.shoeId,
+    this.finalShadowGapM,
   });
 
   Map<String, dynamic> toMap() => {
@@ -44,6 +47,7 @@ class RunModel {
     'location': location,
     'name': name,
     'shoe_id': shoeId,
+    'final_shadow_gap_m': finalShadowGapM,
   };
 
   factory RunModel.fromMap(Map<String, dynamic> map) => RunModel(
@@ -59,6 +63,7 @@ class RunModel {
     location: map['location'] as String?,
     name: map['name'] as String?,
     shoeId: map['shoe_id'] as int?,
+    finalShadowGapM: (map['final_shadow_gap_m'] as num?)?.toDouble(),
   );
 
   String get formattedDistance => formattedDistanceUnit(_useMiles ? 'mi' : 'km');

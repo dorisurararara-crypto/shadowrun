@@ -203,11 +203,13 @@ class _ResultScreenState extends State<ResultScreen>
             distanceM: run.distanceM,
             durationS: run.durationS,
             avgPaceText: run.formattedPace,
-            shadowGapM: _isChallenge ? _computeFinalShadowGapM() : null,
+            // DB에 저장된 최종 간격(multiplier 반영값) 우선, 없으면 fallback 계산.
+            shadowGapM: _isChallenge ? (run.finalShadowGapM ?? _computeFinalShadowGapM()) : null,
             shadowDistanceSeries: _buildShadowDistanceSeries(),
             maxPaceText: _computeMaxPaceText(),
             avgHeartRate: _computeAvgHeartRate(),
             calories: run.calories,
+            runId: widget.runId,
             onClose: () {
               SfxService().tapCard();
               context.go('/');
@@ -226,12 +228,14 @@ class _ResultScreenState extends State<ResultScreen>
             distanceM: run.distanceM,
             durationS: run.durationS,
             avgPaceText: run.formattedPace,
-            shadowGapM: _isChallenge ? _computeFinalShadowGapM() : null,
+            // DB에 저장된 최종 간격(multiplier 반영값) 우선, 없으면 fallback 계산.
+            shadowGapM: _isChallenge ? (run.finalShadowGapM ?? _computeFinalShadowGapM()) : null,
             shadowDistanceSeries: _buildShadowDistanceSeries(),
             maxPaceText: _computeMaxPaceText(),
             avgHeartRate: _computeAvgHeartRate(),
             calories: run.calories,
             episodeNumber: widget.runId,
+            runId: widget.runId,
             onClose: () {
               SfxService().tapCard();
               context.go('/');

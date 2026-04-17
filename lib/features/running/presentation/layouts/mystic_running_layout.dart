@@ -225,14 +225,14 @@ class MysticRunningLayout extends StatelessWidget {
               Text(
                 num,
                 style: GoogleFonts.nanumMyeongjo(
-                  fontSize: 140,
+                  fontSize: 108,
                   color: _rice,
-                  height: 0.9,
-                  letterSpacing: -2,
+                  height: 1.0,
+                  letterSpacing: -1,
                   fontWeight: FontWeight.w800,
                   shadows: const [
-                    Shadow(color: Color(0x66C42029), blurRadius: 40),
-                    Shadow(color: Color(0x33C42029), blurRadius: 80),
+                    Shadow(color: Color(0x66C42029), blurRadius: 24),
+                    Shadow(color: Color(0x33C42029), blurRadius: 48),
                   ],
                 ),
               ),

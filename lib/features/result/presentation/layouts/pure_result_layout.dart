@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:shadowrun/core/l10n/app_strings.dart';
 import 'package:shadowrun/core/services/sfx_service.dart';
+import 'package:shadowrun/features/history/presentation/widgets/analytics_overview.dart';
+import 'package:shadowrun/features/result/presentation/widgets/result_detail_section.dart';
 
 /// 순정 시네마(T1) 테마의 러닝 결과 화면.
 ///
@@ -38,6 +41,9 @@ class PureResultLayout extends StatelessWidget {
   final VoidCallback? onShare;
   final VoidCallback? onRestart;
 
+  /// DB에서 splits/페이스 분포를 조회할 runId. null이면 상세 섹션 생략.
+  final int? runId;
+
   const PureResultLayout({
     super.key,
     required this.isWin,
@@ -53,6 +59,7 @@ class PureResultLayout extends StatelessWidget {
     this.onClose,
     this.onShare,
     this.onRestart,
+    this.runId,
   });
 
   // Pure Cinematic 팔레트 (full-t1-pure.html 참고)
@@ -120,6 +127,9 @@ class PureResultLayout extends StatelessWidget {
   String get _episodeTag {
     final ep = episodeNumber;
     final epStr = ep == null ? '—' : ep.toString().padLeft(3, '0');
+    if (S.isKo) {
+      return '에피소드 $epStr · 엔드 크레딧';
+    }
     return 'Episode $epStr · End Credits';
   }
 
@@ -145,10 +155,28 @@ class PureResultLayout extends StatelessWidget {
                       _buildVerdict(),
                       const SizedBox(height: 26),
                       _buildStatsRow(),
-                      const SizedBox(height: 24),
-                      _buildChartSection(),
+                      // 자유러닝(도플갱어 없음)은 그림자 차트 숨김.
+                      if (isWin != null) ...[
+                        const SizedBox(height: 24),
+                        _buildChartSection(),
+                      ],
                       const SizedBox(height: 26),
                       _buildDetails(),
+                      if (runId != null)
+                        ResultDetailSection(
+                          runId: runId!,
+                          palette: const AnalyticsPalette(
+                            card: Color(0xFF0E0E0E),
+                            border: Color(0xFF1A1A1A),
+                            text: _ink,
+                            muted: _inkDim,
+                            fade: _inkFade,
+                            accent: _redSub,
+                            danger: _redSub,
+                            numFamily: 'Playfair Display',
+                            bodyFamily: 'Noto Serif KR',
+                          ),
+                        ),
                       const SizedBox(height: 28),
                       _buildActions(),
                       const SizedBox(height: 12),
@@ -190,13 +218,20 @@ class PureResultLayout extends StatelessWidget {
                   ),
                   const SizedBox(width: 8),
                   Text(
-                    'CLOSE',
-                    style: GoogleFonts.notoSerif(
-                      fontSize: 10,
-                      color: _inkFade,
-                      letterSpacing: 2,
-                      fontWeight: FontWeight.w300,
-                    ),
+                    S.isKo ? '닫기' : 'CLOSE',
+                    style: S.isKo
+                        ? GoogleFonts.notoSerifKr(
+                            fontSize: 10,
+                            color: _inkFade,
+                            letterSpacing: 2,
+                            fontWeight: FontWeight.w400,
+                          )
+                        : GoogleFonts.notoSerif(
+                            fontSize: 10,
+                            color: _inkFade,
+                            letterSpacing: 2,
+                            fontWeight: FontWeight.w300,
+                          ),
                   ),
                 ],
               ),
@@ -321,7 +356,7 @@ class PureResultLayout extends StatelessWidget {
         children: [
           Expanded(
             child: _statCell(
-              label: 'DISTANCE',
+              label: S.isKo ? '거리' : 'DISTANCE',
               value: _formattedDistance,
               unit: _distanceUnit,
             ),
@@ -329,7 +364,7 @@ class PureResultLayout extends StatelessWidget {
           Container(width: 1, height: 36, color: _hair),
           Expanded(
             child: _statCell(
-              label: 'ELAPSED',
+              label: S.isKo ? '시간' : 'ELAPSED',
               value: _formattedDuration,
               unit: '',
             ),
@@ -337,7 +372,7 @@ class PureResultLayout extends StatelessWidget {
           Container(width: 1, height: 36, color: _hair),
           Expanded(
             child: _statCell(
-              label: 'FINAL GAP',
+              label: S.isKo ? '최종 간격' : 'FINAL GAP',
               value: _formattedGap,
               unit: shadowGapM == null ? '' : 'm',
             ),
@@ -404,14 +439,21 @@ class PureResultLayout extends StatelessWidget {
           textBaseline: TextBaseline.alphabetic,
           children: [
             Text(
-              'DISTANCE FROM THE SHADOW',
-              style: GoogleFonts.playfairDisplay(
-                fontSize: 11,
-                fontStyle: FontStyle.italic,
-                color: _redSub,
-                letterSpacing: 3,
-                fontWeight: FontWeight.w400,
-              ),
+              S.isKo ? '그림자와의 거리' : 'DISTANCE FROM THE SHADOW',
+              style: S.isKo
+                  ? GoogleFonts.notoSerifKr(
+                      fontSize: 11,
+                      color: _redSub,
+                      letterSpacing: 3,
+                      fontWeight: FontWeight.w500,
+                    )
+                  : GoogleFonts.playfairDisplay(
+                      fontSize: 11,
+                      fontStyle: FontStyle.italic,
+                      color: _redSub,
+                      letterSpacing: 3,
+                      fontWeight: FontWeight.w400,
+                    ),
             ),
             const Spacer(),
             Text(
@@ -453,26 +495,38 @@ class PureResultLayout extends StatelessWidget {
                   top: 6,
                   left: 8,
                   child: Text(
-                    '+max',
-                    style: GoogleFonts.playfairDisplay(
-                      fontSize: 9,
-                      fontStyle: FontStyle.italic,
-                      color: _inkFade,
-                      fontWeight: FontWeight.w400,
-                    ),
+                    S.isKo ? '+최대' : '+max',
+                    style: S.isKo
+                        ? GoogleFonts.notoSerifKr(
+                            fontSize: 9,
+                            color: _inkFade,
+                            fontWeight: FontWeight.w400,
+                          )
+                        : GoogleFonts.playfairDisplay(
+                            fontSize: 9,
+                            fontStyle: FontStyle.italic,
+                            color: _inkFade,
+                            fontWeight: FontWeight.w400,
+                          ),
                   ),
                 ),
                 Positioned(
                   top: 6,
                   right: 8,
                   child: Text(
-                    'safe',
-                    style: GoogleFonts.playfairDisplay(
-                      fontSize: 9,
-                      fontStyle: FontStyle.italic,
-                      color: _redSub,
-                      fontWeight: FontWeight.w400,
-                    ),
+                    S.isKo ? '안전' : 'safe',
+                    style: S.isKo
+                        ? GoogleFonts.notoSerifKr(
+                            fontSize: 9,
+                            color: _redSub,
+                            fontWeight: FontWeight.w500,
+                          )
+                        : GoogleFonts.playfairDisplay(
+                            fontSize: 9,
+                            fontStyle: FontStyle.italic,
+                            color: _redSub,
+                            fontWeight: FontWeight.w400,
+                          ),
                   ),
                 ),
                 Positioned(
@@ -492,13 +546,21 @@ class PureResultLayout extends StatelessWidget {
                   bottom: 5,
                   right: 8,
                   child: Text(
-                    isWin == false ? 'caught' : 'danger',
-                    style: GoogleFonts.playfairDisplay(
-                      fontSize: 9,
-                      fontStyle: FontStyle.italic,
-                      color: _inkFade,
-                      fontWeight: FontWeight.w400,
-                    ),
+                    S.isKo
+                        ? (isWin == false ? '잡힘' : '위험')
+                        : (isWin == false ? 'caught' : 'danger'),
+                    style: S.isKo
+                        ? GoogleFonts.notoSerifKr(
+                            fontSize: 9,
+                            color: _inkFade,
+                            fontWeight: FontWeight.w400,
+                          )
+                        : GoogleFonts.playfairDisplay(
+                            fontSize: 9,
+                            fontStyle: FontStyle.italic,
+                            color: _inkFade,
+                            fontWeight: FontWeight.w400,
+                          ),
                   ),
                 ),
               ],
@@ -543,14 +605,21 @@ class PureResultLayout extends StatelessWidget {
             border: Border(bottom: BorderSide(color: _hair, width: 1)),
           ),
           child: Text(
-            'THE FINE PRINT',
-            style: GoogleFonts.playfairDisplay(
-              fontSize: 11,
-              fontStyle: FontStyle.italic,
-              color: _redSub,
-              letterSpacing: 3,
-              fontWeight: FontWeight.w400,
-            ),
+            S.isKo ? '세부 기록' : 'THE FINE PRINT',
+            style: S.isKo
+                ? GoogleFonts.notoSerifKr(
+                    fontSize: 11,
+                    color: _redSub,
+                    letterSpacing: 3,
+                    fontWeight: FontWeight.w500,
+                  )
+                : GoogleFonts.playfairDisplay(
+                    fontSize: 11,
+                    fontStyle: FontStyle.italic,
+                    color: _redSub,
+                    letterSpacing: 3,
+                    fontWeight: FontWeight.w400,
+                  ),
           ),
         ),
         for (int i = 0; i < rows.length; i++)
@@ -626,14 +695,21 @@ class PureResultLayout extends StatelessWidget {
                 innerColor: Colors.transparent,
                 child: Center(
                   child: Text(
-                    'HOME',
-                    style: GoogleFonts.playfairDisplay(
-                      fontSize: 13,
-                      fontStyle: FontStyle.italic,
-                      color: _ink,
-                      letterSpacing: 5,
-                      fontWeight: FontWeight.w400,
-                    ),
+                    S.isKo ? '홈' : 'HOME',
+                    style: S.isKo
+                        ? GoogleFonts.notoSerifKr(
+                            fontSize: 13,
+                            color: _ink,
+                            letterSpacing: 5,
+                            fontWeight: FontWeight.w500,
+                          )
+                        : GoogleFonts.playfairDisplay(
+                            fontSize: 13,
+                            fontStyle: FontStyle.italic,
+                            color: _ink,
+                            letterSpacing: 5,
+                            fontWeight: FontWeight.w400,
+                          ),
                   ),
                 ),
               ),
@@ -655,14 +731,21 @@ class PureResultLayout extends StatelessWidget {
                 innerColor: const Color(0xFF0A0000),
                 child: Center(
                   child: Text(
-                    'AGAIN',
-                    style: GoogleFonts.playfairDisplay(
-                      fontSize: 13,
-                      fontStyle: FontStyle.italic,
-                      color: _redSub,
-                      letterSpacing: 5,
-                      fontWeight: FontWeight.w700,
-                    ),
+                    S.isKo ? '다시' : 'AGAIN',
+                    style: S.isKo
+                        ? GoogleFonts.notoSerifKr(
+                            fontSize: 13,
+                            color: _redSub,
+                            letterSpacing: 5,
+                            fontWeight: FontWeight.w700,
+                          )
+                        : GoogleFonts.playfairDisplay(
+                            fontSize: 13,
+                            fontStyle: FontStyle.italic,
+                            color: _redSub,
+                            letterSpacing: 5,
+                            fontWeight: FontWeight.w700,
+                          ),
                   ),
                 ),
               ),
