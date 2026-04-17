@@ -1,0 +1,1367 @@
+html {overflow: scroll; overflow-x: auto;}
+/**/
+var mylogURL = 'https://blog.naver.com';
+var adminURL = 'https://admin.blog.naver.com';
+var noteURL = 'https://note.naver.com';
+var itemURL = 'https://item.naver.com';
+var cafeURL = 'https://cafe.naver.com';
+var profileURL = 'https://blog.naver.com';
+var blogURL = 'https://blog.naver.com';
+var blogURLHttp = 'https://blog.naver.com';
+var prologueURL = 'https://blog.naver.com';
+var sectionURL = 'https://section.blog.naver.com';
+var memologURL = 'https://blog.naver.com';
+var lifeURL = 'https://lifelog.blog.naver.com';
+var uploadURL = 'https://upload.blog.naver.com';
+var imageURL = 'https://blogimgs.pstatic.net';
+var attachURL = 'https://blogfiles.pstatic.net';
+var thumbnailURL = 'https://blogthumb.pstatic.net';
+var nonCachedThumbnailURL = 'https://blogthumb.pstatic.net';
+var filetransURL = 'http://filetrans.blog.naver.com';
+var item2_bridgeURL = 'http://bridge.item2.naver.com';
+var idURL = 'http://nid.naver.com';
+var idURLSecret = 'https://nid.naver.com';
+var mapviewURL = 'http://mapview.naver.com';
+var exifURL = 'https://exif-blog.ssl.phinf.net';
+var viewerImageUrl = imageURL + "/blog20/blog/layout_photo/viewer/";
+var domainURL = "";
+var greenReviewCampaignURL = 'http://campaign.naver.com';
+var writeURL = 'https://blog.naver.com';
+var spiURL = 'https://ssl.pstatic.net/spi';
+var blogProfileThumbnailUrl='https://blogpfthumb-phinf.pstatic.net';
+var naverCommentStaticURL = 'https://ssl.pstatic.net/static.cbox';
+var naverCommentApiURL = 'https://apis.naver.com/commentBox/cbox9';
+var naverCommentApiProxyURL = 'https://apis.naver.com/commentBox/blogid';
+var itemImagesURL = 'https://blogimgs.pstatic.net/item';
+var sCssUrlForPhotoLayer = 'https://ssl.pstatic.net/t.static.blog/mylog/versioning//common/css/storyphoto_original_viewer-adf5d27_https.css';
+var commonStatDailyURL = 'https://blog.stat.naver.com';
+var baUrl = 'https://scv-blog.io.naver.com/jackpotlog/v1/logs';
+var blogId = 'the_observeriter' || 'the_observeriter';
+var userId = '';
+var userNo = '';
+var userNaverId = '';
+var baUserKey = '__UNKNOWN__';
+var userIdNo = "";
+var isWritingBlocked = false;
+var isWritingBlockedBySpamIP = false;
+var isWritingBlockedBySpamIPManually = false;
+var isLoggedIn = false;
+var isShortestContentAreaWidth = false;
+var blogOwner = false;
+var blogNo = '156622918';
+var nickName = 'Healthy Super Ager';
+var isInitializingBlog = false;
+var rightClickOpenYn = false;
+var isMylogBlocked = false;
+var isBlogBlock = false;
+var blockOrWriteBlock = false;
+var autoSourcingYn = true;
+var isMemolog = false;
+var isMemologList = false;
+var isPrologue = false;
+var isBlogMe = false;
+var isUsingUrl = false;
+var isRequestFromIPad = false;
+var isOverIOS5_0Version = false;
+var isOverAndroidJellybeanVersion = false;
+var isCommingNaverApp = false;
+var isUsingNaverKitkatEngine = false;
+var isAndroidKitkatVersion = false;
+var defaultSmartEditorVersion = 2;
+var adContentLocation = "0";
+var gAdBucket = "";
+var readOnlyStatus = false;
+var readOnlyStatusAll = false;
+var readOnlyLinkErrorMsg = '죄송합니다. 블로그 서비스 점검 중입니다. \n점검 시간 동안은 기능 이용이 제한됩니다. \n자세한 내용은 블로그 홈 공지사항을 참고해주세요.';
+var readOnlyCommentMsg = '12월 17일(월) 오전 0시~8시 서비스 점검으로 댓글 작성이 제한됩니다. \n더욱 안정적인 서비스로 찾아뵙겠습니다. 불편하시더라도 조금만 기다려주세요.';
+var sIsTagReadOnly = '';
+var sTagSorryText = '죄송합니다. 태그 서비스 점검 중입니다.\n점검 시간 동안은 일부 서비스 이용이 제한됩니다.\n자세한 내용은 공지사항을 참조하세요.';
+var blogQuickPostingUseType = "NOT_SET";
+var isCommentReadOnly = false;
+var sCommentReadOnlyBlockSubmit = '죄송합니다. 블로그 댓글, 답글 서비스 점검 중에는 이용이 제한됩니다.';
+var sCommentReadOnlyWriteMsg = '서비스 점검으로 댓글 작성이 제한됩니다.\n더욱 안정적인 서비스로 찾아뵙겠습니다. 불편하시더라도 조금만 기다려주세요.';
+var isJeagleDebug = false;
+var skinId = "0";
+var skinType = "C";
+var isEnglish = "false";
+var areaCode = "11B10101";
+var weatherType = "0";
+var currencySign = "ALL";
+var listNumVisitor = '5';
+var isVisitorOpen = true;
+var isCategoryOpen = true;
+var writingMaterialListType = '1'
+var previewCalType = '';
+var oExternalWidget = [{'teminationMessageHtml':'','blockYn':false,'reversedWidgetCode':'E3%aF2%C3%E3%F2%+22%669wD3%epytF3%gnp.005x071F2%retirevresbo_eht.GNP.g4SIAIQcTj3P1T5Fr7FWN-IdGgREC8FIBx6n1t-EsscU.gswceHTD5ap4VJLYwcpU9g0NissBRMCd7Ilj41Yw8eY0.2czN0AjN0EDM3AzNxADMF2%wkjMfRDMyADNyAjMF2%ten.citatsp.seliftsopF2%F2%A3%sptthA0%22%D3%crs+gmiC3%E3%22%21D3%oNyrogetaCtnerapB3%pma62%21D3%oNyrogetacB3%pma62%tsiLtsopD3%morfB3%pma62%retirevresbo_ehtD3%dIgolbF3%revan.tsiLtsoPF2%moc.revan.golbF2%F2%A3%sptth22%D3%ferh++22%knalb_22%D3%tegrat+aC3%','serviceTerminated':false,'seq':10},{'teminationMessageHtml':'','blockYn':false,'reversedWidgetCode':'E3%aF2%C3%E3%F2%+22%669wD3%epytF3%gnp.005x071F2%retirevresbo_eht.GNP.g4SIAIQcTj3P1T5Fr7FWN-IdGgREC8FIBx6n1t-EsscU.gswceHTD5ap4VJLYwcpU9g0NissBRMCd7Ilj41Yw8eY0.2czN0AjN0EDM3AzNxADMF2%wkjMfRDMyADNyAjMF2%ten.citatsp.seliftsopF2%F2%A3%sptthA0%22%D3%crs+gmiC3%E3%22%31D3%oNyrogetaCtnerapB3%pma62%31D3%oNyrogetacB3%pma62%tsiLtsopD3%morfB3%pma62%retirevresbo_ehtD3%dIgolbF3%revan.tsiLtsoPF2%moc.revan.golbF2%F2%A3%sptth22%D3%ferh++22%knalb_22%D3%tegrat+aC3%','serviceTerminated':false,'seq':11},{'teminationMessageHtml':'','blockYn':false,'reversedWidgetCode':'E3%aF2%C3%E3%F2%+22%669wD3%epytF3%gnp.005x071F2%retirevresbo_eht.GNP.g4SIAIQcTj3P1T5Fr7FWN-IdGgREC8FIBx6n1t-EsscU.gswceHTD5ap4VJLYwcpU9g0NissBRMCd7Ilj41Yw8eY0.2czN0AjN0EDM3AzNxADMF2%wkjMfRDMyADNyAjMF2%ten.citatsp.seliftsopF2%F2%A3%sptthA0%22%D3%crs+gmiC3%E3%22%41D3%oNyrogetaCtnerapB3%pma62%41D3%oNyrogetacB3%pma62%tsiLtsopD3%morfB3%pma62%retirevresbo_ehtD3%dIgolbF3%revan.tsiLtsoPF2%moc.revan.golbF2%F2%A3%sptth22%D3%ferh++22%knalb_22%D3%tegrat+aC3%','serviceTerminated':false,'seq':12},{'teminationMessageHtml':'','blockYn':false,'reversedWidgetCode':'E3%aF2%C3%E3%F2%+22%A0%669wD3%epytF3%gnp.005x071F2%retirevresbo_eht.GNP.g4SIAIQcTj3P1T5Fr7FWN-IdGgREC8FIBx6n1t-EsscU.gswceHTD5ap4VJLYwcpU9g0NissBRMCd7Ilj41Yw8eY0.2czN0AjN0EDM3AzNxADMF2%wkjMfRDMyADNyAjMF2%ten.citatsp.seliftsopF2%F2%A3%sptthA0%22%D3%crs+gmiC3%E3%22%51D3%oNyrogetaCtnerapB3%pma62%51D3%oNyrogetacB3%pma62%tsiLtsopD3%morfB3%pma62%retirevresbo_ehtD3%dIgolbF3%revan.tsiLtsoPF2%moc.revan.golbF2%F2%A3%sptth22%D3%ferh++22%knalb_22%D3%tegrat+aC3%','serviceTerminated':false,'seq':13},{'teminationMessageHtml':'','blockYn':false,'reversedWidgetCode':'E3%aF2%C3%E3%F2%+22%669wD3%epytF3%gnp.005x071F2%retirevresbo_eht.GNP.g4SIAIQcTj3P1T5Fr7FWN-IdGgREC8FIBx6n1t-EsscU.gswceHTD5ap4VJLYwcpU9g0NissBRMCd7Ilj41Yw8eY0.2czN0AjN0EDM3AzNxADMF2%wkjMfRDMyADNyAjMF2%ten.citatsp.seliftsopF2%F2%A3%sptthA0%22%D3%crs+gmiC3%E3%22%C8%68%CE%CB%3A%CE%+0A%59%DE%99%F8%BE%4B%D9%CE%22%D3%ferh++22%knalb_22%D3%tegrat+aC3%','serviceTerminated':false,'seq':14},{'teminationMessageHtml':'','blockYn':false,'reversedWidgetCode':'E3%aF2%C3%E3%F2%+22%669wD3%epytF3%gnp.07x071F2%retirevresbo_eht.GNP.gIPi9XUrFz2n4MLkHGqlSIGQV2JmlHMLoX54Y9dubXi6.gsajb8G8EgEE2yLTyL10U12MRzq78H6YLWXEF-uDyXZC.zgzN0AjN0EDM3AzNxADMF2%4AjMfRDMyADNyAjMF2%ten.citatsp.seliftsopF2%F2%A3%sptthA0%22%D3%crs+gmiC3%E3%22%A0%21D3%oNyrogetaCtnerapB3%pma62%21D3%oNyrogetacB3%pma62%tsiLtsopD3%morfB3%pma62%retirevresbo_ehtD3%dIgolbF3%revan.tsiLtsoPF2%moc.revan.golbF2%F2%A3%sptth22%D3%ferh++22%knalb_22%D3%tegrat+aC3%','serviceTerminated':false,'seq':15},{'teminationMessageHtml':'','blockYn':false,'reversedWidgetCode':'E3%aF2%C3%E3%F2%+22%669wD3%epytF3%gnp.07x071F2%retirevresbo_eht.GNP.gIPi9XUrFz2n4MLkHGqlSIGQV2JmlHMLoX54Y9dubXi6.gsajb8G8EgEE2yLTyL10U12MRzq78H6YLWXEF-uDyXZC.zgzN0AjN0EDM3AzNxADMF2%4AjMfRDMyADNyAjMF2%ten.citatsp.seliftsopF2%F2%A3%sptthA0%22%D3%crs+gmiC3%E3%22%31D3%oNyrogetaCtnerapB3%pma62%31D3%oNyrogetacB3%pma62%tsiLtsopD3%morfB3%pma62%retirevresbo_ehtD3%dIgolbF3%revan.tsiLtsoPF2%moc.revan.golbF2%F2%A3%sptth22%D3%ferh++22%knalb_22%D3%tegrat+aC3%','serviceTerminated':false,'seq':16},{'teminationMessageHtml':'','blockYn':false,'reversedWidgetCode':'E3%aF2%C3%E3%F2%+22%A0%669wD3%epytF3%gnp.07x071F2%retirevresbo_eht.GNP.gIPi9XUrFz2n4MLkHGqlSIGQV2JmlHMLoX54Y9dubXi6.gsajb8G8EgEE2yLTyL10U12MRzq78H6YLWXEF-uDyXZC.zgzN0AjN0EDM3AzNxADMF2%4AjMfRDMyADNyAjMF2%ten.citatsp.seliftsopF2%F2%A3%sptthA0%22%D3%crs+gmiC3%E3%22%41D3%oNyrogetaCtnerapB3%pma62%41D3%oNyrogetacB3%pma62%tsiLtsopD3%morfB3%pma62%retirevresbo_ehtD3%dIgolbF3%revan.tsiLtsoPF2%moc.revan.golbF2%F2%A3%sptth22%D3%ferh++22%knalb_22%D3%tegrat+aC3%','serviceTerminated':false,'seq':17},{'teminationMessageHtml':'','blockYn':false,'reversedWidgetCode':'E3%aF2%C3%E3%F2%+22%669wD3%epytF3%gnp.07x071F2%retirevresbo_eht.GNP.gIPi9XUrFz2n4MLkHGqlSIGQV2JmlHMLoX54Y9dubXi6.gsajb8G8EgEE2yLTyL10U12MRzq78H6YLWXEF-uDyXZC.zgzN0AjN0EDM3AzNxADMF2%4AjMfRDMyADNyAjMF2%ten.citatsp.seliftsopF2%F2%A3%sptthA0%22%D3%crs+gmiC3%E3%22%51D3%oNyrogetaCtnerapB3%pma62%51D3%oNyrogetacB3%pma62%tsiLtsopD3%morfB3%pma62%retirevresbo_ehtD3%dIgolbF3%revan.tsiLtsoPF2%moc.revan.golbF2%F2%A3%sptth22%D3%ferh++22%knalb_22%D3%tegrat+aC3%','serviceTerminated':false,'seq':18},{'teminationMessageHtml':'','blockYn':false,'reversedWidgetCode':'E3%aF2%C3%E3%F2%+22%0A3%redrob22%D3%elyts+22%07122%D3%htdiw+22%gpj.48b9b80b03341ed461a09a5da15c061aF2%tegdiwF2%rk.oc.trahcgolb.tegdiwF2%F2%22%D3%crs+gmiC3%E3%22%0A3%redrob22%D3%elyts++22%rk.oc.trahcgolb.wwwF2%F2%A3%sptth22%D3%ferh+22%knalb_22%D3%tegrat+aC3%','serviceTerminated':false,'seq':19}];
+var calType = "";
+var curLog = 'https://blog.naver.com';
+var playerType = '0';
+var playerDesign = '0';
+var isCommentOpen = false;
+var listNumComment = 5;
+var isBuddyOpen = false;
+var userSelectMenu = '';
+var visitorgpData = '2';
+var vigitorSetUrl = '';
+var vigitorPropUrl = '/versioning//common/swf/Widget/visitorGP/VisitorGP-50a2c61.xml';
+var visitorgp_vars = {
+	setUrl    : vigitorSetUrl,
+	req_url   : '/NVisitorgp4Ajax.naver?blogId=' + blogId,
+	prop_url  : vigitorPropUrl,
+	graphType : visitorgpData,
+	flashvars : function(){
+		return "req_url=" + this.req_url +"&prop_url=" + this.prop_url +"&graphType=" + this.graphType;
+	},
+	height    : 121
+};
+var watchData = '';
+var watch_design = {
+	name    : watchData.split('|')[0],
+	font    : watchData.split('|')[1],
+	color   : watchData.split('|')[2],
+	bgcolor : watchData.split('|')[3]
+}
+var watch_vars = {
+	blogId : blogId,
+	skinType : skinType,
+	skinId : skinId
+}
+var serviceId = '';
+var naverId = '';
+var happyBeanApiURL = '';
+var reqparam = '';
+var HAPPYBEAN_API_URL = "";
+var HAPPYBEAN_FUND_URL = "";
+//var HAPPYBEAN_MY_URL   = "";
+var HAPPYBEAN_DONATION_URL = "";
+var selectCategoryNo = "0";
+var aNonWidget = ['rss', 'powered','adpost','buddyconnect','greenreview'];
+var aWidget = [];
+aWidget.push('profile');
+aWidget.push('category');
+aWidget.push('buddyconnect');
+aWidget.push('visitorgp');
+aWidget.push('counter');
+aWidget.push('19');
+aWidget.push('search');
+aWidget.push('rss');
+aWidget.push('menu');
+aWidget.push('10');
+aWidget.push('11');
+aWidget.push('12');
+aWidget.push('13');
+aWidget.push('14');
+aWidget.push('15');
+aWidget.push('16');
+aWidget.push('17');
+aWidget.push('18');
+aWidget.push('content');
+aWidget.push('gnb');
+aWidget.push('externalwidget');
+var bIsRemocon = false;
+var bIsPreview = document.location.href.indexOf("PostPreview.nhn") > -1 || document.location.href.indexOf("MemologMemoPreview.nhn") > -1;
+var isTopLayoutEmpty = false;
+var openSideType = "1";
+var foldSideType = "2";
+var g_ContentShareObject = {
+	adPostPreview : false,
+	adPostPreviewSide : false,
+	adPostPreviewContent : false,
+	adPostAlign : "",
+	adPostCount : ""
+};
+var blogDomainUrl = "";
+var sAjaxFlashUrl = '/versioning//common/lib/ajax.flash/ajax-885363e.swf';
+var isHappyBeanLeverage = false;
+var doc = document.documentElement;
+doc.setAttribute('data-useragent',navigator.userAgent);
+var gbIsNotOpenBlogUser = "false" === "true";
+var gbIsNPayAccepted = "false";
+var gbIsPayAcceptedOrBefore = "false";
+		초보 러닝앱 어플 비교 추천ㅣ갤럭시워치 나이키런클럽 스트라바 런데이 지도 표시 기능 러닝 기록 분석 : 네이버 블로그
+/**/
+    var gbTrackingCode = '';
+    var gbTrackingCodeReferer = '';
+    var gbIsOnNotAdPostAd = false;
+    var gbPostGdid = '90000003_0000000000000034090A5630';
+    var gbPostTitle = '\uCD08\uBCF4 \uB7EC\uB2DD\uC571 \uC5B4\uD50C \uBE44\uAD50 \uCD94\uCC9C\u3163\uAC24\uB7ED\uC2DC\uC6CC\uCE58 \uB098\uC774\uD0A4\uB7F0\uD074\uB7FD \uC2A4\uD2B8\uB77C\uBC14 \uB7F0\uB370\uC774 \uC9C0\uB3C4 \uD45C\uC2DC \uAE30\uB2A5 \uB7EC\uB2DD \uAE30\uB85D \uBD84\uC11D'
+JEagleEyeClient.setEnable(isJeagleDebug);
+	var autoCompleteToSearchSwitch = "true" === "true";
+			NAVER
+			블로그
+				건강하게 노화하자. Healthy Aging.
+					블로그 검색
+						이 블로그에서 검색
+													공감
+													0
+													칭찬
+													0
+													감사
+													0
+													웃김
+													0
+													놀람
+													0
+													슬픔
+													0
+									 span.u_likeit_button) 공감 face 3개 (전체)) -->
+											공감
+											0
+													공감
+													0
+													칭찬
+													0
+													감사
+													0
+													웃김
+													0
+													놀람
+													0
+													슬픔
+													0
+											댓글
+											10
+					공유하기
+        window.profileImagePhotoViewerOn = true;
+    $Fn(function () {
+        var thumbnailTypeW3840EnableDomainListJson = '["https://postfiles.pstatic.net","https://postfiles.pstatic.net","https://postfiles.pstatic.net","https://postfiles.pstatic.net","https://postfiles.pstatic.net","https://postfiles.pstatic.net","https://postfiles.pstatic.net","https://postfiles.pstatic.net","https://postfiles.pstatic.net","https://postfiles.pstatic.net","https://postfiles.pstatic.net","https://postfiles.pstatic.net","https://postfiles.pstatic.net","https://postfiles.pstatic.net","https://postfiles.pstatic.net","https://postfiles.pstatic.net","https://blogfiles.pstatic.net","https://blogfiles.pstatic.net","https://blogfiles.pstatic.net","https://blogfiles.pstatic.net","https://blogfiles.pstatic.net","https://blogfiles.pstatic.net","https://blogfiles.pstatic.net","https://blogfiles.pstatic.net","https://blogfiles.pstatic.net","https://blogfiles.pstatic.net","https://blogfiles.pstatic.net","https://blogfiles.pstatic.net","https://blogfiles.pstatic.net","https://blogfiles.pstatic.net","https://blogfiles.pstatic.net","https://blogfiles.pstatic.net","https://blogfiles.pstatic.net","https://blogfiles.pstatic.net","https://blogpfthumb-phinf.pstatic.net","https://blogthumb.pstatic.net","https://blogthumb.pstatic.net","https://blogthumb.pstatic.net"]';
+        var beyondAnalyticsUrl = "https://scv-blog.io.naver.com/jackpotlog/v1/logs";
+        PhotoViewerNew.initThumbnailTypeW3840EnableDomainListJson(thumbnailTypeW3840EnableDomainListJson);
+        if (typeof mylogBaEventSender != 'undefined' && typeof baUserKey != 'undefined') {
+            PhotoViewerNew.initBeyondAnalytics(mylogBaEventSender, beyondAnalyticsUrl, baUserKey)
+        }
+    }).attach(window, "load");
+                블로그 주소 변경 불가 안내
+                    블로그 마켓 판매자의 이력 관리를 위해
+                    블로그 주소 변경이 불가합니다.
+                자세히 보기
+                레이어 닫기
+                블로그 아이디가 필요해요!
+                    블로그에서 진짜 나를 기록하고
+                    다양한 이웃과 소식을 만나보세요. 지금 시작해볼까요?
+                블로그 아이디 만들기
+                블로그 아이디 만들기 레이어 닫기
+                blog.naver.com/
+                        입력 내용 삭제
+                        설정한 아이디는 나중에 변경할 수 없으니 신중하게 입력해주세요.
+                        변경 전 공유된 블로그/글/클립 링크는 연결이 끊길 수 있습니다.
+                        네이버 아이디 또는 개인정보가 포함된 문자 사용은 피해주세요.
+                        블로그 도움말에서 아이디 변경 유의사항을 확인해보세요.
+                    나중에 할게요
+                    1. 이전 주소로 공유된 글은
+                    3개월간 새로운 주소로 연결을 지원하며
+                    이후 언제든 연결이 끊길 수 있습니다.
+                    2. 블로그 아이디는 한번 변경하면
+                    다시 변경이 불가능합니다.
+                    변경하시겠습니까?
+                취소
+                확인
+                    블로그 아이디는 한번 정하면
+                    다시 변경이 불가능합니다.
+                이 아이디로 블로그를 만들까요?
+                취소
+                확인
+                환영합니다!
+                블로그 아이디가 만들어졌어요.
+                    blog.naver.com/
+                바로 시작하기
+                추가정보 입력하기
+            기본정보를 입력해주세요.
+            나중에 언제든지 변경할 수 있어요.
+                프로필 이미지 설정
+                        지우기
+                            사진 업로드
+                        취소
+                        적용
+                    별명
+                    블로그명
+                    블로그 주제
+                    주제 없음
+                        엔터테인먼트·예술
+                                문학·책
+                                영화
+                                미술·디자인
+                                공연·전시
+                                음악
+                                드라마
+                                스타·연예인
+                                만화·애니
+                                방송
+                        생활·노하우·쇼핑
+                                일상·생각
+                                육아·결혼
+                                반려동물
+                                좋은글·이미지
+                                패션·미용
+                                인테리어·DIY
+                                요리·레시피
+                                상품리뷰
+                                원예·재배
+                        취미·여가·여행
+                                게임
+                                스포츠
+                                사진
+                                자동차
+                                취미
+                                국내여행
+                                세계여행
+                                맛집
+                        지식·동향
+                                IT·컴퓨터
+                                사회·정치
+                                건강·의학
+                                비즈니스·경제
+                                어학·외국어
+                                교육·학문
+                        주제없음
+                                주제 선택 보류
+                    나중에 할게요
+                기본정보 입력
+                주제 선택
+                이웃 맺기
+                뒤로가기 버튼
+            주제를 선택해 주세요.
+            선택한 주제의 글과 이웃을 추천받을 수 있어요.
+                    나중에 할게요
+                기본정보 입력
+                주제 선택
+                이웃 맺기
+                뒤로가기 버튼
+            인기블로거와 이웃을 맺으세요.
+            이웃을 맺으면 이웃새글에서 글을 받아볼 수 있어요.
+                    블로그 시작하기
+                기본정보 입력
+                주제 선택
+                이웃 맺기
+                뒤로가기 버튼
+                확인
+                확인
+            이웃추가
+            이웃
+    jQuery.noConflict();
+메뉴 바로가기
+본문 바로가기
+					내 블로그
+			이웃블로그
+		블로그 홈
+			로그인
+	검색어 켜기
+ -->
+	var gnb_service="blog";
+	var gnb_template="gnb_utf8";
+	var gnb_brightness=1;
+	var gnb_url='https://blog.naver.com/the_observeriter/223489971760';
+	var gnb_logout = gnb_url;
+	var gnb_login = gnb_url;
+	var gnb_login_on_top = true;
+	var gnb_item_hide_option= 1|4|8|16|128;
+	var isGetGnbCalled = false;
+	window.onload = function() {
+		if (!isGetGnbCalled) {
+			getGNB();
+			isGetGnbCalled = true;
+		}
+		setSkipNavigationInfo();
+	};
+	//웹접근성 스킵네비게이션 설정
+	function setSkipNavigationInfo() {
+		var contentsId;
+		if ($("postListBody")) {
+			contentsId = "postListBody";
+		} else {
+			contentsId = "post-area";
+		}
+		if (contentsId) {
+			$("goContentsAreaLink").href = "#" + contentsId;
+			if (document.getElementById("goContentsAreaLink").addEventListener) {
+				document.getElementById("goContentsAreaLink").addEventListener(
+						'click', onClickChangeFocus, false);
+			} else if (document.getElementById("goContentsAreaLink").attachEvent) {	//IE8을 위한 이벤트 등록 리스너
+				document.getElementById("goContentsAreaLink").attachEvent(
+						'click', onClickChangeFocus);
+			}
+			function onClickChangeFocus() {
+				var t = document.getElementById(contentsId);
+				t.tabIndex = -1;
+				t.focus();
+				return false;
+			};
+		}
+	}
+	var goMarketAdmin = function (isWheelEvent) {
+		sendClickNlog('gnb_myb.itemlist','');
+		if (userAgentUtil.isSafariBrowser() || userAgentUtil.isUnderIE11VersionBrowser()){
+			if (confirm("이 브라우저는 현재 블로그 마켓 관리를 지원하지 않습니다.\n 네이버 웨일 등 다른 브라우저를 이용하시기 바랍니다.\n 지금 네이버 웨일을 설치하시겠습니까?")) {
+				window.open("https://whale.naver.com/ko/download");
+				return;
+			}
+			return;
+		}
+		if ("" === 'fee_not_set') {
+			if (confirm("배송비 설정을 마친 후 마켓 관리 메뉴에 접근할 수 있습니다. 배송비 설정으로 이동하시겠습니까?")) {
+				window.location = 'https://seller.blog.naver.com' + "/market/deliveryFee";
+				return;
+			}
+			return;
+		}
+		if(isWheelEvent){
+			window.open('https://seller.blog.naver.com' + "/market/my");
+			return;
+		}
+		if (window.parent) {
+			window.parent.location = 'https://seller.blog.naver.com' + "/market/my";
+			return;
+		}
+		window.location = 'https://seller.blog.naver.com' + "/market/my";
+	};
+    var doc = document.documentElement;
+    doc.setAttribute('data-useragent',navigator.userAgent);
+setTimeout(function() {
+	if (!isGetGnbCalled) {
+		getGNB();
+		isGetGnbCalled = true;
+	}
+}, 1500);
+					블로그 메뉴
+				프롤로그
+				블로그
+				지도
+				서재
+				안부
+블로그
+#post-area .commentbox_header,
+#post-area .u_cbox \{background:{=comment} !important;\}
+#post-area .u_cbox .u_cbox_name_area,
+#post-area .u_cbox .u_cbox_target_name,
+#post-area .u_cbox .u_cbox_comment .u_cbox_text_wrap,
+#post-area .u_cbox .u_cbox_date,
+#post-area .u_cbox .u_cbox_btn_report,
+#post-area .u_cbox .u_cbox_btn_unhide,
+#post-area .u_cbox .u_cbox_tool .u_cbox_btn_reply,
+#post-area .u_cbox .u_cbox_paginate .u_cbox_cnt_page,
+#post-area .u_cbox .u_cbox_paginate .u_cbox_num_page,
+#post-area .commentbox_header .btn_write_comment,
+#post-area .commentbox_header .commentbox_pagination .num,
+#post-area .commentbox_header .btn_pagination .icon,
+#post-area .post-btn .postre .u_likeit_list_module .u_likeit_list_btn,
+#post-area .u_cbox .u_cbox_recomm_set .u_cbox_ico_recomm:before,
+#post-area .u_cbox .u_cbox_recomm_set .u_cbox_cnt_recomm,
+#post-area .u_cbox .u_cbox_ico_stat_secret,
+#post-area .u_cbox .u_cbox_work_sub .u_cbox_ico_open \{color:{=pcol2} !important;\}
+#post-area .u_cbox .u_cbox_info_base .u_cbox_ico_bar \{background-color:{=pcol2} !important;\}
+#post-area .u_cbox .u_cbox_tool .u_cbox_btn_reply:before,
+#post-area .u_cbox .u_cbox_work_sub .u_cbox_work_box:before,
+#post-area .u_cbox .u_cbox_comment_box:before,
+#post-area .u_cbox .u_cbox_ico_reply,
+#post-area .u_cbox .u_cbox_paginate strong.u_cbox_page:before,
+#post-area .commentbox_header:before,
+#post-area .commentbox_header .btn_pagination a:before,
+#post-area .post-btn .postre .u_likeit_list_module .u_likeit_list_btn:before,
+#post-area .u_cbox .u_cbox_recomm_set .u_cbox_btn_recomm:before \{border-color:{=pcol2} !important;\}
+#post-area .u_cbox .u_cbox_mine .u_cbox_name_area,
+#post-area .u_cbox .u_cbox_paginate strong.u_cbox_page .u_cbox_num_page,
+#post-area .commentbox_header .commentbox_pagination .num strong,
+#post-area .post-btn .postre .u_likeit_list_module .u_likeit_list_btn.on,
+#post-area .u_cbox .u_cbox_recomm_set .u_cbox_btn_recomm_on .u_cbox_ico_recomm:before,
+#post-area .u_cbox .u_cbox_recomm_set .u_cbox_btn_recomm_on .u_cbox_cnt_recomm,
+#post-area .u_cbox .u_cbox_ico_editor .u_cbox_txt_editor \{color:{=pcol3} !important;\}
+#post-area .post-btn .postre .u_likeit_list_module .u_likeit_list_btn.on:before,
+#post-area .u_cbox .u_cbox_recomm_set .u_cbox_btn_recomm_on:before,
+#post-area .u_cbox .u_cbox_ico_editor \{border-color:{=pcol3} !important;\}
+#post-area .u_cbox .u_cbox_content_wrap:before,
+#post-area .u_cbox .u_cbox_comment_box:before,
+#post-area .u_cbox .u_cbox_comment .u_cbox_write_wrap:before,
+#post-area .u_cbox .u_cbox_tool .u_cbox_btn_reply:before,
+#post-area .u_cbox .u_cbox_work_sub .u_cbox_work_box:before,
+#post-area .u_cbox .u_cbox_ico_reply,
+#post-area .u_cbox .u_cbox_paginate strong.u_cbox_page:before,
+#post-area .commentbox_header:before,
+#post-area .commentbox_header .btn_pagination a:before,
+#post-area .post-btn .postre .u_likeit_list_module .u_likeit_list_btn:before,
+#post-area .u_cbox .u_cbox_recomm_set .u_cbox_btn_recomm:before
+\{border-color:{=pcol2};\}
+var isAutoPlayYN = false;
+var tagOpenModeType = '0';
+var tagMarkDisplayIfPostTagEmpty = false;
+var categoryNo = '0';
+var parentCategoryNo = '0';
+var categoryParentCategoryNo = '';
+var currentCategoryNo;
+if(categoryNo=="" && parentCategoryNo == ""){
+	currentCategoryNo = 0;
+}else if((categoryNo=="" || categoryNo=="0") && parentCategoryNo != ""){
+	currentCategoryNo = parentCategoryNo;
+}else if(categoryNo!=""){
+	currentCategoryNo = categoryNo;
+}
+var viewDate = '' || '';
+var isFromSearch = false;
+var isFromSection = false;
+var forFocusingTargetId = "category-name";
+var isFirstPage = false;
+var from = 'postView';
+var search_logNo = "223489971760";
+var postListTopCurrentPage = '1';
+var categoryName = "%EA%B1%B4%EA%B0%95+%EC%9A%B4%EB%8F%99+%EC%A0%9C%ED%92%88+%EB%A6%AC%EB%B7%B0+%ED%9B%84%EA%B8%B0";
+var gsGfMarketUrl = 'http://m.gfmarket.naver.com';
+var userTopListCurrentPage = "";
+var userTopListCount = "";
+var userTopListOpen = false;
+var userTopListManageOpen = false;
+var isTopListOpen = false;
+var topListPostCount = "5";
+var isTopListCategoryEmpty = true;
+if (!isTopListCategoryEmpty) {
+	isTopListOpen = false;
+	topListPostCount = "";
+}
+var isThumbnailList = false;
+var isThumbnailView = true;
+var aPostSendInfo = [];
+var aPostBaseInfo = [];
+var aPostFiles = [];
+var aPostVideoInfo = [];
+var aPostImageFileSizeInfo = [];
+var aPostAutoSourcingHtmlView = [];
+var aQueuePost = [];
+var htInitData = [];
+var paramLogNo = '223489971760';
+var blogId = 'the_observeriter';
+var isAfterWrite = false;
+var isRecommendedBlog = false;
+var gdidTag = [];
+var g_ssc = "blog.post";
+var nsc = "blog.post";
+var nFirstLogNo = "";
+var pagePerPostCount = 3;
+var sCommentNoPosition = '';
+var isCommentAreaOpen = false;
+var postBottomOptionalAreaType = '0';
+var commentAreaOpenType = '1';
+var isRelayAreaOpen = false;
+var isSympathyAreaOpen = false;
+var relayAreaOpenType = '2';
+var firstPostLogNo = "223489971760";
+var firstPostIsAllOpenPost = true;
+var searchImg = '';
+var searchVid = '';
+var blockedBlog = 'false';
+var videoAutoPlay = blockedBlog === 'false';
+var currentPage = '1';
+var tagParam = '' || '&logNo=223489971760';
+var imageWidth = '' || '936';
+var maxNoticePostCount = '5';
+var gbIsPostCommentOpen = false;
+var isDoPostAggregate = false;
+var apiGwUrl = 'https://apis.naver.com/';
+var likeItVideoEnable = true;
+var likeItVideoIdListJson = '[]';
+var likeItVideoContentsIdMapJson = '{}';
+var blogNicknameOrBlogId = 'Healthy Super Ager';
+var videoPlayerUrl = "https://ssl.pstatic.net/t.static.blog/mylog/versioning//lib/prismplayer/prismplayer-pc-1.10.1.min-b3ce59b_https.js";
+var advertiseInfoUrl = 'https://api.tv.naver.com';
+var isDevPhase = "false";
+var isStagePhase = "false";
+var isNotHasSe3AndSeOne = false;
+var isScrap = 'false' === 'true';
+var vodCloudPluginUrl;
+if (isDevPhase === 'true') {
+	vodCloudPluginUrl = "https://ssl.pstatic.net/t.static.blog/mylog/versioning//lib/prismplayer/vodcloud-plugin/vodcloud-config.dev-d5a61c0_https.js";
+} else if (isStagePhase === 'true') {
+	vodCloudPluginUrl = "https://ssl.pstatic.net/t.static.blog/mylog/versioning//lib/prismplayer/vodcloud-plugin/vodcloud-config.stage-22e3471_https.js";
+} else {
+	vodCloudPluginUrl = "https://ssl.pstatic.net/t.static.blog/mylog/versioning//lib/prismplayer/vodcloud-plugin/vodcloud-config.real-5601565_https.js";
+}
+var postAdvertiseEnableYN = true;
+var rproductId = '';
+var bLoginUser = 'false' === 'true';
+var isVideoSubtitleInsertEnable = 'false'  === 'true';
+var userNaverId = '';
+var showCoupon = 'false' === 'true';
+var gPcUrl = 'https://blog.naver.com';
+var hasProduct = 'false' === 'true';
+var feEnv = 'real';
+var infEnv = 'real';
+var	gbIsInf = "" == "true" ? true : false;
+var endPageProductMap = JSON.parse('{"223489971760":{"sellerNo":0,"hasProduct":false,"secedeSellerHasProduct":false,"productList":[],"delivery":{"merchantName":"","deliveryCompany":"","returnShippingFee":0,"exchangeShippingFee":0,"address1":"","address2":"","zipCode":"","phoneNumber":"","feePrice":0,"conditionalFree":0,"etcDeliveryFee":0},"postProductStatus":null,"tradeInterruptionSeller":false,"temporaryStopSeller":false,"leaveRequestSeller":false}}');
+var feMobileUrl= "https://fe-m.blog.naver.com";
+var blogModuleJs= "https://feblog.pstatic.net/module/real/market/market_1.0.3/js/market.js";
+var itemFactoryDomainDisabled = "true" === "true";
+var powerLinkABATestJson = JSON.parse('{}');
+var beyondAnalyticsUrl = "https://scv-blog.io.naver.com/jackpotlog/v1/logs";
+var baUserKey = "__UNKNOWN__";
+var userIdNo = "";
+	gUserId = "";
+	gBlogId = "the_observeriter";
+	gSE3Url = "https://blog.editor.naver.com/";
+    gsSesseionId = "";
+    gsSearchKeyword = "";
+    gsBlogOwnerYn = false? "Y" : "N";
+    gIsRabbitWriterOn = 'true';
+	gsSaInfo = "";
+	gbIsNotOpenBlogUser = "false" === "true";
+	gUserNaverId = "";
+		nFirstLogNo = "223489971760";
+        gnFirstLogNo = "223489971760";
+        gsFirstCategoryName = "\uAC74\uAC15 \uC6B4\uB3D9 \uC81C\uD488 \uB9AC\uBDF0 \uD6C4\uAE30";
+	gdidTag[1] = "90000003_0000000000000034090A5630";
+	aPostAutoSourcingHtmlView[1] = "[출처] 초보 러닝앱 어플 비교 추천ㅣ갤럭시워치 나이키런클럽 스트라바 런데이 지도 표시 기능 러닝 기록 분석|작성자 Healthy Super Ager
+";
+		aPostFiles[1] = JSON.parse('[]'.replace(/\\'/g, ''));
+	aPostVideoInfo[1] = [];
+	aPostImageFileSizeInfo[1] = '{\'\/MjAyNDA2MjRfMjAx\/MDAxNzE5MjMxNDU5MzMx.Va9McF6kcljMK26bVOf13O4DI3EEoLUmNO2X4p_e2Qkg.Sq7RbY6mqBuuTsuP3bFiGyu0J6w2my4BA1E7ZSFY6iog.JPEG\/%EF%A7%A6%E2%89%AA%EC%BF%82.JPG\': \'66,225|%EF%A7%A6%E2%89%AA%EC%BF%82.JPG\' , \'\/MjAyNDA2MjNfMjk0\/MDAxNzE5MTM2MTY2ODc3.dYMiGE_Z9hEg3SfhNLH1vokEcvapXT15CEhi23mwNusg.bVMT4JR_KorgicF2by30ArF5HxZdnLxRwU2KWoG_1vcg.JPEG\/IMG_5420.jpg\': \'187,648|IMG_5420.jpg\' , \'\/MjAyNDA2MjNfMzcg\/MDAxNzE5MTM2MTY2Nzkx.V_pXvql75v8qfwIkutSWBvi1AhHmapjbbeIo9Ir8Ehwg.xdul9_mNVX_ZL3u3KauvDOIjBnYF4tle8nPQOo6lubAg.JPEG\/IMG_5421.jpg\': \'170,302|IMG_5421.jpg\' , \'\/MjAyNDA2MjNfMTAw\/MDAxNzE5MTM0MjcyMTQx.ME_vwmWW9tufh_Lc_lbBz5xsakzbpz8sJqgVL6Ue6_Mg.O4vvvzALNYLQgJBcZyWSnmPJaH8DaZ3rNOMz2QO705og.JPEG\/IMG_5392.jpg\': \'150,880|IMG_5392.jpg\' , \'\/MjAyNDA2MjNfMjY2\/MDAxNzE5MTM0MjcyMjE1.6Bu0qNynVwTn5owB8Rk136JMYLTNhYU4ocvAQTMhu7Yg.-QS6Jgzs2H8aqLykZ9tKA1vP1jEtuyZxfrUxiX6GdTMg.JPEG\/IMG_5393.jpg\': \'266,983|IMG_5393.jpg\' , \'\/MjAyNDA2MjNfNDgg\/MDAxNzE5MTM2NjA3ODU0.8EYgxBPupSJWpvvVgsIGeMZYE3Sfp2Zkz0nKqPkEeiEg.13RNO6QDJzbxZ_cd9kLWeD5vnqHov276-LFJc1u40oAg.JPEG\/IMG_5422.jpg\': \'238,900|IMG_5422.jpg\' , \'\/MjAyNDA2MjNfNyAg\/MDAxNzE5MTM0NTMzNTUy.lGL0O03eUCe8l04x8rFahPwP53HsOuaAhUfNHTC2eTog.ZuMHw0iowWjvUCZcx2EjcoHT740BMqyxD_VAV8RhaR4g.GIF\/2968589424.gif\': \'980,822|2968589424.gif\' , \'\/MjAyNDA2MjNfNyAg\/MDAxNzE5MTM0Nzc5Mjg0.ohLBv6N3op1MaXV2sj57Qw-o3iwefo1s2EtYZ_pkaIYg.Jy5wHEcPeOXeD5nLor9jc-7-BmjqDsqVTeh024JkftAg.JPEG\/IMG_5406.jpg\': \'274,531|IMG_5406.jpg\' , \'\/MjAyNDA2MjNfMTc2\/MDAxNzE5MTM1MDEwMTE1.mpU_3LVQjatulRCNLRmMGPX81_tZszujczGTNdiUF50g.kAK7PRdUBbR5tx5f5bzPjUo_S4hfl6Kwi7FpwGeaq8Yg.JPEG\/IMG_5411.jpg\': \'175,742|IMG_5411.jpg\' , \'\/MjAyNDA2MjNfOTMg\/MDAxNzE5MTM0MjcyMTAy.KCIw8AafTsME13rY0GD71YuDxkSNIwqUx7Um0yQNKV0g.pwYoe3VMjCgEGcXKUSw6oXWvRHljWX7jr9AvzhTwL3Eg.JPEG\/IMG_5394.jpg\': \'81,119|IMG_5394.jpg\' , \'\/MjAyNDA2MjNfMjI3\/MDAxNzE5MTM0MjcyMDg1.UjMWdO8MWaXouxAmKXrNrAEQji_DWrM1Fo6Jf7iq2C8g.hq8k_ZR0mgfAs_Z1SP6k9AaAZaN-bjVhNXQ0k9R8ez0g.JPEG\/IMG_5395.jpg\': \'67,701|IMG_5395.jpg\' , \'\/MjAyNDA2MjNfNSAg\/MDAxNzE5MTM0MjcyMDA2.9LlFLvokRttJ_YAWbR6xkcnLUToWR2qwWWoeqcSX8qAg.232bJYi8Ym4ON25KVAS2FAvyx-QrYz0D6sUFg_EL2s0g.JPEG\/IMG_5396.jpg\': \'38,757|IMG_5396.jpg\' , \'\/MjAyNDA2MjNfMjgx\/MDAxNzE5MTM0MjcyMDUw.J1xop-xOtVUNkMVrS6ud_Hmdw7pNDx8_iJwiP6P694Ig.J8FyEiFsPrRDsgsxq1T3wlWMukRblEJeJgIdL9V3kfwg.JPEG\/IMG_5397.jpg\': \'114,374|IMG_5397.jpg\' , \'\/MjAyNDA2MjNfMjQ1\/MDAxNzE5MTM0NTA0MTUw.Jw8QSzBPBvoggxrKCthfEgBnNCwUPXeHCO5zaPla_kYg.GkpOsr81UGtHxMVkqj2qwu0OV9tLn1T9gEVUDAlqlGIg.JPEG\/IMG_5399.jpg\': \'157,112|IMG_5399.jpg\' , \'\/MjAyNDA2MjNfNjQg\/MDAxNzE5MTM0NTA0MDI1.9kdinUVZ2j3lvIKl3hFlK2MC2hoqfS8rmakqgU6kqqEg.TBGGoKdCWxRQABhiGjLWYGbLD2Y3lsHbGW20WGpYlaYg.JPEG\/IMG_5400.jpg\': \'68,287|IMG_5400.jpg\' , \'\/MjAyNDA2MTNfMjIx\/MDAxNzE4MjYxMzM1NTU4.GTLsWnHWtne6zr97QPSqWPAO279qerNZOld0kN8ripQg.qiqKHJGF4rs3g6yNRbiRZeFc-0sl1rIXo3a2bc_xStcg.JPEG\/IMG_5020.jpg\': \'73,465|IMG_5020.jpg\' , \'\/MjAyNDA2MjNfNjcg\/MDAxNzE5MTM0NTA0MTEx.WgpABaTRrTbGg7F4R_9TJftUy05gC6BTFPNMVmadDdog.1EnE39XH6sskWnqezdYaMRrubkVj1dpIqqGcRHkZbx4g.JPEG\/IMG_5402.jpg\': \'99,135|IMG_5402.jpg\' , \'\/MjAyNDA2MjRfMjQg\/MDAxNzE5MjIyMjcxNzAz.sXhSCZ5TOl3d7KJ446cgOK38N33gF6j3LJIRsgbRqr0g.6GIHvkhmgWkSotPEm8ilGE6j-E-lztMC1C8Kiaf5rv8g.JPEG\/IMG_5405.jpg\': \'472,105|IMG_5405.jpg\' , \'\/MjAyNDA2MjNfMjQ4\/MDAxNzE5MTM0Nzc5MTY0.PG_gcXoKZRnDByDFmHxVdYDbo0VtdYMnU8uoaT6J8bYg.QNm5zi1jK1JAns3iSX-nDM8VzdinRYWraW_6hSkke8og.JPEG\/IMG_5408.jpg\': \'95,487|IMG_5408.jpg\' , \'\/MjAyNDA2MjNfMjEy\/MDAxNzE5MTM0Nzc5MTI5.k8JcLic1pO1dPPRNPO8F4eP5wPa7lggjDK-mxtaiG6kg.Wvh6jZrr9u9f7lyAIzTltlWMzRLy8IS3FXinbeFeL-Ug.JPEG\/IMG_5409.jpg\': \'76,736|IMG_5409.jpg\' , \'\/MjAyNDA2MjNfMjUx\/MDAxNzE5MTM0Nzc5MTYz.IJO0RoNyTRzF5Z-APlTBvgOmX2tDVIO822kuvpn998kg.kvgKXMXH0gFvryz4mhUK_Q1mmaY5H-YCout993KPssYg.JPEG\/IMG_5410.jpg\': \'147,045|IMG_5410.jpg\' , \'\/MjAyNDA2MjNfMjc3\/MDAxNzE5MTM1MDEwMzc5.71462RvEsr8XHwGnvdR4ZFvLMkqn4_6KSujLyiEg_mAg.U7wT0fbS4J-6H3Lr2cMaQfFTKNwB6XkosdkEyic_w8Yg.JPEG\/IMG_5412.jpg\': \'41,096|IMG_5412.jpg\' , \'\/MjAyNDA2MjNfNDUg\/MDAxNzE5MTM1MDEwNDM1.2x3LOkeAOeEs9k8vyq-QQLU2r2e9KcC-uWf2PsYDsBIg.fMwu6VWQ-MzqeIGSdBkE7WvszuScr7wHU1SOGkbcXbsg.JPEG\/IMG_5413.jpg\': \'89,177|IMG_5413.jpg\' , \'\/MjAyNDA2MjNfMzEg\/MDAxNzE5MTM1MDEwMDU0.rzOIkARz0sNBXGUE9_ZeYbjonDnNxY4jjXYLFLklvJ4g.AJCQHFQYwvCSo_692yXAisjGf-rxllB8GMSY8L0q0O4g.JPEG\/IMG_5414.jpg\': \'63,895|IMG_5414.jpg\' , \'\/MjAyNDA2MjNfMjUg\/MDAxNzE5MTM1MDEwMDgy.0eNUe8s5lV7A35syWV1D5U1fRmeGgwa0DLVVxcR2ER4g.OujfgBxmpaC6sHQaIM5LBHy9HMHspNKpymVVfIs0KFQg.JPEG\/IMG_5415.jpg\': \'82,043|IMG_5415.jpg\' , \'\/MjAyNDA2MjNfMTgx\/MDAxNzE5MTM1MDEwNDQw.c_fZhU3qoz9XcsULFfHQRAHq9J_gPsH0lX0mONxx388g.jXgitLPUtvClyqGPTXRBP2eR3acpdNxTMaSqmGUOvWgg.JPEG\/IMG_5416.jpg\': \'64,009|IMG_5416.jpg\' , \'\/MjAyNDA2MjNfMTc4\/MDAxNzE5MTM1MDEwMDUz.h45HDMh-VVuxaODdnPwmmJ-ll84mke44YecrVYWff-Ug.bgnJ2YhWNUvS7PMKzXiwC3FXfxm-cVNljDqoXv6QS5og.JPEG\/IMG_5417.jpg\': \'63,794|IMG_5417.jpg\' , \'\/MjAyNDA2MjNfNjcg\/MDAxNzE5MTM1MDEwMDkx.5xsPkqD1YDd_Rqc_gf7LD9RdrBN_Rz26x7dRJvwf9Bcg.oFD2MOfQMmkqaW_BM7YnFBvp5D006BukvD75AIcgQbQg.JPEG\/IMG_5418.jpg\': \'111,839|IMG_5418.jpg\' , \'\/MjAyNDA2MjNfNDUg\/MDAxNzE5MTM1MDEwMDk4.zjGK4wQbzpoyM4qSNhyqE1P9mimPGTsF8-T0QCjdYZkg.3Xti7i5CpfijYeukcABxOEZG82YoSFke9koaMhApI8wg.JPEG\/IMG_5419.jpg\': \'81,612|IMG_5419.jpg\'}';
+	aPostSendInfo[1] = [];
+	aPostBaseInfo[1] = "223489971760|0|1|1|0|0|false|4|MYLOG";
+	aQueuePost.push({logNo : '223489971760',tagNames : ''});
+//
+function splugin_oninitialize(nCount) {
+	return htInitData[nCount - 1];
+}
+		글쓰기
+		가벼운 글쓰기툴 퀵에디터가 오픈했어요!
+	공지 목록
+			공지글
+				글 제목
+				작성일
+								(2)
+								공지
+								비타민 B군과 비타민C 영양제의 먹는 시간은 어떻게 될까요??ㅣ섭취 복용 방법 포함
+					2025. 1. 16.
+								공지
+								고혈압 환자의 겨울철 트레드밀 런닝머신 러닝 방법ㅣ속도 페이스 환산 과연 정확할까요??
+					2025. 1. 14.
+								(2)
+								공지
+								가성비 겨울 러닝 복장 데카트론 비니 모자 헤어 헤드 밴드 전 종류 실착 후기 총정리 추천 제품
+					2025. 1. 12.
+								(21)
+								공지
+								백의 고혈압 환자의 1주일 동안 매일 측정한 혈압 결과 분석(혈압 시간 자세 등 혈압에 대한 마인드셋의 중요성)
+					2025. 1. 10.
+							전체보기 539개의 글
+						전체보기목록열기
+[IMG: %EC%BA%A1%EC%B2%98.JPG | https://postfiles.pstatic.net/MjAyNDA2MjRfMjAx/MDAxNzE5MjMxNDU5MzMx.Va9McF6kcljMK26bVOf13O4DI3EEoLUmNO2X4p_e2Qkg.Sq7RbY6mqBuuTsuP3bFiGyu0J6w2my4BA1E7ZSFY6iog.JPEG/%EC%BA%A1%EC%B2%98.JPG?type=w966]
+	건강 운동 제품 리뷰 후기
+                    초보 러닝앱 어플 비교 추천ㅣ갤럭시워치 나이키런클럽 스트라바 런데이 지도 표시 기능 러닝 기록 분석
+        Healthy Super Ager
+             ・
+            2024. 6. 24. 21:30
+	URL 복사
+             이웃추가
+        본문 기타 기능
+                   공유하기
+                신고하기
+                                    러닝을 하면서 워치가 있는 경우에는 워치와 연동된 앱을 사용하지만 그렇지 않고 스마트폰만 있는 경우에는 러닝앱을 찾게 되실 겁니다.
+저의 경우에도 예전에 갤럭시폰을 사용했을 때는 현재 사용하고 있는 갤럭시 워치가 연동이 잘 되고 쓰기 편했는데 아이폰으로 바꾸고 나서는 동기화도 잘되지 않고 볼 수 있는 기록도 한정적이어서 불편함을 많습니다.
+[IMG: IMG_5420.jpg | https://postfiles.pstatic.net/MjAyNDA2MjNfMjk0/MDAxNzE5MTM2MTY2ODc3.dYMiGE_Z9hEg3SfhNLH1vokEcvapXT15CEhi23mwNusg.bVMT4JR_KorgicF2by30ArF5HxZdnLxRwU2KWoG_1vcg.JPEG/IMG_5420.jpg?type=w466]
+[IMG: IMG_5421.jpg | https://postfiles.pstatic.net/MjAyNDA2MjNfMzcg/MDAxNzE5MTM2MTY2Nzkx.V_pXvql75v8qfwIkutSWBvi1AhHmapjbbeIo9Ir8Ehwg.xdul9_mNVX_ZL3u3KauvDOIjBnYF4tle8nPQOo6lubAg.JPEG/IMG_5421.jpg?type=w466]
+                                    앱스토어에서 가장 유명한 무료 러닝 어플 3가지를 다운로드해서 사용해 봤습니다.
+나이키런클럽 러닝앱
+런데이
+스트라바(strava)
+조깅을 할 때 갤럭시 워치를 켜고 3가지 러닝 앱을 차례로 실행을 시킵니다. 약 1주일 정도 사용한 저의 경험을 공유해 드릴게요.
+                                러닝 지도 표시
+(삼성헬스 vs 나이키러닝앱 vs 스트라바 vs 런데이)
+[IMG: IMG_5392.jpg | https://postfiles.pstatic.net/MjAyNDA2MjNfMTAw/MDAxNzE5MTM0MjcyMTQx.ME_vwmWW9tufh_Lc_lbBz5xsakzbpz8sJqgVL6Ue6_Mg.O4vvvzALNYLQgJBcZyWSnmPJaH8DaZ3rNOMz2QO705og.JPEG/IMG_5392.jpg?type=w466]
+[IMG: IMG_5393.jpg | https://postfiles.pstatic.net/MjAyNDA2MjNfMjY2/MDAxNzE5MTM0MjcyMjE1.6Bu0qNynVwTn5owB8Rk136JMYLTNhYU4ocvAQTMhu7Yg.-QS6Jgzs2H8aqLykZ9tKA1vP1jEtuyZxfrUxiX6GdTMg.JPEG/IMG_5393.jpg?type=w466]
+                                    삼성 헬스 앱에서 확인할 수 있는 지도 화면입니다. 왼쪽이 기본 화면이고 클릭을 하면 오른쪽처럼 확대되어 나옵니다. 1km 기준으로 구분이 됩니다.
+[IMG: IMG_5422.jpg | https://postfiles.pstatic.net/MjAyNDA2MjNfNDgg/MDAxNzE5MTM2NjA3ODU0.8EYgxBPupSJWpvvVgsIGeMZYE3Sfp2Zkz0nKqPkEeiEg.13RNO6QDJzbxZ_cd9kLWeD5vnqHov276-LFJc1u40oAg.JPEG/IMG_5422.jpg?type=w466]
+                                    나이키런클럽 러닝 앱의 지도입니다. 재미있게도 상세 지도에서 개별 페이스를 확인할 수 있습니다. 내가 어느 지점에서 페이스가 떨어졌는지 확인할 수 있어서 좋았네요.
+[IMG: IMG_5406.jpg | https://postfiles.pstatic.net/MjAyNDA2MjNfNyAg/MDAxNzE5MTM0Nzc5Mjg0.ohLBv6N3op1MaXV2sj57Qw-o3iwefo1s2EtYZ_pkaIYg.Jy5wHEcPeOXeD5nLor9jc-7-BmjqDsqVTeh024JkftAg.JPEG/IMG_5406.jpg?type=w466]
+[IMG: IMG_5411.jpg | https://postfiles.pstatic.net/MjAyNDA2MjNfMTc2/MDAxNzE5MTM1MDEwMTE1.mpU_3LVQjatulRCNLRmMGPX81_tZszujczGTNdiUF50g.kAK7PRdUBbR5tx5f5bzPjUo_S4hfl6Kwi7FpwGeaq8Yg.JPEG/IMG_5411.jpg?type=w466]
+                                    무료 버전의 스트라바는 단순히 지도에서 러닝 영역을 표시해 주는 기능밖에 없네요.
+오른쪽 사진은 런데이 앱입니다. 런데이도 나이키러닝앱과 비슷하게 표시가 되어서 한눈에 더 잘 들어오네요.
+[IMG: IMG_5393.jpg | https://postfiles.pstatic.net/MjAyNDA2MjNfMjY2/MDAxNzE5MTM0MjcyMjE1.6Bu0qNynVwTn5owB8Rk136JMYLTNhYU4ocvAQTMhu7Yg.-QS6Jgzs2H8aqLykZ9tKA1vP1jEtuyZxfrUxiX6GdTMg.JPEG/IMG_5393.jpg?type=w466]
+[IMG: IMG_5422.jpg | https://postfiles.pstatic.net/MjAyNDA2MjNfNDgg/MDAxNzE5MTM2NjA3ODU0.8EYgxBPupSJWpvvVgsIGeMZYE3Sfp2Zkz0nKqPkEeiEg.13RNO6QDJzbxZ_cd9kLWeD5vnqHov276-LFJc1u40oAg.JPEG/IMG_5422.jpg?type=w466]
+                            <좌 : 삼성헬스 / 우 : 나이키런클럽 러닝앱>
+[IMG: IMG_5406.jpg | https://postfiles.pstatic.net/MjAyNDA2MjNfNyAg/MDAxNzE5MTM0Nzc5Mjg0.ohLBv6N3op1MaXV2sj57Qw-o3iwefo1s2EtYZ_pkaIYg.Jy5wHEcPeOXeD5nLor9jc-7-BmjqDsqVTeh024JkftAg.JPEG/IMG_5406.jpg?type=w466]
+[IMG: IMG_5411.jpg | https://postfiles.pstatic.net/MjAyNDA2MjNfMTc2/MDAxNzE5MTM1MDEwMTE1.mpU_3LVQjatulRCNLRmMGPX81_tZszujczGTNdiUF50g.kAK7PRdUBbR5tx5f5bzPjUo_S4hfl6Kwi7FpwGeaq8Yg.JPEG/IMG_5411.jpg?type=w466]
+                            <좌 : 스트라바 / 우 : 런데이>
+                                개인적인 선호 순서는
+1) 나이키러닝앱
+2) 삼성 헬스
+3) 런데이
+4)스트라바
+                                러닝 기록 분석 확인
+(삼성헬스 vs 나이키러닝앱 vs 스트라바 vs 런데이)
+                                    속도와 심박수, 케이던스 등 우리가 러닝을 통해서 확인할 수 있는 기록이 분석된 부분을 비교해 보겠습니다.
+3가지 앱을 쓰게 된 이유도 부정확한 갤럭시 워치의 GPS와 러닝 페이스 때문이지요.
+제가 쓰고 있는 갤럭시 워치 연동의 삼성 헬스 앱을 기본으로 생각하고 나머지 앱들의 기능을 비교해 보겠습니다. 먼저 삼성헬스 앱입니다.
+[IMG: IMG_5394.jpg | https://postfiles.pstatic.net/MjAyNDA2MjNfOTMg/MDAxNzE5MTM0MjcyMTAy.KCIw8AafTsME13rY0GD71YuDxkSNIwqUx7Um0yQNKV0g.pwYoe3VMjCgEGcXKUSw6oXWvRHljWX7jr9AvzhTwL3Eg.JPEG/IMG_5394.jpg?type=w966]
+                                    기본적인 그래프에서는 속도, 심박수, 고도, 케이던스 4가지 항목 중에 2가지 내용을 같이 확인할 수 있습니다. 먼저 심박에 따른 저의 기록을 보고 아래에는 케이던스를 확인하겠습니다.
+[IMG: IMG_5395.jpg | https://postfiles.pstatic.net/MjAyNDA2MjNfMjI3/MDAxNzE5MTM0MjcyMDg1.UjMWdO8MWaXouxAmKXrNrAEQji_DWrM1Fo6Jf7iq2C8g.hq8k_ZR0mgfAs_Z1SP6k9AaAZaN-bjVhNXQ0k9R8ez0g.JPEG/IMG_5395.jpg?type=w966]
+[IMG: IMG_5396.jpg | https://postfiles.pstatic.net/MjAyNDA2MjNfNSAg/MDAxNzE5MTM0MjcyMDA2.9LlFLvokRttJ_YAWbR6xkcnLUToWR2qwWWoeqcSX8qAg.232bJYi8Ym4ON25KVAS2FAvyx-QrYz0D6sUFg_EL2s0g.JPEG/IMG_5396.jpg?type=w966]
+                                    구간대별 페이스도 확인이 가능합니다.
+[IMG: IMG_5397.jpg | https://postfiles.pstatic.net/MjAyNDA2MjNfMjgx/MDAxNzE5MTM0MjcyMDUw.J1xop-xOtVUNkMVrS6ud_Hmdw7pNDx8_iJwiP6P694Ig.J8FyEiFsPrRDsgsxq1T3wlWMukRblEJeJgIdL9V3kfwg.JPEG/IMG_5397.jpg?type=w966]
+                                    삼성 헬스 앱의 전체 러닝 기록입니다. 시간, 거리, 평균 속도, 페이스, 케이던스, 고도 등 거의 대부분의 내용이 표시되어 있습니다.
+1) 나이키런클럽 러닝앱
+[IMG: IMG_5399.jpg | https://postfiles.pstatic.net/MjAyNDA2MjNfMjQ1/MDAxNzE5MTM0NTA0MTUw.Jw8QSzBPBvoggxrKCthfEgBnNCwUPXeHCO5zaPla_kYg.GkpOsr81UGtHxMVkqj2qwu0OV9tLn1T9gEVUDAlqlGIg.JPEG/IMG_5399.jpg?type=w966]
+                                    나이키 러닝 앱입니다. 기본적인 정보와 지도가 나오고요.
+[IMG: IMG_5400.jpg | https://postfiles.pstatic.net/MjAyNDA2MjNfNjQg/MDAxNzE5MTM0NTA0MDI1.9kdinUVZ2j3lvIKl3hFlK2MC2hoqfS8rmakqgU6kqqEg.TBGGoKdCWxRQABhiGjLWYGbLD2Y3lsHbGW20WGpYlaYg.JPEG/IMG_5400.jpg?type=w466]
+[IMG: IMG_5020.jpg | https://postfiles.pstatic.net/MjAyNDA2MTNfMjIx/MDAxNzE4MjYxMzM1NTU4.GTLsWnHWtne6zr97QPSqWPAO279qerNZOld0kN8ripQg.qiqKHJGF4rs3g6yNRbiRZeFc-0sl1rIXo3a2bc_xStcg.JPEG/IMG_5020.jpg?type=w466]
+                                    구간별 페이스가 확인이 됩니다. 나이키 러닝 앱은 러닝화를 선택할 수 있어서 누적된 거리를 확인하기 좋습니다.
+[IMG: IMG_5402.jpg | https://postfiles.pstatic.net/MjAyNDA2MjNfNjcg/MDAxNzE5MTM0NTA0MTEx.WgpABaTRrTbGg7F4R_9TJftUy05gC6BTFPNMVmadDdog.1EnE39XH6sskWnqezdYaMRrubkVj1dpIqqGcRHkZbx4g.JPEG/IMG_5402.jpg?type=w966]
+                                    삼성 헬스처럼 나이키 러닝앱도 기본적인 페이스, 케이던스, 고도, 심박수 등이 나옵니다.
+2) 스트라바
+[IMG: SE-DF1D13C6-ED82-428D-BB53-1B71FD76F2D4.jpg | https://postfiles.pstatic.net/MjAyNDA2MjRfMjQg/MDAxNzE5MjIyMjcxNzAz.sXhSCZ5TOl3d7KJ446cgOK38N33gF6j3LJIRsgbRqr0g.6GIHvkhmgWkSotPEm8ilGE6j-E-lztMC1C8Kiaf5rv8g.JPEG/SE-DF1D13C6-ED82-428D-BB53-1B71FD76F2D4.jpg?type=w966]
+                                    다음은 스트라바입니다. 기본 페이지에서 화살표로 표시된 기록 부분을 클릭하시면 세부 페이지로 넘어갑니다.
+[IMG: IMG_5408.jpg | https://postfiles.pstatic.net/MjAyNDA2MjNfMjQ4/MDAxNzE5MTM0Nzc5MTY0.PG_gcXoKZRnDByDFmHxVdYDbo0VtdYMnU8uoaT6J8bYg.QNm5zi1jK1JAns3iSX-nDM8VzdinRYWraW_6hSkke8og.JPEG/IMG_5408.jpg?type=w466]
+[IMG: IMG_5409.jpg | https://postfiles.pstatic.net/MjAyNDA2MjNfMjEy/MDAxNzE5MTM0Nzc5MTI5.k8JcLic1pO1dPPRNPO8F4eP5wPa7lggjDK-mxtaiG6kg.Wvh6jZrr9u9f7lyAIzTltlWMzRLy8IS3FXinbeFeL-Ug.JPEG/IMG_5409.jpg?type=w466]
+                                    구간별 페이스와 고도 등을 확인할 수 있고 페이스는 Detail 버튼을 한 번 더 클릭을 하시면
+[IMG: IMG_5410.jpg | https://postfiles.pstatic.net/MjAyNDA2MjNfMjUx/MDAxNzE5MTM0Nzc5MTYz.IJO0RoNyTRzF5Z-APlTBvgOmX2tDVIO822kuvpn998kg.kvgKXMXH0gFvryz4mhUK_Q1mmaY5H-YCout993KPssYg.JPEG/IMG_5410.jpg?type=w966]
+                                    세부적인 내용을 확인할 수 있습니다.
+3) 런데이
+[IMG: IMG_5412.jpg | https://postfiles.pstatic.net/MjAyNDA2MjNfMjc3/MDAxNzE5MTM1MDEwMzc5.71462RvEsr8XHwGnvdR4ZFvLMkqn4_6KSujLyiEg_mAg.U7wT0fbS4J-6H3Lr2cMaQfFTKNwB6XkosdkEyic_w8Yg.JPEG/IMG_5412.jpg?type=w966]
+                                    런데이 앱의 운동 상세 정보 내용입니다. 구간별 페이스가 확인이 됩니다.
+[IMG: IMG_5413.jpg | https://postfiles.pstatic.net/MjAyNDA2MjNfNDUg/MDAxNzE5MTM1MDEwNDM1.2x3LOkeAOeEs9k8vyq-QQLU2r2e9KcC-uWf2PsYDsBIg.fMwu6VWQ-MzqeIGSdBkE7WvszuScr7wHU1SOGkbcXbsg.JPEG/IMG_5413.jpg?type=w966]
+                                    분석으로 들어가면 시간이 경과되면서 페이스의 변화가 나타나고,
+[IMG: IMG_5414.jpg | https://postfiles.pstatic.net/MjAyNDA2MjNfMzEg/MDAxNzE5MTM1MDEwMDU0.rzOIkARz0sNBXGUE9_ZeYbjonDnNxY4jjXYLFLklvJ4g.AJCQHFQYwvCSo_692yXAisjGf-rxllB8GMSY8L0q0O4g.JPEG/IMG_5414.jpg?type=w466]
+[IMG: IMG_5415.jpg | https://postfiles.pstatic.net/MjAyNDA2MjNfMjUg/MDAxNzE5MTM1MDEwMDgy.0eNUe8s5lV7A35syWV1D5U1fRmeGgwa0DLVVxcR2ER4g.OujfgBxmpaC6sHQaIM5LBHy9HMHspNKpymVVfIs0KFQg.JPEG/IMG_5415.jpg?type=w466]
+                                    고도와 속도도 동일하게 확인이 됩니다.
+[IMG: IMG_5416.jpg | https://postfiles.pstatic.net/MjAyNDA2MjNfMTgx/MDAxNzE5MTM1MDEwNDQw.c_fZhU3qoz9XcsULFfHQRAHq9J_gPsH0lX0mONxx388g.jXgitLPUtvClyqGPTXRBP2eR3acpdNxTMaSqmGUOvWgg.JPEG/IMG_5416.jpg?type=w466]
+[IMG: IMG_5417.jpg | https://postfiles.pstatic.net/MjAyNDA2MjNfMTc4/MDAxNzE5MTM1MDEwMDUz.h45HDMh-VVuxaODdnPwmmJ-ll84mke44YecrVYWff-Ug.bgnJ2YhWNUvS7PMKzXiwC3FXfxm-cVNljDqoXv6QS5og.JPEG/IMG_5417.jpg?type=w466]
+                                    런데이 워치 앱을 이용하면 케이던스, 걸음 수도 확인할 수 있는데 워치 앱은 어디서 다운로드하는 걸까요?
+[IMG: IMG_5418.jpg | https://postfiles.pstatic.net/MjAyNDA2MjNfNjcg/MDAxNzE5MTM1MDEwMDkx.5xsPkqD1YDd_Rqc_gf7LD9RdrBN_Rz26x7dRJvwf9Bcg.oFD2MOfQMmkqaW_BM7YnFBvp5D006BukvD75AIcgQbQg.JPEG/IMG_5418.jpg?type=w966]
+                                    심박수도 연결이 되어있으면 확인하실 수 있습니다.
+[IMG: IMG_5419.jpg | https://postfiles.pstatic.net/MjAyNDA2MjNfNDUg/MDAxNzE5MTM1MDEwMDk4.zjGK4wQbzpoyM4qSNhyqE1P9mimPGTsF8-T0QCjdYZkg.3Xti7i5CpfijYeukcABxOEZG82YoSFke9koaMhApI8wg.JPEG/IMG_5419.jpg?type=w966]
+                                    런데이앱도 나이키러닝앱처럼 러닝화를 선택할 수 있습니다.
+저의 경우에는 러닝을 할 때 시간, 거리, 페이스, 심박수, 케이던스만 보이면 되어서 나머지 부분은 고도 정도만 있으면 되는 것 같습니다.
+개인적으로는 갤럭시 워치 삼성 헬스 앱의 그래프를 통해서 한눈에 볼 수 있는 부분이 좋았습니다. 스트라바 앱은 직관적인 부분에서 가장 불편했던 것 같네요. 나이키 러닝앱과 런데이는 비슷했습니다.
+                                개인적인 선호 순서는
+1) 삼성 헬스
+2) 나이키런클럽 러닝앱, 런데이
+3)스트라바
+                                초보 러너 러닝앱 비교 결론
+(삼성헬스 vs 나이키러닝앱 vs 스트라바 vs 런데이)
+                                    오늘은 러닝을 시작한 지는 조금 되었지만 아직은 유리몸인 초보 러너의 입장에서 사용해 본 3가지 러닝 앱, 나이키러닝앱, 스트라바, 런데이를 비교해 봤습니다.
+갤럭시 워치 유저 입장에서는 삼성 헬스 앱에서 나오는 화면이 가장 편하긴 한데 아이폰을 쓰면서 동기화의 문제가 발생하고 있기 때문에 나이키 러닝 앱, 스트라바, 런데이 중 하나를 써야 한다고 하면 저는 나이키 러닝 앱을 선택할 것 같습니다.
+기본적으로 앱 화면이 가장 심플했고 직관적이기 때문입니다. 스트라바앱은 영문이고 런데이앱은 자꾸 광고가 팝업이 떠서 이용하기에 불편했는데 나이키러닝앱은 그런 부분이 없어서 좋았습니다. 개인적으로는 러닝 후에 페이스와 심박, 케이던스 정도만 확인하기 때문에 그 부분이 나이키러닝앱이 가장 잘 표시가 된 것 같았습니다.
+다음에는 각 러닝 앱의 상세한 사용 방법, 장점, 단점에 관한 리뷰를 하나씩 차례로 알려드리겠습니다.
+                                    ※ 나이키런클럽 러닝앱 자세한 후기 및 사용 방법은 아래를 참고해 주세요.
+                                        나이키런클럽 앱 사용방법 및 장점 단점 후기
+                                        초보 런닝이들을 위한 러닝 앱 3가지를 리뷰해 봤습니다. 오늘은 그 중 많은 사람들이 이용하고 있는 대표...
+                                        blog.naver.com
+													태그
+									취소
+									확인
+													공감
+													0
+															공감
+															0
+															칭찬
+															0
+															감사
+															0
+															웃김
+															0
+															놀람
+															0
+															슬픔
+															0
+											 span.u_likeit_button) 공감 face 3개 (전체)) -->
+													공감
+													0
+															공감
+															0
+															칭찬
+															0
+															감사
+															0
+															웃김
+															0
+															놀람
+															0
+															슬픔
+															0
+										이 글에 공감한 블로거 열고 닫기
+                                         댓글
+											10
+                                        이 글에 댓글 단 블로거 열고 닫기
+										인쇄
+								댓글쓰기
+									1/1
+											이전
+											다음
+									var gAdPostUnitIdForPC = "pc_blog_bottom";
+									var gNotAdPostUnitIdForPC = false;
+									var gAdContentUnitIdForPC = "pc_blog_body";
+									var gAdContentDaUnitIdForPc = "pc_blog_body_2nd";
+									var gAdContentDaUnitIdForPc2 = "pc_blog_body_3rd";
+function ImageLazyLoader(selectors) {
+   this.selectors = selectors;
+}
+var imageLazyLoadVisible = new eg.Visible(document, {
+    targetClass : "egjs-visible",
+    expandSize : "100"
+});
+var imageLoad = function(el) {
+    var img = $Element(el);
+    // gifmp4인 경우 재생처리
+    if (img.hasClass("_gifmp4") && img._element.tagName === "VIDEO" && img._element.paused) {
+        img._element.play().catch(function(){
+            var gifUrl = img.attr("data-gif-url");
+            if (!gifUrl) {
+                return;
+            }
+            img.attr("poster", gifUrl);
+        });
+        return;
+    }
+    var realSrc = img.attr("data-lazy-src");
+    if (!realSrc) {
+        return;
+    }
+    img.attr("src", realSrc);
+    img.attr("data-lazy-src", "");
+};
+ImageLazyLoader.prototype.loadImages = function () {
+    var containers = this.selectors instanceof HTMLElement ? [this.selectors] : jindo.$$(this.selectors);
+    $A(containers).forEach($Fn(function (element) {
+        this.loadImagesForEachContainer($Element(element));
+    }, this).bind());
+    imageLazyLoadVisible.on("change", function(e) {
+        e.visible.forEach(imageLoad);
+    });
+    imageLazyLoadVisible.check();
+};
+ImageLazyLoader.prototype.loadImagesForEachContainer = function (postContentArea) {
+    $A(postContentArea.queryAll("img")).forEach($Fn(function (imgEl) {
+        $Element(imgEl).addClass("egjs-visible");
+    }, this).bind());
+    $A(postContentArea.queryAll("video._gifmp4")).forEach($Fn(function (imgEl) {
+        $Element(imgEl).addClass("egjs-visible");
+    }, this).bind());
+    //marquee tag안에 이미지가 있을경우 이미지가 loading되지 않는 현상이 발생하여 예외처리 진행
+    $A(postContentArea.queryAll("marquee")).forEach(function (marqueeEl) {
+        $A($Element(marqueeEl).queryAll("img")).forEach(function (img) {
+            imageLoad(img);
+        });
+    });
+};
+var imageLazyLoader = new ImageLazyLoader("#postListBody .post, .post.prologue");
+imageLazyLoader.loadImages();
+$Fn(function() {
+    $Fn(function(){
+        imageLazyLoadVisible.check();
+    }).attach(window, "scroll");
+}).attach(window, "domready");
+$Fn(function() {
+    imageLazyLoadVisible.check();
+}).attach(window, "load");
+	var isConvertEnabled = 'true' === 'true';
+	function closeCompletePopup() {
+		var lyr_popup = document.getElementById("challengePopLayer");
+		lyr_popup.style.display = 'none';
+		window.document.body.style.overflow = '';
+		var lyr_popup_dimmed = document.getElementById("challengePopLayerDimmed");
+		if (lyr_popup_dimmed) {
+			lyr_popup_dimmed.style.display = 'none';
+		}
+	}
+	function suggestConvert(logNo, isSupportSE3, scrapPostYn, editorversion) {
+		if (isConvertEnabled && !isSupportSE3) {
+			if (editorversion === 1) {
+				alert("SE1.0 으로 작성된 글로\n수정 발행 시 이미지가 모두 사라집니다.\n글 내 이미지를 저장하여\n재업로드 후 발행 부탁 드립니다.");
+			}
+			if (confirm("스마트에디터 ONE으로 글을 수정합니다.\n발행 전에 글감이 잘 노출되는지 확인해 주세요.")) {
+				location.href = "the_observeriter/postupdate?logNo=" + logNo + "&isConvert=true";
+			}
+		} else {
+			location.href = "the_observeriter/postupdate?logNo=" + logNo;
+		}
+	}
+										이 블로그
+												  전체
+										카테고리 글
+											전체글 보기
+                                    화면 최상단으로 이동
+	postViewBottomTitleListController.start(blogId, nFirstLogNo, 'false' == 'true', parentCategoryNo, currentCategoryNo, categoryName, viewDate, '1719232202483', from, 'true', '6');
+    var fromClosedPost = "" === "true";
+    var isStage = "false" === "true";
+    var blogRealHttpDomain = "http://blog.naver.com";
+    var blogNewsProxyUrl = "https://blog.naver.com/api/news/article";
+	var nilOptions = {
+        devMode: "true"=="false",
+            topReferer : (function() {
+                if (fromClosedPost) {
+                    return '';
+                }
+                var ref = "";
+                var isMobile = function() {
+                    return window.location.host.indexOf('m.blog.naver.com') >= 0;
+                };
+                if (isMobile()){
+                    return document.referrer;
+                } else {
+                    if (ref == '') {
+                        if (parent != window && parent.location.href == document.referrer) {
+                            return '';
+                        } else {
+                            return document.referrer;
+                        }
+                    } else {
+                        return ref;
+                    }
+                }
+            })()
+	}
+	window.onload = function() {
+        window.__splugin = SocialPlugIn_Core({
+            //소셜 플러그인 기본 설정
+            // nEvent Key
+            "evKey"       : "blog",
+            // 서비스명
+            "serviceName" : "블로그",
+            // 출처
+            "sourceName"  : "\uAC74\uAC15\uD558\uAC8C ..",
+            "sendNClick"  : 'off',
+            "nClickCode" : {
+                'blog': { 'in': 'shr_lyr.blog', 'out': 'shr.blog' },
+                'cafe': { 'in': 'shr_lyr.cafe', 'out': 'shr.cafe' },
+                'bookmark': { 'in': 'shr_lyr.bookmark', 'out': 'shr.bookmark' },
+                'memo':     { 'in': 'shr_lyr.memo',     'out': 'shr.memo' },
+                'mail':     { 'in': 'shr_lyr.mail',     'out': 'shr.mail' },
+                'band':     { 'in': 'shr_lyr.band',     'out': 'shr.band' },
+                'line':     { 'in': 'shr_lyr.line',     'out': 'shr.line' },
+                'twitter':  { 'in': 'shr_lyr.twitter',  'out': 'shr.twitter' },
+                'facebook': { 'in': 'shr_lyr.facebook', 'out': 'shr.facebook' },
+                'weibo':    { 'in': 'shr_lyr.weibo',    'out': 'shr.weibo' },
+                'reddit':   { 'in': 'shr_lyr.reddit',   'out': 'shr.reddit' },
+                'copyurl':  { 'in': 'shr_lyr.copyurl' },
+                'release':  { 'out': 'shr.sharebtn' }
+        	},
+			"darkMode"      : false
+        });
+	}
+[{&#034;title&#034;:&#034;초보 러닝앱 어플 비교 추천ㅣ갤럭시워치 나이키런클럽 스트라바 런데이 지도 표시 기능 러닝 기록 분석&#034;,&#034;source&#034;:&#034;https://blog.naver.com/the_observeriter/223489971760&#034;,&#034;blogName&#034;:&#034;건강하게 ..&#034;,&#034;domainIdOrBlogId&#034;:&#034;the_observeriter&#034;,&#034;nicknameOrBlogId&#034;:&#034;Healthy Super Ager&#034;,&#034;logNo&#034;:223489971760,&#034;smartEditorVersion&#034;:4,&#034;meDisplay&#034;:true,&#034;lineDisplay&#034;:true,&#034;outsideDisplay&#034;:true,&#034;cafeDisplay&#034;:true,&#034;blogDisplay&#034;:true}]
+    var thumbnailTypeW3840EnableDomainListJson = '["https://postfiles.pstatic.net","https://postfiles.pstatic.net","https://postfiles.pstatic.net","https://postfiles.pstatic.net","https://postfiles.pstatic.net","https://postfiles.pstatic.net","https://postfiles.pstatic.net","https://postfiles.pstatic.net","https://postfiles.pstatic.net","https://postfiles.pstatic.net","https://postfiles.pstatic.net","https://postfiles.pstatic.net","https://postfiles.pstatic.net","https://postfiles.pstatic.net","https://postfiles.pstatic.net","https://postfiles.pstatic.net","https://blogfiles.pstatic.net","https://blogfiles.pstatic.net","https://blogfiles.pstatic.net","https://blogfiles.pstatic.net","https://blogfiles.pstatic.net","https://blogfiles.pstatic.net","https://blogfiles.pstatic.net","https://blogfiles.pstatic.net","https://blogfiles.pstatic.net","https://blogfiles.pstatic.net","https://blogfiles.pstatic.net","https://blogfiles.pstatic.net","https://blogfiles.pstatic.net","https://blogfiles.pstatic.net","https://blogfiles.pstatic.net","https://blogfiles.pstatic.net","https://blogfiles.pstatic.net","https://blogfiles.pstatic.net","https://blogpfthumb-phinf.pstatic.net","https://blogthumb.pstatic.net","https://blogthumb.pstatic.net","https://blogthumb.pstatic.net"]';
+    var photoViewerSocialPluginInfoJson = document.getElementById('socialPluginInfoJson').innerText;
+    var photoViewerBeyondAnalyticsUrl = "https://scv-blog.io.naver.com/jackpotlog/v1/logs";
+    $Fn(function () {
+        PhotoViewerNew.init(mylogBaEventSender,
+            photoViewerBeyondAnalyticsUrl,
+            baUserKey,
+            photoViewerSocialPluginInfoJson,
+            thumbnailTypeW3840EnableDomainListJson);
+    }).attach(window, "load");
+new InstallBlogAppPush();
+        var urlDomain = 'http://blog.naver.com';
+        // stage의 경우 real과 동일하게 집계되게 하기 위하여 real로 처리
+        if(isStage){
+            urlDomain = blogRealHttpDomain;
+        }
+        var nilNtmLibUrl = "https://ssl.pstatic.net/t.static.blog/mylog/versioning//common/js/nilForNtm-89afd2f_https.js";
+        var gdid = '90000003_0000000000000034090A5630';
+        var firstTitle = '\uCD08\uBCF4 \uB7EC\uB2DD\uC571 \uC5B4\uD50C \uBE44\uAD50 \uCD94\uCC9C\u3163\uAC24\uB7ED\uC2DC\uC6CC\uCE58 \uB098\uC774\uD0A4\uB7F0\uD074\uB7FD \uC2A4\uD2B8\uB77C\uBC14 \uB7F0\uB370\uC774 \uC9C0\uB3C4 \uD45C\uC2DC \uAE30\uB2A5 \uB7EC\uB2DD \uAE30\uB85D \uBD84\uC11D';
+        var sBlogIdForNil = 'the_observeriter';
+        var uri = urlDomain + '/the_observeriter/223489971760';
+        var relationType = 4;
+        var blogOwnerRelationType = 4;
+        var referrer = nilOptions.topReferer;
+        var dimension_1 = "%EC%83%81%ED%92%88%EB%A6%AC%EB%B7%B0";
+        var optional_1 = false;
+        var event_category = "post_view";
+        var isNilAnalystLeaveEvent = "true";
+        var isPostList = !!isPostList;
+        // postList 인 경우, 첫번째 포스트에 대한 상품 첨부 여부를 보낸다.
+        var firstPostHasProduct = false;
+        //ba
+        var postWriteDate = "1719232202483";
+        var attachmentSetCount = {"korea_map":0,"foreign_map":0,"writing_material_info":0,"buy_with_my_own_money_shopping":0,"buy_with_my_own_money_visit_order":0,"buy_with_my_own_money_visit_reservation":0,"buy_with_my_own_money_visit_receipt":0,"image":0,"book_count":0,"movie_count":0,"tv_count":0,"music_count":0,"shopping_count":0,"show_count":0,"news_count":0,"sports_count":0,"stock_count":0,"realestate_count":0};
+        var postTopics = {"short_ai_directory_name":"IT·컴퓨터","directory_name":"상품리뷰","full_ai_directory_name":"IT>소프트웨어/어플리케이션"};
+        $Fn(function () {
+            try {
+                new nilNtmForBlogCVAnalyst(sBlogIdForNil, uri, relationType, gdid, dimension_1, referrer, optional_1, event_category, nilNtmLibUrl, isPostList, isNilAnalystLeaveEvent, firstPostHasProduct);
+            } catch (e) {}
+        }).attach(window, "load");
+$Fn(function() {
+	try {
+        reaction.init({
+            type: "face",
+            domain : "https://blog.like.naver.com",
+            staticDomain : "https://static-like.pstatic.net",
+            cssId : "blog",
+            isMobile : false,
+            maxCount : 9999,
+            highlightCount : 50,
+            highlightClassname : "double_heart",
+            isUseApigw : true,
+            isZeroFace: true,
+            isDuplication: false,
+            apigwInfo : {
+                domain : "https://apis.naver.com/blogserver/like",
+                pool : "blogid"
+            },
+            isAllowLongPress: true,
+            faceButtonMaxIconCount: 3,
+            callback : {
+                click : function(param){
+                    if (gbIsNotOpenBlogUser) {
+                        var oOptions = {
+                            wrapperDivId: "domainRegisterWrap"
+                            , title: "공감을 남기려면 블로그 아이디가 필요해요."
+                            , confirmBtnValue: "아이디 만들기"
+                            , win: window
+                            , isLightVersion: true
+                            , clickCodePrefix : "bsu*l.like"
+                            , initialCode : "bsu*l.like"
+                            , callbackFn: function () {
+                                location.reload();
+                            },
+                            apiUrl: {
+                                recommendDomainListUrl: "/blogdomain/RecommendBlogDomainList.naver",
+                                duplicateCheckUrl: "/blogdomain/BlogDomainDuplicateCheck.naver",
+                                blogDomainRegisterUrl: "/blogdomain/BlogDomainRegistration.naver"
+                            }
+                        };
+                        blogDomainRegisterLayer.init(oOptions);
+                        blogDomainRegisterLayer.show();
+                        return false;
+                    }
+                    try {
+                        var cid = param.target.closest(".u_likeit_list_module").getAttribute("data-cid")
+                        oSympathyLayer.reloadLogNo =  cid.substring(cid.lastIndexOf("_")+1)
+                    } catch(e) {}
+                },
+                clicked : function(){
+                    oSympathyLayer.reloadSympathyLayer();
+                }
+            }
+        });
+	} catch(e){}
+    ReactionLottie(".u_ico._icon", function(element) {
+        return element.parentElement.getAttribute("data-type");
+    });
+    $ElementList(".u_likeit_list_btn").addClass("pcol2");
+    $ElementList("#floating_bottom .u_likeit_list_btn").removeClass("pcol2");
+}).attach(window, "load");
+function showBlogDomainRegisterLayer(event){
+    event.preventDefault();
+    event.stopPropagation();
+    var oOptions = {
+        wrapperDivId: "domainRegisterWrap"
+        /*, registerBtnEl: angular.element(document.querySelector(attr['bgBlogDomainRegisterBtnId']))*/
+        , title: "사용하실 블로그 아이디를 입력해주세요."
+        , confirmBtnValue: "확인"
+        , win: window
+        , isChangeLayer: false
+        , clickCodePrefix : "bsu*i."
+        , initialCode: "bsu*i"
+        , callbackFn: function () {
+            location.reload();
+        },
+        closeFn: function () {
+            location.reload();
+        },
+        apiUrl: {
+            recommendDomainListUrl: "/blogdomain/RecommendBlogDomainList.naver",
+            duplicateCheckUrl: "/blogdomain/BlogDomainDuplicateCheck.naver",
+            blogDomainRegisterUrl: "/blogdomain/BlogDomainRegistration.naver",
+            blogBasicInfoUpdateUrl: "/blogdomain/BlogBasicInfoUpdate.naver",
+            profileImageUploadUrl: "/blogdomain/ProfileImageUpload.naver",
+            profileImageUploadFromUrlUrl: "/blogdomain/ProfileImageUploadFromUrl.naver",
+            blogInfoUrl: "/blogdomain/BlogBasicInfo.naver",
+            recommendBlogByPersonalThemeListUrl: "/blogdomain/RecommendBlogByPersonalThemeList.naver",
+            recommendBlogAddBuddyUrl: "/blogdomain/SimpleBuddyAdd.naver",
+            recommendBlogRemoveBuddyUrl: "/blogdomain/SimpleBuddyRemove.naver",
+            profileDefaultImageUrl: "/blogdomain/ProfileDefaultImage.naver",
+            personalThemeUpdateUrl: "/blogdomain/SimplePersonalThemeUpdate.naver",
+            personalThemeListUrl:"/blogdomain/SimplePersonalThemeList.naver"
+        },
+        blogUrl: blogURL
+    };
+    blogDomainRegisterLayer.init(oOptions);
+    blogDomainRegisterLayer.showSuggestionLayer();
+}
+function showBlogDomainRegisterLayerBuddyAdd() {
+    var oOptions = {
+        wrapperDivId: "domainRegisterWrap"
+        , title: "이웃을 추가하려면 블로그 아이디가 필요해요."
+        , confirmBtnValue: "아이디 만들기"
+        , win: window
+        , isLightVersion: true
+        , clickCodePrefix : "bsu*l.add"
+        , initialCode: "bsu*l.add"
+        , callbackFn: function () {
+            location.reload();
+        },
+        apiUrl: {
+            recommendDomainListUrl: "/blogdomain/RecommendBlogDomainList.naver",
+            duplicateCheckUrl: "/blogdomain/BlogDomainDuplicateCheck.naver",
+            blogDomainRegisterUrl: "/blogdomain/BlogDomainRegistration.naver"
+        }
+    };
+    blogDomainRegisterLayer.init(oOptions);
+    blogDomainRegisterLayer.show();
+}
+		검색
+		글 검색
+  RSS 2.0
+  RSS 1.0
+  ATOM 0.3
+    jQuery.noConflict();
+    var baParams = {};
+    // [BA] 공통
+    baParams.baUrl = "https://scv-blog.io.naver.com/jackpotlog/v1/logs";
+    baParams.baSceneId = 'post_end';
+    baParams.baUserKey = '__UNKNOWN__';
+    baParams.trackingCode = '';
+    // [BA] post_end, blog_home, category
+    baParams.blogNo = '156622918';
+    // [BA] post_end, comment
+    baParams.logNo = '223489971760';
+    // [BA] blog_home
+    baParams.bRelationType = '4';
+    baParams.uRelationType = '4';
+    // [BA] category
+    baParams.categoryName = '건강 운동 제품 리뷰 후기' || '전체보기';
+    // [BA] lnb
+    // [BA] search
+    baParams.range = '';
+    baParams.searchText = '';
+    // [BA] admin
+    baParams.settingMenu = '';
+    MylogPageViewSender.init(baParams);
+	안녕하세요.
+이 포스트는 네이버 블로그에서 작성된 게시글입니다.
+자세한 내용을 보려면 링크를 클릭해주세요.
+감사합니다.
+			글 보내기 서비스 안내
+			2009년 6월 30일 네이버 여행 서비스가 종료되었습니다.
+ 네이버 여행 서비스를 이용해 주신 여러분께 감사드리며,
+더 좋은 서비스로 보답할 수 있도록 노력하겠습니다.
+		악성코드가 포함되어 있는 파일입니다.
+		{FILENAME}
+		백신 프로그램으로 치료하신 후 다시 첨부하시거나, 치료가 어려우시면
+파일을 삭제하시기 바랍니다.
+		네이버 백신으로 치료하기
+		고객님의 PC가 악성코드에 감염될 경우 시스템성능 저하,
+개인정보 유출등의 피해를 입을 수 있으니 주의하시기 바랍니다.
+		작성자 이외의 방문자에게는 이용이 제한되었습니다.
+		{ALERTMESSAGE}
+		이용제한 파일 : {FILENAME}
+		내PC 저장
+		N드라이브 저장
+			카메라 모델
+			해상도
+			노출시간
+			노출보정
+			프로그램모드
+			ISO감도
+			조리개값
+			초점길이
+			측광모드
+			촬영일시
+			글보내기 제한 공지
+					저작권 침해가 우려되는 컨텐츠가 포함되어 있어
+ 글보내기 기능을 제한합니다.
+					네이버는 블로그를 통해 저작물이 무단으로 공유되는 것을 막기 위해,
+						저작권을 침해하는 컨텐츠가 포함되어 있는 게시물의 경우 글보내기 기능을 제한하고 있습니다.
+					상세한 안내를 받고 싶으신 경우 네이버 고객센터로 문의주시면 도움드리도록 하겠습니다.
+						건강한 인터넷 환경을 만들어 나갈 수 있도록 고객님의 많은 관심과 협조를 부탁드립니다.
+			주제 분류 제한 공지
+					저작권 침해가 우려되는 컨텐츠가 포함되어 있어
+ 주제 분류 기능을 제한합니다.
+					네이버는 블로그를 통해 저작물이 무단으로 공유되는 것을 막기 위해,
+						저작권을 침해하는 컨텐츠가 포함되어 있는 게시물의 경우 주제 분류 기능을 제한하고 있습니다.
+					상세한 안내를 받고 싶으신 경우 네이버 고객센터로 문의주시면 도움드리도록 하겠습니다.
+						건강한 인터넷 환경을 만들어 나갈 수 있도록 고객님의 많은 관심과 협조를 부탁드립니다.
+	작성하신 게시글에 사용이 제한된 문구가 포함되어 일시적으로
+ 등록이 제한됩니다.
+		이용자 분들이 홍보성 도배, 스팸 게시물로 불편을 겪지 않도록
+ 다음과 같은 경우 해당 게시물 등록이 일시적으로 제한됩니다.
+			특정 게시물 대량으로 등록되거나 해당 게시물에서 자주 사용하는
+			  문구가 포함된 경우
+			특정 게시물이 과도하게 반복 작성되거나 해당 게시물에서 자주 사용하는
+문구가 포함된 경우
+		스팸 게시물이 확대 생성되는 것을 방지하기 위하여 문구 및 사용 제한기간을
+상세하게 안내해 드리지 못하는 점 양해 부탁 드립니다. 모두가 행복한 인터넷
+문화를 만들기 위한 네이버의 노력이오니 회원님의 양해와 협조 부탁드립니다.
+		더 궁금하신 사항은 고객센터로 문의하시면 자세히 알려드리겠습니다.
+		수정하신 후 다시 등록해 주세요.
+	확인
+				회원님의 안전한 서비스 이용을 위해 비밀번호를 확인해 주세요.
+				다시 한번 비밀번호 확인 하시면 이용중인 화면으로 돌아가며, 작성 중이던
+내용을 정상적으로 전송 또는 등록하실 수 있습니다.
+			1일 안부글 작성횟수를 초과하셨습니다.
+			네이버 블로그에서는 프로그램을 이용한
+			안부글 자동등록 방지를 위해 1일 안부글 작성횟수에
+			제한을 두고 있습니다.
+			1일 안부글 작성횟수를 초과하셨습니다.
+			고객님이 남기신 안부글에 대한 다수의 신고가 접수되어
+			1일 안부글 작성 횟수가 5회로 제한되었습니다.
+			네이버 블로그는 여러 사람이 함께 모여 즐거움을 나누는
+			공간으로 모든 분들이 기분좋게 블로그를 이용할 수 있도록
+			고객님의 이해와 협조 부탁 드립니다.
+	동영상
+{=recommendTitle}
+				{=nickname}
+				{=blogName}
+	이웃추가
+이웃추가 레이어 닫기
+	.layerpop2{position:absolute; z-index:999; font:normal 12px 돋움,Dotum; color:#333; overflow:hidden; display:none;}
+	.layerpop2 .border_type{position:relative; border:solid 2px #777; background-color:#fff;}
+	.layerpop2 .close{position:absolute; top:8px; right:8px;}
+	.layerpop2 .content1{padding:30px 30px 21px; border-bottom:solid 1px #f0f0f0;}
+	.layerpop2 .content1 h6{font-weight:bold; font-size:14px; padding-bottom:10px; margin:0; color:#333;}
+	.layerpop2 .subtext{font-size:11px; color:#999; margin:0; padding:7px 0 0; line-height:16px; letter-spacing:-1px; text-align:left;}
+	.layerpop2 .check{width:13px; height:13px; vertical-align:middle; padding:0 3px 2px 0; margin-left:2px;}
+	.layerpop2 .btn1{background-color:#fbfbfb; border-top:solid 1px #f7f7f7; text-align:center; margin:0; padding:11px 0 20px;}
+	.layerpop2 .btn1 img{margin:0 1px; vertical-align:top;}
+		공감을 삭제하시겠습니까?
+		이 글의 공감수도 함께 차감됩니다.
+	 이웃으로 추가하시겠어요?
+	                   Healthy Super Ager
+	                   건강하게 노화하자. Healthy Aging.
+	         이웃추가
+	 이웃추가 레이어 닫기
+/* Default Type Selector */
+#banword_wrap *, #banword_wrap1 *{ margin:0; padding:0; font-size:12px; font-family:돋움, Dotum, 굴림, Gulim, Helvetica, Sans-serif; text-align:left;}
+#banword_wrap a, #banword_wrap1 a{ color:#004790;}
+#banword_wrap img, #banword_wrap1 img,
+#banword_wrap fieldset, #banword_wrap1 fieldset{ border:none;}
+#banword_wrap legend, #banword_wrap1 legend{ display:none;}
+#banword_wrap em, #banword_wrap1 em{ font-style:normal; color:#258102;}
+#banword_wrap strong, #banword_wrap1 strong{ color:#258102;}
+#banword_wrap li, #banword_wrap1 li{ list-style:none;}
+#banword_wrap h1, #banword_wrap1 h1{ font:bold 13px 굴림, Gulim, 돋움, Dotum, Helvetica, Sans-serif; color:#333; padding:11px 0 0 19px; *padding:12px 0 0 19px; }
+/* Layout */
+#banword_wrap{ position:absolute; width:410px; _width /**/:418px; overflow:hidden; border:4px solid #777; background:#fff; display: none; z-index: 200;}
+#banword_wrap1{ position:relative; width:410px; _width /**/:418px;height:446px; overflow:hidden; border:4px solid #777; background:#fff;}
+#bw_content{ padding:14px 0 28px 0; margin:0 19px 0 18px;}
+#bw_footer{ height:8px; _height:8px; text-align:center;}
+body:first-of-type #bw_footer{ height:7px;}
+#bw_footer, x:-moz-any-link, x:default { height:7px;}
+*:first-child+html #bw_footer{ height:8px;}
+#bw_btn_footer{ height:46px; _height /**/:45px; text-align:center; background:url(https://ssl.pstatic.net/static/common/popup/bg_not_available_common.gif) no-repeat left 1px; padding:16px 0 0 0 ; _padding /**/:16px 0 20px 0 ;}
+/* Common */
+#bw_content .bw_bx1{border:1px solid #f1f1f1; margin:0 1px 9px 2px; height:100px; background:#f8f8f8; }
+#bw_content .bw_bx1_shadow{position:relative;  padding:13px 13px 12px 0; }
+#bw_content .bw_bx1_shadow strong { color:#282828; vertical-align:top; margin-left:13px; margin-bottom:10px; display:block; }
+#bw_content .bw_bx1_shadow a img {vertical-align:middle; margin:-1px 0 0 0; *margin:-2px 0 0 0;}
+@media all and (-webkit-min-device-pixel-ratio:10000), not all and (-webkit-min-device-pixel-ratio:0)
+{
+	#bw_content .bw_bx1_shadow a img {margin:-1px !important;}
+}
+body:first-of-type #bw_content .bw_bx1_shadow a img {vertical-align:middle; margin:-5px 0 0 0;}
+#bw_content .bw_bx1_shadow_in {height:35px; _height /**/:53px; margin:7px 0 0 13px; _margin:5px 0 0 13px; padding:8px 13px 7px 12px; _padding:9px 13px 8px 12px; border:#e3e3e3 1px solid; color:#666; line-height:20px; background:#fff; overflow:auto;}
+body:first-of-type #bw_content .bw_bx1_shadow_in {height:35px; _height /**/:53px; margin:5px 0 0 13px; padding:8px 13px 9px 12px; border:#e3e3e3 1px solid; color:#666; line-height:20px; background:#fff; overflow:auto;}
+#bw_content .bw_bx1_shadow_in, x:-moz-any-link, x:default {height:35px; _height /**/:53px; margin:5px 0 0 13px; padding:8px 13px 9px 12px; border:#e3e3e3 1px solid; color:#666; line-height:20px; background:#fff; overflow:auto;}
+*:first-child+html #bw_content .bw_bx1_shadow_in {height:33px; _height /**/:53px; margin:7px 0 0 13px; padding:8px 13px 9px 12px; border:#e3e3e3 1px solid; color:#666; line-height:20px; background:#fff; overflow:auto;}
+#bw_content .bw_bx2{ border:1px solid #eeeeee; margin:0 0 6px 3px; background:#fbfbfb; line-height:18px;}
+#bw_content .bw_bx2 *{ color:#444444;}
+/* Content */
+#bw_content .bw_desc1{ color:#444444; font-weight:bold; margin:0 0 4px 0;  letter-spacing:-1px;}
+#bw_content .bw_desc2{ color:#444444; margin:0 0 13px 0;}
+#bw_content .bw_desc3{ position:relative; color:#696968; padding:9px 2px 9px 34px; font-size:11px; letter-spacing:-1px; background:url(https://ssl.pstatic.net/static/common/popup/bu_attention.gif) no-repeat 13px 12px;}
+body:first-of-type #bw_content .bw_desc3{ padding:10px 2px 8px 34px;}
+#bw_content .bw_desc3, x:-moz-any-link, x:default { padding:10px 2px 8px 34px;}
+*:first-child+html #bw_content .bw_desc3{ padding:9px 2px 9px 34px;}
+#bw_content .bw_desc4 { color:#6c6c6c; margin:10px 0 0 33px; font-size:11px; letter-spacing:-1px;}
+body:first-of-type #bw_content .bw_desc4 { margin:9px 0 0 33px;}
+#bw_content .bw_desc4, x:-moz-any-link, x:default { margin:9px 0 0 33px;}
+*:first-child+html #bw_content .bw_desc4 { margin:10px 0 0 33px;}
+#bw_content .bw_desc4 a {color:#258102; font-size:11px;}
+#bw_content .bw_desc5 { color:#333333; margin:16px 0 10px 0; _margin:16px 0 10px 0; padding:0 0 0 1px; letter-spacing:-1px;}
+body:first-of-type #bw_content .bw_desc5 { color:#333333; margin:14px 0 12px 0; padding:0 0 0 1px; letter-spacing:-1px;}
+#bw_content .bw_desc5, x:-moz-any-link, x:default { color:#333333; margin:14px 0 12px 0; padding:0 0 0 1px; letter-spacing:-1px;}
+*:first-child+html #bw_content .bw_desc5 { color:#333333; margin:16px 0 12px 0; _margin:16px 0 10px 0; padding:0 0 0 1px; letter-spacing:-1px;}
+#bw_content .bw_desc5 strong{ color:#333333;}
+#bw_content .bw_desc6{color:#333333; margin:21px 0 0 0; padding:0 0 5px 1px; _padding:0 0 3px 1px; letter-spacing:-1px; border-bottom:1px solid #ececec; line-height:20px;}
+/*html:first-child #bw_content .bw_desc6 {margin:46px 0 0 0; padding:0 0 8px 1px;}
+body:first-of-type #bw_content .bw_desc6 {margin:26px 0 0 0; padding:0 0 8px 1px;}
+#bw_content .bw_desc6, x:-moz-any-link, x:default {margin:26px 0 0 0; padding:0 0 8px 1px;}
+*:first-child+html #bw_content .bw_desc6 { margin:27px 0 0 0; padding:0 0 9px 1px;}*/
+#bw_content .bw_desc6 strong{ color:#333333;}
+#bw_content .layer_content p {font-size:11px; line-height:14px; color:#717171; letter-spacing:-1px;}
+#bw_content .layer_content p.bw_orange {margin-top:5px; color:#fd630a;}
+/* function button box */
+#bw_content .function_btn {overflow:hidden; height:53px; *height:57px; _height:60px; width:362px; margin:14px 0 21px 6px; padding-top:4px;}
+body:first-of-type #bw_content .function_btn { margin:14px 0 20px 6px;}
+#bw_content .function_btn, x:-moz-any-link, x:default  { margin:14px 0 20px 6px;}
+*:first-child+html #bw_content .function_btn { margin:14px 0 21px 6px;}
+#bw_content .function_btn .btn_wrap {float:left; width:174px; _width /**/:181px; padding:0 0 0 7px;}
+#bw_content .function_btn .btn_wrap p {margin-top:5px; font-size:11px; letter-spacing:-1px; color:#696968; background:url(https://ssl.pstatic.net/static/common/popup/bu_line.gif) no-repeat right top;}
+body:first-of-type #bw_content .function_btn .btn_wrap p {margin-top:6px;}
+#bw_content .function_btn .btn_wrap p, x:-moz-any-link, x:default  {margin-top:6px;}
+*:first-child+html #bw_content .function_btn .btn_wrap p {margin-top:5px;}
+#bw_content .function_btn .btn_wrap1 {float:left; width:179px; _width /**/:181px; text-align:center; padding-left:2px}
+#bw_content .function_btn .btn_wrap1 p {margin-top:5px; font-size:11px; letter-spacing:-1px; color:#696968; text-align:left; padding:0 0 0 4px;}
+body:first-of-type #bw_content .function_btn .btn_wrap1 p {margin-top:6px;}
+#bw_content .function_btn .btn_wrap1 p, x:-moz-any-link, x:default  {margin-top:6px;}
+*:first-child+html #bw_content .function_btn .btn_wrap1 p {margin-top:5px;}
+#bw_footer button.c_close{position:absolute; top:7px; right:6px; width:18px; height:17px; background:none; border:none;}
+#bw_footer button.c_close, x:-moz-any-link, x:default {top:5px; right:8px;}
+*:first-child+html #bw_footer button.c_close {top:7px; right:6px;}
+#bw_btn_footer button {width:55px; height:27px; text-align:center; font-size:12px;}
+@media all and (-webkit-min-device-pixel-ratio:10000), not all and (-webkit-min-device-pixel-ratio:0)
+{
+	#bw_btn_footer button {padding-top:6px;}
+}
+#bw_btn_footer button.c_close{position:absolute; top:7px; right:6px; width:18px; height:17px; background:none; border:none;}
+#bw_btn_footer button.c_close, x:-moz-any-link, x:default {top:5px; right:8px;}
+*:first-child+html #bw_btn_footer button.c_close {top:7px; right:6px;}
+	var wordCheck;
+	function setWordCheckObject(obj) {
+		wordCheck = obj;
+	}
+		작성하신 에 이용자들의 신고가 많은 표현이 포함되어 있습니다.
+				신고가 많은 표현
+			다른 표현을 사용해주시기 바랍니다.
+			건전한 인터넷 문화 조성을 위해 회원님의 적극적인 협조를 부탁드립니다.
+		더 궁금하신 사항은 고객센터로 문의하시면 자세히 알려드리겠습니다.
+		확인
+if (!window.nhn) window.nhn = {};
+if (!window.nhn.Blog) window.nhn.Blog = {};
+if (!window.nhn.Blog.SocialApp) window.nhn.Blog.SocialApp = {};
+var gsNDriveUrl = "https://mybox.naver.com";
+var gsStaticNetUrl = "https://ssl.pstatic.net/static";
+function openLoginPopup() {
+	var closeUrl = blogURL + "/post/common/reloadOpenerParentAndClose.jsp";
+	window.open(idURLSecret + "/nidlogin.login?mode=form&template=plogin&url="+closeUrl,"loginPopup","width=400,height=267");
+	return;
+}
+var blogId = 'the_observeriter';
+if ( typeof g_ssc == 'undefined') {
+	g_ssc = "blog.post";
+}
+if (typeof nsc == 'undefined') {
+    nsc = "blog.post";
+}
+var ccsrv="cc.naver.com";
+var nclk_evt = 3;
+var bIsNotLoginUser = "true" === "true";
+var sIdSecretUrl = 'https://nid.naver.com';
+			블로그 마켓 가입 완료
+	내 상품 관리에서 배송비 설정 후
+상품 판매를 시작해보세요!
+			배송비 설정하기
+	블로그 마켓 가입 완료 레이어 닫기
+	.blog_market_bridge_set_delivery_popup{position:fixed;left:0;top:0;right:0;bottom:0;z-index:10000;font-size:0;text-align:center;}
+	.blog_market_bridge_set_delivery_popup:before{display:inline-block;width:0;height:100%;vertical-align:middle;content:'';}
+	.blog_market_bridge_set_delivery_popup .dimmed{position:absolute;left:0;top:0;right:0;bottom:0;opacity: 0.7;background: #000000;}
+	.blog_market_bridge_set_delivery_popup .blog_market_bridge_set_delivery_content{display:inline-block;position:relative;width:304px;height:303px;border-radius:8px;box-shadow:1px 1px 7px 0 rgba(0, 0, 0, 0.15);border:solid 1px rgba(0, 0, 0, 0.1);background:#fff;text-align:center;vertical-align:middle;}
+	.blog_market_bridge_set_delivery_popup .text_area:before{
+		display:inline-block;width:192px;height:102px;margin:12px 0 0;content:'';vertical-align:top;
+		background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink' width='192' height='102' viewBox='0 0 192 102'%3E%3Cdefs%3E%3ClinearGradient id='e8xiwmcq5a' x1='50%25' x2='50%25' y1='50%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='%2338D77C'/%3E%3Cstop offset='100%25' stop-color='%232FCFDC'/%3E%3C/linearGradient%3E%3Cfilter id='2o3xn9qpnb' width='125%25' height='125%25' x='-12.5%25' y='-12.5%25' filterUnits='objectBoundingBox'%3E%3CfeOffset in='SourceAlpha' result='shadowOffsetOuter1'/%3E%3CfeGaussianBlur in='shadowOffsetOuter1' result='shadowBlurOuter1' stdDeviation='1'/%3E%3CfeColorMatrix in='shadowBlurOuter1' values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.210500437 0'/%3E%3C/filter%3E%3Ccircle id='2pb8blndrc' cx='12' cy='12' r='12'/%3E%3C/defs%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg%3E%3Cg%3E%3Cg%3E%3Cg transform='translate(-624 -259) translate(568 247) translate(56 12) translate(10 2)'%3E%3Ccircle cx='32.918' cy='96.666' r='2' fill='%23FF7D9F'/%3E%3Ccircle cx='142.418' cy='45.166' r='2.5' fill='%23FFD33E'/%3E%3Ccircle cx='66.918' cy='17.666' r='2' fill='%23928FF4'/%3E%3Ccircle cx='158.918' cy='57.666' r='2' fill='%237CD9B1'/%3E%3Ccircle cx='14.918' cy='14.666' r='4' fill='%23FFD33E'/%3E%3Cpath fill='%23928FF4' d='M2.207 54.71c.985.773 2.167 1.16 3.546 1.16 1.38 0 2.81-.43 4.29-1.288-.777 1.79-1.166 3.26-1.166 4.412 0 1.151.346 2.293 1.039 3.424-.93-.648-2.093-.972-3.491-.972-1.399 0-2.709.228-3.93.685.537-1.33.806-2.599.806-3.809s-.365-2.414-1.094-3.612z' transform='rotate(-45 6.126 58.5)'/%3E%3Crect width='9' height='3' x='142.918' y='90.666' fill='%23FF7D9F' rx='1.5' transform='rotate(43 147.418 92.166)'/%3E%3Crect width='9' height='3' x='23.918' y='79.666' fill='%23FFD33E' rx='1.5' transform='rotate(-41 28.418 81.166)'/%3E%3Crect width='9' height='3' x='123.918' y='17.666' fill='%23928FF4' rx='1.5' transform='rotate(-41 128.418 19.166)'/%3E%3Crect width='9' height='3' x='27.918' y='30.666' fill='%237CD9B1' rx='1.5' transform='rotate(43 32.418 32.166)'/%3E%3Cpath fill='%23FF7D9F' d='M152 20.194c.86.674 1.89 1.012 3.094 1.012 1.203 0 2.45-.375 3.743-1.124-.679 1.561-1.018 2.844-1.018 3.849 0 1.004.302 2 .906 2.987-.81-.565-1.826-.848-3.046-.848-1.22 0-2.363.199-3.428.597.469-1.159.703-2.266.703-3.322s-.318-2.106-.954-3.151z' transform='rotate(-45 155.418 23.5)'/%3E%3Cpath fill='%237CD9B1' d='M66.389 2.115c.88.69 1.936 1.036 3.167 1.036 1.232 0 2.51-.384 3.833-1.151-.695 1.599-1.043 2.912-1.043 3.94 0 1.03.31 2.049.928 3.06-.83-.58-1.869-.869-3.118-.869-1.25 0-2.42.204-3.51.612.48-1.187.72-2.32.72-3.402 0-1.08-.326-2.156-.977-3.226z' transform='rotate(-45 69.889 5.5)'/%3E%3C/g%3E%3Cg%3E%3Cpath fill='url(%23e8xiwmcq5a)' d='M39 0c6.443 0 11.667 5.223 11.667 11.667l-.001 1.286H57c4.418 0 8 3.57 8 7.975v26.801c0 7.026-5.047 12.721-12.095 12.721H25.761C18.714 60.45 13 54.755 13 47.73V20.927c0-4.404 3.582-7.974 8-7.974l6.333-.001v-1.286C27.333 5.223 32.557 0 39 0zm-3.386 23.321h-5.947v26.025h5.948V47.51c1.308 1.484 3.251 2.382 5.908 2.382 5.195 0 9.477-4.49 9.477-10.306 0-5.816-4.282-10.305-9.477-10.305-2.541 0-4.43.821-5.734 2.19l-.174.19v-8.34zm4.72 11.113c2.96 0 5.106 1.985 5.106 5.153 0 3.168-2.146 5.153-5.106 5.153-2.961 0-5.106-1.985-5.106-5.153 0-3.168 2.145-5.153 5.106-5.153zM39 4.914c-3.72 0-6.752 2.953-6.876 6.643l-.004.237-.001 1.159H45.88v-1.16c0-3.799-3.08-6.88-6.88-6.88z' transform='translate(-624 -259) translate(568 247) translate(56 12) translate(54.5 29)'/%3E%3Cg%3E%3Cg transform='translate(-624 -259) translate(568 247) translate(56 12) translate(54.5 29) translate(53 43)'%3E%3Cuse fill='%23000' filter='url(%232o3xn9qpnb)' xlink:href='%232pb8blndrc'/%3E%3Cuse fill='%23FFF' xlink:href='%232pb8blndrc'/%3E%3C/g%3E%3Cpath fill='%2303C75A' d='M16.238 16.83H8.61v-2.034h5.594V4.029h2.034V16.83z' transform='translate(-624 -259) translate(568 247) translate(56 12) translate(54.5 29) translate(53 43) rotate(45 12.424 10.43)'/%3E%3C/g%3E%3C/g%3E%3C/g%3E%3C/g%3E%3C/g%3E%3C/g%3E%3C/svg%3E%0A") no-repeat;
+	}
+	.blog_market_bridge_set_delivery_popup .title{font-family:"나눔스퀘어", "NanumSquare", "NanumSquareWebFont", "Malgun Gothic", "맑은 고딕", "Dotum", "돋움", "Helvetica", "Apple SD Gothic Neo", "sans-serif";font-size:22px;font-weight:bold;line-height:24px;color:#000;padding:12px 0 0;}
+	.blog_market_bridge_set_delivery_popup .desc{font-size:14px;line-height:23px;color:#000;padding:12px 0 0;}
+	.blog_market_bridge_set_delivery_popup .btn{display:block;height:40px;margin:25px 30px 0;background:#03c75a;border-radius:4px;line-height:41px;color:#fff;font-size:15px;font-weight:600;}
+	.blog_market_bridge_set_delivery_popup .btn:hover{text-decoration:none;}
+	.blog_market_bridge_set_delivery_popup .close_btn{position:absolute;right:-7px;top:-50px;width:44px;height:44px;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='30' height='30' viewBox='0 0 30 30'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23FFF'%3E%3Cg%3E%3Cpath d='M22.5 7v14.5H37v1H22.499L22.5 37h-1l-.001-14.5H7v-1h14.5V7h1z' transform='translate(-842 -205) translate(835 198) rotate(45 22 22)'/%3E%3C/g%3E%3C/g%3E%3C/g%3E%3C/svg%3E%0A") 7px 7px no-repeat;border:0;}
+					블로그 마켓 탈퇴가
+완료되었습니다.
+					문의사항은 블로그 마켓 고객센터로 연락주세요.
+						확인
+	.blog__market_leave_popup{position:fixed;left:0;top:0;right:0;bottom:0;z-index:10000;font-size:0;text-align:center;}
+	.blog__market_leave_popup:before{display:inline-block;width:0;height:100%;vertical-align:middle;content:'';}
+	.blog__market_leave_popup .dimmed{position:absolute;left:0;top:0;right:0;bottom:0;opacity: 0.7;background: #000000;}
+	.blog__market_leave_popup .blog__market_leave_layer{display: inline-block;vertical-align: middle;white-space: normal;font-size: 12px;text-align: left;position: relative;outline: none;}
+	.blog__market_leave_popup .blog__market_leave_layer_wrap {box-sizing: border-box;width: 380px;padding: 0 17px;border-radius: 8px;box-shadow: 1px 1px 7px 0 rgba(0, 0, 0, 0.15);border: 1px solid rgba(0, 0, 0, 0.1);background-color: #fff;text-align: center;}
+	.blog__market_leave_popup .blog__market_leave_content {padding: 40px 0 33px;font-family:"나눔스퀘어", "NanumSquare", "NanumSquareWebFont", "Malgun Gothic", "맑은 고딕", "Dotum", "돋움", "Helvetica", "Apple SD Gothic Neo", "sans-serif";}
+	.blog__market_leave_popup .title{font-weight: 700;line-height: 34px;font-size: 24px;color: #444;}
+	.blog__market_leave_popup .text{margin-top: 10px;padding: 0 20px;word-break: keep-all;line-height: 21px;font-size: 13px;color: #888;}
+	.blog__market_leave_popup .btn_area{margin-top: 27px;font-size: 0;}
+	.blog__market_leave_popup .btn_ok{display: inline-block;vertical-align:top;width: 120px;height: 40px;border-radius: 3px;border: 1px solid #ddd;line-height: 14px;font-size: 14px;outline: 0;background-color: transparent;color: #00c73c;}
+	.blog__market_leave_popup .btn_ok:hover{color: #fff;background-color: #00c73c;border-color: #00c73c;}

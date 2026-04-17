@@ -282,20 +282,33 @@ class RunningService extends ChangeNotifier {
       return;
     }
 
-    if (_lastPosition != null && isValidSpeed) {
-      _totalDistanceM += Geolocator.distanceBetween(
+    if (_lastPosition != null) {
+      // 거리 기반 필터 (isValidSpeed 순간속도 의존 제거):
+      // iOS 백그라운드·건물 반사·뺑뺑 회전 시 순간 speed가 0 또는 튐 값으로 잡혀
+      // 거리 누적이 중단되던 버그 수정 (2026-04 사용자 리포트).
+      //
+      // 판정 기준:
+      //  - 한 샘플 점프 > 150m  → GPS drift로 간주, 드롭
+      //    (샘플 간격 1~3초 가정, 150m = 180~540 km/h 불가능)
+      //  - 점프 < 1.5m           → GPS 노이즈, 드롭 (제자리에서 마커 흔들림)
+      //  - 그 사이                 → 정상 이동으로 인정
+      final deltaM = Geolocator.distanceBetween(
         _lastPosition!.latitude, _lastPosition!.longitude,
         pos.latitude, pos.longitude,
       );
 
-      // 유효한 속도일 때만 포인트 추가 (거리와 경로 일치)
-      _points.add(RunPoint(
-        runId: 0,
-        latitude: pos.latitude,
-        longitude: pos.longitude,
-        timestampMs: DateTime.now().millisecondsSinceEpoch,
-        speedMps: pos.speed,
-      ));
+      if (deltaM >= 1.5 && deltaM <= 150) {
+        _totalDistanceM += deltaM;
+        _points.add(RunPoint(
+          runId: 0,
+          latitude: pos.latitude,
+          longitude: pos.longitude,
+          timestampMs: DateTime.now().millisecondsSinceEpoch,
+          speedMps: pos.speed,
+        ));
+      }
+      // 점프 > 150m은 위치·거리 모두 무시 (다음 샘플과 비교)
+      // 점프 < 1.5m는 위치만 갱신 (마지막 부분에서 _lastPosition = pos)
     } else if (_lastPosition == null) {
       // 첫 포인트는 항상 추가 (시작 위치)
       _points.add(RunPoint(
@@ -314,7 +327,21 @@ class RunningService extends ChangeNotifier {
       _announceKmSplit(currentKm);
     }
 
-    _lastPosition = pos;
+    // GPS drift(150m+) 상황에선 _lastPosition을 덮어쓰지 않고 원래 위치 유지 →
+    // 다음 샘플이 정상이면 drift 위치 건너뛰고 정상 차이로 누적.
+    // _lastPosition == null 이면(첫 샘플) 반드시 세팅.
+    if (_lastPosition == null) {
+      _lastPosition = pos;
+    } else {
+      final deltaM = Geolocator.distanceBetween(
+        _lastPosition!.latitude, _lastPosition!.longitude,
+        pos.latitude, pos.longitude,
+      );
+      // 정상 범위이면 업데이트 (0~150m). 큰 점프는 다음 샘플과 비교할 수 있게 유지.
+      if (deltaM <= 150) {
+        _lastPosition = pos;
+      }
+    }
 
     _safeNotify();
 

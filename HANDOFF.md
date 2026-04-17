@@ -29,6 +29,38 @@
 
 ## 최신
 
+### 2026-04-18 03:30 (Windows → Mac) — iOS 백그라운드 audio·GPS 실기 검증 필요
+
+**사용자 iOS 실기 리포트 3건:**
+1. 화면 끄거나 오래 달리면 백그라운드에서 거리 계산 중단
+2. 오래 달리면 BGM/효과음 안 나옴
+3. 같은 곳을 뺑뺑 돌면 거리 안 늘어남
+
+**Windows에서 한 조치:**
+- 3번(뺑뺑 돌면 거리 안 늠) 근본 원인 수정
+  - `RunningService._onPosition`에서 `isValidSpeed` (1.0~8.0 m/s) 순간속도 필터 제거
+  - 대신 샘플 간 **거리 기반** 필터로 교체: 1.5m ≤ delta ≤ 150m만 누적
+  - 150m+ 점프(GPS drift) 시 `_lastPosition` 덮어쓰지 않음 → 다음 정상 샘플과 비교
+  - iOS 건물 반사·저속 이동·뺑뺑 회전에서 순간 speed 0/튐으로 drop되던 버그 해결
+- Info.plist 확인: `audio`/`location` background mode 있음 ✅
+- geolocator AppleSettings: `pauseLocationUpdatesAutomatically=false`, `allowBackgroundLocationUpdates=true`, `showBackgroundLocationIndicator=true` ✅ 올바르게 설정됨
+
+**Mac에서 실기 검증·진단 부탁:**
+1. **백그라운드 GPS 지속 여부** — 화면 꺼진 상태 5~10분 러닝. 상단 파란 바(background location indicator) 유지되는지. distanceFilter=5 설정 OK인지.
+2. **백그라운드 audio 끊김** — Xcode Console 로그로 AudioSession interruption 이벤트 확인. `just_audio` BGM이 앱 suspend 후 끊기면:
+   - `just_audio_background` 패키지 추가 검토
+   - `AudioSession.interruptionEventStream` 구독 → interruption ended 시 자동 resume 로직 HorrorService/MarathonService에 추가
+3. **뺑뺑 돌기 수정 검증** — 같은 자리 작은 원(30m 이내)을 계속 돌면서 거리 누적되는지 확인. 정상이면 이 건 close.
+
+**관련 파일:**
+- `lib/core/services/running_service.dart` (283~340줄 수정됨)
+- `lib/main.dart` AudioSession 설정
+- `ios/Runner/Info.plist`
+
+수정 후 commit/push하고 이 블록을 "## 이력"으로 이동해주세요.
+
+---
+
 ### 2026-04-17 19:20 (Windows → Mac) — 테마 시스템 도입 · 스토어 상품 등록 필요
 
 **Windows에서 완료된 작업 (이번 커밋):**
