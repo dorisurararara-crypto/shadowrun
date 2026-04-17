@@ -907,6 +907,12 @@ class _RunningScreenState extends State<RunningScreen>
 
   @override
   Widget build(BuildContext context) {
+    // codex P2: _runMode(fullmap/mapcenter/datacenter)는 사용자 UX 선호.
+    // 사용자가 map-center 또는 data-center를 저장했다면 테마와 관계없이 그 레이아웃을 우선.
+    // 테마 레이아웃(Mystic/Pure)은 fullmap 모드일 때만 적용.
+    if (_runMode != 'fullmap') {
+      return _buildDefaultLayout();
+    }
     return ValueListenableBuilder<ThemeId>(
       valueListenable: ThemeManager.I.themeIdNotifier,
       builder: (context, themeId, _) {
