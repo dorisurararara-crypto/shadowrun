@@ -47,6 +47,7 @@ GoRouter createRouter(bool languageSelected) => GoRouter(
           runMode: map['mode'] as String? ?? 'freerun',
           sameLocation: map['sameLocation'] as bool? ?? true,
           shoeId: map['shoeId'] as int?,
+          legendId: map['legendId'] as String?,
         );
       },
     ),

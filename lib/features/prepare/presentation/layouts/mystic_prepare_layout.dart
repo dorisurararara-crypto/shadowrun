@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:shadowrun/core/l10n/app_strings.dart';
 import 'package:shadowrun/core/services/sfx_service.dart';
+import 'package:shadowrun/features/running/data/legend_runners.dart';
 import 'package:shadowrun/shared/models/run_model.dart';
 
 /// T3 Korean Mystic 테마용 Prepare 화면 레이아웃.
@@ -26,6 +28,12 @@ class MysticPrepareLayout extends StatelessWidget {
   final int? selectedShoeId;
   final ValueChanged<int?> onShoeChanged;
 
+  // 전설의 마라토너 (marathon 모드일 때)
+  final String? selectedLegendId;
+  final ValueChanged<String> onLegendChanged;
+  final bool isPro;
+  final VoidCallback onLegendLocked;
+
   // 액션
   final VoidCallback onStart;
   final VoidCallback onBack;
@@ -49,6 +57,10 @@ class MysticPrepareLayout extends StatelessWidget {
     required this.shoes,
     required this.selectedShoeId,
     required this.onShoeChanged,
+    required this.selectedLegendId,
+    required this.onLegendChanged,
+    required this.isPro,
+    required this.onLegendLocked,
     required this.onStart,
     required this.onBack,
     required this.countdownActive,
@@ -222,6 +234,10 @@ class MysticPrepareLayout extends StatelessWidget {
           ] else ...[
             _modeSection(),
             const SizedBox(height: 18),
+            if (selectedMode == 'marathon') ...[
+              _legendSection(),
+              const SizedBox(height: 18),
+            ],
           ],
           if (shoes.isNotEmpty) ...[
             _shoeSection(),
@@ -633,6 +649,140 @@ class MysticPrepareLayout extends StatelessWidget {
                 style: TextStyle(color: _bloodFresh, fontSize: 10),
               ),
           ],
+        ),
+      ),
+    );
+  }
+
+  Widget _legendSection() {
+    return _sectionFrame(
+      title: S.isKo ? '전설과 함께 뛰기' : 'Chase a Legend',
+      english: 'L E G E N D',
+      child: SizedBox(
+        height: 198,
+        child: ListView.separated(
+          scrollDirection: Axis.horizontal,
+          itemCount: LegendRunners.all.length,
+          separatorBuilder: (_, _) => const SizedBox(width: 10),
+          itemBuilder: (context, index) {
+            return _legendCard(LegendRunners.all[index]);
+          },
+        ),
+      ),
+    );
+  }
+
+  Widget _legendCard(LegendRunner legend) {
+    final on = selectedLegendId == legend.id;
+    final locked = legend.isProOnly && !isPro;
+    return InkWell(
+      onTap: () {
+        if (locked) {
+          SfxService().toggle();
+          onLegendLocked();
+          return;
+        }
+        SfxService().toggle();
+        onLegendChanged(legend.id);
+      },
+      child: SizedBox(
+        width: 196,
+        child: Container(
+          padding: const EdgeInsets.all(12),
+          decoration: BoxDecoration(
+            color: on ? const Color(0xFF0F0505) : const Color(0x990A0606),
+            border: Border.all(
+              color: on ? _bloodDry : _line,
+              width: on ? 1.2 : 1,
+            ),
+            boxShadow: on
+                ? const [
+                    BoxShadow(
+                      color: Color(0x557A0A0E),
+                      blurRadius: 20,
+                      spreadRadius: -8,
+                    ),
+                  ]
+                : null,
+          ),
+          child: Stack(
+            children: [
+              Positioned(
+                right: -4,
+                top: -6,
+                child: Text(
+                  '走',
+                  style: GoogleFonts.nanumMyeongjo(
+                    fontSize: 54,
+                    color: on
+                        ? _bloodDry.withValues(alpha: 0.35)
+                        : _bloodDry.withValues(alpha: 0.12),
+                    fontWeight: FontWeight.w800,
+                  ),
+                ),
+              ),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Text(legend.flag, style: const TextStyle(fontSize: 30)),
+                      const Spacer(),
+                      if (locked)
+                        const Icon(Icons.lock_rounded,
+                            size: 14, color: _bloodFresh)
+                      else if (on)
+                        Text('●',
+                            style: const TextStyle(
+                                color: _bloodFresh, fontSize: 10)),
+                    ],
+                  ),
+                  const SizedBox(height: 10),
+                  Text(
+                    legend.displayName,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: GoogleFonts.nanumMyeongjo(
+                      fontSize: 16,
+                      color: on ? _rice : _riceDim,
+                      fontWeight: FontWeight.w800,
+                      letterSpacing: 1.4,
+                    ),
+                  ),
+                  const SizedBox(height: 3),
+                  Text(
+                    '${legend.recordLabel}  ·  ${legend.paceLabel}',
+                    style: GoogleFonts.gowunBatang(
+                      fontSize: 11,
+                      color: on ? _bloodFresh : _riceFade,
+                      fontWeight: FontWeight.w700,
+                      letterSpacing: 0.5,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Container(
+                    height: 1,
+                    width: 24,
+                    color: on ? _bloodDry : _line,
+                  ),
+                  const SizedBox(height: 8),
+                  Expanded(
+                    child: Text(
+                      legend.bio,
+                      maxLines: 4,
+                      overflow: TextOverflow.ellipsis,
+                      style: GoogleFonts.gowunBatang(
+                        fontSize: 10.5,
+                        height: 1.55,
+                        color: _riceFade,
+                        fontWeight: FontWeight.w400,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
         ),
       ),
     );

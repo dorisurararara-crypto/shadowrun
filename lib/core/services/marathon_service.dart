@@ -1,8 +1,12 @@
 import 'dart:math';
 import 'package:flutter/foundation.dart';
+import 'package:flutter_tts/flutter_tts.dart';
 import 'package:just_audio/just_audio.dart';
+import 'package:vibration/vibration.dart';
 import 'package:shadowrun/core/l10n/app_strings.dart';
 import 'package:shadowrun/core/services/bgm_preferences.dart';
+import 'package:shadowrun/core/services/watch_connector_service.dart';
+import 'package:shadowrun/features/running/data/legend_runners.dart';
 
 class MarathonService {
   final AudioPlayer _ttsPlayer = AudioPlayer();
@@ -17,6 +21,20 @@ class MarathonService {
   final Set<int> _playedTimeMinutes = {};
   int _nextRandomTtsTime = 90; // 1.5분 후부터 (기존 2분 → 단축)
   int _nextEncourageTtsTime = 60; // 1분 후부터 격려 시작
+
+  // === Legend (전설 러너) 트래커 ===
+  LegendRunner? _legend;
+  FlutterTts? _flutterTts;
+  bool _legendVibrationEnabled = true;
+  bool _hasVibrator = false;
+  bool _isLegendSpeaking = false; // flutter_tts 재생 중
+  int _lastLegendAnnounceSec = -9999; // 마지막 legend 안내 경과초
+  int? _lastBehindBucket; // 뒤처짐 250m 버킷 (1=250m, 2=500m, ...)
+  int? _lastAheadBucket; // 앞섬 250m 버킷
+  final Set<int> _announcedLegendKm = {}; // 이미 안내한 km (사용자 기준)
+  bool? _wasAheadOfLegend; // 마지막 tick 기준 앞섰는지 (null = 초기)
+  int _lastBehindBucketSeen = 0; // 뒤처짐 버킷 최고점 — "계속 벌어짐" 감지용
+  static const int _legendMinIntervalSec = 25; // legend 안내 최소 간격
 
   static const List<int> _availableKmMilestones = [1, 2, 3, 4, 5, 7, 10, 15, 20];
   static const List<int> _timeMinutes = [5, 10, 15, 20, 30, 40, 50, 60];
@@ -52,8 +70,34 @@ class MarathonService {
     'bgm_running_ambient_v3.mp3', 'bgm_running_ambient_v4.mp3', 'bgm_running_ambient_v5.mp3',
   ];
 
-  Future<void> initialize({String voice = 'drill'}) async {
+  Future<void> initialize({
+    String voice = 'drill',
+    LegendRunner? legend,
+    bool vibrationEnabled = true,
+  }) async {
     _voiceId = voice;
+    _legend = legend;
+    _legendVibrationEnabled = vibrationEnabled;
+
+    // flutter_tts 초기화 (legend가 있을 때만) — 동적 문장용.
+    if (_legend != null) {
+      try {
+        final tts = FlutterTts();
+        await tts.setLanguage(S.isKo ? 'ko-KR' : 'en-US');
+        await tts.setVolume(0.8);
+        await tts.setSpeechRate(0.5);
+        await tts.setPitch(1.0);
+        _flutterTts = tts;
+      } catch (e) {
+        debugPrint('Legend flutter_tts 초기화 에러: $e');
+      }
+      try {
+        _hasVibrator = (await Vibration.hasVibrator()) == true;
+      } catch (_) {
+        _hasVibrator = false;
+      }
+    }
+
     final prefs = BgmPreferences.I;
     // 사용자가 BGM off 또는 외부 음악 모드면 재생 안 함.
     if (!prefs.enabled.value || prefs.externalMusicMode.value) {
@@ -320,6 +364,191 @@ class MarathonService {
     _playedTimeMinutes.clear();
     _nextRandomTtsTime = 90;
     _nextEncourageTtsTime = 60;
+    _announcedLegendKm.clear();
+    _lastBehindBucket = null;
+    _lastAheadBucket = null;
+    _wasAheadOfLegend = null;
+    _lastBehindBucketSeen = 0;
+    _lastLegendAnnounceSec = -9999;
+  }
+
+  // ============================================================
+  // Legend(전설 러너) 트래커
+  // ============================================================
+
+  /// 매 GPS tick 또는 1초 tick에서 호출.
+  /// 이벤트 판정 우선순위: 역전 > 새 km 도달 > 250m 버킷 변화.
+  /// legend 이벤트가 발생하면 기존 km/시간 격려 TTS는 자연스럽게 밀림 (_isPlaying 체크).
+  Future<void> updateProgress({
+    required int elapsedSeconds,
+    required double userDistanceKm,
+  }) async {
+    final legend = _legend;
+    if (legend == null || _isDisposed) return;
+
+    final legendKm = legend.virtualDistanceKmAt(elapsedSeconds);
+    final diffKm = userDistanceKm - legendKm; // 양수 = 앞섬
+    final diffMeters = (diffKm * 1000).round();
+    final nowAhead = diffMeters >= 0;
+
+    // 워치 전달 (silent, iOS 외에는 no-op)
+    // ignore: unawaited_futures
+    WatchConnectorService().sendLegendDiff(
+      diffMeters.toDouble(),
+      legendName: legend.displayName,
+    );
+
+    // 역전 이벤트 판정 (가장 우선순위 높음).
+    if (_wasAheadOfLegend != null && _wasAheadOfLegend != nowAhead) {
+      final passed = nowAhead; // true: 방금 추월, false: 방금 추월당함
+      _wasAheadOfLegend = nowAhead;
+      _resetLegendBucketsOnCross();
+      await _announceLegendPass(legend, passed: passed, elapsedSec: elapsedSeconds);
+      return;
+    }
+    _wasAheadOfLegend = nowAhead;
+
+    // 새로운 km 도달 이벤트 (사용자 기준 1, 2, 3km …)
+    final userWholeKm = userDistanceKm.floor();
+    if (userWholeKm >= 1 && !_announcedLegendKm.contains(userWholeKm)) {
+      _announcedLegendKm.add(userWholeKm);
+      if (_canAnnounceLegend(elapsedSeconds)) {
+        await _announceKmReached(legend, userWholeKm, legendKm, elapsedSeconds);
+        return;
+      }
+    }
+
+    // 250m 단위 버킷 변화 이벤트
+    final absMeters = diffMeters.abs();
+    final bucket = absMeters ~/ 250; // 0=<250m, 1=250~499, ...
+    if (nowAhead) {
+      if (bucket >= 1 && bucket != _lastAheadBucket) {
+        _lastAheadBucket = bucket;
+        _lastBehindBucket = null;
+        // 사용자 앞섬 상태 — 햅틱 없음, TTS만 드물게
+        if (_canAnnounceLegend(elapsedSeconds) && bucket >= 1 && bucket <= 4) {
+          await _announceAhead(legend, absMeters, elapsedSeconds);
+        }
+      }
+    } else {
+      if (bucket >= 1 && bucket != _lastBehindBucket) {
+        final widening = bucket > _lastBehindBucketSeen;
+        _lastBehindBucket = bucket;
+        _lastAheadBucket = null;
+        if (bucket > _lastBehindBucketSeen) _lastBehindBucketSeen = bucket;
+        // 햅틱은 간격 상관없이 (짧고 정보량 높음)
+        _legendVibrateBehind(bucket, widening: widening);
+        if (_canAnnounceLegend(elapsedSeconds)) {
+          await _announceBehind(legend, absMeters, elapsedSeconds);
+        }
+      }
+    }
+  }
+
+  bool _canAnnounceLegend(int elapsedSec) {
+    if (_isLegendSpeaking) return false;
+    if (_isPlaying) return false; // 기존 km/시간 TTS와 충돌 방지
+    return (elapsedSec - _lastLegendAnnounceSec) >= _legendMinIntervalSec;
+  }
+
+  void _resetLegendBucketsOnCross() {
+    _lastAheadBucket = null;
+    _lastBehindBucket = null;
+    _lastBehindBucketSeen = 0;
+  }
+
+  Future<void> _announceLegendPass(
+    LegendRunner legend, {
+    required bool passed,
+    required int elapsedSec,
+  }) async {
+    final name = legend.displayName;
+    final text = passed
+        ? (S.isKo ? '$name을 앞섰습니다!' : 'You just passed $name!')
+        : (S.isKo ? '$name가 다시 앞섰습니다' : '$name is back in front');
+    if (passed) {
+      _legendVibratePassed();
+    } else {
+      _legendVibrateOvertaken();
+    }
+    await _speakLegend(text, elapsedSec);
+  }
+
+  Future<void> _announceKmReached(
+    LegendRunner legend,
+    int userKm,
+    double legendKm,
+    int elapsedSec,
+  ) async {
+    final name = legend.displayName;
+    final legendKmRounded = legendKm.toStringAsFixed(1);
+    final text = S.isKo
+        ? '${userKm}km 도달. $name는 ${legendKmRounded}km'
+        : '$userKm km reached. $name at $legendKmRounded km';
+    await _speakLegend(text, elapsedSec);
+  }
+
+  Future<void> _announceBehind(LegendRunner legend, int diffMeters, int elapsedSec) async {
+    final name = legend.displayName;
+    final text = S.isKo
+        ? '$name과 $diffMeters미터 차이'
+        : '$name is ${diffMeters}m ahead';
+    await _speakLegend(text, elapsedSec);
+  }
+
+  Future<void> _announceAhead(LegendRunner legend, int diffMeters, int elapsedSec) async {
+    final name = legend.displayName;
+    final text = S.isKo
+        ? '$name를 $diffMeters미터 앞서가고 있어요'
+        : 'You are ${diffMeters}m ahead of $name';
+    await _speakLegend(text, elapsedSec);
+  }
+
+  Future<void> _speakLegend(String text, int elapsedSec) async {
+    final tts = _flutterTts;
+    if (tts == null || _isDisposed) return;
+    _isLegendSpeaking = true;
+    _lastLegendAnnounceSec = elapsedSec;
+    try {
+      await tts.stop();
+      await tts.speak(text);
+    } catch (e) {
+      debugPrint('Legend TTS 에러: $e');
+    } finally {
+      // 비동기 완료 대기 — flutter_tts는 awaitSpeakCompletion 지원이 플랫폼별이라
+      // 보수적으로 짧은 지연 후 플래그 해제.
+      Future<void>.delayed(const Duration(milliseconds: 400), () {
+        _isLegendSpeaking = false;
+      });
+    }
+  }
+
+  void _legendVibrateBehind(int bucket, {required bool widening}) {
+    if (!_legendVibrationEnabled || !_hasVibrator || _isDisposed) return;
+    try {
+      if (bucket >= 2 && widening) {
+        // 500m+ && 계속 벌어짐 → 길게 2번 (300ms × 2, 150ms 간격)
+        Vibration.vibrate(pattern: [0, 300, 150, 300]);
+      } else {
+        // 250m 버킷 전환 → 짧게 1번
+        Vibration.vibrate(duration: 100);
+      }
+    } catch (_) {}
+  }
+
+  void _legendVibratePassed() {
+    if (!_legendVibrationEnabled || !_hasVibrator || _isDisposed) return;
+    try {
+      // 빠른 3번
+      Vibration.vibrate(pattern: [0, 80, 80, 80, 80, 80]);
+    } catch (_) {}
+  }
+
+  void _legendVibrateOvertaken() {
+    if (!_legendVibrationEnabled || !_hasVibrator || _isDisposed) return;
+    try {
+      Vibration.vibrate(duration: 500);
+    } catch (_) {}
   }
 
   void dispose() {
@@ -329,5 +558,12 @@ class MarathonService {
     BgmPreferences.I.enabled.removeListener(_onEnabledChanged);
     _ttsPlayer.dispose();
     _bgmPlayer.dispose();
+    try {
+      _flutterTts?.stop();
+    } catch (_) {}
+    _flutterTts = null;
+    try {
+      Vibration.cancel();
+    } catch (_) {}
   }
 }

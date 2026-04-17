@@ -26,14 +26,16 @@ import 'package:shadowrun/core/theme/theme_manager.dart';
 import 'package:shadowrun/core/theme/theme_id.dart';
 import 'package:shadowrun/features/running/presentation/layouts/mystic_running_layout.dart';
 import 'package:shadowrun/features/running/presentation/layouts/pure_running_layout.dart';
+import 'package:shadowrun/features/running/data/legend_runners.dart';
 
 class RunningScreen extends StatefulWidget {
   final int? shadowRunId;
   final String runMode; // 'doppelganger', 'marathon', 'freerun'
   final bool sameLocation; // 도플갱어: 같은 장소 vs 다른 장소
   final int? shoeId;
+  final String? legendId; // marathon 모드일 때 선택한 전설 러너 id
 
-  const RunningScreen({super.key, this.shadowRunId, this.runMode = 'freerun', this.sameLocation = true, this.shoeId});
+  const RunningScreen({super.key, this.shadowRunId, this.runMode = 'freerun', this.sameLocation = true, this.shoeId, this.legendId});
 
   @override
   State<RunningScreen> createState() => _RunningScreenState();
@@ -235,7 +237,14 @@ class _RunningScreenState extends State<RunningScreen>
       // 모드별 서비스 초기화
       if (widget.runMode == 'marathon') {
         _marathonService = MarathonService();
-        await _marathonService!.initialize(voice: voice);
+        final legend = widget.legendId != null
+            ? LegendRunners.byId(widget.legendId!)
+            : null;
+        await _marathonService!.initialize(
+          voice: voice,
+          legend: legend,
+          vibrationEnabled: vibEnabled,
+        );
         if (_aborted()) return;
       } else if (widget.runMode == 'freerun') {
         _soloTtsService = SoloTtsService();
@@ -319,6 +328,12 @@ class _RunningScreenState extends State<RunningScreen>
           _sendDataToWatch();
           if (widget.runMode == 'marathon' && _ttsOn) {
             _updateMarathonTime();
+            // Legend(전설) 트래커 — legendId가 있을 때만 내부에서 동작.
+            // ignore: unawaited_futures
+            _marathonService?.updateProgress(
+              elapsedSeconds: _runService.durationS,
+              userDistanceKm: _runService.totalDistanceM / 1000.0,
+            );
           }
         }
       });

@@ -135,4 +135,16 @@ class WatchConnectorService {
       await _methodChannel.invokeMethod('sendAppContext', {'runState': 'idle'});
     } catch (_) {}
   }
+
+  /// Legend(전설) 러너와의 거리 차이(m) 워치 전달.
+  /// +: 사용자가 앞섬, −: 뒤처짐.
+  /// 워치 미연결/채널 미구현이어도 에러 안 남 (silent).
+  Future<void> sendLegendDiff(double meters, {String? legendName}) async {
+    if (!_isIOS) return;
+    try {
+      final data = <String, dynamic>{'legendDiffM': meters};
+      if (legendName != null) data['legendName'] = legendName;
+      await _methodChannel.invokeMethod('sendLegendDiff', data);
+    } catch (_) {}
+  }
 }

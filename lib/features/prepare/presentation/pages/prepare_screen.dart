@@ -13,6 +13,8 @@ import 'package:shadowrun/core/database/database_helper.dart';
 import 'package:shadowrun/shared/models/run_model.dart';
 import 'package:shadowrun/core/l10n/app_strings.dart';
 import 'package:shadowrun/core/services/sfx_service.dart';
+import 'package:shadowrun/core/services/purchase_service.dart';
+import 'package:shadowrun/features/running/data/legend_runners.dart';
 import 'package:shadowrun/features/prepare/presentation/layouts/mystic_prepare_layout.dart';
 import 'package:shadowrun/features/prepare/presentation/layouts/pure_prepare_layout.dart';
 
@@ -93,9 +95,16 @@ class _PrepareScreenState extends State<PrepareScreen>
   String _shadowLocationType = 'same'; // 'same' or 'different'
   List<Map<String, dynamic>> _shoes = [];
   int? _selectedShoeId;
+  String? _selectedLegendId; // null이면 자유 러닝, id면 해당 전설과 대결
 
+  bool get _isPro => PurchaseService().isPro;
   bool get _isChallenge => widget.shadowRunId != null;
-  bool get _canStart => _gpsReady && !(_tooFarFromStart && _shadowLocationType == 'same');
+  bool get _legendRequiredButMissing =>
+      !_isChallenge && _selectedMode == 'marathon' && _selectedLegendId == null;
+  bool get _canStart =>
+      _gpsReady &&
+      !(_tooFarFromStart && _shadowLocationType == 'same') &&
+      !_legendRequiredButMissing;
 
   @override
   void initState() {
@@ -121,6 +130,14 @@ class _PrepareScreenState extends State<PrepareScreen>
       _shadowPoints = await DatabaseHelper.getRunPoints(widget.shadowRunId!);
     }
     _shoes = await DatabaseHelper.getActiveShoes();
+    // 첫 진입 시 첫 번째 전설(킵초게)을 기본 선택. PRO-only면 무료 전설 중 첫 번째.
+    if (_selectedLegendId == null) {
+      final first = LegendRunners.all.firstWhere(
+        (r) => !r.isProOnly || _isPro,
+        orElse: () => LegendRunners.all.first,
+      );
+      _selectedLegendId = first.id;
+    }
     await _pickRandomQuote();
     if (mounted) setState(() => _loading = false);
   }
@@ -264,6 +281,7 @@ class _PrepareScreenState extends State<PrepareScreen>
           context.go('/running', extra: {
             'mode': _selectedMode,
             'shoeId': _selectedShoeId,
+            'legendId': _selectedMode == 'marathon' ? _selectedLegendId : null,
           });
         }
       }
@@ -277,6 +295,18 @@ class _PrepareScreenState extends State<PrepareScreen>
     _countdownAnim.dispose();
     _pulseAnim.dispose();
     super.dispose();
+  }
+
+  void _showLegendLockedMessage() {
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(S.isKo
+            ? '이 전설은 PRO 전용입니다. 업그레이드해서 함께 뛰세요.'
+            : 'This legend is PRO only. Upgrade to run with them.'),
+        backgroundColor: SRColors.primaryContainer,
+      ),
+    );
   }
 
   @override
@@ -313,6 +343,10 @@ class _PrepareScreenState extends State<PrepareScreen>
             shoes: _shoes,
             selectedShoeId: _selectedShoeId,
             onShoeChanged: (id) => setState(() => _selectedShoeId = id),
+            selectedLegendId: _selectedLegendId,
+            onLegendChanged: (id) => setState(() => _selectedLegendId = id),
+            isPro: _isPro,
+            onLegendLocked: _showLegendLockedMessage,
             onStart: _startCountdown,
             onBack: () => context.pop(),
             countdownActive: _countdownActive,
@@ -348,6 +382,10 @@ class _PrepareScreenState extends State<PrepareScreen>
             shoes: _shoes,
             selectedShoeId: _selectedShoeId,
             onShoeChanged: (id) => setState(() => _selectedShoeId = id),
+            selectedLegendId: _selectedLegendId,
+            onLegendChanged: (id) => setState(() => _selectedLegendId = id),
+            isPro: _isPro,
+            onLegendLocked: _showLegendLockedMessage,
             onStart: _startCountdown,
             onBack: () => context.pop(),
             countdownActive: _countdownActive,
@@ -392,6 +430,10 @@ class _PrepareScreenState extends State<PrepareScreen>
                               if (!_isChallenge) ...[
                                 const SizedBox(height: 16),
                                 _buildRunModeSelector(),
+                                if (_selectedMode == 'marathon') ...[
+                                  const SizedBox(height: 20),
+                                  _buildLegendSelector(),
+                                ],
                               ],
                               _buildShoeSelector(),
                               const SizedBox(height: 28),
@@ -1006,6 +1048,140 @@ class _PrepareScreenState extends State<PrepareScreen>
             ),
             if (selected)
               Icon(Icons.check_circle, color: SRColors.primaryContainer, size: 22),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildLegendSelector() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          S.isKo ? '전설과 함께 뛰기' : 'CHASE A LEGEND',
+          style: GoogleFonts.spaceGrotesk(
+            fontSize: 14,
+            fontWeight: FontWeight.w700,
+            color: SRColors.neutral500,
+            letterSpacing: 3,
+          ),
+        ),
+        const SizedBox(height: 12),
+        SizedBox(
+          height: 176,
+          child: ListView.separated(
+            scrollDirection: Axis.horizontal,
+            itemCount: LegendRunners.all.length,
+            separatorBuilder: (_, _) => const SizedBox(width: 12),
+            itemBuilder: (context, index) {
+              final legend = LegendRunners.all[index];
+              return _legendCard(legend);
+            },
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _legendCard(LegendRunner legend) {
+    final selected = _selectedLegendId == legend.id;
+    final locked = legend.isProOnly && !_isPro;
+    return GestureDetector(
+      onTap: () {
+        if (locked) {
+          SfxService().toggle();
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(S.isKo
+                  ? '${legend.displayName}는 PRO 전용입니다.'
+                  : '${legend.displayName} is PRO only.'),
+              backgroundColor: SRColors.primaryContainer,
+            ),
+          );
+          return;
+        }
+        SfxService().toggle();
+        setState(() => _selectedLegendId = legend.id);
+      },
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 180),
+        width: 200,
+        padding: const EdgeInsets.all(14),
+        decoration: BoxDecoration(
+          color: selected
+              ? SRColors.primaryContainer.withValues(alpha: 0.12)
+              : const Color(0xFF161616),
+          borderRadius: BorderRadius.circular(14),
+          border: Border.all(
+            color: selected
+                ? SRColors.primaryContainer.withValues(alpha: 0.7)
+                : Colors.white.withValues(alpha: 0.05),
+            width: selected ? 1.5 : 1,
+          ),
+          boxShadow: selected
+              ? [
+                  BoxShadow(
+                    color: SRColors.primaryContainer.withValues(alpha: 0.35),
+                    blurRadius: 16,
+                    offset: const Offset(0, 4),
+                  ),
+                ]
+              : null,
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Row(
+              children: [
+                Text(legend.flag, style: const TextStyle(fontSize: 34)),
+                const Spacer(),
+                if (locked)
+                  const Icon(Icons.lock_rounded, size: 16, color: Colors.amber)
+                else if (selected)
+                  Icon(Icons.check_circle,
+                      size: 18, color: SRColors.primaryContainer),
+              ],
+            ),
+            const SizedBox(height: 8),
+            Text(
+              legend.displayName,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: GoogleFonts.spaceGrotesk(
+                fontSize: 15,
+                fontWeight: FontWeight.w700,
+                color: selected
+                    ? SRColors.onSurface
+                    : SRColors.onSurface.withValues(alpha: 0.85),
+              ),
+            ),
+            const SizedBox(height: 4),
+            Text(
+              '${legend.recordLabel} · ${legend.paceLabel}',
+              style: GoogleFonts.inter(
+                fontSize: 12,
+                fontWeight: FontWeight.w600,
+                color: selected
+                    ? SRColors.primaryContainer
+                    : SRColors.neutral500,
+                letterSpacing: 0.3,
+              ),
+            ),
+            const SizedBox(height: 6),
+            Expanded(
+              child: Text(
+                legend.bio,
+                maxLines: 3,
+                overflow: TextOverflow.ellipsis,
+                style: GoogleFonts.inter(
+                  fontSize: 11,
+                  height: 1.35,
+                  color: SRColors.neutral500.withValues(alpha: 0.85),
+                ),
+              ),
+            ),
           ],
         ),
       ),

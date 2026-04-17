@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:shadowrun/core/l10n/app_strings.dart';
 import 'package:shadowrun/core/services/sfx_service.dart';
+import 'package:shadowrun/features/running/data/legend_runners.dart';
 import 'package:shadowrun/shared/models/run_model.dart';
 
 /// T1 Pure Cinematic 테마용 Prepare 화면 레이아웃.
@@ -26,6 +28,12 @@ class PurePrepareLayout extends StatelessWidget {
   final int? selectedShoeId;
   final ValueChanged<int?> onShoeChanged;
 
+  // 전설의 마라토너 (marathon 모드일 때)
+  final String? selectedLegendId;
+  final ValueChanged<String> onLegendChanged;
+  final bool isPro;
+  final VoidCallback onLegendLocked;
+
   // 액션
   final VoidCallback onStart;
   final VoidCallback onBack;
@@ -49,6 +57,10 @@ class PurePrepareLayout extends StatelessWidget {
     required this.shoes,
     required this.selectedShoeId,
     required this.onShoeChanged,
+    required this.selectedLegendId,
+    required this.onLegendChanged,
+    required this.isPro,
+    required this.onLegendLocked,
     required this.onStart,
     required this.onBack,
     required this.countdownActive,
@@ -166,6 +178,10 @@ class PurePrepareLayout extends StatelessWidget {
           ] else ...[
             _modeSection(),
             const SizedBox(height: 22),
+            if (selectedMode == 'marathon') ...[
+              _legendSection(),
+              const SizedBox(height: 22),
+            ],
           ],
           if (shoes.isNotEmpty) ...[
             _shoeCard(),
@@ -622,6 +638,132 @@ class PurePrepareLayout extends StatelessWidget {
                     shape: BoxShape.circle,
                   ),
                 ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _legendSection() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        _sectionHeader(
+          S.isKo ? '전설과 함께 뛰기' : 'Chase a legend',
+          'select',
+        ),
+        const SizedBox(height: 12),
+        SizedBox(
+          height: 186,
+          child: ListView.separated(
+            scrollDirection: Axis.horizontal,
+            itemCount: LegendRunners.all.length,
+            separatorBuilder: (_, _) => const SizedBox(width: 10),
+            itemBuilder: (context, index) {
+              return _legendCard(LegendRunners.all[index]);
+            },
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _legendCard(LegendRunner legend) {
+    final on = selectedLegendId == legend.id;
+    final locked = legend.isProOnly && !isPro;
+    return GestureDetector(
+      behavior: HitTestBehavior.opaque,
+      onTap: () {
+        if (locked) {
+          SfxService().toggle();
+          onLegendLocked();
+          return;
+        }
+        SfxService().toggle();
+        onLegendChanged(legend.id);
+      },
+      child: SizedBox(
+        width: 200,
+        child: Container(
+          padding: const EdgeInsets.all(14),
+          decoration: BoxDecoration(
+            color: on ? const Color(0xFF0A0304) : _bgPage,
+            border: Border.all(
+              color: on ? _red : _inkGhost,
+              width: on ? 1.2 : 1,
+            ),
+            boxShadow: on
+                ? const [
+                    BoxShadow(
+                      color: Color(0x558B0000),
+                      blurRadius: 22,
+                      spreadRadius: -8,
+                    ),
+                  ]
+                : null,
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Text(legend.flag, style: const TextStyle(fontSize: 32)),
+                  const Spacer(),
+                  if (locked)
+                    const Icon(Icons.lock_rounded,
+                        size: 15, color: Color(0xFFC83030))
+                  else if (on)
+                    Container(
+                      width: 6,
+                      height: 6,
+                      decoration: const BoxDecoration(
+                        color: _redSub,
+                        shape: BoxShape.circle,
+                      ),
+                    ),
+                ],
+              ),
+              const SizedBox(height: 10),
+              Text(
+                legend.displayName,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: GoogleFonts.playfairDisplay(
+                  fontStyle: FontStyle.italic,
+                  fontSize: 17,
+                  color: on ? _ink : _inkDim,
+                  fontWeight: FontWeight.w700,
+                  letterSpacing: 0.2,
+                ),
+              ),
+              const SizedBox(height: 3),
+              Text(
+                '${legend.recordLabel}  ·  ${legend.paceLabel}',
+                style: GoogleFonts.playfairDisplay(
+                  fontSize: 11.5,
+                  color: on ? _redSub : _inkFade,
+                  letterSpacing: 0.4,
+                  fontWeight: FontWeight.w400,
+                ),
+              ),
+              const SizedBox(height: 8),
+              Container(height: 1, width: 24, color: on ? _red : _hair),
+              const SizedBox(height: 8),
+              Expanded(
+                child: Text(
+                  legend.bio,
+                  maxLines: 4,
+                  overflow: TextOverflow.ellipsis,
+                  style: GoogleFonts.notoSerif(
+                    fontStyle: FontStyle.italic,
+                    fontSize: 10.5,
+                    height: 1.45,
+                    color: _inkFade,
+                    fontWeight: FontWeight.w300,
+                  ),
+                ),
+              ),
             ],
           ),
         ),
