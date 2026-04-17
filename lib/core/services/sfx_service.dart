@@ -1,5 +1,8 @@
+import 'dart:math';
 import 'package:flutter/foundation.dart';
 import 'package:just_audio/just_audio.dart';
+import 'package:shadowrun/core/theme/theme_id.dart';
+import 'package:shadowrun/core/theme/theme_manager.dart';
 
 class SfxService {
   static final SfxService _instance = SfxService._();
@@ -27,7 +30,9 @@ class SfxService {
   }
 
   // === App Entry ===
-  Future<void> splash() => play('sfx_splash.mp3');
+  static final _splashRng = Random();
+  Future<void> splash() => play(
+      _splashRng.nextBool() ? 'sfx_splash_v1.mp3' : 'sfx_splash_v2.mp3');
   Future<void> heartbeatSingle() => play('sfx_heartbeat_single.mp3');
 
   // === Home Screen ===
@@ -38,8 +43,18 @@ class SfxService {
   // === Prepare Screen ===
   Future<void> gpsReady() => play('sfx_gps_ready.mp3');
   Future<void> toggle() => play('sfx_toggle.mp3');
-  Future<void> countdown() => play('sfx_countdown.mp3');
-  Future<void> go() => play('sfx_go.mp3');
+  Future<void> countdown() {
+    final file = ThemeManager.I.currentId == ThemeId.pureCinematic
+        ? 'sfx_countdown_pure.mp3'
+        : 'sfx_countdown.mp3';
+    return play(file);
+  }
+  Future<void> go() {
+    final file = ThemeManager.I.currentId == ThemeId.koreanMystic
+        ? 'sfx_go_mystic.mp3'
+        : 'sfx_go.mp3';
+    return play(file);
+  }
 
   // === Doppelganger Running ===
   Future<void> alertLow() => play('sfx_alert_low.mp3');
