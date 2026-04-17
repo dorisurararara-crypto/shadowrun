@@ -10,6 +10,7 @@ import 'package:shadowrun/core/services/ad_service.dart';
 import 'package:shadowrun/core/services/purchase_service.dart';
 import 'package:shadowrun/core/l10n/app_strings.dart';
 import 'package:shadowrun/core/services/sfx_service.dart';
+import 'package:shadowrun/shared/widgets/challenge_run_picker.dart';
 import 'package:shadowrun/features/home/presentation/layouts/mystic_home_layout.dart';
 import 'package:shadowrun/features/home/presentation/layouts/pure_home_layout.dart';
 
@@ -229,7 +230,11 @@ class _HomeScreenState extends State<HomeScreen> {
                   return;
                 }
                 SfxService().tapChallenge();
-                context.push('/prepare', extra: -1);
+                final runId = await pickChallengeRun(context);
+                if (!mounted) return;
+                if (runId != null) {
+                  context.push('/prepare', extra: runId);
+                }
               },
               icon: const Icon(Icons.workspace_premium, size: 20),
               label: FittedBox(

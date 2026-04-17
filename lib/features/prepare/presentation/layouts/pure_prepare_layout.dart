@@ -423,7 +423,7 @@ class PurePrepareLayout extends StatelessWidget {
         SfxService().toggle();
       },
       child: SizedBox(
-        height: 78,
+        height: 96,
         child: Container(
           padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 6),
           decoration: BoxDecoration(

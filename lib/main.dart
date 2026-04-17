@@ -92,17 +92,14 @@ class ShadowRunApp extends StatelessWidget {
     return ValueListenableBuilder<String>(
       valueListenable: S.languageNotifier,
       builder: (context, lang, _) {
-        return ValueListenableBuilder(
-          valueListenable: ThemeManager.I.themeIdNotifier,
-          builder: (context, themeId, _) {
-            return MaterialApp.router(
-              key: ValueKey('${lang}_${themeId.key}'),
-              title: 'SHADOW RUN',
-              debugShowCheckedModeBanner: false,
-              theme: SRTheme.dark,
-              routerConfig: createRouter(languageSelected),
-            );
-          },
+        // 테마 변경 시에도 Router state 유지해야 (codex P1: key가 바뀌면 GoRouter 재생성 → /splash로 재부팅).
+        // 각 화면이 자체적으로 ThemeManager.themeIdNotifier를 ValueListenableBuilder로 구독해 rebuild.
+        return MaterialApp.router(
+          key: ValueKey(lang),
+          title: 'SHADOW RUN',
+          debugShowCheckedModeBanner: false,
+          theme: SRTheme.dark,
+          routerConfig: createRouter(languageSelected),
         );
       },
     );

@@ -151,81 +151,104 @@ class _SettingsScreenState extends State<SettingsScreen> {
     return ValueListenableBuilder<ThemeId>(
       valueListenable: ThemeManager.I.themeIdNotifier,
       builder: (context, themeId, _) {
-        if (themeId == ThemeId.koreanMystic) {
-          if (_loading) {
-            return const Scaffold(
-              backgroundColor: Color(0xFF050302),
-              body: Center(
-                child: CircularProgressIndicator(
-                  color: Color(0xFFC42029),
-                  strokeWidth: 2,
-                ),
-              ),
-            );
-          }
-          return MysticSettingsLayout(
-            userName: _profileDisplayName(),
-            isPro: _isPro,
-            horrorLevel: _horrorLevel,
-            versionLabel: '1.0.0 · 012',
-            onHorrorHeaderTap: _onHorrorHeaderTap,
-            onThemeTap: () => context.push('/settings/theme'),
-            onLanguageToggle: () async {
-              final next = S.isKo ? 'en' : 'ko';
-              final prefs = await SharedPreferences.getInstance();
-              await prefs.setString('language', next);
-              await S.init(next);
-              if (mounted) setState(() {});
-            },
-            onVoiceTap: () {
-              _showMysticInfo(S.isKo ? '음성은 기본 설정에서 변경하세요.' : 'Change voice in default layout.');
-            },
-            onGoalTap: () {
-              _showMysticInfo(S.isKo ? '목표는 기본 설정에서 변경하세요.' : 'Set goal in default layout.');
-            },
-            onProTap: () {
-              if (_isPro) {
-                _showMysticInfo(S.isKo ? 'PRO 활성 상태입니다.' : 'PRO is active.');
-              } else {
-                _showMysticInfo(S.isKo ? 'PRO 업그레이드는 기본 설정에서 진행됩니다.' : 'Upgrade PRO in default layout.');
-              }
-            },
-            onPrivacyTap: () {
-              _showMysticInfo(S.isKo ? '개인정보 처리방침' : 'Privacy policy');
-            },
-            onReviewTap: () {
-              _showMysticInfo(S.isKo ? '리뷰 남기기' : 'Leave a review');
-            },
-            onTermsTap: () {
-              _showMysticInfo(S.isKo ? '이용약관' : 'Terms of service');
-            },
-            onBack: () => context.go('/'),
+        if (_loading) {
+          final bg = themeId == ThemeId.koreanMystic
+              ? const Color(0xFF050302)
+              : themeId == ThemeId.pureCinematic
+                  ? const Color(0xFF000000)
+                  : SRColors.background;
+          final ring = themeId == ThemeId.koreanMystic
+              ? const Color(0xFFC42029)
+              : themeId == ThemeId.pureCinematic
+                  ? const Color(0xFFC83030)
+                  : SRColors.primaryContainer;
+          return Scaffold(
+            backgroundColor: bg,
+            body: Center(
+              child: CircularProgressIndicator(color: ring, strokeWidth: 2),
+            ),
           );
         }
+        if (themeId == ThemeId.koreanMystic) {
+          return _buildMysticLayout(context);
+        }
         if (themeId == ThemeId.pureCinematic) {
-          if (_loading) {
-            return const Scaffold(
-              backgroundColor: Color(0xFF000000),
-              body: Center(
-                child: CircularProgressIndicator(
-                  color: Color(0xFFC83030),
-                  strokeWidth: 2,
-                ),
-              ),
-            );
-          }
-          return PureSettingsLayout(
-            userName: _profileDisplayName(),
-            isPro: _isPro,
-            horrorLevel: _horrorLevel,
-            onHorrorHeaderTap: _onHorrorHeaderTap,
-            onThemeTap: () => context.push('/settings/theme'),
-            onBack: () => context.go('/'),
-          );
+          return _buildPureLayout(context);
         }
         return _buildDefaultLayout(context);
       },
     );
+  }
+
+  /// T3 Korean Mystic Settings — 모든 설정 기능 연결 (항목별 핸들러는 순차 확장)
+  Widget _buildMysticLayout(BuildContext context) {
+    return MysticSettingsLayout(
+      userName: _profileDisplayName(),
+      isPro: _isPro,
+      horrorLevel: _horrorLevel,
+      versionLabel: '1.0.0 · 012',
+      onHorrorHeaderTap: _onHorrorHeaderTap,
+      onThemeTap: () => context.push('/settings/theme'),
+      onLanguageToggle: () async {
+        final next = S.isKo ? 'en' : 'ko';
+        final prefs = await SharedPreferences.getInstance();
+        await prefs.setString('language', next);
+        await S.init(next);
+        if (mounted) setState(() {});
+      },
+      onVoiceTap: _openVoicePicker,
+      onGoalTap: _openGoalEditor,
+      onProTap: _openProFlow,
+      onPrivacyTap: _openPrivacy,
+      onReviewTap: _openReview,
+      onTermsTap: _openTerms,
+      onBack: () => context.go('/'),
+    );
+  }
+
+  /// T1 Pure Cinematic Settings — 모든 설정 기능 연결
+  Widget _buildPureLayout(BuildContext context) {
+    return PureSettingsLayout(
+      userName: _profileDisplayName(),
+      isPro: _isPro,
+      horrorLevel: _horrorLevel,
+      onHorrorHeaderTap: _onHorrorHeaderTap,
+      onThemeTap: () => context.push('/settings/theme'),
+      onBack: () => context.go('/'),
+    );
+  }
+
+  // 아래 핸들러는 Mystic/Pure Settings Layout에서 호출되는 실제 기능 연결 지점.
+  // TODO(theme-settings): 항목별로 모달/바텀시트 다이얼로그로 기존 Default 설정 위젯을 호출.
+  void _openVoicePicker() {
+    _showMysticInfo(S.isKo ? '음성 설정은 다음 업데이트에서 연결됩니다.' : 'Voice picker wiring pending.');
+  }
+
+  void _openGoalEditor() {
+    _showMysticInfo(S.isKo ? '목표 설정은 다음 업데이트에서 연결됩니다.' : 'Goal editor wiring pending.');
+  }
+
+  Future<void> _openProFlow() async {
+    if (_isPro) {
+      _showMysticInfo(S.isKo ? 'PRO 활성 상태입니다.' : 'PRO is active.');
+      return;
+    }
+    final ok = await PurchaseService().buyPro();
+    if (!ok && mounted) {
+      _showMysticInfo(S.isKo ? '구매를 시작할 수 없습니다.' : 'Could not start purchase.');
+    }
+  }
+
+  void _openPrivacy() {
+    _showMysticInfo(S.isKo ? '개인정보 처리방침' : 'Privacy policy');
+  }
+
+  void _openReview() {
+    _showMysticInfo(S.isKo ? '리뷰 남기기' : 'Leave a review');
+  }
+
+  void _openTerms() {
+    _showMysticInfo(S.isKo ? '이용약관' : 'Terms of service');
   }
 
   String _profileDisplayName() {

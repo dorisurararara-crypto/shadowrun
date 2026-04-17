@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:shadowrun/shared/models/run_model.dart';
+import 'package:shadowrun/shared/widgets/challenge_run_picker.dart';
 import 'package:shadowrun/core/services/sfx_service.dart';
 
 class MysticHomeLayout extends StatelessWidget {
@@ -501,10 +502,12 @@ class MysticHomeLayout extends StatelessWidget {
         ),
         border: Border.all(color: _bloodDry, width: 1),
       ),
-      onTap: () {
-        debugPrint('[MysticHome] 도플갱어 카드 TAP');
+      onTap: () async {
         SfxService().tapChallenge();
-        context.push('/prepare', extra: -1);
+        final runId = await pickChallengeRun(context);
+        if (runId != null && context.mounted) {
+          context.push('/prepare', extra: runId);
+        }
       },
     );
   }

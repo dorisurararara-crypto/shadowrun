@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:shadowrun/shared/models/run_model.dart';
+import 'package:shadowrun/shared/widgets/challenge_run_picker.dart';
 import 'package:shadowrun/core/services/sfx_service.dart';
 
 /// T1 — Pure Cinematic 홈 레이아웃
@@ -407,10 +408,12 @@ class PureHomeLayout extends StatelessWidget {
       subtitleEn: "begin tonight's run",
       borderColor: _bloodDeep,
       accentColor: _bloodSub,
-      onTap: () {
-        debugPrint('[PureHome] 도플갱어 카드 TAP');
+      onTap: () async {
         SfxService().tapChallenge();
-        context.push('/prepare', extra: -1);
+        final runId = await pickChallengeRun(context);
+        if (runId != null && context.mounted) {
+          context.push('/prepare', extra: runId);
+        }
       },
     );
   }
