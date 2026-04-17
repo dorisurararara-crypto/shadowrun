@@ -100,5 +100,7 @@
 		<string>SHADOW RUN needs heart rate data from Apple Watch to enhance the running experience.</string>
 		<key>NSHealthUpdateUsageDescription</key>
 		<string>SHADOW RUN records workout sessions to Apple Health.</string>
+		<key>ITSAppUsesNonExemptEncryption</key>
+		<false/>
 	</dict>
 </plist>

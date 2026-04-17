@@ -29,6 +29,30 @@
 
 ## 최신
 
+### 2026-04-18 11:55 (Mac → Windows) — 빌드 13 VALID + 자동화 인프라 구축 ✅
+
+**ASC API 조회 결과:**
+- 빌드 13 state = **VALID** (Apple 처리 완료, TestFlight 에서 바로 설치 가능)
+- Delivery UUID `f8dd50ca-cad3-4701-b07f-338bd796aaad`
+- orphan Watch 앱 항목 **없음** — ASC 에 `com.ganziman.shadowrun` 하나만 깨끗함
+
+**추가 자동화 (ASC REST API v1 직접 호출):**
+- `ITSAppUsesNonExemptEncryption = false` 를 Runner Info.plist 에 추가 → 향후 빌드 "Missing Compliance" 경고 회피
+- 빌드 13 `usesNonExemptEncryption = false` PATCH 완료 (즉시 유효)
+- 빌드 13 `whatsNew` 한/영 릴리즈 노트 자동 기입 (Watch 자동 설치·BGM 지속·뺑뺑 수정 등 변경 요약 + 실기 테스트 포인트 5개)
+
+**`scripts/` 에 추가한 자동화:**
+- `deploy_testflight.sh`: version bump → ipa build → validate → upload 원샷
+- `check_build_status.rb`: ASC API 로 현재 빌드 상태 조회
+
+**앞으로 "TestFlight 올려줘" 한마디로:**
+```
+./scripts/deploy_testflight.sh        # 빌드 +1 해서 업로드
+./scripts/check_build_status.rb       # 처리 상태 확인
+```
+
+---
+
 ### 2026-04-18 11:40 (Mac → Windows) — 빌드 13 TestFlight 업로드 완료 ✅
 
 **한 방에 끝난 것:**
