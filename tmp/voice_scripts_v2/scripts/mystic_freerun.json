@@ -1,0 +1,100 @@
+{
+  "mode": "mystic_freerun",
+  "preset": "mystic_whisper",
+  "voices": ["halmeoni"],
+  "theme": "korean_mystic",
+  "note": "Mystic 테마 프리런. 할머니의 차분한 인사/축복 톤.",
+
+  "categories": {
+    "elder_greeting": {
+      "ko": [
+        "[calm] 왔냐? 오늘은 바람이 참 좋다.",
+        "[whispers] 우리 손주, 오랜만에 나왔네.",
+        "[calm] 조심히 다녀오너라.",
+        "[whispers] 좋은 시간 골랐어. 이때가 딱이지.",
+        "[calm] 잘 다녀와라. 무사히만.",
+        "[whispers] 오늘도 나와 줘서 고맙구나."
+      ],
+      "en": [
+        "[calm] You're here? Nice breeze today.",
+        "[whispers] Grandchild, been a while.",
+        "[calm] Go carefully.",
+        "[whispers] Good time pick. Perfect hour.",
+        "[calm] Go and come back safe.",
+        "[whispers] Thank you for coming today."
+      ]
+    },
+    "wind_remark": {
+      "ko": [
+        "[whispers] 바람이 네 편이다. 잘 뛰거라.",
+        "[calm] 오늘은 바람이 동쪽에서 오는구나.",
+        "[whispers] 바람 방향 따라 가봐라. 편할 거다.",
+        "[calm] 이 바람, 오랜만이다.",
+        "[whispers] 바람이 시원한 날은 귀한 날이다.",
+        "[calm] 이런 바람엔 느리게 뛰는 게 맛이다."
+      ],
+      "en": [
+        "[whispers] The wind's with you. Run well.",
+        "[calm] East wind today.",
+        "[whispers] Follow the wind's direction. Easier.",
+        "[calm] Been a while since wind like this.",
+        "[whispers] Cool-wind days are rare.",
+        "[calm] In winds like this, slow running tastes best."
+      ]
+    },
+    "old_memory": {
+      "ko": [
+        "[calm] 네 또래일 때 나도 이런 길 자주 다녔다.",
+        "[whispers] 옛날 생각 나는구나. 딱 이런 계절이었지.",
+        "[calm] 이 길 지나가면 시장 가는 길이 있었다.",
+        "[whispers] 내 어릴 적엔 이런 것도 없었지. 맨날 걸었어.",
+        "[calm] 네 뛰는 거 보니까 내 청춘 보는 것 같다.",
+        "[whispers] 옛날 사람들도 이 시간에 동네 한 바퀴 돌았어."
+      ],
+      "en": [
+        "[calm] At your age I often walked paths like this.",
+        "[whispers] Reminds me. Just this season.",
+        "[calm] Past this road was the market way.",
+        "[whispers] Nothing like this in my youth. We walked.",
+        "[calm] Watching you run is like seeing my own youth.",
+        "[whispers] Old folk would do a village lap at this hour."
+      ]
+    },
+    "blessing": {
+      "ko": [
+        "[calm] 잘 다녀오너라. 조심하고.",
+        "[whispers] 무사히 돌아오너라. 기도하마.",
+        "[calm] 오늘도 네 몸 잘 지키거라.",
+        "[whispers] 나쁜 기운 없이 뛰어라.",
+        "[calm] 부디 다치지 말거라.",
+        "[whispers] 집까지 편히 가거라."
+      ],
+      "en": [
+        "[calm] Go and return. Be careful.",
+        "[whispers] Come back safely. I'll pray.",
+        "[calm] Guard your body today too.",
+        "[whispers] Run free of ill spirits.",
+        "[calm] Please don't get hurt.",
+        "[whispers] Come home easy."
+      ]
+    },
+    "quiet_farewell": {
+      "ko": [
+        "[sighs] 오늘도 수고했다. 들어가자.",
+        "[calm] 끝났구나. 집에서 쉬거라.",
+        "[whispers] 한숨 돌리고. 내일 또 보자.",
+        "[sighs] 잘 뛰었다. 이제 쉬거라.",
+        "[calm] 늦었다. 조심히 들어가.",
+        "[whispers] 오늘 이만하면 충분하다."
+      ],
+      "en": [
+        "[sighs] Good work today. Let's go in.",
+        "[calm] Done. Rest at home.",
+        "[whispers] Catch your breath. See you tomorrow.",
+        "[sighs] Ran well. Rest now.",
+        "[calm] It's late. Go in safely.",
+        "[whispers] Today was enough."
+      ]
+    }
+  }
+}

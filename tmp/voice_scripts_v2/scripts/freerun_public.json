@@ -1,0 +1,369 @@
+{
+  "mode": "freerun_public",
+  "preset": "calm_robust",
+  "voices": ["harry", "callum", "drill"],
+  "note": "20 카테고리 × 6변형 × ko+en = 240 대사. 차분한 동반자 톤.",
+
+  "categories": {
+    "start_solo": {
+      "ko": [
+        "[calm] 자, 나가자. 오늘은 가볍게.",
+        "[cheerfully] 오랜만이지. 천천히 뛰자.",
+        "[calm] 나섰네. 이 시간 딱 좋다.",
+        "[matter-of-fact] 시작. 호흡부터.",
+        "[calm] 오늘도 한 바퀴. 편하게.",
+        "[cheerfully] 바람 좋은 날이네. 천천히 가보자."
+      ],
+      "en": [
+        "[calm] Let's head out. Easy pace today.",
+        "[cheerfully] Been a while. Easy run.",
+        "[calm] Out here. Perfect time.",
+        "[matter-of-fact] Start. Breath first.",
+        "[calm] Another lap today. Easy.",
+        "[cheerfully] Nice breeze. Take it slow."
+      ]
+    },
+    "end_solo": {
+      "ko": [
+        "[sighs] 끝. 기분 좋지.",
+        "[calm] 마무리. 오늘도 잘 뛰었어.",
+        "[cheerfully] 다 뛰었네. 샤워하자.",
+        "[sighs] 여기까지. 수고했어.",
+        "[calm] 끝났다. 물 한 잔 먹자.",
+        "[cheerfully] 잘 마쳤다. 내일 또 보자."
+      ],
+      "en": [
+        "[sighs] Done. Feels good.",
+        "[calm] Wrapping up. Good run today.",
+        "[cheerfully] Finished. Time for a shower.",
+        "[sighs] That's it. Nice work.",
+        "[calm] Done. Grab some water.",
+        "[cheerfully] Good finish. See you tomorrow."
+      ]
+    },
+    "time_5min": {
+      "ko": [
+        "[calm] 오 분 뛰었네. 몸 풀렸지.",
+        "[matter-of-fact] 오 분 경과. 호흡 잡혔어.",
+        "[calm] 첫 오 분 넘어갔어. 편하게.",
+        "[cheerfully] 오 분. 벌써 시간 가네.",
+        "[calm] 오 분째. 리듬 만들어가자.",
+        "[matter-of-fact] 오 분. 워밍업 끝났어."
+      ],
+      "en": [
+        "[calm] Five minutes in. Body's loose.",
+        "[matter-of-fact] Past five. Breath settled.",
+        "[calm] First five done. Easy mode.",
+        "[cheerfully] Five. Time moves.",
+        "[calm] Minute five. Find the rhythm.",
+        "[matter-of-fact] Five. Warm-up's over."
+      ]
+    },
+    "time_15min": {
+      "ko": [
+        "[calm] 십오 분 경과. 컨디션 괜찮지.",
+        "[matter-of-fact] 십오 분 뛰었어. 꾸준해.",
+        "[cheerfully] 십오 분. 기분 올라오지.",
+        "[calm] 십오 분째. 머리가 맑아져.",
+        "[matter-of-fact] 십오 분. 호흡 깊어졌어.",
+        "[cheerfully] 십오 분 왔다. 오늘 길게 가볼까."
+      ],
+      "en": [
+        "[calm] Fifteen minutes in. Feeling good.",
+        "[matter-of-fact] Past fifteen. Consistent.",
+        "[cheerfully] Fifteen. Mood rising.",
+        "[calm] Minute fifteen. Head clearing up.",
+        "[matter-of-fact] Fifteen. Breath deeper.",
+        "[cheerfully] Fifteen in. Going long today?"
+      ]
+    },
+    "time_30min": {
+      "ko": [
+        "[calm] 삼십 분. 장거리 분위기.",
+        "[cheerfully] 삼십 분 왔다. 잘하고 있어.",
+        "[matter-of-fact] 삼십 분 경과. 몸이 익숙해졌지.",
+        "[calm] 삼십 분. 오늘 러닝 탄 듯.",
+        "[matter-of-fact] 삼십 분. 페이스 유지 중.",
+        "[cheerfully] 삼십 분. 기분 최고지."
+      ],
+      "en": [
+        "[calm] Thirty. Feels like a long run.",
+        "[cheerfully] Thirty in. Doing well.",
+        "[matter-of-fact] Past thirty. Body's used to it.",
+        "[calm] Thirty. Locked into today's run.",
+        "[matter-of-fact] Thirty. Pace holding.",
+        "[cheerfully] Thirty. Feels great."
+      ]
+    },
+    "time_45min": {
+      "ko": [
+        "[calm] 사십오 분. 조금만 더 갈까.",
+        "[matter-of-fact] 사십오 분 경과. 어떤 페이스든 편해.",
+        "[cheerfully] 사십오 분. 요즘 중에 제일 잘 뛴다.",
+        "[calm] 사십오 분째. 몸이 고마워하고 있어.",
+        "[matter-of-fact] 사십오 분. 한 시간 찍어볼까.",
+        "[cheerfully] 사십오 분 돌파. 하루 잘 채웠네."
+      ],
+      "en": [
+        "[calm] Forty-five. Little more?",
+        "[matter-of-fact] Past forty-five. Any pace feels easy.",
+        "[cheerfully] Forty-five. Best run in a while.",
+        "[calm] Minute forty-five. Body's thanking you.",
+        "[matter-of-fact] Forty-five. Going for the hour?",
+        "[cheerfully] Forty-five mark. Day well filled."
+      ]
+    },
+    "time_1hour": {
+      "ko": [
+        "[cheerfully] 한 시간! 대단해.",
+        "[calm] 한 시간 뛰었어. 에너지 많이 남았지.",
+        "[matter-of-fact] 한 시간 경과. 여긴 러너의 영역.",
+        "[cheerfully] 한 시간. 오늘 기억에 남을 러닝.",
+        "[calm] 한 시간째. 마무리할까 더 갈까.",
+        "[matter-of-fact] 한 시간 채웠어. 잘 달렸다."
+      ],
+      "en": [
+        "[cheerfully] One hour! Amazing.",
+        "[calm] Hour in. Plenty of energy left.",
+        "[matter-of-fact] Past an hour. Runner's territory.",
+        "[cheerfully] One hour. Memorable run today.",
+        "[calm] Hour one. Wrap or keep going.",
+        "[matter-of-fact] Hour filled. Good run."
+      ]
+    },
+    "pace_fast": {
+      "ko": [
+        "[cheerfully] 오, 빠르네. 오늘 컨디션 좋지.",
+        "[matter-of-fact] 페이스 빠른데. 유지할 수 있어?",
+        "[cheerfully] 속도 붙었다. 당겨봐.",
+        "[calm] 빠른 페이스. 무리는 하지 말고.",
+        "[matter-of-fact] 페이스 업 됐어. 이대로 가도 좋아.",
+        "[cheerfully] 오늘 의외로 잘 나가네."
+      ],
+      "en": [
+        "[cheerfully] Oh, fast today. Feeling good?",
+        "[matter-of-fact] Pace is quick. Can you hold it?",
+        "[cheerfully] Speed's up. Ride it.",
+        "[calm] Fast pace. Don't push too hard.",
+        "[matter-of-fact] Pace up. Fine to stay here.",
+        "[cheerfully] Moving well today."
+      ]
+    },
+    "pace_good": {
+      "ko": [
+        "[calm] 페이스 딱 좋다. 이대로.",
+        "[matter-of-fact] 균형 잡혔어. 호흡이랑 발걸음.",
+        "[calm] 이 속도 편하지. 계속.",
+        "[cheerfully] 완벽한 페이스야. 잘 잡았어.",
+        "[matter-of-fact] 페이스 안정권. 유지.",
+        "[calm] 너무 빠르지도 느리지도 않고."
+      ],
+      "en": [
+        "[calm] Pace is just right. Keep it.",
+        "[matter-of-fact] Balanced. Breath and feet.",
+        "[calm] This speed's comfortable. Hold.",
+        "[cheerfully] Perfect pace. Locked in.",
+        "[matter-of-fact] Pace stable. Maintain.",
+        "[calm] Not too fast, not too slow."
+      ]
+    },
+    "pace_slow": {
+      "ko": [
+        "[calm] 페이스 느려. 오늘은 회복 러닝이지.",
+        "[matter-of-fact] 속도 여유 있어. 편하게.",
+        "[calm] 천천히 가도 돼. 오늘 컨디션 봐.",
+        "[matter-of-fact] 페이스 낮게. 롱 슬로우 같은 날.",
+        "[calm] 조깅 모드. 좋다.",
+        "[matter-of-fact] 느리게 가는 날이야. 즐겨."
+      ],
+      "en": [
+        "[calm] Slow today. Recovery run.",
+        "[matter-of-fact] Easy speed. Relaxed.",
+        "[calm] Slow is fine. Read the body.",
+        "[matter-of-fact] Low pace. Long-slow kind of day.",
+        "[calm] Jog mode. Nice.",
+        "[matter-of-fact] Slow day. Enjoy it."
+      ]
+    },
+    "weather_note": {
+      "ko": [
+        "[calm] 바람 시원하네. 러닝 하기 좋은 날.",
+        "[cheerfully] 날씨 착하다. 땀 덜 나는 날.",
+        "[calm] 공기 상쾌해. 심호흡 한 번 해.",
+        "[matter-of-fact] 오늘 습도 낮다. 페이스 잘 나올 거야.",
+        "[calm] 햇살 부드럽지. 이 시간대가 좋아.",
+        "[cheerfully] 날씨 완벽. 더 뛸 수 있지."
+      ],
+      "en": [
+        "[calm] Breeze feels nice. Good day to run.",
+        "[cheerfully] Weather's kind today. Less sweat.",
+        "[calm] Air's crisp. Take a deep breath.",
+        "[matter-of-fact] Low humidity today. Pace should come easy.",
+        "[calm] Sun's gentle. This time is perfect.",
+        "[cheerfully] Perfect weather. You could go longer."
+      ]
+    },
+    "sunset_note": {
+      "ko": [
+        "[calm] 해 지네. 이 시간엔 뛰는 게 딱이지.",
+        "[cheerfully] 노을 예쁘다. 잠깐 보고 가.",
+        "[calm] 해 넘어가는 중. 바람 변하지.",
+        "[matter-of-fact] 일몰 시각. 분위기 바뀌었어.",
+        "[calm] 하늘 붉어졌어. 이런 날에 뛰는 거 복이야.",
+        "[cheerfully] 해 질 녘 러닝. 모든 러너의 로망."
+      ],
+      "en": [
+        "[calm] Sun's setting. Perfect time to run.",
+        "[cheerfully] Pretty sunset. Look a second.",
+        "[calm] Sun going down. Wind shifts here.",
+        "[matter-of-fact] Sunset hour. Mood changed.",
+        "[calm] Sky's red. Blessed to run on days like this.",
+        "[cheerfully] Sunset run. Every runner's dream."
+      ]
+    },
+    "city_ambient": {
+      "ko": [
+        "[calm] 도시 소리 익숙하지. 이것도 러닝 맛.",
+        "[matter-of-fact] 신호등 기다리면서 숨 고르자.",
+        "[calm] 카페 지나간다. 커피 냄새.",
+        "[cheerfully] 강변 나왔네. 시야 열려.",
+        "[matter-of-fact] 사거리. 좌우 보고 건너.",
+        "[calm] 공원 입구. 여기부터 호흡 편해져."
+      ],
+      "en": [
+        "[calm] City sounds. Part of the run.",
+        "[matter-of-fact] At the light, catch your breath.",
+        "[calm] Passing a café. Coffee smell.",
+        "[cheerfully] Hit the riverside. Wide view.",
+        "[matter-of-fact] Intersection. Look both ways.",
+        "[calm] Park entrance. Breathing gets easier here."
+      ]
+    },
+    "morning_run": {
+      "ko": [
+        "[cheerfully] 아침 러닝. 하루가 달라.",
+        "[calm] 새벽 공기. 이거 먹으려고 뛰는 거지.",
+        "[matter-of-fact] 아침 뛰면 하루 종일 가뿐해.",
+        "[calm] 해 뜨는 중. 좋은 시간 골랐어.",
+        "[cheerfully] 아직 조용한 거리. 우리만 달린다.",
+        "[matter-of-fact] 아침 러닝. 하루 시작 확실하지."
+      ],
+      "en": [
+        "[cheerfully] Morning run. Different day.",
+        "[calm] Early air. This is why we run.",
+        "[matter-of-fact] Morning run makes the day lighter.",
+        "[calm] Sun rising. Good time pick.",
+        "[cheerfully] Streets still quiet. Just us running.",
+        "[matter-of-fact] Morning run. Solid start."
+      ]
+    },
+    "night_run": {
+      "ko": [
+        "[calm] 야간 러닝. 나만의 시간.",
+        "[matter-of-fact] 밤바람 시원하다. 한낮보다 낫지.",
+        "[calm] 가로등 따라서. 이 분위기가 좋아.",
+        "[cheerfully] 야간. 가게 불빛 예쁘지.",
+        "[matter-of-fact] 밤에 뛰면 머리가 비워져.",
+        "[calm] 달빛 밑. 속도보다 분위기."
+      ],
+      "en": [
+        "[calm] Night run. My time.",
+        "[matter-of-fact] Night breeze. Better than midday.",
+        "[calm] Lamp to lamp. Love this mood.",
+        "[cheerfully] Nighttime. Store lights look nice.",
+        "[matter-of-fact] Running at night empties the head.",
+        "[calm] Under the moon. Mood over speed."
+      ]
+    },
+    "alone_thought": {
+      "ko": [
+        "[calm] 뛰다 보면 생각 정리되지.",
+        "[matter-of-fact] 혼자 뛰는 시간. 이거 귀해.",
+        "[calm] 머릿속 복잡한 거 다 털리지.",
+        "[cheerfully] 러닝 하면서 하는 생각이 제일 정직해.",
+        "[calm] 네 페이스로. 누구랑도 안 비교.",
+        "[matter-of-fact] 이 시간, 너만의 거야."
+      ],
+      "en": [
+        "[calm] Running sorts the thoughts.",
+        "[matter-of-fact] Alone time while running. Rare thing.",
+        "[calm] Clutter leaves the head.",
+        "[cheerfully] Thoughts during a run are the honest ones.",
+        "[calm] Your pace. No comparison.",
+        "[matter-of-fact] This time is yours."
+      ]
+    },
+    "photo_worthy": {
+      "ko": [
+        "[cheerfully] 여기 풍경 좋다. 나중에 다시 와봐.",
+        "[matter-of-fact] 이 각도 괜찮은데. 기억해둬.",
+        "[calm] 이 자리 예쁘지. 내일 낮에 다시.",
+        "[cheerfully] 사진 찍을 만한 곳이야.",
+        "[matter-of-fact] 이 풍경은 러너만 봐.",
+        "[calm] 오늘은 기억으로. 다음엔 사진으로."
+      ],
+      "en": [
+        "[cheerfully] View's nice here. Come back later.",
+        "[matter-of-fact] Good angle. Remember this.",
+        "[calm] This spot's pretty. Come back tomorrow.",
+        "[cheerfully] Worth a photo.",
+        "[matter-of-fact] Only runners see this view.",
+        "[calm] Memory today. Photo next time."
+      ]
+    },
+    "music_suggestion": {
+      "ko": [
+        "[cheerfully] 지금 느낌엔 느린 비트 어떨까.",
+        "[matter-of-fact] 이 페이스엔 사분의 사 박자가 딱.",
+        "[cheerfully] 업비트 하나 틀어봐. 추진력 생겨.",
+        "[calm] 재즈도 러닝이랑 잘 맞아. 의외지.",
+        "[matter-of-fact] 지금 속도엔 비피엠 백오십 정도가 맞아.",
+        "[cheerfully] 좋아하는 노래 하나만 반복해도 돼."
+      ],
+      "en": [
+        "[cheerfully] Slow beats would fit this mood.",
+        "[matter-of-fact] Four-four time matches this pace.",
+        "[cheerfully] Try an upbeat track. Gives a push.",
+        "[calm] Jazz works for running too. Surprisingly.",
+        "[matter-of-fact] Around one-fifty BPM for this speed.",
+        "[cheerfully] Just loop a favorite song."
+      ]
+    },
+    "funfact": {
+      "ko": [
+        "[matter-of-fact] 재미있는 사실. 달리기는 사람이 제일 효율적으로 할 수 있는 이동이야.",
+        "[calm] 러너는 심장이 더 크대. 실제로 측정된 거야.",
+        "[matter-of-fact] 엔도르핀 말고, 엔도카나비노이드가 러너스 하이의 진짜 원인이래.",
+        "[calm] 아프리카 원주민은 동물을 뛰어서 잡는다고. 지구력 사냥이래.",
+        "[matter-of-fact] 최초 마라톤 우승자는 세 시간 걸렸다고 해.",
+        "[cheerfully] 발바닥에 뼈가 스물여섯 개야. 러닝 하면서 다 쓰는 거지."
+      ],
+      "en": [
+        "[matter-of-fact] Fun fact. Running is humans' most efficient travel mode.",
+        "[calm] Runners have bigger hearts. Measured fact.",
+        "[matter-of-fact] It's endocannabinoids, not endorphins, that cause runner's high.",
+        "[calm] Some African tribes hunt by running animals down.",
+        "[matter-of-fact] First marathon winner took about three hours.",
+        "[cheerfully] Twenty-six bones in each foot. All working when you run."
+      ]
+    },
+    "tip": {
+      "ko": [
+        "[matter-of-fact] 팁. 러닝화는 삼백 킬로 뛰면 바꿀 때야.",
+        "[calm] 물은 뛰기 삼십 분 전에 마시는 게 좋아.",
+        "[matter-of-fact] 스트레칭보다 워밍업 조깅이 더 효과적이야.",
+        "[calm] 부상은 쉬어야 나아. 뛰면서 낫지 않아.",
+        "[matter-of-fact] 발바닥 중간으로 착지하면 무릎 부담 줄어.",
+        "[calm] 러닝 후 단백질 이십 분 안에. 회복 빨라져."
+      ],
+      "en": [
+        "[matter-of-fact] Tip. Swap running shoes around 300 K.",
+        "[calm] Drink water thirty minutes before a run.",
+        "[matter-of-fact] Warm-up jog beats static stretching.",
+        "[calm] Injuries heal with rest. Not by running through.",
+        "[matter-of-fact] Mid-foot landing eases the knees.",
+        "[calm] Protein within twenty minutes after. Faster recovery."
+      ]
+    }
+  }
+}

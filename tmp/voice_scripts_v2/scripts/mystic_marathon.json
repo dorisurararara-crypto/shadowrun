@@ -1,0 +1,130 @@
+{
+  "mode": "mystic_marathon",
+  "preset": "mystic_whisper",
+  "voices": ["halmeoni"],
+  "theme": "korean_mystic",
+  "note": "Mystic 테마 마라톤. 할머니 옛 선조 톤의 응원.",
+
+  "categories": {
+    "elder_cheer": {
+      "ko": [
+        "[whispers] 내 젊었을 적엔 이 길을 하루 세 번 뛰었지. 너도 할 수 있다.",
+        "[whispers] 내가 해봐서 아는데, 이 고비만 넘기면 된다.",
+        "[whispers] 옛 사람들도 다 뛰었어. 이 땅이 그런 땅이야.",
+        "[calm] 내 보기엔 잘 뛴다. 조금만 더 가거라.",
+        "[whispers] 힘들지? 그래도 할미는 더 힘들었다.",
+        "[whispers] 내 말 들어라. 너 지금 잘하고 있다.",
+        "[calm] 천천히 가거라. 숨 고르면서."
+      ],
+      "en": [
+        "[whispers] In my youth I ran this road three times a day. You can too.",
+        "[whispers] I've done it. Just past this hump.",
+        "[whispers] The old folk all ran. This land is like that.",
+        "[calm] You're doing well. Just a bit more.",
+        "[whispers] Hard? Grandma had it harder.",
+        "[whispers] Listen. You're doing fine.",
+        "[calm] Slow down. Breathe."
+      ]
+    },
+    "old_days_tale": {
+      "ko": [
+        "[calm] 내 동생도 이 길 뛰다가 꽃 한 송이 봤다더라.",
+        "[whispers] 옛날에는 이 언덕 넘으면 장터가 있었다.",
+        "[calm] 아버지가 이 길을 매일 걸어서 학교 다니셨지.",
+        "[whispers] 우리 때는 운동화 같은 것도 없었다. 맨발로 뛰었지.",
+        "[calm] 이 동네에 이런 길이 여러 개 있었다. 다 못 뛴 사람이 많았지.",
+        "[whispers] 내 남편도 젊을 때 이런 걸 좋아했어.",
+        "[calm] 너 뛰는 거 보니까 내 어릴 적 생각난다."
+      ],
+      "en": [
+        "[calm] My brother once saw a flower running this path.",
+        "[whispers] Long ago, past this hill was a market.",
+        "[calm] Father walked this every day to school.",
+        "[whispers] In our days there were no sneakers. Barefoot.",
+        "[calm] Roads like this all around the village. Many couldn't run them.",
+        "[whispers] My husband loved this sort of thing when young.",
+        "[calm] Watching you run reminds me of my youth."
+      ]
+    },
+    "village_wisdom": {
+      "ko": [
+        "[calm] 느리게 오래 가는 게 빨리 한 번 가는 거보다 낫다.",
+        "[whispers] 한 걸음씩 쌓으면 산도 넘는다.",
+        "[calm] 호흡이 길어야 사람이 길게 산다.",
+        "[whispers] 몸이 피곤할 땐 마음으로 뛰어라.",
+        "[calm] 급할수록 돌아가는 법이다.",
+        "[whispers] 나무도 뿌리부터 자란다. 너도 천천히.",
+        "[calm] 땀 흘린 만큼만 네 거다."
+      ],
+      "en": [
+        "[calm] Long and slow beats fast once.",
+        "[whispers] Step by step and you cross a mountain.",
+        "[calm] Long breath, long life.",
+        "[whispers] When the body's tired, run with the heart.",
+        "[calm] The hurried take the long way.",
+        "[whispers] Trees grow from the roots. So do you.",
+        "[calm] Only the sweat you shed is yours."
+      ]
+    },
+    "ancestor_record": {
+      "ko": [
+        "[matter-of-fact] 내 선조 중에 파발꾼이 있었다. 하루 백 리 뛰었어.",
+        "[calm] 우리 집안에 장거리 잘하는 사람 많았지.",
+        "[matter-of-fact] 조상 중 한 분은 산 넘어 소식 전했다.",
+        "[calm] 그 피가 너한테도 있다. 그래서 뛰고 있지.",
+        "[matter-of-fact] 옛날엔 기록이 아니라 목숨 걸고 뛰었지.",
+        "[calm] 우리 할아버지가 마을에서 제일 빨랐다.",
+        "[matter-of-fact] 너 뛰는 거 보니 피 흐르는 게 보인다."
+      ],
+      "en": [
+        "[matter-of-fact] One ancestor was a courier. Ran a hundred li a day.",
+        "[calm] Many long runners in our family.",
+        "[matter-of-fact] One crossed mountains carrying messages.",
+        "[calm] That blood's in you. That's why you run.",
+        "[matter-of-fact] They didn't run for records. They ran for lives.",
+        "[calm] My grandfather was the village's fastest.",
+        "[matter-of-fact] Watching you run, I see the blood showing."
+      ]
+    },
+    "grandma_encouragement": {
+      "ko": [
+        "[calm] 우리 손주, 오늘도 잘한다.",
+        "[whispers] 힘내라. 할매가 보고 있다.",
+        "[calm] 너 뛰는 거 대견하구나.",
+        "[whispers] 할매도 같이 뛰어주고 싶다.",
+        "[calm] 조심히 뛰어라. 무리는 말고.",
+        "[whispers] 할매가 물 떠놓고 기다리마.",
+        "[calm] 내 눈에는 네가 제일 멋있다."
+      ],
+      "en": [
+        "[calm] My grandchild, doing well today.",
+        "[whispers] Keep going. Grandma's watching.",
+        "[calm] Proud of you running like this.",
+        "[whispers] Wish I could run beside you.",
+        "[calm] Run carefully. Don't push too hard.",
+        "[whispers] I'll have water waiting.",
+        "[calm] In my eyes, you're the finest."
+      ]
+    },
+    "folk_saying": {
+      "ko": [
+        "[matter-of-fact] 천 리 길도 한 걸음부터.",
+        "[calm] 느린 말이 장거리 간다.",
+        "[matter-of-fact] 쥐구멍에도 볕 들 날 있다.",
+        "[calm] 고생 끝에 낙이 온다.",
+        "[matter-of-fact] 우물 안 개구리 말고, 넓은 세상 봐라.",
+        "[calm] 달리는 말에 채찍질.",
+        "[matter-of-fact] 돌다리도 두들겨 보고 건너라."
+      ],
+      "en": [
+        "[matter-of-fact] A thousand li starts with one step.",
+        "[calm] The slow horse goes the distance.",
+        "[matter-of-fact] Even a mouse hole sees sunlight.",
+        "[calm] Joy follows hardship.",
+        "[matter-of-fact] Don't be a frog in a well. See the world.",
+        "[calm] Whip even the running horse.",
+        "[matter-of-fact] Tap even the stone bridge before crossing."
+      ]
+    }
+  }
+}

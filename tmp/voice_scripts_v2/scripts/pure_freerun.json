@@ -1,0 +1,118 @@
+{
+  "mode": "pure_freerun",
+  "preset": "calm_robust",
+  "voices": ["harry"],
+  "theme": "pure_cinematic",
+  "note": "Pure Cinematic 전용 프리런. 차분한 시네마틱 내레이션.",
+
+  "categories": {
+    "opening_credits": {
+      "ko": [
+        "[calm] 오프닝. 그는 오늘 혼자 뛴다.",
+        "[matter-of-fact] 장면 하나. 거리는 그의 것이다.",
+        "[calm] 타이틀이 떠오른다. 자유 러닝.",
+        "[dramatic pause] 오늘은 아무도 쫓지 않는다.",
+        "[calm] 첫 장면. 도시가 깨어난다.",
+        "[matter-of-fact] 영화는 조용히 시작한다. 그도 그렇다."
+      ],
+      "en": [
+        "[calm] Opening. He runs alone today.",
+        "[matter-of-fact] Scene one. The street is his.",
+        "[calm] Title rises. Free Run.",
+        "[dramatic pause] Today no one chases him.",
+        "[calm] First scene. The city wakes.",
+        "[matter-of-fact] The film opens quietly. So does he."
+      ]
+    },
+    "scene_note": {
+      "ko": [
+        "[calm] 이 장면엔 대사가 필요 없다.",
+        "[matter-of-fact] 카메라는 그의 발만 본다.",
+        "[calm] 한 컷 한 컷, 평범하지만 다르다.",
+        "[whispers] 이 장면은 길다. 그래도 괜찮다.",
+        "[matter-of-fact] 와이드 샷. 그는 작고, 도시는 크다.",
+        "[calm] 이런 장면이 좋은 영화를 만든다."
+      ],
+      "en": [
+        "[calm] This scene needs no lines.",
+        "[matter-of-fact] Camera watches only his feet.",
+        "[calm] Frame by frame, ordinary yet not.",
+        "[whispers] This scene is long. That's fine.",
+        "[matter-of-fact] Wide shot. He's small. The city is large.",
+        "[calm] Scenes like this make good films."
+      ]
+    },
+    "city_poetry": {
+      "ko": [
+        "[whispers] 도시는 그를 잊지 않는다.",
+        "[calm] 네온 불빛이 그를 지나간다.",
+        "[whispers] 강이 그와 같은 방향으로 흐른다.",
+        "[matter-of-fact] 도시는 러너에게 먼저 인사한다.",
+        "[calm] 지하철 소리가 박자를 맞춘다.",
+        "[whispers] 거리의 모든 소음이 그의 스코어다."
+      ],
+      "en": [
+        "[whispers] The city doesn't forget him.",
+        "[calm] Neon lights pass through him.",
+        "[whispers] The river flows his way.",
+        "[matter-of-fact] The city greets runners first.",
+        "[calm] The subway's rumble keeps time.",
+        "[whispers] Every sound is his score."
+      ]
+    },
+    "weather_voiceover": {
+      "ko": [
+        "[calm] 오늘 공기는 그에게 친절하다.",
+        "[matter-of-fact] 바람이 그의 편에서 분다.",
+        "[calm] 비가 오면 영화가 된다.",
+        "[whispers] 햇살이 카메라 렌즈에 스며든다.",
+        "[matter-of-fact] 날씨는 연출이다. 오늘은 완벽했다.",
+        "[calm] 이 계절의 빛은 러너만 안다."
+      ],
+      "en": [
+        "[calm] The air is kind to him today.",
+        "[matter-of-fact] The wind runs on his side.",
+        "[calm] Rain makes it cinematic.",
+        "[whispers] Sunlight leaks into the lens.",
+        "[matter-of-fact] Weather is direction. Today was perfect.",
+        "[calm] Only runners know this season's light."
+      ]
+    },
+    "closing_credits": {
+      "ko": [
+        "[calm] 오늘의 영화는 여기까지.",
+        "[sighs] 엔딩 크레딧. 그는 집으로 간다.",
+        "[calm] 다음 작품은 내일이다.",
+        "[matter-of-fact] 조용한 엔딩. 그답다.",
+        "[calm] 화면이 천천히 어두워진다.",
+        "[sighs] 이 영화의 감독은, 그 자신이다."
+      ],
+      "en": [
+        "[calm] Today's film ends here.",
+        "[sighs] End credits. He goes home.",
+        "[calm] Next one tomorrow.",
+        "[matter-of-fact] Quiet ending. Fits him.",
+        "[calm] Screen fades slowly.",
+        "[sighs] The director of this film is himself."
+      ]
+    },
+    "quiet_whisper": {
+      "ko": [
+        "[whispers] 혼자일 때가 가장 많은 이야기다.",
+        "[whispers] 그는 말을 아낀다. 발로 말한다.",
+        "[whispers] 오늘의 대사는 거리 위에 있다.",
+        "[whispers] 침묵도 장면이다.",
+        "[whispers] 그의 러닝은 시다.",
+        "[whispers] 바람과 둘이서 쓴 영화."
+      ],
+      "en": [
+        "[whispers] Alone is where stories grow.",
+        "[whispers] He saves his words. Feet speak.",
+        "[whispers] Today's lines are on the road.",
+        "[whispers] Silence is a scene too.",
+        "[whispers] His run is a poem.",
+        "[whispers] A film written with the wind."
+      ]
+    }
+  }
+}

@@ -1,0 +1,509 @@
+{
+  "mode": "marathon_public",
+  "preset": "coach_natural",
+  "voices": ["harry", "callum", "drill"],
+  "note": "25 카테고리 × 7변형 × ko+en = 350 대사. 코치 톤, 수사 수동 검수 완료.",
+
+  "categories": {
+    "marathon_start": {
+      "ko": [
+        "[calm] 출발. 천천히, 호흡부터 맞춰.",
+        "[matter-of-fact] 시작이야. 전설들이 섰던 스타트 라인이야.",
+        "[cheerfully] 자, 달려보자. 오늘은 어디까지 갈 거야?",
+        "[calm] 레이스 시작. 처음 일 킬로는 숨 고르기.",
+        "[matter-of-fact] 출발 신호. 페이스부터 잡아.",
+        "[calm] 천천히 나가자. 급한 건 없어.",
+        "[cheerfully] 자, 그럼 시작. 컨디션 체크하면서 가."
+      ],
+      "en": [
+        "[calm] And go. Breath first.",
+        "[matter-of-fact] Starting. Same line the legends stood on.",
+        "[cheerfully] Let's run. How far today?",
+        "[calm] Race on. First K is breathing.",
+        "[matter-of-fact] Starting signal. Set your pace.",
+        "[calm] Go easy. No rush.",
+        "[cheerfully] Alright, here we go. Check how you feel."
+      ]
+    },
+    "marathon_end": {
+      "ko": [
+        "[cheerfully] 끝났어. 수고했어 진짜.",
+        "[sighs] 다 했다. 마지막 한 발까지.",
+        "[cheerfully] 결승점. 기록은 네가 증명했어.",
+        "[calm] 경기 끝. 몸 식기 전에 천천히 걸어.",
+        "[cheerfully] 다 왔네. 잘 해냈어.",
+        "[sighs] 이번 레이스도 끝. 전설 옆에 네 이름 올라갔어.",
+        "[calm] 완주. 지금부터가 진짜 회복이야."
+      ],
+      "en": [
+        "[cheerfully] Done. Well run.",
+        "[sighs] Finished. Every last step.",
+        "[cheerfully] Finish line. You earned this.",
+        "[calm] Race over. Walk a bit before you stop.",
+        "[cheerfully] You made it. Great work.",
+        "[sighs] Race done. Your name's next to the legends.",
+        "[calm] Complete. Recovery starts now."
+      ]
+    },
+    "legend_intro": {
+      "ko": [
+        "[matter-of-fact] 오늘 페이스 메이커는 킵초게야. 세계 기록 보유자.",
+        "[matter-of-fact] 베켈레랑 뛴다. 오천 미터, 만 미터 세계 신기록 주인.",
+        "[cheerfully] 파리 올림픽 금메달리스트. 같이 뛸 준비 됐어?",
+        "[matter-of-fact] 하일레 게브르셀라시에. 현역 시절 세계 최강이었지.",
+        "[matter-of-fact] 폴라 래드클리프. 여자 마라톤 역사를 다시 쓴 선수.",
+        "[cheerfully] 데니스 키메토. 이 페이스, 그가 베를린에서 세운 기록이야.",
+        "[matter-of-fact] 모 패라. 장거리 황제랑 같이 뛴다."
+      ],
+      "en": [
+        "[matter-of-fact] Today's pacer is Kipchoge. World record holder.",
+        "[matter-of-fact] You're running with Bekele. Five K and ten K WR.",
+        "[cheerfully] Paris gold medalist. Ready to match?",
+        "[matter-of-fact] Haile Gebrselassie. Prime-era king.",
+        "[matter-of-fact] Paula Radcliffe. Rewrote women's marathon.",
+        "[cheerfully] Dennis Kimetto. This pace is his Berlin record.",
+        "[matter-of-fact] Mo Farah. Running with the long-distance king."
+      ]
+    },
+    "record_approaching": {
+      "ko": [
+        "[cheerfully] 개인 최고 기록 근처야. 이 페이스 유지해.",
+        "[matter-of-fact] 기존 기록까지 삼십 초. 어떻게 할래.",
+        "[cheerfully] 지금 속도면 기록 갱신이야. 당겨.",
+        "[matter-of-fact] 최고 기록 위협 중. 한 번 더 밀어봐.",
+        "[cheerfully] 기록 깨질 것 같은데. 느낌 오지.",
+        "[matter-of-fact] 네 최고 기록, 오늘 다시 쓴다.",
+        "[cheerfully] 지금이 그 순간이야. 기록 뒤집어."
+      ],
+      "en": [
+        "[cheerfully] Near your personal best. Hold this pace.",
+        "[matter-of-fact] Thirty seconds from the record. Your call.",
+        "[cheerfully] At this speed, PR is yours. Push.",
+        "[matter-of-fact] Threatening your best. One more push.",
+        "[cheerfully] You might break it. Feels close.",
+        "[matter-of-fact] Rewriting your record today.",
+        "[cheerfully] This is the moment. Flip the record."
+      ]
+    },
+    "km_1": {
+      "ko": [
+        "[calm] 일 킬로. 몸 데워지기 시작해.",
+        "[matter-of-fact] 첫 킬로. 페이스 확인해.",
+        "[calm] 일 킬로 지났어. 호흡 자리 잡을 시간.",
+        "[cheerfully] 일 킬로. 방금 시작한 거랑 같아. 한참 남았어.",
+        "[matter-of-fact] 일 킬로 경과. 킵초게도 이 구간은 워밍업.",
+        "[calm] 첫 킬로 넘어갔어. 리듬 만들어가.",
+        "[matter-of-fact] 일 킬로. 체력 아직 안 썼어. 천천히."
+      ],
+      "en": [
+        "[calm] One K. Body warming up.",
+        "[matter-of-fact] First K. Check the pace.",
+        "[calm] Past one kilometer. Settle the breath.",
+        "[cheerfully] One K. Just getting started. Long way to go.",
+        "[matter-of-fact] K one done. Even Kipchoge warms up here.",
+        "[calm] First kilometer behind. Build the rhythm.",
+        "[matter-of-fact] One K. Fuel's full. Easy."
+      ]
+    },
+    "km_2": {
+      "ko": [
+        "[matter-of-fact] 이 킬로. 몸 풀리기 시작.",
+        "[calm] 이 킬로 지났어. 컨디션 어떤지 봐.",
+        "[cheerfully] 이 킬로. 다리 가벼워졌지.",
+        "[matter-of-fact] 두 번째 킬로 경과. 페이스 유지.",
+        "[calm] 이 킬로. 슬슬 러닝 모드.",
+        "[matter-of-fact] 이 킬로 넘었어. 심박 안정.",
+        "[cheerfully] 이 킬로. 원하던 페이스 들어왔어."
+      ],
+      "en": [
+        "[matter-of-fact] Two K. Body opening up.",
+        "[calm] Past two kilometers. Check how you feel.",
+        "[cheerfully] Two K. Legs feel lighter.",
+        "[matter-of-fact] Second K clear. Hold pace.",
+        "[calm] Two K. Shifting into running mode.",
+        "[matter-of-fact] Past two. Heart rate steady.",
+        "[cheerfully] Two K. Locked into target pace."
+      ]
+    },
+    "km_3": {
+      "ko": [
+        "[matter-of-fact] 삼 킬로. 이제 본격.",
+        "[calm] 삼 킬로 넘었어. 여기부터가 러닝.",
+        "[cheerfully] 삼 킬로. 벌써 감 잡혔지.",
+        "[matter-of-fact] 세 번째 킬로. 엔도르핀 준비.",
+        "[calm] 삼 킬로 지났다. 호흡 부드럽게.",
+        "[matter-of-fact] 삼 킬로 경과. 페이스 체크.",
+        "[cheerfully] 삼 킬로. 잘 올라왔어."
+      ],
+      "en": [
+        "[matter-of-fact] Three K. Real running now.",
+        "[calm] Past three. This is where it starts.",
+        "[cheerfully] Three K. Feel's locked in.",
+        "[matter-of-fact] Third K. Endorphins loading.",
+        "[calm] Three K done. Smooth breathing.",
+        "[matter-of-fact] Past three K. Check pace.",
+        "[cheerfully] Three K. Good progress."
+      ]
+    },
+    "km_5": {
+      "ko": [
+        "[cheerfully] 오 킬로 돌파. 킵초게도 이 지점 지났지.",
+        "[calm] 오 킬로 왔네. 페이스 좋아.",
+        "[matter-of-fact] 오 킬로. 첫 관문 넘었어.",
+        "[cheerfully] 오 킬로. 하프의 사분의 일.",
+        "[matter-of-fact] 오 킬로 경과. 물 생각나면 한 모금.",
+        "[calm] 오 킬로 지났어. 몸이 리듬 찾았다.",
+        "[cheerfully] 오 킬로. 오늘 컨디션 괜찮은 듯."
+      ],
+      "en": [
+        "[cheerfully] Five K! Kipchoge passed this same mark.",
+        "[calm] Five K in. Nice pace.",
+        "[matter-of-fact] Five K. First checkpoint cleared.",
+        "[cheerfully] Five K. Quarter of a half marathon.",
+        "[matter-of-fact] Past five K. Sip water if you need.",
+        "[calm] Five K done. Body found its rhythm.",
+        "[cheerfully] Five K. Good condition today."
+      ]
+    },
+    "km_7": {
+      "ko": [
+        "[matter-of-fact] 칠 킬로. 안정권 들어왔어.",
+        "[calm] 칠 킬로 지났어. 페이스 변함없지.",
+        "[cheerfully] 칠 킬로. 하프 절반 가까이.",
+        "[matter-of-fact] 일곱 번째 킬로. 호흡 깊어졌어.",
+        "[calm] 칠 킬로. 몸이 편해졌지.",
+        "[matter-of-fact] 칠 킬로 경과. 체력 배분 잘하고 있어.",
+        "[cheerfully] 칠 킬로. 이 페이스면 기록 좋아."
+      ],
+      "en": [
+        "[matter-of-fact] Seven K. In the zone.",
+        "[calm] Past seven K. Pace unchanged.",
+        "[cheerfully] Seven K. Near half-marathon midpoint.",
+        "[matter-of-fact] Seventh K. Breathing deep.",
+        "[calm] Seven K. Body settled.",
+        "[matter-of-fact] Past seven. Pacing fuel well.",
+        "[cheerfully] Seven K. Good pace for a good time."
+      ]
+    },
+    "km_10": {
+      "ko": [
+        "[cheerfully] 십 킬로 돌파. 한 자리 기록 넘겼어.",
+        "[matter-of-fact] 십 킬로. 두 자릿수 들어왔다.",
+        "[cheerfully] 십 킬로. 모 패라도 이 기준에서 세계 기록 냈지.",
+        "[calm] 십 킬로 지났어. 안정 페이스.",
+        "[matter-of-fact] 십 킬로 경과. 체력 삼분의 일 썼다.",
+        "[cheerfully] 십 킬로. 진짜 잘 왔다.",
+        "[calm] 십 킬로. 몸이 너 믿고 있어."
+      ],
+      "en": [
+        "[cheerfully] Ten K. Past single digits.",
+        "[matter-of-fact] Ten K. Into double digits.",
+        "[cheerfully] Ten K. Mo Farah set WR at this distance.",
+        "[calm] Ten K done. Steady pace.",
+        "[matter-of-fact] Past ten K. Spent about a third of fuel.",
+        "[cheerfully] Ten K. Real progress.",
+        "[calm] Ten K. Body trusts you."
+      ]
+    },
+    "km_15": {
+      "ko": [
+        "[matter-of-fact] 십오 킬로. 장거리 감각 확실해졌어.",
+        "[calm] 십오 킬로 지났어. 호흡 안정.",
+        "[cheerfully] 십오 킬로. 진짜 잘 달리고 있어.",
+        "[matter-of-fact] 십오 킬로 경과. 하프까지 이제 조금.",
+        "[calm] 십오 킬로. 페이스 무너지지 마.",
+        "[matter-of-fact] 십오 킬로. 정신력 구간 들어왔다.",
+        "[cheerfully] 십오 킬로. 드디어 여기까지."
+      ],
+      "en": [
+        "[matter-of-fact] Fifteen K. Long-distance feel locked in.",
+        "[calm] Past fifteen K. Breath's steady.",
+        "[cheerfully] Fifteen K. Really moving well.",
+        "[matter-of-fact] Fifteen K. Half-marathon's close.",
+        "[calm] Fifteen K. Don't let pace break.",
+        "[matter-of-fact] Fifteen K. Mind-over-body zone now.",
+        "[cheerfully] Fifteen K. Finally here."
+      ]
+    },
+    "km_20": {
+      "ko": [
+        "[cheerfully] 이십 킬로. 하프까지 코앞.",
+        "[matter-of-fact] 이십 킬로 지났어. 기록 구간.",
+        "[calm] 이십 킬로. 여기까지 오면 자신감 생기지.",
+        "[matter-of-fact] 이십 킬로 경과. 남은 거리 계산해봐.",
+        "[cheerfully] 이십 킬로. 오래 달렸다.",
+        "[matter-of-fact] 이십 킬로. 이제 지구력 게임.",
+        "[calm] 이십 킬로 돌파. 페이스 놓치지 마."
+      ],
+      "en": [
+        "[cheerfully] Twenty K. Half-marathon's right there.",
+        "[matter-of-fact] Past twenty K. Record territory.",
+        "[calm] Twenty K. Confidence builds here.",
+        "[matter-of-fact] Twenty K. Count what's left.",
+        "[cheerfully] Twenty K. Long way covered.",
+        "[matter-of-fact] Twenty K. Pure endurance from here.",
+        "[calm] Twenty K done. Don't lose the pace."
+      ]
+    },
+    "half_marathon": {
+      "ko": [
+        "[cheerfully] 하프! 이십일 킬로 백구십오 미터. 해냈어.",
+        "[matter-of-fact] 하프 마라톤 완주. 대단한 거야.",
+        "[cheerfully] 하프 돌파. 여기서 멈춰도 훌륭해.",
+        "[calm] 하프. 절반이야. 후반은 정신으로.",
+        "[matter-of-fact] 하프 지났다. 남은 거 한 번 더 갈 수 있어.",
+        "[cheerfully] 하프! 킵초게도 이 지점에서 페이스 확인해.",
+        "[calm] 하프 마라톤. 이 거리 자체가 목표인 사람도 많아."
+      ],
+      "en": [
+        "[cheerfully] Half! Twenty-one K and change. You did it.",
+        "[matter-of-fact] Half marathon complete. That's a feat.",
+        "[cheerfully] Past half. Stopping here is still great.",
+        "[calm] Half. Halfway. Rest is mental.",
+        "[matter-of-fact] Past half. You can do it again.",
+        "[cheerfully] Half! Even Kipchoge checks pace here.",
+        "[calm] Half marathon. Many aim for just this distance."
+      ]
+    },
+    "full_marathon": {
+      "ko": [
+        "[cheerfully] 풀 마라톤! 사십이 킬로 완주. 전설이야.",
+        "[matter-of-fact] 풀코스 완주. 네 이름이 기록에 올라간다.",
+        "[cheerfully] 풀 마라톤. 상상한 거보다 멀리 왔지.",
+        "[calm] 풀코스 끝. 이건 네 거야. 아무도 못 가져가.",
+        "[matter-of-fact] 사십이 킬로 백구십오 미터. 완주.",
+        "[cheerfully] 풀 마라톤 완주자. 이제부터 네 타이틀.",
+        "[calm] 풀코스 끝났어. 지금 이 감정, 기억해둬."
+      ],
+      "en": [
+        "[cheerfully] Full marathon! 42K done. Legendary.",
+        "[matter-of-fact] Full course complete. Your name's in the books.",
+        "[cheerfully] Full marathon. Further than you imagined.",
+        "[calm] Full course done. This is yours. No one takes it.",
+        "[matter-of-fact] 42.195 kilometers. Complete.",
+        "[cheerfully] Marathon finisher. That's your title now.",
+        "[calm] Full course done. Remember this feeling."
+      ]
+    },
+    "pace_behind_legend": {
+      "ko": [
+        "[nervous] 베켈레한테 밀리고 있어. 지금 끌어올려.",
+        "[rushed] 삼십 초 차. 이제부터 진짜야.",
+        "[nervous] 전설이 앞서가. 집중해.",
+        "[frustrated] 페이스 떨어졌어. 간격 벌어지고 있어.",
+        "[rushed] 따라잡아. 아직 늦지 않았어.",
+        "[nervous] 전설 뒤에 있어. 붙어서 가자.",
+        "[frustrated] 기록 놓친다. 당겨."
+      ],
+      "en": [
+        "[nervous] Bekele's pulling away. Step it up.",
+        "[rushed] Thirty seconds back. Time to work.",
+        "[nervous] Legend's leading. Focus.",
+        "[frustrated] Pace dropped. Gap's growing.",
+        "[rushed] Catch up. Not too late.",
+        "[nervous] Trailing the legend. Stay close.",
+        "[frustrated] Losing the record. Push."
+      ]
+    },
+    "pace_even": {
+      "ko": [
+        "[matter-of-fact] 전설이랑 어깨 나란히. 이 페이스.",
+        "[calm] 박빙이다. 지금처럼만.",
+        "[matter-of-fact] 킵초게랑 같은 속도. 놀라운 거야.",
+        "[cheerfully] 전설 옆에 붙어 있어. 그대로.",
+        "[matter-of-fact] 격차 제로. 정확히 같은 페이스.",
+        "[calm] 동기화됐다. 흔들림 없이.",
+        "[matter-of-fact] 전설과 동률. 이 자리 지켜."
+      ],
+      "en": [
+        "[matter-of-fact] Shoulder to shoulder with the legend. Hold pace.",
+        "[calm] Neck and neck. Just like this.",
+        "[matter-of-fact] Same speed as Kipchoge. Amazing.",
+        "[cheerfully] Right next to the legend. Stay there.",
+        "[matter-of-fact] Gap is zero. Exact same pace.",
+        "[calm] Synchronized. No wobble.",
+        "[matter-of-fact] Tied with the legend. Hold this spot."
+      ]
+    },
+    "pace_ahead_legend": {
+      "ko": [
+        "[cheerfully] 킵초게보다 앞서 있어. 말이 돼?",
+        "[matter-of-fact] 전설을 리드하고 있어. 유지해.",
+        "[cheerfully] 베켈레 따돌렸어. 지금 이 순간.",
+        "[calm] 전설 앞. 놀라지 말고 계속.",
+        "[matter-of-fact] 역사적 페이스야. 이 속도.",
+        "[cheerfully] 기록 갱신 각이야. 당겨.",
+        "[calm] 전설보다 빠르다. 실감 안 나지."
+      ],
+      "en": [
+        "[cheerfully] You're ahead of Kipchoge. Really.",
+        "[matter-of-fact] Leading the legend. Hold it.",
+        "[cheerfully] Dropped Bekele. Right now.",
+        "[calm] Past the legend. Don't panic, keep going.",
+        "[matter-of-fact] Historic pace. This speed.",
+        "[cheerfully] Record-breaking angle. Push.",
+        "[calm] Faster than the legend. Hard to believe."
+      ]
+    },
+    "second_wind": {
+      "ko": [
+        "[cheerfully] 다리가 다시 살아났네. 이제부터야.",
+        "[matter-of-fact] 세컨드 윈드 들어왔어. 이때 밀어.",
+        "[cheerfully] 피로 사라졌지. 이 느낌 놓치지 마.",
+        "[calm] 몸이 한 단계 올라갔어. 감 살려.",
+        "[matter-of-fact] 리부팅. 체력이 되돌아왔다.",
+        "[cheerfully] 지금 갑자기 쉬워졌지. 그게 세컨드 윈드.",
+        "[calm] 고비 넘겼어. 지금부터 즐겨."
+      ],
+      "en": [
+        "[cheerfully] Legs came back to life. From here, push.",
+        "[matter-of-fact] Second wind. Ride it.",
+        "[cheerfully] Fatigue gone. Don't lose the feel.",
+        "[calm] Body just leveled up. Use it.",
+        "[matter-of-fact] Rebooted. Energy back.",
+        "[cheerfully] Suddenly easier, right? That's second wind.",
+        "[calm] Past the wall. Enjoy from here."
+      ]
+    },
+    "hit_the_wall": {
+      "ko": [
+        "[frustrated] 벽에 걸렸다. 그래도 한 걸음씩.",
+        "[rushed] 다리 무겁지. 여기가 고비.",
+        "[nervous] 뭔가 안 돼지. 정신력으로 가.",
+        "[frustrated] 체력 바닥 느낌. 조금만 버텨.",
+        "[rushed] 벽 만났어. 뚫고 나가면 세컨드 윈드 와.",
+        "[nervous] 에너지 뚝 떨어졌어. 페이스 살짝 줄여.",
+        "[frustrated] 지친 거 알아. 그래도 여기선 못 멈춰."
+      ],
+      "en": [
+        "[frustrated] Hit the wall. Step by step still.",
+        "[rushed] Heavy legs. This is the wall.",
+        "[nervous] Feels off. Mind through it.",
+        "[frustrated] Tank's low. Just hold.",
+        "[rushed] The wall. Push through for second wind.",
+        "[nervous] Energy dropped. Ease pace slightly.",
+        "[frustrated] I know you're tired. Don't stop here."
+      ]
+    },
+    "time_10min": {
+      "ko": [
+        "[matter-of-fact] 십 분 달렸어. 페이스 적응 끝.",
+        "[calm] 십 분 경과. 몸 완전히 열렸지.",
+        "[cheerfully] 십 분. 좋은 시작이야.",
+        "[matter-of-fact] 십 분 뛰었어. 이 페이스가 기준.",
+        "[calm] 십 분째. 호흡 깊어졌어.",
+        "[matter-of-fact] 십 분 지났어. 현 페이스면 예상 기록 좋아.",
+        "[cheerfully] 십 분. 벌써 익숙해진 거 느껴지지."
+      ],
+      "en": [
+        "[matter-of-fact] Ten minutes in. Pace adapted.",
+        "[calm] Past ten. Body fully open.",
+        "[cheerfully] Ten minutes. Nice start.",
+        "[matter-of-fact] Ten in. This pace is the baseline.",
+        "[calm] Minute ten. Breath deeper.",
+        "[matter-of-fact] Past ten. Good projected time at this pace.",
+        "[cheerfully] Ten minutes. Feeling settled already."
+      ]
+    },
+    "time_30min": {
+      "ko": [
+        "[cheerfully] 삼십 분. 큰 산 넘었어.",
+        "[matter-of-fact] 삼십 분 경과. 지구력 존 들어왔어.",
+        "[calm] 삼십 분째. 몸이 레이스에 익숙해졌어.",
+        "[cheerfully] 삼십 분. 오늘 진짜 잘하고 있어.",
+        "[matter-of-fact] 삼십 분 뛰었어. 남은 거리 체크.",
+        "[calm] 삼십 분. 러너 모드 완전 가동.",
+        "[cheerfully] 삼십 분 통과. 박수 받을 만해."
+      ],
+      "en": [
+        "[cheerfully] Thirty minutes. Big mountain passed.",
+        "[matter-of-fact] Past thirty. Endurance zone.",
+        "[calm] Minute thirty. Body used to the race.",
+        "[cheerfully] Thirty. You're doing great today.",
+        "[matter-of-fact] Thirty in. Check remaining distance.",
+        "[calm] Thirty minutes. Runner mode fully on.",
+        "[cheerfully] Thirty mark. Deserve applause."
+      ]
+    },
+    "time_1hour": {
+      "ko": [
+        "[cheerfully] 한 시간! 달렸다는 게 실감 나지.",
+        "[matter-of-fact] 한 시간 경과. 네 몸 기억력이 장난 아니야.",
+        "[calm] 한 시간째. 이 거리 해낸 네가 대단해.",
+        "[cheerfully] 한 시간. 아무나 못 해.",
+        "[matter-of-fact] 한 시간 뛰었어. 체력 관리 본격.",
+        "[calm] 한 시간 경과. 세컨드 윈드 슬슬 올 시간.",
+        "[cheerfully] 한 시간 돌파. 진짜 러너야 이제."
+      ],
+      "en": [
+        "[cheerfully] One hour! Feels real now.",
+        "[matter-of-fact] Past an hour. Your endurance is no joke.",
+        "[calm] Hour one. Impressive to cover this far.",
+        "[cheerfully] An hour. Not easy for most people.",
+        "[matter-of-fact] Hour in. Fuel management's real now.",
+        "[calm] One hour. Second wind may be coming.",
+        "[cheerfully] Past an hour. Genuine runner now."
+      ]
+    },
+    "marathon_tip": {
+      "ko": [
+        "[matter-of-fact] 팁 하나. 팔 세게 흔들지 말고 자연스럽게.",
+        "[calm] 호흡은 두 번 들이마시고 세 번 내뱉어.",
+        "[matter-of-fact] 어깨 힘 빼는 게 체력 절약이야.",
+        "[calm] 발 착지는 뒤꿈치 말고 앞발 중간으로.",
+        "[matter-of-fact] 상체 살짝 앞으로. 중심 앞에 두고.",
+        "[calm] 물은 한 모금씩. 한번에 많이 마시지 말고.",
+        "[matter-of-fact] 페이스 유지가 속도 올리는 것보다 중요해."
+      ],
+      "en": [
+        "[matter-of-fact] Tip. Swing arms naturally, not hard.",
+        "[calm] Breathe in for two, out for three.",
+        "[matter-of-fact] Relaxed shoulders save energy.",
+        "[calm] Land on the mid-foot, not the heel.",
+        "[matter-of-fact] Slight forward lean. Keep weight ahead.",
+        "[calm] Sip water. Don't gulp it.",
+        "[matter-of-fact] Holding pace beats speeding up."
+      ]
+    },
+    "legend_quote": {
+      "ko": [
+        "[matter-of-fact] 킵초게 말 중에. 한계는 마음에 있대. 다리가 아니라.",
+        "[calm] 드 카스텔라 명언. 고통은 일시적, 영광은 영원하다.",
+        "[matter-of-fact] 엠마 코번이 그랬지. 오늘을 위해 매일 준비했다고.",
+        "[calm] 모 패라 말. 일어나면 뛰었고, 뛰고 나면 나았다.",
+        "[matter-of-fact] 폴라 래드클리프. 불가능은 시도 안 한 자의 말이다.",
+        "[calm] 하일레가 그랬어. 달리는 동안 가장 자유롭다고.",
+        "[matter-of-fact] 베켈레. 기록은 깨지라고 있는 거야."
+      ],
+      "en": [
+        "[matter-of-fact] Kipchoge said, limits are in the mind, not the legs.",
+        "[calm] De Castella said, pain is temporary, glory is forever.",
+        "[matter-of-fact] Emma Coburn said she prepared every day for today.",
+        "[calm] Mo Farah. I woke up and ran. I ran and I healed.",
+        "[matter-of-fact] Paula Radcliffe. Impossible is just untried.",
+        "[calm] Haile said running is where he feels most free.",
+        "[matter-of-fact] Bekele. Records exist to be broken."
+      ]
+    },
+    "athlete_fact": {
+      "ko": [
+        "[matter-of-fact] 킵초게는 한 주에 백팔십 킬로씩 뛴다고 해.",
+        "[calm] 하일레는 맨발로 학교까지 십 킬로를 매일 다녔지.",
+        "[matter-of-fact] 폴라 래드클리프는 출산 후 구 개월 만에 세계 기록을 냈어.",
+        "[calm] 모 패라는 소말리아 난민 출신 올림픽 챔피언이야.",
+        "[matter-of-fact] 베켈레 형제가 만 미터, 오천 미터 둘 다 세계 기록 보유.",
+        "[calm] 킵초게는 대회 전날 밤 아홉 시간을 잔다고 해.",
+        "[matter-of-fact] 데니스 키메토는 삼십 대 초반에 베를린 기록 냈지."
+      ],
+      "en": [
+        "[matter-of-fact] Kipchoge runs 180 K every week.",
+        "[calm] Haile ran 10 K to school barefoot. Daily.",
+        "[matter-of-fact] Paula Radcliffe set WR nine months after giving birth.",
+        "[calm] Mo Farah, Somali refugee turned Olympic champion.",
+        "[matter-of-fact] The Bekele brothers held both 10K and 5K WRs.",
+        "[calm] Kipchoge sleeps nine hours the night before a race.",
+        "[matter-of-fact] Dennis Kimetto set Berlin record in his early thirties."
+      ]
+    }
+  }
+}

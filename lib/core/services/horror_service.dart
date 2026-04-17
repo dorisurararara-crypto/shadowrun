@@ -5,6 +5,9 @@ import 'package:vibration/vibration.dart';
 import 'package:shadowrun/core/l10n/app_strings.dart';
 import 'package:shadowrun/core/services/sfx_service.dart';
 import 'package:shadowrun/core/services/bgm_preferences.dart';
+import 'package:shadowrun/core/services/tts_line_bank.dart';
+import 'package:shadowrun/core/theme/theme_id.dart';
+import 'package:shadowrun/core/theme/theme_manager.dart';
 
 enum ThreatLevel { safe, warningFar, warningClose, dangerFar, dangerClose, critical, aheadClose, aheadMid, aheadFar }
 
@@ -69,6 +72,35 @@ class HorrorService {
     'tts_losing_lead_6', 'tts_losing_lead_7', 'tts_losing_lead_8', 'tts_losing_lead_9', 'tts_losing_lead_10',
   ];
 
+  // 신 TTS Bank 시스템 — 레벨 → 카테고리 매핑
+  static const _levelToCategory = {
+    ThreatLevel.aheadFar: 'ahead_far',
+    ThreatLevel.aheadMid: 'ahead_mid',
+    ThreatLevel.aheadClose: 'ahead_close',
+    ThreatLevel.safe: 'safe',
+    ThreatLevel.warningFar: 'warning_far',
+    ThreatLevel.warningClose: 'warning_close',
+    ThreatLevel.dangerFar: 'danger_far',
+    ThreatLevel.dangerClose: 'danger_close',
+    ThreatLevel.critical: 'critical',
+  };
+
+  // Pure Cinematic 테마 전용 카테고리 풀 (도플갱어 모드)
+  static const _pureCats = [
+    'scene_cut', 'title_drop', 'voiceover_distance', 'voiceover_pace',
+    'critical_narration', 'chapter_mark', 'inner_monologue', 'ending_credits',
+    'tagline_random', 'whisper',
+  ];
+
+  // Korean Mystic 테마 전용 카테고리 풀 (할머니 무당 도플갱어)
+  static const _mysticCats = [
+    'whisper', 'omen', 'chant', 'ancestor_warning', 'ghost_mock',
+    'threshold', 'incantation', 'final_climax', 'spirit_breath', 'curse',
+  ];
+
+  // 테마 전용 TTS 혼합 확률 (20%)
+  static const double _themeMixRatio = 0.20;
+
   // 구간별 배경음 (3개 변형 중 랜덤)
   static const _bgmVariants = {
     ThreatLevel.aheadFar: ['bgm_peaceful.mp3', 'bgm_peaceful_v2.mp3', 'bgm_peaceful_v3.mp3'],
@@ -131,8 +163,14 @@ class HorrorService {
     final isNowAhead = _wasAhead ? distanceM >= 190 : distanceM >= 210;
     if (_wasAhead && !isNowAhead && _ttsEnabled) {
       SfxService().glassBreak();
-      final variant = _losingLeadVariants[_rng.nextInt(_losingLeadVariants.length)];
-      await _playTts(variant);
+      final played = await TtsLineBank.I.play(
+        mode: 'doppelganger_public',
+        category: 'losing_lead',
+      );
+      if (!played) {
+        final variant = _losingLeadVariants[_rng.nextInt(_losingLeadVariants.length)];
+        await _playTts(variant);
+      }
     }
     _wasAhead = isNowAhead;
 
@@ -156,9 +194,37 @@ class HorrorService {
     final now = DateTime.now();
     if (_lastPeriodicTts != null && now.difference(_lastPeriodicTts!).inSeconds < interval) return;
     _lastPeriodicTts = now;
+    await _playContextualTts(level);
+  }
+
+  /// 신 TtsLineBank 시스템 우선 재생 + 실패 시 구 시스템 fallback.
+  /// 20% 확률로 현재 테마 전용 카테고리로 대체 재생.
+  Future<void> _playContextualTts(ThreatLevel level) async {
+    final category = _levelToCategory[level];
+    if (category == null) return;
+
+    String mode = 'doppelganger_public';
+    String cat = category;
+
+    if (_rng.nextDouble() < _themeMixRatio) {
+      final themeId = ThemeManager.I.currentId;
+      if (themeId == ThemeId.koreanMystic) {
+        mode = 'mystic_doppelganger';
+        cat = _mysticCats[_rng.nextInt(_mysticCats.length)];
+      } else if (themeId == ThemeId.pureCinematic) {
+        mode = 'pure_doppelganger';
+        cat = _pureCats[_rng.nextInt(_pureCats.length)];
+      }
+    }
+
+    final played = await TtsLineBank.I.play(mode: mode, category: cat);
+    if (played) return;
+
+    // fallback — 구 시스템 (생성 완료 전까지 자동 유지)
     final variants = _ttsVariants[level];
-    if (variants == null || variants.isEmpty) return;
-    await _playTts(variants[_rng.nextInt(variants.length)]);
+    if (variants != null && variants.isNotEmpty) {
+      await _playTts(variants[_rng.nextInt(variants.length)]);
+    }
   }
 
   Future<void> _onLevelChanged(ThreatLevel level) async {
@@ -196,12 +262,9 @@ class HorrorService {
         break;
     }
 
-    // TTS (랜덤 변형)
+    // TTS (신 Bank → 구 시스템 fallback)
     if (_ttsEnabled) {
-      final variants = _ttsVariants[level];
-      if (variants != null && variants.isNotEmpty) {
-        await _playTts(variants[_rng.nextInt(variants.length)]);
-      }
+      await _playContextualTts(level);
     }
   }
 

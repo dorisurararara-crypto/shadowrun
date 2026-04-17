@@ -1,0 +1,170 @@
+{
+  "mode": "pure_marathon",
+  "preset": "coach_natural",
+  "voices": ["harry"],
+  "theme": "pure_cinematic",
+  "note": "Pure Cinematic 전용 마라톤 내레이션.",
+
+  "categories": {
+    "race_opening": {
+      "ko": [
+        "[dramatic pause] 출발선. 그는 숨을 고른다. 역사도 숨을 고른다.",
+        "[matter-of-fact] 레이스 오프닝. 음악이 흐른다.",
+        "[calm] 스타트. 천 개의 발걸음 중 첫 번째.",
+        "[dramatic pause] 그의 심장이 총성을 대신한다.",
+        "[matter-of-fact] 경주 시작. 카메라는 그를 따라간다.",
+        "[calm] 첫 미터. 그는 이미 다른 사람이다.",
+        "[dramatic pause] 이것은 한 편의 영화다. 그리고 그는 주인공이다."
+      ],
+      "en": [
+        "[dramatic pause] Starting line. He breathes. History breathes.",
+        "[matter-of-fact] Race opening. Music rises.",
+        "[calm] Start. First of a thousand steps.",
+        "[dramatic pause] His heart replaces the gun.",
+        "[matter-of-fact] Race begins. Camera tracks him.",
+        "[calm] First meter. He is already different.",
+        "[dramatic pause] This is a film. He is the lead."
+      ]
+    },
+    "legend_tribute": {
+      "ko": [
+        "[matter-of-fact] 킵초게가 달리던 길을, 그가 오늘 밟는다.",
+        "[dramatic pause] 전설은 기록을 남긴다. 그는 오늘 그 기록을 읽는다.",
+        "[matter-of-fact] 베켈레의 페이스. 그의 발걸음이 대답한다.",
+        "[calm] 전설의 그림자 위를 달린다.",
+        "[matter-of-fact] 하일레가 만든 라인을, 그가 따라간다.",
+        "[dramatic pause] 역사는 뛴 자의 것. 그가 오늘 더한다.",
+        "[matter-of-fact] 폴라 래드클리프처럼, 조용하고 단단하게."
+      ],
+      "en": [
+        "[matter-of-fact] He runs where Kipchoge ran today.",
+        "[dramatic pause] Legends leave records. Today he reads them.",
+        "[matter-of-fact] Bekele's pace. His steps answer.",
+        "[calm] Running over the legend's shadow.",
+        "[matter-of-fact] He follows the line Haile drew.",
+        "[dramatic pause] History belongs to those who ran. Today he adds.",
+        "[matter-of-fact] Like Paula Radcliffe. Quiet and firm."
+      ]
+    },
+    "km_narration": {
+      "ko": [
+        "[matter-of-fact] 오 킬로. 카메라 앵글이 바뀐다.",
+        "[dramatic pause] 십 킬로. 그의 표정은 변하지 않는다.",
+        "[calm] 십오 킬로. 음악이 조용해진다.",
+        "[matter-of-fact] 이십 킬로. 시계는 흐르고, 그는 여전히 흐른다.",
+        "[dramatic pause] 하프. 그는 절반의 영웅이 되었다.",
+        "[calm] 삼십 킬로. 모든 프레임이 그의 것이다.",
+        "[matter-of-fact] 사십 킬로. 결말이 가까워진다."
+      ],
+      "en": [
+        "[matter-of-fact] Five K. The angle shifts.",
+        "[dramatic pause] Ten K. His face hasn't changed.",
+        "[calm] Fifteen K. The music softens.",
+        "[matter-of-fact] Twenty K. Time moves. He keeps moving.",
+        "[dramatic pause] Half. He's half a hero now.",
+        "[calm] Thirty K. Every frame is his.",
+        "[matter-of-fact] Forty K. The ending nears."
+      ]
+    },
+    "pace_commentary": {
+      "ko": [
+        "[matter-of-fact] 그의 페이스는 시적이다. 흔들림 없이.",
+        "[calm] 호흡과 발걸음이 한 장면을 만든다.",
+        "[dramatic pause] 속도는 그의 대사다.",
+        "[matter-of-fact] 이 페이스를 유지하는 것은 의지가 아니라 습관이다.",
+        "[calm] 그는 페이스로 세상과 약속한다.",
+        "[matter-of-fact] 리듬. 이 한 단어가 그의 모든 것이다.",
+        "[dramatic pause] 페이스가 무너지는 순간, 영화도 끝난다."
+      ],
+      "en": [
+        "[matter-of-fact] His pace is poetic. Unshaken.",
+        "[calm] Breath and step compose a frame.",
+        "[dramatic pause] Speed is his line.",
+        "[matter-of-fact] Holding this pace is habit, not willpower.",
+        "[calm] He keeps his promise through pace.",
+        "[matter-of-fact] Rhythm. One word, his everything.",
+        "[dramatic pause] The moment pace breaks, the film ends."
+      ]
+    },
+    "record_drama": {
+      "ko": [
+        "[dramatic pause] 기록이 눈앞에 있다. 한 초 차이.",
+        "[matter-of-fact] 시간이 좁아진다. 그는 넓어진다.",
+        "[dramatic pause] 기록의 선. 그가 넘을까. 넘지 못할까.",
+        "[rushed] 카메라가 흔들린다. 그의 발이 더 빨리 움직인다.",
+        "[dramatic pause] 역사가 기록되는 순간.",
+        "[matter-of-fact] 한 페이스만 더. 그럼 기록이 바뀐다.",
+        "[dramatic pause] 영화는 이 장면을 위해 존재했다."
+      ],
+      "en": [
+        "[dramatic pause] The record is right there. One second.",
+        "[matter-of-fact] Time narrows. He expands.",
+        "[dramatic pause] The line of the record. Will he cross it.",
+        "[rushed] The camera shakes. His feet move faster.",
+        "[dramatic pause] History is being recorded.",
+        "[matter-of-fact] One more pace. Then the record changes.",
+        "[dramatic pause] The film existed for this scene."
+      ]
+    },
+    "final_stretch": {
+      "ko": [
+        "[rushed] 마지막 구간. 그는 더 빨라진다.",
+        "[dramatic pause] 결승선이 보인다. 영화의 끝이 보인다.",
+        "[rushed] 한 장면만 남았다. 가장 긴 장면.",
+        "[matter-of-fact] 남은 킬로 하나. 인생 전체가 담긴다.",
+        "[dramatic pause] 그의 그림자가 그를 앞질러간다.",
+        "[rushed] 최종 박자. 심장이 카운트다운한다.",
+        "[dramatic pause] 마지막 한 걸음이 모든 것을 말한다."
+      ],
+      "en": [
+        "[rushed] Final stretch. He accelerates.",
+        "[dramatic pause] Finish line visible. Film's end visible.",
+        "[rushed] One scene left. The longest.",
+        "[matter-of-fact] One K remaining. A lifetime in it.",
+        "[dramatic pause] His shadow overtakes him.",
+        "[rushed] Final beat. His heart counts down.",
+        "[dramatic pause] The last step says everything."
+      ]
+    },
+    "race_ending": {
+      "ko": [
+        "[calm] 결승점. 음악이 멈춘다.",
+        "[sighs] 끝. 그의 숨이 영화의 마지막 대사다.",
+        "[dramatic pause] 그가 서 있다. 영화도 서 있다.",
+        "[calm] 크레딧. 오늘의 주인공, 그.",
+        "[sighs] 끝났다. 한 번 숨 쉰다. 한 번 더.",
+        "[matter-of-fact] 엔딩. 다음 레이스는 내일.",
+        "[dramatic pause] 영화는 끝났고, 그는 계속된다."
+      ],
+      "en": [
+        "[calm] Finish. The music stops.",
+        "[sighs] End. His breath is the final line.",
+        "[dramatic pause] He stands still. So does the film.",
+        "[calm] Credits. Today's lead, him.",
+        "[sighs] Done. One breath. One more.",
+        "[matter-of-fact] End. Next race tomorrow.",
+        "[dramatic pause] The film ends. He continues."
+      ]
+    },
+    "ambient_score": {
+      "ko": [
+        "[whispers] 음악이 그를 따라간다.",
+        "[calm] 배경음이 낮게 깔린다.",
+        "[whispers] 스코어가 그의 심장을 닮았다.",
+        "[calm] 이 장면의 음악은 침묵이다.",
+        "[whispers] 테마곡이 다시 시작된다.",
+        "[calm] 음악이 없을 때, 그는 가장 크게 들린다.",
+        "[whispers] 영화음악처럼, 그는 멈추지 않는다."
+      ],
+      "en": [
+        "[whispers] The score follows him.",
+        "[calm] Ambient tones lie low.",
+        "[whispers] The score mirrors his heart.",
+        "[calm] Music for this scene is silence.",
+        "[whispers] Theme resumes.",
+        "[calm] When there's no music, he's loudest.",
+        "[whispers] Like a film score, he doesn't stop."
+      ]
+    }
+  }
+}

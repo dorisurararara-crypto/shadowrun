@@ -2,6 +2,11 @@
 .env
 *.env
 
+# Large local backups / TTS generation logs
+tmp/tts_backup/
+tmp/voice_samples/
+tmp/voice_scripts_v2/generate.log
+
 # Miscellaneous
 *.class
 *.log

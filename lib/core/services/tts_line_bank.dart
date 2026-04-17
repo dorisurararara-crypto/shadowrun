@@ -39,7 +39,7 @@ class TtsLineBank {
 
   String _voiceForTheme() {
     final id = ThemeManager.I.currentId;
-    if (id == ThemeId.koreanMystic) return 'drill';
+    if (id == ThemeId.koreanMystic) return 'halmeoni';
     if (id == ThemeId.pureCinematic) return 'harry';
     return 'callum';
   }

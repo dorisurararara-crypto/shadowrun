@@ -1,0 +1,794 @@
+{
+  "mode": "doppelganger_public",
+  "preset": "horror_creative",
+  "voices": ["harry", "callum", "drill"],
+  "note": "30 카테고리 × 10변형 × ko+en = 600 대사. 수사 수동 검수 완료. 2026-04-18.",
+
+  "categories": {
+    "ahead_far": {
+      "ko": [
+        "[calm] 저만치 뒤처졌어. 숨 돌려도 돼.",
+        "[sighs] 발소리 안 들리네. 이 정도면 됐다.",
+        "[matter-of-fact] 이백 미터는 벌렸어. 여유 있어.",
+        "[calm] 한참 멀어졌네. 웃어도 되겠어.",
+        "[sighs] 뒤에 없어. 마음 놓고 가.",
+        "[playfully] 뭐야, 놓친 거야? 발소리도 없네.",
+        "[calm] 이 정도 거리면 잠깐 쉬어도 돼.",
+        "[matter-of-fact] 이 페이스로만 가면 돼. 괜찮아.",
+        "[sighs] 한숨 돌리자. 지금은 안전해.",
+        "[calm] 뒤에서 누구도 쫓아오지 않아."
+      ],
+      "en": [
+        "[calm] Way back. Take a breath.",
+        "[sighs] No footsteps. You're clear.",
+        "[matter-of-fact] Two hundred meters of lead. You're safe.",
+        "[calm] He's miles away. Relax a second.",
+        "[sighs] Nothing behind you. Keep going easy.",
+        "[playfully] Did he give up? No sound at all.",
+        "[calm] Plenty of room. Take it down a notch.",
+        "[matter-of-fact] This pace is fine. Hold it.",
+        "[sighs] Breathe. You're clear now.",
+        "[calm] No one's chasing you right now."
+      ]
+    },
+    "ahead_mid": {
+      "ko": [
+        "[matter-of-fact] 차이 벌려놨어. 지금처럼만.",
+        "[calm] 뒤에 없어. 일단은.",
+        "[matter-of-fact] 거리 좋다. 페이스 유지해.",
+        "[sighs] 아직 여유 있어. 한 번 더 밀어봐.",
+        "[calm] 따돌린 상태야. 집중만 하면 돼.",
+        "[matter-of-fact] 삼백 미터 차. 나쁘지 않아.",
+        "[calm] 괜찮아. 이 속도면 따라잡기 힘들어.",
+        "[sighs] 어깨 힘 빼고 가자.",
+        "[calm] 잘 벌려놨다. 이대로 유지.",
+        "[matter-of-fact] 안정권. 다음 고비까지 잘 가자."
+      ],
+      "en": [
+        "[matter-of-fact] You've got the gap. Hold it.",
+        "[calm] Nothing close behind. Not yet.",
+        "[matter-of-fact] Good distance. Keep pace.",
+        "[sighs] Some room still. Push a bit more.",
+        "[calm] You lost him. Just don't slack.",
+        "[matter-of-fact] Three hundred meters out. Not bad.",
+        "[calm] At this speed he won't catch up.",
+        "[sighs] Drop the shoulders. Breathe.",
+        "[calm] Nice buffer. Keep it up.",
+        "[matter-of-fact] Safe zone. Hold until the next stretch."
+      ]
+    },
+    "ahead_close": {
+      "ko": [
+        "[hesitates] 음... 좀 떨어뜨려 놓은 것 같은데.",
+        "[nervous] 아직 멀지 않아. 방심하지 마.",
+        "[matter-of-fact] 이제 막 벗어났어. 페이스 유지.",
+        "[hesitates] 거리 벌어졌는데, 조심은 해.",
+        "[nervous] 아슬아슬해. 더 멀어져야 안심돼.",
+        "[rushed] 간신히 떨어뜨렸다. 이 상태로 더 가.",
+        "[matter-of-fact] 이백 미터. 여긴 안전 밖이야.",
+        "[hesitates] 막 따돌렸어. 느긋하면 안 돼.",
+        "[nervous] 발소리 희미해졌는데, 완전히 없진 않아.",
+        "[matter-of-fact] 여유 생겼다. 이 리듬 지켜."
+      ],
+      "en": [
+        "[hesitates] Hm... a bit of a gap now.",
+        "[nervous] Still not far enough. Stay sharp.",
+        "[matter-of-fact] You just broke free. Hold pace.",
+        "[hesitates] Distance opened, but don't ease up.",
+        "[nervous] Barely safe. Push further.",
+        "[rushed] Just shook him. Keep going.",
+        "[matter-of-fact] Two hundred. Edge of safe.",
+        "[hesitates] You slipped out. Don't relax yet.",
+        "[nervous] Footsteps fading, not gone.",
+        "[matter-of-fact] A bit of room. Lock this rhythm."
+      ]
+    },
+    "safe": {
+      "ko": [
+        "[matter-of-fact] 거리 유지 중. 괜찮아.",
+        "[calm] 지금이 딱 좋아. 이대로.",
+        "[matter-of-fact] 안전권. 한 호흡 쉬어도 돼.",
+        "[calm] 페이스 안 깨뜨리기만 하면 돼.",
+        "[matter-of-fact] 이 간격. 이 상태.",
+        "[calm] 뒤에 있긴 한데, 붙진 못해.",
+        "[sighs] 숨 편하게 가. 긴장 풀어도 돼.",
+        "[matter-of-fact] 백오십 미터 차. 나쁘지 않아.",
+        "[calm] 이 리듬이면 따라잡히진 않아.",
+        "[matter-of-fact] 컨트롤 안에 있어. 잘하고 있어."
+      ],
+      "en": [
+        "[matter-of-fact] Holding distance. You're fine.",
+        "[calm] Right in the sweet spot. Keep it.",
+        "[matter-of-fact] Safe range. Breathe it out.",
+        "[calm] Don't break the rhythm, that's all.",
+        "[matter-of-fact] This gap. This feeling.",
+        "[calm] He's there but he can't close it.",
+        "[sighs] Easy breaths. Loosen up.",
+        "[matter-of-fact] One-fifty meters. Not bad.",
+        "[calm] At this pace he won't catch you.",
+        "[matter-of-fact] You're in control. Doing well."
+      ]
+    },
+    "warning_far": {
+      "ko": [
+        "[nervous] 뒤에서 쫓아와. 속도 올려.",
+        "[whispers] 소리 들려? 따라오고 있어.",
+        "[nervous] 거리 좁혀져. 정신 차려.",
+        "[rushed] 발소리 점점 가까워져. 페이스 올려.",
+        "[nervous] 백이십 미터 뒤야. 한 번 밀어봐.",
+        "[whispers] 멀리 있긴 한데, 멈추진 않아.",
+        "[nervous] 붙고 있어. 자, 집중.",
+        "[rushed] 한눈 팔면 안 돼. 지금부터.",
+        "[nervous] 이 거리. 여기서 버텨야 해.",
+        "[whispers] 저 발소리, 박자 빨라졌어."
+      ],
+      "en": [
+        "[nervous] He's chasing. Speed up.",
+        "[whispers] Hear that? He's back there.",
+        "[nervous] Gap's closing. Focus.",
+        "[rushed] Footsteps getting louder. Push.",
+        "[nervous] A hundred twenty behind. Go harder.",
+        "[whispers] Far off, but not stopping.",
+        "[nervous] Closing in. Lock in now.",
+        "[rushed] No distractions. Starting now.",
+        "[nervous] This gap. Hold here.",
+        "[whispers] His rhythm. It's quicker now."
+      ]
+    },
+    "warning_close": {
+      "ko": [
+        "[nervous] 가까워지고 있어. 멈추면 안 돼.",
+        "[whispers] 백 미터도 안 남았어. 속도 올려.",
+        "[rushed] 빨리. 더 빨리. 놓치면 안 돼.",
+        "[nervous] 어느새 바로 뒤야. 페이스 깨뜨리지 마.",
+        "[whispers] 숨소리 들려. 진짜 가까워.",
+        "[rushed] 팔 더 휘둘러. 속도 올려.",
+        "[nervous] 여기서 뺏기면 답 없어.",
+        "[whispers] 발소리 맞물려. 박자 맞추려 해.",
+        "[rushed] 당겨. 한 번만 더. 한 번만 더.",
+        "[nervous] 오십 미터. 딱 벗어나야 해."
+      ],
+      "en": [
+        "[nervous] Closing in. Don't stop.",
+        "[whispers] Less than a hundred. Push.",
+        "[rushed] Faster. Faster. Don't lose it.",
+        "[nervous] Right behind now. Hold your pace.",
+        "[whispers] I can hear him breathing. Too close.",
+        "[rushed] Swing your arms. Break free.",
+        "[nervous] Losing ground here ends you.",
+        "[whispers] His steps match yours. Creepy.",
+        "[rushed] Pull. One more. One more.",
+        "[nervous] Fifty meters. Break the line."
+      ]
+    },
+    "danger_far": {
+      "ko": [
+        "[gasps] 바로 뒤야. 뛰어!",
+        "[rushed] 숨소리 들려. 빨리!",
+        "[gasps] 오십 미터 안이야. 이건 위험해.",
+        "[rushed] 멈추면 끝이야. 계속 가.",
+        "[nervous] 목덜미 싸늘해. 더 밀어.",
+        "[rushed] 숨 뱉어. 뱉고 당겨. 당겨!",
+        "[gasps] 거의 붙었어. 빨리 빠져나가.",
+        "[rushed] 손이라도 닿을 거리야. 속도, 속도.",
+        "[nervous] 삼십 미터. 거리 안 봐도 돼.",
+        "[rushed] 다리. 다리만 보자. 계속."
+      ],
+      "en": [
+        "[gasps] Right on you. Run!",
+        "[rushed] I can hear him. Go!",
+        "[gasps] Under fifty meters. Dangerous.",
+        "[rushed] Stop and it's over. Keep moving.",
+        "[nervous] Cold on your neck. Push.",
+        "[rushed] Breathe out. Out and pull. Pull!",
+        "[gasps] Almost touching. Get out.",
+        "[rushed] Arm's length. Speed, speed.",
+        "[nervous] Thirty meters. Don't look.",
+        "[rushed] Legs. Just legs. Go."
+      ]
+    },
+    "danger_close": {
+      "ko": [
+        "[shouts] 지금! 지금이야!",
+        "[gasps] 놓치면 끝이야. 더 빨리!",
+        "[rushed] 닿을 거리야. 뛰어, 뛰어!",
+        "[shouts] 진짜 잡힌다고! 달려!",
+        "[gasps] 숨 섞여. 진짜야. 진짜 뒤에 있어.",
+        "[rushed] 멈추면 잡혀. 멈추면 끝.",
+        "[shouts] 빨리! 제발, 빨리!",
+        "[gasps] 그림자 겹쳤어. 완전 붙었어.",
+        "[rushed] 앞만 봐. 앞만. 다리 더 빨리.",
+        "[shouts] 십 미터! 놓치지 마!"
+      ],
+      "en": [
+        "[shouts] Now! Right now!",
+        "[gasps] Lose it and you're done. Faster!",
+        "[rushed] Within reach. Run, run!",
+        "[shouts] He can grab you! Go!",
+        "[gasps] His breath on yours. Really.",
+        "[rushed] Stop and you're caught. Don't stop.",
+        "[shouts] Faster! Please, faster!",
+        "[gasps] Shadows touching. Dead close.",
+        "[rushed] Eyes forward. Forward. Legs!",
+        "[shouts] Ten meters! Don't let him!"
+      ]
+    },
+    "critical": {
+      "ko": [
+        "[shouts] 뛰어! 지금 당장!",
+        "[gasps] 마지막 기회야!",
+        "[rushed] 한 발만. 한 발만 더!",
+        "[shouts] 지금 안 뛰면 끝이야!",
+        "[gasps] 손끝이 닿았어. 빠져 나가!",
+        "[rushed] 놓치지 마. 놓치면 진짜 끝.",
+        "[shouts] 있는 힘 다!",
+        "[gasps] 뒤돌지 마. 계속 가!",
+        "[rushed] 정신줄. 정신줄 잡아!",
+        "[shouts] 살려면 뛰어! 살려면!"
+      ],
+      "en": [
+        "[shouts] Run! Right now!",
+        "[gasps] Last chance!",
+        "[rushed] One step. Just one more!",
+        "[shouts] Move or you're done!",
+        "[gasps] Fingers on you. Break away!",
+        "[rushed] Don't lose it. Don't let go.",
+        "[shouts] Everything you've got!",
+        "[gasps] Don't turn. Just keep moving!",
+        "[rushed] Hold on. Hold your mind!",
+        "[shouts] Run to live! Run!"
+      ]
+    },
+
+    "losing_lead": {
+      "ko": [
+        "[frustrated] 아 왜 따라잡히는 거야. 정신 차려.",
+        "[nervous] 거리 줄어들고 있어. 페이스 회복해.",
+        "[rushed] 뒤집히기 시작했어. 다시 밀어.",
+        "[frustrated] 여기서 놓치면 너무 아깝잖아.",
+        "[nervous] 어깨 굳었지? 풀고 다시 가.",
+        "[rushed] 지금 늦추면 끝이야. 힘내.",
+        "[frustrated] 한눈 판 사이에 붙었네. 집중.",
+        "[nervous] 안전권 빠져나갔어. 다시 벌려.",
+        "[rushed] 속도 떨어졌어. 올려, 올려.",
+        "[frustrated] 방심했네. 한 번 더 각오해."
+      ],
+      "en": [
+        "[frustrated] Why is he catching up. Focus.",
+        "[nervous] Gap's shrinking. Get back on pace.",
+        "[rushed] Slipping. Push again.",
+        "[frustrated] Don't waste everything you've built.",
+        "[nervous] Shoulders tight? Loosen. Move.",
+        "[rushed] Slow down now and it's over. Dig in.",
+        "[frustrated] You blinked. Now focus.",
+        "[nervous] Out of the safe range. Open it again.",
+        "[rushed] Speed dropped. Push. Push.",
+        "[frustrated] Got complacent. Set again."
+      ]
+    },
+    "gaining_lead": {
+      "ko": [
+        "[cheerfully] 거리 벌려진다. 이대로 더.",
+        "[matter-of-fact] 다시 떨어뜨렸어. 좋아.",
+        "[calm] 뒤에서 밀려나는 중. 계속.",
+        "[cheerfully] 됐다. 숨 좀 쉬어도 돼.",
+        "[matter-of-fact] 간격 늘었어. 이 페이스.",
+        "[calm] 차이 생겼다. 긴장 풀지만 마.",
+        "[cheerfully] 지금 리듬 좋은데. 탔다.",
+        "[matter-of-fact] 이대로만. 이대로만 가.",
+        "[calm] 안전권 진입. 회복해.",
+        "[cheerfully] 잘한다. 한 번만 더 밀어봐."
+      ],
+      "en": [
+        "[cheerfully] Gap's widening. Keep going.",
+        "[matter-of-fact] You dropped him again. Good.",
+        "[calm] He's falling back. Stay on it.",
+        "[cheerfully] Done. You can breathe now.",
+        "[matter-of-fact] Distance up. Hold pace.",
+        "[calm] Gap opened. Don't relax fully.",
+        "[cheerfully] Rhythm's hitting. Ride it.",
+        "[matter-of-fact] Just like this. Just like this.",
+        "[calm] Back in safe range. Recover.",
+        "[cheerfully] Nice. Push once more."
+      ]
+    },
+    "caught_glimpse": {
+      "ko": [
+        "[whispers] 방금 뭐 본 거 아니지?",
+        "[nervous] 눈 깜빡한 사이에... 사라졌어.",
+        "[whispers] 옆에 뭐 지나간 것 같은데.",
+        "[hesitates] 기분 탓이겠지. 아마도.",
+        "[whispers] 가로등 밑에 뭐 있었지.",
+        "[nervous] 뒤에서 뭐가... 아니, 못 봤어.",
+        "[whispers] 시야 끝에. 딱 한 번 움직였어.",
+        "[hesitates] 착각일 거야. 계속 가.",
+        "[whispers] 나무 그림자가 좀 이상한데.",
+        "[nervous] 보지 마. 그냥 앞만 봐."
+      ],
+      "en": [
+        "[whispers] Did you just see something?",
+        "[nervous] Blink and it was gone.",
+        "[whispers] Something passed beside you.",
+        "[hesitates] Maybe it's nothing. Maybe.",
+        "[whispers] Under the lamp. Just now.",
+        "[nervous] Behind you... no, didn't catch it.",
+        "[whispers] Edge of vision. One twitch.",
+        "[hesitates] Has to be your imagination. Keep going.",
+        "[whispers] That tree shadow looked wrong.",
+        "[nervous] Don't look. Just forward."
+      ]
+    },
+
+    "pace_drop_panic": {
+      "ko": [
+        "[rushed] 속도 확 떨어졌어. 정신 차려.",
+        "[nervous] 지금 늦추면 안 돼. 왜 처져.",
+        "[rushed] 다리 떨리지? 그래도 계속 가.",
+        "[frustrated] 페이스 놓쳤다. 다시 잡아.",
+        "[rushed] 호흡 꼬였어. 하나, 둘, 하나, 둘.",
+        "[nervous] 급하게 느려지면 잡혀.",
+        "[rushed] 엉덩이 내려. 중심 앞.",
+        "[frustrated] 왜 하필 여기서. 한 번만 버텨봐.",
+        "[rushed] 팔 흔들어. 팔이 다리 끌어.",
+        "[nervous] 떨어지는 중이야. 회복 빨리."
+      ],
+      "en": [
+        "[rushed] Pace just tanked. Wake up.",
+        "[nervous] Can't slow now. Why are you fading.",
+        "[rushed] Legs shaking? Push through anyway.",
+        "[frustrated] Lost the pace. Grab it back.",
+        "[rushed] Breathing's off. One, two, one, two.",
+        "[nervous] Slow here and he catches you.",
+        "[rushed] Drop your hips. Lean forward.",
+        "[frustrated] Not here. Just hold on.",
+        "[rushed] Swing the arms. Arms pull the legs.",
+        "[nervous] You're dropping. Recover fast."
+      ]
+    },
+    "pace_surge": {
+      "ko": [
+        "[cheerfully] 속도 팍 올랐다. 잘했어.",
+        "[matter-of-fact] 이거야. 이 페이스 유지.",
+        "[cheerfully] 리듬 탔다. 이 기세.",
+        "[matter-of-fact] 급가속 깨끗했어. 계속.",
+        "[cheerfully] 다리 가볍지? 이 상태 살려.",
+        "[matter-of-fact] 한 단계 올라왔어. 유지만 잘해.",
+        "[cheerfully] 오, 좋은데. 이대로 가.",
+        "[matter-of-fact] 심장 박자랑 발 박자 맞았다.",
+        "[cheerfully] 잘 당겼어. 더 갈 수 있어.",
+        "[matter-of-fact] 페이스 점프. 탄력 놓치지 마."
+      ],
+      "en": [
+        "[cheerfully] Pace jumped. Nice.",
+        "[matter-of-fact] That's it. Hold this pace.",
+        "[cheerfully] Rhythm's locked. Ride it.",
+        "[matter-of-fact] Clean acceleration. Keep it.",
+        "[cheerfully] Legs light? Keep that feeling.",
+        "[matter-of-fact] Moved up a gear. Just maintain.",
+        "[cheerfully] Oh, nice. Stay right here.",
+        "[matter-of-fact] Heart and feet in sync.",
+        "[cheerfully] Good pull. You've got more.",
+        "[matter-of-fact] Pace surge. Don't lose the momentum."
+      ]
+    },
+    "pace_steady": {
+      "ko": [
+        "[calm] 페이스 일정하다. 이게 정답.",
+        "[matter-of-fact] 흔들림 없어. 좋아.",
+        "[calm] 같은 리듬. 같은 숨.",
+        "[matter-of-fact] 균형 잘 잡혀 있어.",
+        "[calm] 이 고요함이 중요해. 계속.",
+        "[matter-of-fact] 호흡이랑 발걸음 맞춰졌다.",
+        "[calm] 몸이 자리 잡았어. 잘하고 있어.",
+        "[matter-of-fact] 변동 없어. 일정해.",
+        "[calm] 한결같네. 이 페이스 믿어.",
+        "[matter-of-fact] 심박도 일정해. 완벽."
+      ],
+      "en": [
+        "[calm] Pace is steady. That's the answer.",
+        "[matter-of-fact] No wobble. Good.",
+        "[calm] Same rhythm. Same breath.",
+        "[matter-of-fact] Well balanced.",
+        "[calm] This calm matters. Keep it.",
+        "[matter-of-fact] Breath and feet in time.",
+        "[calm] Body's settled. Doing well.",
+        "[matter-of-fact] No drift. Steady.",
+        "[calm] Consistent. Trust this pace.",
+        "[matter-of-fact] Heart steady too. Perfect."
+      ]
+    },
+    "catching_breath": {
+      "ko": [
+        "[sighs] 숨 좀 고르자. 페이스는 지키고.",
+        "[calm] 한 호흡 길게. 다시.",
+        "[sighs] 괜찮아. 여기서 살짝 내쉬어.",
+        "[calm] 배로 숨 쉬어. 어깨 말고.",
+        "[sighs] 들이마시고... 뱉고. 천천히.",
+        "[calm] 박자 맞춰 숨 쉬어.",
+        "[sighs] 이 간격이면 숨 고를 여유 있어.",
+        "[calm] 들숨 둘, 날숨 셋.",
+        "[sighs] 어깨 힘 빼고. 그거면 돼.",
+        "[calm] 숨 크게 마시고 뱉어."
+      ],
+      "en": [
+        "[sighs] Catch your breath. Keep the pace.",
+        "[calm] One long breath. Again.",
+        "[sighs] You're fine. Exhale here.",
+        "[calm] Breathe from the belly. Not the shoulders.",
+        "[sighs] In... and out. Slow.",
+        "[calm] Breathe to the rhythm.",
+        "[sighs] This gap gives you room to breathe.",
+        "[calm] Two in, three out.",
+        "[sighs] Drop the shoulder tension. That's it.",
+        "[calm] Fill the lungs. Empty them."
+      ]
+    },
+
+    "time_1min": {
+      "ko": [
+        "[matter-of-fact] 일 분 버텼다. 시작이야.",
+        "[calm] 첫 일 분 넘겼어. 좋다.",
+        "[matter-of-fact] 몸 아직 식어 있어. 서두르지 마.",
+        "[calm] 일 분 경과. 워밍업 끝.",
+        "[matter-of-fact] 한 분 돌파. 페이스 맞춰가.",
+        "[calm] 이제 본격. 다리 풀렸지.",
+        "[matter-of-fact] 일 분이면 아직 느껴지지도 않아.",
+        "[calm] 시작이 제일 힘들어. 방금 넘겼어.",
+        "[matter-of-fact] 호흡 자리 잡을 시간.",
+        "[calm] 일 분. 아직 한참 남았으니까 천천히."
+      ],
+      "en": [
+        "[matter-of-fact] One minute in. Beginning.",
+        "[calm] First minute clear. Good.",
+        "[matter-of-fact] Body's still cold. Don't rush.",
+        "[calm] Minute one done. Warm-up over.",
+        "[matter-of-fact] Past sixty seconds. Settle.",
+        "[calm] Now the real run. Legs loose.",
+        "[matter-of-fact] One minute is nothing. Yet.",
+        "[calm] Starts are the hardest. Just cleared it.",
+        "[matter-of-fact] Time to lock in breathing.",
+        "[calm] Minute one. Long way to go. Easy."
+      ]
+    },
+    "time_3min": {
+      "ko": [
+        "[matter-of-fact] 삼 분. 몸 달아오르기 시작해.",
+        "[calm] 삼 분 넘겼다. 리듬 만들자.",
+        "[matter-of-fact] 이제 땀 나기 시작.",
+        "[calm] 심박 안정권 들어왔어.",
+        "[matter-of-fact] 삼 분 경과. 페이스 굳혀.",
+        "[calm] 여기서부터가 진짜 러닝이야.",
+        "[matter-of-fact] 삼 분이면 몸 알아듣는다.",
+        "[calm] 호흡 안정됐지? 계속.",
+        "[matter-of-fact] 세 번째 분. 탄력 받는 구간.",
+        "[calm] 삼 분. 멈출 이유 없다."
+      ],
+      "en": [
+        "[matter-of-fact] Three minutes. Body's waking up.",
+        "[calm] Past three. Find the rhythm.",
+        "[matter-of-fact] Sweat starting.",
+        "[calm] Heart rate stable.",
+        "[matter-of-fact] Three minutes in. Lock the pace.",
+        "[calm] Real running starts here.",
+        "[matter-of-fact] Three minutes in, body gets it.",
+        "[calm] Breathing settled? Keep it.",
+        "[matter-of-fact] Third minute. Momentum building.",
+        "[calm] Three minutes. No reason to stop."
+      ]
+    },
+    "time_5min": {
+      "ko": [
+        "[matter-of-fact] 오 분 버텼다. 자리 잡았어.",
+        "[calm] 오 분째. 몸이 도와주기 시작해.",
+        "[matter-of-fact] 오 분 넘었다. 물 한 모금 생각나지.",
+        "[cheerfully] 오 분 돌파. 잘하고 있어.",
+        "[matter-of-fact] 첫 오 분은 끝났어. 여기서부터 진짜.",
+        "[calm] 이제 몸이 자동으로 달린다.",
+        "[matter-of-fact] 오 분. 한 고비 넘겼네.",
+        "[calm] 심장이 리듬 알아챘어.",
+        "[cheerfully] 오 분 왔다. 계속 이 기세.",
+        "[matter-of-fact] 첫 오 분이 제일 길어. 끝났어."
+      ],
+      "en": [
+        "[matter-of-fact] Five minutes held. Locked in.",
+        "[calm] Minute five. Body's helping now.",
+        "[matter-of-fact] Past five. Water comes to mind.",
+        "[cheerfully] Five minutes clear. Doing well.",
+        "[matter-of-fact] First five done. Real work starts.",
+        "[calm] Body runs on its own now.",
+        "[matter-of-fact] Five minutes. Past a hump.",
+        "[calm] Heart caught the rhythm.",
+        "[cheerfully] Five in. Keep the wave.",
+        "[matter-of-fact] First five's the longest. Done."
+      ]
+    },
+    "time_10min": {
+      "ko": [
+        "[cheerfully] 십 분 왔다. 한 고비 제대로 넘겼어.",
+        "[matter-of-fact] 십 분째. 몸이 풀렸어.",
+        "[calm] 십 분 돌파. 컨디션 체크해봐.",
+        "[cheerfully] 벌써 십 분이야. 시간 빠르지.",
+        "[matter-of-fact] 두 자릿수 진입. 큰 산 하나 넘었어.",
+        "[calm] 호흡 완전히 잡혔지. 여기서부터 여유.",
+        "[cheerfully] 십 분. 잘한다 진짜.",
+        "[matter-of-fact] 십 분이면 주자도 된다고 하더라.",
+        "[calm] 이 페이스 십 분째. 몸이 기억할 거야.",
+        "[cheerfully] 십 분 통과. 한 번 웃고 가자."
+      ],
+      "en": [
+        "[cheerfully] Ten minutes in. Cleared a hump.",
+        "[matter-of-fact] Minute ten. Body's open.",
+        "[calm] Past ten. Check how you feel.",
+        "[cheerfully] Already ten. Time flies.",
+        "[matter-of-fact] Double digits. Big mountain passed.",
+        "[calm] Breathing locked. From here it's smoother.",
+        "[cheerfully] Ten minutes. Actually impressive.",
+        "[matter-of-fact] They say ten makes a runner.",
+        "[calm] Ten at this pace. Body will remember.",
+        "[cheerfully] Ten mark. Crack a smile."
+      ]
+    },
+    "time_15min": {
+      "ko": [
+        "[matter-of-fact] 십오 분. 장거리 감각 들어왔어.",
+        "[calm] 십오 분 지났다. 다리가 알아서 나가.",
+        "[cheerfully] 십오 분 돌파. 한 세트 끝낸 거야.",
+        "[matter-of-fact] 엔도르핀 돌기 시작하지.",
+        "[calm] 십오 분. 몸이 너만큼 집중했어.",
+        "[matter-of-fact] 이제 피로랑 싸우는 구간.",
+        "[cheerfully] 십오 분. 진짜 달리는 거 맞지.",
+        "[calm] 호흡 끝이 예쁘다. 안정 들어갔어.",
+        "[matter-of-fact] 십오 분 경과. 체력 관리 시점.",
+        "[cheerfully] 십오 분 왔다. 여기까지만 와도 잘한 거야."
+      ],
+      "en": [
+        "[matter-of-fact] Fifteen. Long-run feel kicking in.",
+        "[calm] Past fifteen. Legs on autopilot.",
+        "[cheerfully] Fifteen down. Set one done.",
+        "[matter-of-fact] Endorphins starting.",
+        "[calm] Fifteen. Body's as focused as you are.",
+        "[matter-of-fact] Now it's you versus fatigue.",
+        "[cheerfully] Fifteen minutes. That's a real run.",
+        "[calm] Breath finishing smoothly.",
+        "[matter-of-fact] Fifteen in. Manage the fuel now.",
+        "[cheerfully] Fifteen mark. Even this much is great."
+      ]
+    },
+    "time_30min": {
+      "ko": [
+        "[cheerfully] 삼십 분이다! 진짜 거뜬해졌네.",
+        "[matter-of-fact] 삼십 분. 이제 정신력 게임이야.",
+        "[calm] 삼십 분 지났어. 몸이 너 믿기 시작해.",
+        "[cheerfully] 삼십 분 돌파. 기분 좋지.",
+        "[matter-of-fact] 삼십 분. 여기부터는 맛있는 피로야.",
+        "[calm] 호흡이 풍부해졌어. 폐가 열렸다.",
+        "[cheerfully] 삼십 분이면 오늘 벌써 이긴 거야.",
+        "[matter-of-fact] 삼십 분 경과. 지구력 존.",
+        "[calm] 머리 맑아지기 시작하지. 그게 러너 맛.",
+        "[cheerfully] 삼십 분 통과. 박수."
+      ],
+      "en": [
+        "[cheerfully] Thirty minutes! Comfortable now.",
+        "[matter-of-fact] Thirty. Mind game from here.",
+        "[calm] Past thirty. Body trusts you.",
+        "[cheerfully] Half hour cleared. Feels good.",
+        "[matter-of-fact] Thirty. This is the good kind of tired.",
+        "[calm] Breath's deeper. Lungs open.",
+        "[cheerfully] Thirty means you already won today.",
+        "[matter-of-fact] Thirty in. Endurance zone.",
+        "[calm] Head clearing up. That's the runner high.",
+        "[cheerfully] Thirty mark. Applause."
+      ]
+    },
+
+    "started_running": {
+      "ko": [
+        "[calm] 자, 시작. 첫 걸음 가볍게.",
+        "[matter-of-fact] 첫 백 미터가 중요해.",
+        "[calm] 천천히 가. 워밍업이야.",
+        "[matter-of-fact] 급할 필요 없어. 페이스부터.",
+        "[calm] 숨 먼저 맞추고 발 맞춰.",
+        "[matter-of-fact] 출발. 뒤돌아보지 마.",
+        "[calm] 오늘도 좋은 달리기 될 거야.",
+        "[matter-of-fact] 처음엔 어색해. 곧 풀려.",
+        "[calm] 자, 가자. 멈출 이유 없어.",
+        "[matter-of-fact] 시작. 리듬 찾는 게 먼저야."
+      ],
+      "en": [
+        "[calm] And go. First steps light.",
+        "[matter-of-fact] This first hundred meters decides it.",
+        "[calm] Take it slow. This is warm-up.",
+        "[matter-of-fact] No hurry. Pace first.",
+        "[calm] Breath first, then feet.",
+        "[matter-of-fact] We're off. Don't look back.",
+        "[calm] Today will be a good run.",
+        "[matter-of-fact] Feels off at first. It'll open up.",
+        "[calm] Let's go. No reason to stop.",
+        "[matter-of-fact] Start. Find the rhythm first."
+      ]
+    },
+    "stopped_suddenly": {
+      "ko": [
+        "[nervous] 왜 멈췄어. 지금 멈추면 안 돼.",
+        "[rushed] 다시 뛰어. 무조건 다시.",
+        "[nervous] 멈춰 있으면 잡혀.",
+        "[rushed] 스탑 안 돼. 한 걸음만이라도.",
+        "[nervous] 지금 서 있으면 끝이야.",
+        "[rushed] 다리 움직여. 그냥 움직여.",
+        "[frustrated] 왜. 도대체 왜 여기서 멈춰.",
+        "[rushed] 걷더라도 계속 앞으로.",
+        "[nervous] 그놈 아직 뒤에서 보고 있어.",
+        "[rushed] 다시 출발. 한 번만 더."
+      ],
+      "en": [
+        "[nervous] Why stop. Not now.",
+        "[rushed] Run again. Just run.",
+        "[nervous] Standing still means caught.",
+        "[rushed] No stop. At least one step.",
+        "[nervous] Stop here and you're done.",
+        "[rushed] Move the legs. Just move.",
+        "[frustrated] Why. Why stop here.",
+        "[rushed] Walk if you must, but forward.",
+        "[nervous] He's still watching you.",
+        "[rushed] Go again. One more time."
+      ]
+    },
+    "u_turn": {
+      "ko": [
+        "[hesitates] 어, 방향 바꿨네. 확실해?",
+        "[nervous] 돌아가면 마주칠 수도 있어.",
+        "[hesitates] 길 맞아? 한 번 확인해.",
+        "[matter-of-fact] 방향 돌렸어. 그쪽에 조심해.",
+        "[nervous] 유턴 잘못한 거 아니지?",
+        "[hesitates] 다시 왔던 길. 진짜 괜찮은 거야?",
+        "[matter-of-fact] 경로 바꿨다. 페이스만 놓치지 마.",
+        "[nervous] 너 방향 바꾼 거 다 봤을 거야.",
+        "[hesitates] 이 길... 이쪽 맞아?",
+        "[matter-of-fact] 유턴 기록됨. 경로 확인."
+      ],
+      "en": [
+        "[hesitates] You turned around. Sure?",
+        "[nervous] Going back could put you in front of him.",
+        "[hesitates] Right path? Check.",
+        "[matter-of-fact] You flipped direction. Careful.",
+        "[nervous] Wrong u-turn?",
+        "[hesitates] Back the way you came. You good?",
+        "[matter-of-fact] Route changed. Just hold pace.",
+        "[nervous] He saw you turn.",
+        "[hesitates] This way... right way?",
+        "[matter-of-fact] U-turn logged. Confirm route."
+      ]
+    },
+    "gps_lost": {
+      "ko": [
+        "[nervous] 신호 끊겼어. 건물 많은 데야?",
+        "[hesitates] 위치 애매하다. 계속 가.",
+        "[matter-of-fact] 지피에스 복구 중. 페이스 유지.",
+        "[nervous] 거리 기록 잠깐 불안정해.",
+        "[hesitates] 신호 돌아올 때까지 몇 초만.",
+        "[matter-of-fact] 지도 잠깐 흐려졌어. 괜찮아.",
+        "[nervous] 지금 어디쯤이지.",
+        "[hesitates] 좀 있으면 다시 잡힐 거야.",
+        "[matter-of-fact] 위성 세 개 잡혔다. 안정된다.",
+        "[nervous] 끊긴 구간은 보정될 거야. 뛰어."
+      ],
+      "en": [
+        "[nervous] Signal dropped. Tall buildings?",
+        "[hesitates] Location's fuzzy. Keep going.",
+        "[matter-of-fact] GPS recovering. Hold pace.",
+        "[nervous] Distance tracking unstable for a sec.",
+        "[hesitates] A few seconds till signal's back.",
+        "[matter-of-fact] Map got blurry. You're fine.",
+        "[nervous] Where are you exactly.",
+        "[hesitates] It'll lock in soon.",
+        "[matter-of-fact] Three satellites. Stabilizing.",
+        "[nervous] The gap'll be filled in. Just run."
+      ]
+    },
+
+    "footsteps_count": {
+      "ko": [
+        "[whispers] 발소리 두 겹이야. 네 거랑... 또 하나.",
+        "[whispers] 잘 들어봐. 네 발 말고, 하나 더 들리지.",
+        "[whispers] 박자 맞춰서 뛰고 있네. 네 뒤에서.",
+        "[whispers] 발 디딜 때마다 두 번 울리지. 이상하지.",
+        "[whispers] 같이 뛰는 것 같은데. 너 혼자 뛰는 거 맞지.",
+        "[whispers] 네 발소리가 아닌 게 섞여 있어.",
+        "[whispers] 지금 박자 맞춰서 쫓아와. 알아챘니.",
+        "[whispers] 왼발. 오른발. 또 다른 발.",
+        "[whispers] 너무 정확한 박자야. 거울처럼.",
+        "[whispers] 발소리 하나만 들려야 하는데."
+      ],
+      "en": [
+        "[whispers] Two sets of footsteps. Yours and... another.",
+        "[whispers] Listen. Your feet, and one more.",
+        "[whispers] Matching your rhythm. Just behind.",
+        "[whispers] Every step echoes twice. Weird, right.",
+        "[whispers] Sounds like two runners. Running alone?",
+        "[whispers] Something not yours is in there.",
+        "[whispers] He's matching your stride. You notice?",
+        "[whispers] Left foot. Right foot. Another foot.",
+        "[whispers] Too perfect a rhythm. Mirror-like.",
+        "[whispers] Should just be your steps."
+      ]
+    },
+    "breath_heavy": {
+      "ko": [
+        "[whispers] 숨소리 섞였어. 네 것만이 아니야.",
+        "[rushed] 헉헉 소리 하나 더 들리지.",
+        "[whispers] 너 숨 참았는데, 왜 소리가 계속 나지.",
+        "[whispers] 뒤에서 숨 쉬고 있어. 가까워.",
+        "[rushed] 속도 맞춰서 헐떡여. 그놈.",
+        "[whispers] 네 숨소리랑 그놈 숨소리 겹친다.",
+        "[whispers] 조용히. 들키지 말고.",
+        "[rushed] 숨소리로 거리 가늠해. 점점 가까워.",
+        "[whispers] 숨이 목덜미에. 진짜야.",
+        "[whispers] 숨 죽여도 들려. 그쪽은 안 죽여."
+      ],
+      "en": [
+        "[whispers] Two breaths. Not just yours.",
+        "[rushed] One more panting sound out there.",
+        "[whispers] You held your breath. Why's it still coming.",
+        "[whispers] Someone breathing behind you. Close.",
+        "[rushed] He's panting at your pace.",
+        "[whispers] Your breath, his breath. Overlap.",
+        "[whispers] Quiet. Don't get noticed.",
+        "[rushed] Gauge him by the breathing. Closer.",
+        "[whispers] Breath on your neck. Real.",
+        "[whispers] Even holding yours, his keeps coming."
+      ]
+    },
+    "ambient_whisper": {
+      "ko": [
+        "[whispers] 방금 누가 이름 부른 거 같지 않아. 기분 탓이겠지.",
+        "[whispers] 가로등이 껌뻑이는 거 봤지.",
+        "[whispers] 이 시간에 왜 이렇게 조용해.",
+        "[whispers] 이 거리, 아까보다 조용하지 않니.",
+        "[whispers] 개도 안 짖어. 평소엔 한 마리는 짖었는데.",
+        "[whispers] 바람 방향이 계속 이상해.",
+        "[whispers] 조명이 꺼진 창문 많지.",
+        "[whispers] 뒤에서 누가 같이 뛰는 것 같은데.",
+        "[whispers] 이 길, 원래 이렇게 길었어?",
+        "[whispers] 시간 보지 마. 안 좋을 거야."
+      ],
+      "en": [
+        "[whispers] Did someone just call your name? Probably nothing.",
+        "[whispers] The streetlight flickered. Saw it?",
+        "[whispers] Too quiet for this hour.",
+        "[whispers] This street's quieter than before.",
+        "[whispers] No dogs barking. Usually there's at least one.",
+        "[whispers] The wind keeps changing direction.",
+        "[whispers] A lot of dark windows tonight.",
+        "[whispers] Someone's running behind you, isn't there.",
+        "[whispers] Was this street always this long?",
+        "[whispers] Don't check the time. You won't like it."
+      ]
+    },
+    "heartbeat_rising": {
+      "ko": [
+        "[rushed] 심장 소리 들리지? 걔도 듣고 있어.",
+        "[nervous] 박동 점점 빨라져. 괜찮아, 정상이야.",
+        "[rushed] 심박 급해졌다. 숨으로 내려봐.",
+        "[whispers] 심장 박동이 발소리랑 엇박자네.",
+        "[nervous] 너무 빨리 뛰면 그놈 신호 돼.",
+        "[rushed] 가슴 두근두근. 한 번만 누그러뜨려.",
+        "[whispers] 심박도 소리 내고 있어. 들려.",
+        "[nervous] 감정 탓이야. 진정해.",
+        "[rushed] 심장만 먼저 튀어나가네. 진정해.",
+        "[whispers] 그놈 심장은 조용해. 너만 시끄럽다."
+      ],
+      "en": [
+        "[rushed] Hear your heart? He hears it too.",
+        "[nervous] Heart's racing. That's normal.",
+        "[rushed] Heart rate spiked. Bring it down with breath.",
+        "[whispers] Your heartbeat's off-rhythm with your steps.",
+        "[nervous] Too loud and he'll find you.",
+        "[rushed] Chest pounding. Ease it once.",
+        "[whispers] Your heart's making noise. Audible.",
+        "[nervous] Just adrenaline. Calm.",
+        "[rushed] Heart's trying to run first. Match it.",
+        "[whispers] His heart is quiet. Only yours is loud."
+      ]
+    }
+  }
+}
