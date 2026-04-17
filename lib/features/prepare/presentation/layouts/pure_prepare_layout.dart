@@ -127,14 +127,21 @@ class PurePrepareLayout extends StatelessWidget {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Text(
-                    '←  back',
-                    style: GoogleFonts.playfairDisplay(
-                      fontStyle: FontStyle.italic,
-                      fontSize: 13,
-                      color: _inkDim,
-                      letterSpacing: 1.5,
-                      fontWeight: FontWeight.w400,
-                    ),
+                    S.isKo ? '←  뒤로' : '←  back',
+                    style: S.isKo
+                        ? GoogleFonts.notoSerif(
+                            fontSize: 13,
+                            color: _inkDim,
+                            letterSpacing: 1.5,
+                            fontWeight: FontWeight.w400,
+                          )
+                        : GoogleFonts.playfairDisplay(
+                            fontStyle: FontStyle.italic,
+                            fontSize: 13,
+                            color: _inkDim,
+                            letterSpacing: 1.5,
+                            fontWeight: FontWeight.w400,
+                          ),
                   ),
                 ],
               ),
@@ -142,14 +149,21 @@ class PurePrepareLayout extends StatelessWidget {
           ),
           const Spacer(),
           Text(
-            'BRIEFING',
-            style: GoogleFonts.playfairDisplay(
-              fontStyle: FontStyle.italic,
-              fontSize: 11,
-              color: _redSub,
-              letterSpacing: 4,
-              fontWeight: FontWeight.w400,
-            ),
+            S.isKo ? '브 리 핑' : 'BRIEFING',
+            style: S.isKo
+                ? GoogleFonts.notoSerif(
+                    fontSize: 11,
+                    color: _redSub,
+                    letterSpacing: 4,
+                    fontWeight: FontWeight.w500,
+                  )
+                : GoogleFonts.playfairDisplay(
+                    fontStyle: FontStyle.italic,
+                    fontSize: 11,
+                    color: _redSub,
+                    letterSpacing: 4,
+                    fontWeight: FontWeight.w400,
+                  ),
           ),
         ],
       ),
@@ -174,11 +188,11 @@ class PurePrepareLayout extends StatelessWidget {
             _quoteLine(),
             const SizedBox(height: 22),
           ],
-          _articleRow('Subject', _subjectValue()),
+          _articleRow(S.isKo ? '주인공' : 'Subject', _subjectValue()),
           _articleDivider(),
-          _articleRow('Equipment', _equipmentValue()),
+          _articleRow(S.isKo ? '장비' : 'Equipment', _equipmentValue()),
           _articleDivider(),
-          _articleRow('Distance', _distanceValue()),
+          _articleRow(S.isKo ? '거리' : 'Distance', _distanceValue()),
           const SizedBox(height: 26),
           if (isChallenge) ...[
             _shadowSpeedSection(),
@@ -210,47 +224,95 @@ class PurePrepareLayout extends StatelessWidget {
 
   Widget _buildTitleBlock() {
     final chapterNum = _chapterNumber();
+    final isKo = S.isKo;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          '— Pre-game —',
-          style: GoogleFonts.playfairDisplay(
-            fontStyle: FontStyle.italic,
-            fontSize: 11,
-            color: _redSub,
-            letterSpacing: 3.5,
-            fontWeight: FontWeight.w400,
-          ),
+          isKo ? '— 출 발 전 —' : '— Pre-game —',
+          style: isKo
+              ? GoogleFonts.notoSerif(
+                  fontSize: 11,
+                  color: _redSub,
+                  letterSpacing: 3.5,
+                  fontWeight: FontWeight.w500,
+                )
+              : GoogleFonts.playfairDisplay(
+                  fontStyle: FontStyle.italic,
+                  fontSize: 11,
+                  color: _redSub,
+                  letterSpacing: 3.5,
+                  fontWeight: FontWeight.w400,
+                ),
         ),
         const SizedBox(height: 14),
-        RichText(
-          text: TextSpan(
+        if (isKo)
+          RichText(
+            text: TextSpan(
+              style: GoogleFonts.notoSerifKr(
+                fontSize: 34,
+                color: _ink,
+                height: 1.15,
+                fontWeight: FontWeight.w500,
+                letterSpacing: -0.5,
+              ),
+              children: [
+                const TextSpan(text: '제 '),
+                TextSpan(
+                  text: chapterNum,
+                  style: GoogleFonts.notoSerifKr(
+                    fontSize: 34,
+                    color: _redSub,
+                    height: 1.15,
+                    fontWeight: FontWeight.w900,
+                    letterSpacing: -0.5,
+                  ),
+                ),
+                const TextSpan(text: '밤의\n준비.'),
+              ],
+            ),
+          )
+        else
+          RichText(
+            text: TextSpan(
+              style: GoogleFonts.playfairDisplay(
+                fontStyle: FontStyle.italic,
+                fontSize: 36,
+                color: _ink,
+                height: 1.1,
+                fontWeight: FontWeight.w400,
+                letterSpacing: -0.5,
+              ),
+              children: [
+                const TextSpan(text: 'Preparing\n'),
+                TextSpan(
+                  text: 'Chapter $chapterNum',
+                  style: GoogleFonts.playfairDisplay(
+                    fontStyle: FontStyle.italic,
+                    fontSize: 36,
+                    color: _redSub,
+                    height: 1.1,
+                    fontWeight: FontWeight.w900,
+                    letterSpacing: -0.5,
+                  ),
+                ),
+                const TextSpan(text: '.'),
+              ],
+            ),
+          ),
+        if (isKo) ...[
+          const SizedBox(height: 6),
+          Text(
+            'Chapter $chapterNum',
             style: GoogleFonts.playfairDisplay(
               fontStyle: FontStyle.italic,
-              fontSize: 36,
-              color: _ink,
-              height: 1.1,
+              fontSize: 12,
+              color: _inkFade,
+              letterSpacing: 3,
               fontWeight: FontWeight.w400,
-              letterSpacing: -0.5,
             ),
-            children: [
-              const TextSpan(text: 'Preparing\n'),
-              TextSpan(
-                text: 'Chapter $chapterNum',
-                style: GoogleFonts.playfairDisplay(
-                  fontStyle: FontStyle.italic,
-                  fontSize: 36,
-                  color: _redSub,
-                  height: 1.1,
-                  fontWeight: FontWeight.w900,
-                  letterSpacing: -0.5,
-                ),
-              ),
-              const TextSpan(text: '.'),
-            ],
           ),
-        ),
+        ],
         const SizedBox(height: 14),
         Container(
           height: 1,
@@ -289,14 +351,23 @@ class PurePrepareLayout extends StatelessWidget {
         const SizedBox(width: 10),
         Expanded(
           child: Text(
-            ok ? 'GPS connected · signal locked' : 'searching for signal…',
-            style: GoogleFonts.playfairDisplay(
-              fontStyle: FontStyle.italic,
-              fontSize: 12,
-              color: _inkDim,
-              letterSpacing: 1,
-              fontWeight: FontWeight.w400,
-            ),
+            S.isKo
+                ? (ok ? 'GPS 연결 · 신호 확보' : '신호 탐색 중…')
+                : (ok ? 'GPS connected · signal locked' : 'searching for signal…'),
+            style: S.isKo
+                ? GoogleFonts.notoSerif(
+                    fontSize: 12,
+                    color: _inkDim,
+                    letterSpacing: 1,
+                    fontWeight: FontWeight.w400,
+                  )
+                : GoogleFonts.playfairDisplay(
+                    fontStyle: FontStyle.italic,
+                    fontSize: 12,
+                    color: _inkDim,
+                    letterSpacing: 1,
+                    fontWeight: FontWeight.w400,
+                  ),
           ),
         ),
       ],
@@ -322,14 +393,23 @@ class PurePrepareLayout extends StatelessWidget {
           const SizedBox(width: 10),
           Expanded(
             child: Text(
-              'more than 200m from the starting point.',
-              style: GoogleFonts.playfairDisplay(
-                fontStyle: FontStyle.italic,
-                fontSize: 11.5,
-                color: _redSub,
-                letterSpacing: 0.5,
-                fontWeight: FontWeight.w400,
-              ),
+              S.isKo
+                  ? '출발점에서 200m 이상 떨어져 있어요.'
+                  : 'more than 200m from the starting point.',
+              style: S.isKo
+                  ? GoogleFonts.notoSerif(
+                      fontSize: 11.5,
+                      color: _redSub,
+                      letterSpacing: 0.5,
+                      fontWeight: FontWeight.w400,
+                    )
+                  : GoogleFonts.playfairDisplay(
+                      fontStyle: FontStyle.italic,
+                      fontSize: 11.5,
+                      color: _redSub,
+                      letterSpacing: 0.5,
+                      fontWeight: FontWeight.w400,
+                    ),
             ),
           ),
         ],
@@ -352,6 +432,7 @@ class PurePrepareLayout extends StatelessWidget {
   }
 
   Widget _articleRow(String label, String value) {
+    final isKo = S.isKo;
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 10),
       child: Row(
@@ -361,26 +442,41 @@ class PurePrepareLayout extends StatelessWidget {
             width: 100,
             child: Text(
               label,
-              style: GoogleFonts.notoSerif(
-                fontStyle: FontStyle.italic,
-                fontSize: 11,
-                color: _inkFade,
-                letterSpacing: 2.5,
-                fontWeight: FontWeight.w300,
-              ),
+              style: isKo
+                  ? GoogleFonts.notoSerifKr(
+                      fontSize: 11,
+                      color: _inkFade,
+                      letterSpacing: 2.5,
+                      fontWeight: FontWeight.w400,
+                    )
+                  : GoogleFonts.notoSerif(
+                      fontStyle: FontStyle.italic,
+                      fontSize: 11,
+                      color: _inkFade,
+                      letterSpacing: 2.5,
+                      fontWeight: FontWeight.w300,
+                    ),
             ),
           ),
           Expanded(
             child: Text(
               value,
               textAlign: TextAlign.right,
-              style: GoogleFonts.playfairDisplay(
-                fontSize: 17,
-                color: _ink,
-                letterSpacing: 0.1,
-                fontWeight: FontWeight.w400,
-                height: 1.2,
-              ),
+              style: isKo
+                  ? GoogleFonts.notoSerifKr(
+                      fontSize: 17,
+                      color: _ink,
+                      letterSpacing: 0.1,
+                      fontWeight: FontWeight.w500,
+                      height: 1.2,
+                    )
+                  : GoogleFonts.playfairDisplay(
+                      fontSize: 17,
+                      color: _ink,
+                      letterSpacing: 0.1,
+                      fontWeight: FontWeight.w400,
+                      height: 1.2,
+                    ),
             ),
           ),
         ],
@@ -393,27 +489,32 @@ class PurePrepareLayout extends StatelessWidget {
   }
 
   String _subjectValue() {
+    final isKo = S.isKo;
     if (isChallenge) {
-      return 'The Doppelgänger';
+      return isKo ? '도플갱어' : 'The Doppelgänger';
     }
-    return selectedMode == 'marathon' ? 'Legendary Marathoners' : 'The Free Runner';
+    if (selectedMode == 'marathon') {
+      return isKo ? '전설의 마라토너' : 'Legendary Marathoners';
+    }
+    return isKo ? '자유 러너' : 'The Free Runner';
   }
 
   String _equipmentValue() {
-    if (shoes.isEmpty) return 'Bare feet';
-    if (selectedShoeId == null) return 'Not chosen';
+    final isKo = S.isKo;
+    if (shoes.isEmpty) return isKo ? '맨발' : 'Bare feet';
+    if (selectedShoeId == null) return isKo ? '미정' : 'Not chosen';
     final match = shoes.firstWhere(
       (s) => (s['id'] as int?) == selectedShoeId,
       orElse: () => shoes.first,
     );
-    return (match['name'] as String?) ?? 'Running shoes';
+    return (match['name'] as String?) ?? (isKo ? '러닝화' : 'Running shoes');
   }
 
   String _distanceValue() {
     if (isChallenge && shadowRun != null) {
       return shadowRun!.formattedDistance;
     }
-    return 'Free · open';
+    return S.isKo ? '자유 · 열림' : 'Free · open';
   }
 
   /// 챌린지 — 그림자의 속도 (slow 6:30 / mid 5:30 / fast 4:30)
@@ -427,18 +528,31 @@ class PurePrepareLayout extends StatelessWidget {
     } else {
       current = 'mid';
     }
+    final isKo = S.isKo;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        _sectionHeader('Doppelgänger Pace', 'auto'),
+        _sectionHeader(
+          isKo ? '도플갱어 속도' : 'Doppelgänger Pace',
+          isKo ? '자동' : 'auto',
+        ),
         const SizedBox(height: 12),
         Row(
           children: [
-            Expanded(child: _speedOption('slow', 'slow', '6:30', current)),
+            Expanded(
+              child: _speedOption(
+                  'slow', isKo ? '느림' : 'slow', '6:30', current),
+            ),
             const SizedBox(width: 8),
-            Expanded(child: _speedOption('mid', 'medium', '5:30', current)),
+            Expanded(
+              child: _speedOption(
+                  'mid', isKo ? '보통' : 'medium', '5:30', current),
+            ),
             const SizedBox(width: 8),
-            Expanded(child: _speedOption('fast', 'fast', '4:30', current)),
+            Expanded(
+              child: _speedOption(
+                  'fast', isKo ? '빠름' : 'fast', '4:30', current),
+            ),
           ],
         ),
       ],
@@ -468,13 +582,20 @@ class PurePrepareLayout extends StatelessWidget {
             children: [
               Text(
                 label,
-                style: GoogleFonts.playfairDisplay(
-                  fontStyle: FontStyle.italic,
-                  fontSize: 12,
-                  color: on ? _redSub : _inkFade,
-                  letterSpacing: 1.5,
-                  fontWeight: FontWeight.w400,
-                ),
+                style: S.isKo
+                    ? GoogleFonts.notoSerifKr(
+                        fontSize: 12,
+                        color: on ? _redSub : _inkFade,
+                        letterSpacing: 1.5,
+                        fontWeight: FontWeight.w500,
+                      )
+                    : GoogleFonts.playfairDisplay(
+                        fontStyle: FontStyle.italic,
+                        fontSize: 12,
+                        color: on ? _redSub : _inkFade,
+                        letterSpacing: 1.5,
+                        fontWeight: FontWeight.w400,
+                      ),
               ),
               const SizedBox(height: 6),
               Text(
@@ -504,20 +625,33 @@ class PurePrepareLayout extends StatelessWidget {
   }
 
   Widget _locationSection() {
+    final isKo = S.isKo;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        _sectionHeader('Location', 'tap to change'),
+        _sectionHeader(
+          isKo ? '장소' : 'Location',
+          isKo ? '탭으로 변경' : 'tap to change',
+        ),
         const SizedBox(height: 12),
-        _locationOption('same', 'Same ground', 'follow the shadow\'s actual path'),
+        _locationOption(
+          'same',
+          isKo ? '같은 곳' : 'Same ground',
+          isKo ? '그림자의 실제 경로를 따른다' : 'follow the shadow\'s actual path',
+        ),
         const SizedBox(height: 8),
-        _locationOption('different', 'Different ground', 'only the voice follows you'),
+        _locationOption(
+          'different',
+          isKo ? '다른 곳' : 'Different ground',
+          isKo ? '목소리만 따라온다' : 'only the voice follows you',
+        ),
       ],
     );
   }
 
   Widget _locationOption(String key, String title, String desc) {
     final on = shadowLocationType == key;
+    final isKo = S.isKo;
     return GestureDetector(
       behavior: HitTestBehavior.opaque,
       onTap: () {
@@ -544,23 +678,37 @@ class PurePrepareLayout extends StatelessWidget {
                   children: [
                     Text(
                       title,
-                      style: GoogleFonts.playfairDisplay(
-                        fontSize: 15,
-                        color: on ? _ink : _inkDim,
-                        letterSpacing: 0.3,
-                        fontWeight: FontWeight.w400,
-                      ),
+                      style: isKo
+                          ? GoogleFonts.notoSerifKr(
+                              fontSize: 15,
+                              color: on ? _ink : _inkDim,
+                              letterSpacing: 0.3,
+                              fontWeight: FontWeight.w500,
+                            )
+                          : GoogleFonts.playfairDisplay(
+                              fontSize: 15,
+                              color: on ? _ink : _inkDim,
+                              letterSpacing: 0.3,
+                              fontWeight: FontWeight.w400,
+                            ),
                     ),
                     const SizedBox(height: 3),
                     Text(
                       desc,
-                      style: GoogleFonts.notoSerif(
-                        fontStyle: FontStyle.italic,
-                        fontSize: 10.5,
-                        color: _inkFade,
-                        letterSpacing: 0.4,
-                        fontWeight: FontWeight.w300,
-                      ),
+                      style: isKo
+                          ? GoogleFonts.notoSerifKr(
+                              fontSize: 10.5,
+                              color: _inkFade,
+                              letterSpacing: 0.4,
+                              fontWeight: FontWeight.w300,
+                            )
+                          : GoogleFonts.notoSerif(
+                              fontStyle: FontStyle.italic,
+                              fontSize: 10.5,
+                              color: _inkFade,
+                              letterSpacing: 0.4,
+                              fontWeight: FontWeight.w300,
+                            ),
                     ),
                   ],
                 ),
@@ -582,20 +730,33 @@ class PurePrepareLayout extends StatelessWidget {
   }
 
   Widget _modeSection() {
+    final isKo = S.isKo;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        _sectionHeader('Mode', 'tonight\'s run'),
+        _sectionHeader(
+          isKo ? '모드' : 'Mode',
+          isKo ? '오늘 밤의 러닝' : 'tonight\'s run',
+        ),
         const SizedBox(height: 12),
-        _modeOption('marathon', 'The Marathoners', 'world records chase you'),
+        _modeOption(
+          'marathon',
+          isKo ? '전설의 마라토너' : 'The Marathoners',
+          isKo ? '세계 기록이 당신을 쫓는다' : 'world records chase you',
+        ),
         const SizedBox(height: 8),
-        _modeOption('freerun', 'Free Run', 'no one follows. only you.'),
+        _modeOption(
+          'freerun',
+          isKo ? '자유 러닝' : 'Free Run',
+          isKo ? '아무도 따라오지 않는다. 오직 당신뿐.' : 'no one follows. only you.',
+        ),
       ],
     );
   }
 
   Widget _modeOption(String key, String title, String desc) {
     final on = selectedMode == key;
+    final isKo = S.isKo;
     return GestureDetector(
       behavior: HitTestBehavior.opaque,
       onTap: () {
@@ -622,23 +783,37 @@ class PurePrepareLayout extends StatelessWidget {
                   children: [
                     Text(
                       title,
-                      style: GoogleFonts.playfairDisplay(
-                        fontSize: 15,
-                        color: on ? _ink : _inkDim,
-                        letterSpacing: 0.3,
-                        fontWeight: FontWeight.w400,
-                      ),
+                      style: isKo
+                          ? GoogleFonts.notoSerifKr(
+                              fontSize: 15,
+                              color: on ? _ink : _inkDim,
+                              letterSpacing: 0.3,
+                              fontWeight: FontWeight.w500,
+                            )
+                          : GoogleFonts.playfairDisplay(
+                              fontSize: 15,
+                              color: on ? _ink : _inkDim,
+                              letterSpacing: 0.3,
+                              fontWeight: FontWeight.w400,
+                            ),
                     ),
                     const SizedBox(height: 3),
                     Text(
                       desc,
-                      style: GoogleFonts.notoSerif(
-                        fontStyle: FontStyle.italic,
-                        fontSize: 10.5,
-                        color: _inkFade,
-                        letterSpacing: 0.4,
-                        fontWeight: FontWeight.w300,
-                      ),
+                      style: isKo
+                          ? GoogleFonts.notoSerifKr(
+                              fontSize: 10.5,
+                              color: _inkFade,
+                              letterSpacing: 0.4,
+                              fontWeight: FontWeight.w300,
+                            )
+                          : GoogleFonts.notoSerif(
+                              fontStyle: FontStyle.italic,
+                              fontSize: 10.5,
+                              color: _inkFade,
+                              letterSpacing: 0.4,
+                              fontWeight: FontWeight.w300,
+                            ),
                     ),
                   ],
                 ),
@@ -665,7 +840,7 @@ class PurePrepareLayout extends StatelessWidget {
       children: [
         _sectionHeader(
           S.isKo ? '전설과 함께 뛰기' : 'Chase a legend',
-          'select',
+          S.isKo ? '선택' : 'select',
         ),
         const SizedBox(height: 12),
         SizedBox(
@@ -787,9 +962,9 @@ class PurePrepareLayout extends StatelessWidget {
 
   Widget _pacemakerSection() {
     final isKo = S.isKo;
-    final title = isKo ? '페이스 메이커' : 'Pacemaker';
+    final title = isKo ? '페이스메이커' : 'Pacemaker';
     final desc = isKo
-        ? '유령이 이 페이스로 뛰어요. 앞서/뒤처지면 알려줘요.'
+        ? '유령이 이 페이스로 뛰어요. 앞서거나 뒤처지면 알려줘요.'
         : 'A ghost paces with you and tells you when you drift.';
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -799,13 +974,20 @@ class PurePrepareLayout extends StatelessWidget {
           children: [
             Text(
               title,
-              style: GoogleFonts.notoSerif(
-                fontStyle: FontStyle.italic,
-                fontSize: 11,
-                color: _inkFade,
-                letterSpacing: 2.5,
-                fontWeight: FontWeight.w300,
-              ),
+              style: isKo
+                  ? GoogleFonts.notoSerifKr(
+                      fontSize: 11,
+                      color: _inkFade,
+                      letterSpacing: 2.5,
+                      fontWeight: FontWeight.w400,
+                    )
+                  : GoogleFonts.notoSerif(
+                      fontStyle: FontStyle.italic,
+                      fontSize: 11,
+                      color: _inkFade,
+                      letterSpacing: 2.5,
+                      fontWeight: FontWeight.w300,
+                    ),
             ),
             const Spacer(),
             GestureDetector(
@@ -839,14 +1021,22 @@ class PurePrepareLayout extends StatelessWidget {
         const SizedBox(height: 10),
         Text(
           desc,
-          style: GoogleFonts.notoSerif(
-            fontStyle: FontStyle.italic,
-            fontSize: 11,
-            color: _inkFade,
-            letterSpacing: 0.3,
-            fontWeight: FontWeight.w300,
-            height: 1.5,
-          ),
+          style: isKo
+              ? GoogleFonts.notoSerifKr(
+                  fontSize: 11,
+                  color: _inkFade,
+                  letterSpacing: 0.3,
+                  fontWeight: FontWeight.w300,
+                  height: 1.6,
+                )
+              : GoogleFonts.notoSerif(
+                  fontStyle: FontStyle.italic,
+                  fontSize: 11,
+                  color: _inkFade,
+                  letterSpacing: 0.3,
+                  fontWeight: FontWeight.w300,
+                  height: 1.5,
+                ),
         ),
         const SizedBox(height: 14),
         Opacity(
@@ -945,7 +1135,10 @@ class PurePrepareLayout extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        _sectionHeader('Footwear', 'swap'),
+        _sectionHeader(
+          S.isKo ? '러닝화' : 'Footwear',
+          S.isKo ? '교체' : 'swap',
+        ),
         const SizedBox(height: 12),
         SizedBox(
           height: 60,
@@ -994,23 +1187,39 @@ class PurePrepareLayout extends StatelessWidget {
                           children: [
                             Text(
                               name,
-                              style: GoogleFonts.playfairDisplay(
-                                fontSize: 13,
-                                color: on ? _ink : _inkDim,
-                                letterSpacing: 0.2,
-                                fontWeight: FontWeight.w400,
-                              ),
+                              style: S.isKo
+                                  ? GoogleFonts.notoSerifKr(
+                                      fontSize: 13,
+                                      color: on ? _ink : _inkDim,
+                                      letterSpacing: 0.2,
+                                      fontWeight: FontWeight.w500,
+                                    )
+                                  : GoogleFonts.playfairDisplay(
+                                      fontSize: 13,
+                                      color: on ? _ink : _inkDim,
+                                      letterSpacing: 0.2,
+                                      fontWeight: FontWeight.w400,
+                                    ),
                             ),
                             const SizedBox(height: 2),
                             Text(
-                              '$totalKm km walked together',
-                              style: GoogleFonts.notoSerif(
-                                fontStyle: FontStyle.italic,
-                                fontSize: 9.5,
-                                color: _inkFade,
-                                letterSpacing: 0.8,
-                                fontWeight: FontWeight.w300,
-                              ),
+                              S.isKo
+                                  ? '$totalKm km 함께 걸었어요'
+                                  : '$totalKm km walked together',
+                              style: S.isKo
+                                  ? GoogleFonts.notoSerifKr(
+                                      fontSize: 9.5,
+                                      color: _inkFade,
+                                      letterSpacing: 0.8,
+                                      fontWeight: FontWeight.w300,
+                                    )
+                                  : GoogleFonts.notoSerif(
+                                      fontStyle: FontStyle.italic,
+                                      fontSize: 9.5,
+                                      color: _inkFade,
+                                      letterSpacing: 0.8,
+                                      fontWeight: FontWeight.w300,
+                                    ),
                             ),
                           ],
                         ),
@@ -1033,7 +1242,10 @@ class PurePrepareLayout extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        _sectionHeader('Target Distance', 'edit'),
+        _sectionHeader(
+          S.isKo ? '목표 거리' : 'Target Distance',
+          S.isKo ? '수정' : 'edit',
+        ),
         const SizedBox(height: 12),
         SizedBox(
           height: 60,
@@ -1058,14 +1270,23 @@ class PurePrepareLayout extends StatelessWidget {
                 Container(width: 1, height: 16, color: _hair),
                 const SizedBox(width: 10),
                 Text(
-                  isChallenge ? 'set' : 'free',
-                  style: GoogleFonts.playfairDisplay(
-                    fontStyle: FontStyle.italic,
-                    fontSize: 12,
-                    color: _inkFade,
-                    letterSpacing: 1.5,
-                    fontWeight: FontWeight.w400,
-                  ),
+                  S.isKo
+                      ? (isChallenge ? '고정' : '자유')
+                      : (isChallenge ? 'set' : 'free'),
+                  style: S.isKo
+                      ? GoogleFonts.notoSerifKr(
+                          fontSize: 12,
+                          color: _inkFade,
+                          letterSpacing: 1.5,
+                          fontWeight: FontWeight.w400,
+                        )
+                      : GoogleFonts.playfairDisplay(
+                          fontStyle: FontStyle.italic,
+                          fontSize: 12,
+                          color: _inkFade,
+                          letterSpacing: 1.5,
+                          fontWeight: FontWeight.w400,
+                        ),
                 ),
                 const Spacer(),
                 Text(
@@ -1085,29 +1306,44 @@ class PurePrepareLayout extends StatelessWidget {
   }
 
   Widget _sectionHeader(String title, String action) {
+    final isKo = S.isKo;
     return Row(
       crossAxisAlignment: CrossAxisAlignment.end,
       children: [
         Text(
           title,
-          style: GoogleFonts.notoSerif(
-            fontStyle: FontStyle.italic,
-            fontSize: 11,
-            color: _inkFade,
-            letterSpacing: 2.5,
-            fontWeight: FontWeight.w300,
-          ),
+          style: isKo
+              ? GoogleFonts.notoSerifKr(
+                  fontSize: 11,
+                  color: _inkFade,
+                  letterSpacing: 2.5,
+                  fontWeight: FontWeight.w400,
+                )
+              : GoogleFonts.notoSerif(
+                  fontStyle: FontStyle.italic,
+                  fontSize: 11,
+                  color: _inkFade,
+                  letterSpacing: 2.5,
+                  fontWeight: FontWeight.w300,
+                ),
         ),
         const Spacer(),
         Text(
           action,
-          style: GoogleFonts.playfairDisplay(
-            fontStyle: FontStyle.italic,
-            fontSize: 10.5,
-            color: _redSub,
-            letterSpacing: 2,
-            fontWeight: FontWeight.w400,
-          ),
+          style: isKo
+              ? GoogleFonts.notoSerifKr(
+                  fontSize: 10.5,
+                  color: _redSub,
+                  letterSpacing: 2,
+                  fontWeight: FontWeight.w400,
+                )
+              : GoogleFonts.playfairDisplay(
+                  fontStyle: FontStyle.italic,
+                  fontSize: 10.5,
+                  color: _redSub,
+                  letterSpacing: 2,
+                  fontWeight: FontWeight.w400,
+                ),
         ),
       ],
     );
@@ -1165,28 +1401,45 @@ class PurePrepareLayout extends StatelessWidget {
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       Text(
-                        'Tonight\'s Chase',
-                        style: GoogleFonts.playfairDisplay(
-                          fontStyle: FontStyle.italic,
-                          fontSize: 11,
-                          color: active ? _redSub : _inkFade,
-                          letterSpacing: 3.5,
-                          fontWeight: FontWeight.w400,
-                        ),
+                        S.isKo ? '오늘 밤의 추격' : 'Tonight\'s Chase',
+                        style: S.isKo
+                            ? GoogleFonts.notoSerifKr(
+                                fontSize: 11,
+                                color: active ? _redSub : _inkFade,
+                                letterSpacing: 3.5,
+                                fontWeight: FontWeight.w500,
+                              )
+                            : GoogleFonts.playfairDisplay(
+                                fontStyle: FontStyle.italic,
+                                fontSize: 11,
+                                color: active ? _redSub : _inkFade,
+                                letterSpacing: 3.5,
+                                fontWeight: FontWeight.w400,
+                              ),
                       ),
                       const SizedBox(height: 8),
                       Text(
-                        'Begin.',
-                        style: GoogleFonts.playfairDisplay(
-                          fontStyle: FontStyle.italic,
-                          fontSize: 34,
-                          color: active
-                              ? _red
-                              : _red.withValues(alpha: 0.45),
-                          letterSpacing: 0.5,
-                          fontWeight: FontWeight.w900,
-                          height: 1.05,
-                        ),
+                        S.isKo ? '시작.' : 'Begin.',
+                        style: S.isKo
+                            ? GoogleFonts.notoSerifKr(
+                                fontSize: 34,
+                                color: active
+                                    ? _red
+                                    : _red.withValues(alpha: 0.45),
+                                letterSpacing: 0.5,
+                                fontWeight: FontWeight.w900,
+                                height: 1.05,
+                              )
+                            : GoogleFonts.playfairDisplay(
+                                fontStyle: FontStyle.italic,
+                                fontSize: 34,
+                                color: active
+                                    ? _red
+                                    : _red.withValues(alpha: 0.45),
+                                letterSpacing: 0.5,
+                                fontWeight: FontWeight.w900,
+                                height: 1.05,
+                              ),
                       ),
                     ],
                   ),
@@ -1200,7 +1453,8 @@ class PurePrepareLayout extends StatelessWidget {
   }
 
   Widget _buildCountdownOverlay() {
-    final label = countdownValue > 0 ? '$countdownValue' : 'run';
+    final label =
+        countdownValue > 0 ? '$countdownValue' : (S.isKo ? '달려' : 'run');
     return Container(
       color: _bg.withValues(alpha: 0.97),
       child: Center(
@@ -1223,14 +1477,23 @@ class PurePrepareLayout extends StatelessWidget {
             ),
             const SizedBox(height: 16),
             Text(
-              countdownValue > 0 ? '— ready —' : '— now —',
-              style: GoogleFonts.playfairDisplay(
-                fontStyle: FontStyle.italic,
-                fontSize: 13,
-                color: _redSub,
-                letterSpacing: 6,
-                fontWeight: FontWeight.w400,
-              ),
+              S.isKo
+                  ? (countdownValue > 0 ? '— 준비 —' : '— 지금 —')
+                  : (countdownValue > 0 ? '— ready —' : '— now —'),
+              style: S.isKo
+                  ? GoogleFonts.notoSerifKr(
+                      fontSize: 13,
+                      color: _redSub,
+                      letterSpacing: 6,
+                      fontWeight: FontWeight.w500,
+                    )
+                  : GoogleFonts.playfairDisplay(
+                      fontStyle: FontStyle.italic,
+                      fontSize: 13,
+                      color: _redSub,
+                      letterSpacing: 6,
+                      fontWeight: FontWeight.w400,
+                    ),
             ),
           ],
         ),
