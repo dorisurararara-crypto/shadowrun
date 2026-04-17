@@ -29,31 +29,37 @@
 
 ## 최신
 
-### 2026-04-18 자정 (Windows → Mac) — 🔧 TTS 전면 재작성 진행 중 · 완료 후 빌드 14 요청
+### 2026-04-18 새벽 (Windows → Mac) — ✅ TTS 전면 재작성 완료 · 빌드 14 외부 배포 요청
 
-**배경:**
-- 기존 assets/audio/tts_*.mp3 약 1705개에서 영/한 혼용 발음 버그("피프틴미터" = 15 meters 영어 발음이 한국어 문장 섞임) 등 품질 문제
-- ElevenLabs Pro 토큰 여유 있어서 이 밤 사이 **전면 재작성**
-- 관련 커밋: `e0b9b9a` (코드 + 대본 + generate 스크립트)
+**완료 요약:**
+- 9개 모드별 대본 JSON 완성 (도플갱어/마라톤/프리런 공용 + Pure/Mystic 전용 각 3모드)
+- ElevenLabs eleven_v3 로 **mp3 4166개 / 256MB** 생성 (35분 소요, ThreadPool=2)
+- 실패 82개 (Pro 토큰 500k 소진 후 막판 pure_marathon 일부 카테고리만 누락 — fallback 로 자동 대응됨)
+- Mystic 테마 새 보이스 `halmeoni` (할머니 · 낮은 속삭임) 적용
+- 영/한 혼용 발음 버그 해결 — `language_code` 명시 + `apply_text_normalization=off` + 한글 수사 수동 검수
 
-**현재 상태 (commit `e0b9b9a` 기준):**
-- ✅ 9개 모드 대본 JSON 작성 (도플 공용 600 + 마라톤 350 + 프리런 240 + Pure 354 + Mystic 324 대사)
-- ✅ `tmp/voice_scripts_v2/generate_v3.py` — eleven_v3 + audio tags + language_code + apply_text_normalization=off
-- ✅ 기존 mp3 백업 완료 (tmp/tts_backup/, .gitignore 로 repo 제외)
-- ✅ `tts_line_bank.dart`: koreanMystic 기본 보이스 → `halmeoni` (신 voice ID `UOxKeHS7lixzgw35mtAR`, 할머니·낮은 속삭임)
-- ✅ `horror_service.dart`: TtsLineBank 우선 재생 + 구 시스템 fallback, 테마 전용 20% 혼합
-- ⏳ **TTS mp3 생성 중** (백그라운드, concurrent 2, 4248회 / 약 15만 자, eleven_v3)
-- ⏳ 완료 후 Windows 가 mp3 커밋 + 이 HANDOFF 재갱신 예정
+**관련 커밋:**
+- `e0b9b9a` feat(tts): 신 TtsLineBank 시스템 + 9개 모드 대본 4248개 작성
+- `3e9a4ff` chore: handoff TTS 전면 재작성 진행 중
+- `38a968e` feat(tts): ElevenLabs v3 mp3 4166개 생성 완료 · 256MB
 
-**🚨 Mac 에게 요청:**
-1. **지금은 대기** — TTS mp3 생성이 완료돼야 신 시스템이 실제 앱에서 작동 (현재 fallback 로 구 mp3 사용 중)
-2. 다음 Windows 업데이트 ("TTS 완료, 빌드 14 올려줘") 오면:
-   - `./scripts/deploy_testflight.sh` (pubspec bump, 빌드, validate, upload)
-   - `./scripts/asc/submit_external_beta.rb` (외부 그룹 `ganzitester` 배포)
-   - 결과 HANDOFF 에 기록
-3. 참고: **지금 커밋 `e0b9b9a` 만으로도 빌드는 안 깨짐** (fallback 덕). 긴급하면 바로 배포 가능하지만 새 보이스 시스템 반영 안 됨.
+**🚨 Mac 에게 요청: 빌드 14 → 외부 테스트 배포**
 
-**진행률 (작업 시작 기준):** 약 14% (598/4248). 약 1.5시간 후 완료 예상.
+사용자가 자러 가기 전 "외부 테스트 배포 요청" 지시했음. 다음 순서대로 자동 처리 부탁:
+
+```bash
+./scripts/deploy_testflight.sh        # pubspec 1.0.0+13 → +14 bump, ipa build, validate, upload
+./scripts/asc/check_build_status.rb   # VALID 대기 (5~20분)
+./scripts/asc/submit_external_beta.rb # 외부 그룹 ganzitester 할당 + Beta Review 제출
+```
+
+빌드 완료되면 이 HANDOFF 에 결과 (빌드 번호, Delivery UUID, ASC 상태) 기록.
+
+**참고:**
+- 외부 그룹 `ganzitester` 는 이미 Beta Review 통과 상태 → 재심사 없이 즉시~몇 시간 내 테스터 배포 예상
+- pubspec 현재 `1.0.0+13` (빌드 13). deploy_testflight.sh 가 자동으로 +14 로 올려줌
+- assets/audio/voice/ 에 신규 mp3 4166개 추가됨 (IPA 크기 증가, 약 +120MB 추정) — upload 시간 약간 늘 수 있음
+- Horror_service fallback 로직은 그대로 유지 — 혹시 신 mp3 로드 실패하는 카테고리 있어도 앱 안 깨짐
 
 ---
 
