@@ -29,6 +29,42 @@
 
 ## 최신
 
+### 2026-04-17 19:20 (Windows → Mac) — 테마 시스템 도입 · 스토어 상품 등록 필요
+
+**Windows에서 완료된 작업 (이번 커밋):**
+- 5개 테마 확장 가능한 인프라 구축 (`core/theme/` 아래 `theme_id.dart`, `app_theme_set.dart`, `themes/theme_definitions.dart`, `theme_manager.dart`)
+- T1 Pure Cinematic(무료 기본) + T3 Korean Mystic(유료) 1차 구현. T2/T4/T5는 `comingSoon: true`로 플레이스홀더.
+- 테마 선택 화면 (`features/settings/presentation/pages/theme_picker_screen.dart`) 신규
+- 설정 화면에 "테마" 섹션 진입점 추가
+- `PurchaseService`에 테마 개별 구매 / 복원 / PRO 우선 로직 추가 (`buyTheme`, `canUseTheme`, `purchasedThemes`)
+- 홈 화면 헤더 로고 · 배경 한자 워터마크 테마 반영 (T3 선택 시 '쉐도우런' + 影 워터마크)
+- `main.dart`에서 `ThemeManager.loadSaved()` 호출 + MaterialApp이 테마 변경 시 rebuild
+- 기존 관리자 모드(공포 헤더 5번 탭 → `ganzinam95`) 그대로 재사용 — PRO 활성화 = 모든 테마 자동 해제
+- `flutter analyze` No issues. Android 디버그 빌드 성공 확인
+
+**디자인 참고:** `designs/full-t1-pure.html`, `designs/full-t3-mystic.html`, `designs/index-full.html` (T2/T4/T5 풀 목업도 보존됨 — 2차 추가 구현 시 레퍼런스)
+
+---
+
+### ⚠️ Mac에서 꼭 해야 할 작업 (스토어 상품 등록)
+
+**Google Play Console (Android):**
+1. **기존 상품 `shadowrun_pro` 가격 인상** → **₩13,900** (기존 가격에서 변경)
+2. **신규 상품 등록:**
+   - `shadowrun_theme_mystic` · 일회성 결제 · ₩5,500 · "Korean Mystic 테마" (1차 구현됨 — 실제 구매 가능)
+   - `shadowrun_theme_noir` · 일회성 결제 · ₩5,500 · "Film Noir 테마" (2차 예정 — 미리 등록만)
+   - `shadowrun_theme_editorial` · 일회성 결제 · ₩5,500 · "Editorial Thriller 테마" (2차 예정)
+   - `shadowrun_theme_cyber` · 일회성 결제 · ₩5,500 · "Neo-Noir Cyber 테마" (2차 예정)
+
+**App Store Connect (iOS):** 위와 동일 4개 상품 추가 + PRO 가격 인상.
+
+**그 외:**
+- iOS 빌드 테스트 (`flutter build ios --release`)
+- TestFlight 업로드 여부 결정 (가격 정책 바뀌면 업데이트 릴리즈 필요)
+- 변경 후 **이 블록을 "## 이력"으로 옮기고** 완료 보고 추가
+
+---
+
 ### 2026-04-17 03:10 (Windows → Mac) — 라이프사이클 대대적 리팩토링 (bbe3487)
 
 Codex adversarial 리뷰 **12회차**를 CLEAN으로 통과시킨 running_screen.dart 및 관련 서비스 버그픽스 337+/143- 푸시.

@@ -1,0 +1,1203 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Shadow Run — Cinematic 5 Variants</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,700;1,400;1,700&family=Gowun+Batang:wght@400;700&family=Nanum+Myeongjo:wght@400;700;800&family=Noto+Serif+KR:wght@200;400;500;700;900&family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=Space+Grotesk:wght@400;500;700;900&family=Inter:wght@100;200;300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;700&family=Oswald:wght@200;400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css" />
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: #0a0a0a;
+    color: #eaeaea;
+    font-family: 'Pretendard', sans-serif;
+    min-height: 100vh;
+    padding: 40px 20px 80px;
+  }
+  .page-header {
+    max-width: 1400px;
+    margin: 0 auto 40px;
+    text-align: center;
+  }
+  .page-header h1 {
+    font-family: 'Playfair Display', serif;
+    font-weight: 900;
+    font-size: 44px;
+    letter-spacing: -0.02em;
+  }
+  .page-header h1 em { font-style: italic; color: #ff6b7e; font-weight: 400; }
+  .page-header p {
+    color: #8a8a91;
+    font-size: 14px;
+    line-height: 1.6;
+    max-width: 760px;
+    margin: 10px auto 0;
+  }
+
+  .grid {
+    max-width: 1800px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
+    gap: 32px 24px;
+    justify-items: center;
+  }
+
+  .card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+    max-width: 360px;
+  }
+
+  .phone {
+    width: 320px; height: 700px;
+    border-radius: 44px;
+    overflow: hidden;
+    position: relative;
+    box-shadow: 0 24px 60px rgba(0,0,0,0.8), 0 0 0 8px #1a1a1a, 0 0 0 9px #2c2c30;
+  }
+  .notch {
+    position: absolute;
+    top: 12px; left: 50%; transform: translateX(-50%);
+    width: 110px; height: 28px;
+    background: #000;
+    border-radius: 20px;
+    z-index: 100;
+  }
+  .screen {
+    width: 100%; height: 100%;
+    position: relative;
+    overflow: hidden;
+  }
+  .statusbar {
+    position: absolute; top: 0; left: 0; right: 0;
+    padding: 14px 24px 0;
+    display: flex;
+    justify-content: space-between;
+    font-family: 'Inter', sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    z-index: 80;
+    letter-spacing: -0.02em;
+  }
+
+  .card-label {
+    text-align: center;
+    max-width: 320px;
+  }
+  .card-num {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    color: #888;
+    font-size: 12px;
+    letter-spacing: 0.25em;
+    margin-bottom: 4px;
+  }
+  .card-title { font-size: 18px; font-weight: 700; margin-bottom: 6px; letter-spacing: -0.01em; }
+  .card-desc { color: #888; font-size: 13px; line-height: 1.55; }
+
+  /* ==================== V1: PURE CINEMATIC ==================== */
+  .v1 {
+    background: #000;
+    color: #f5f5f5;
+    font-family: 'Noto Serif KR', serif;
+    padding: 50px 0 0;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+  }
+  .v1 .statusbar { color: #f5f5f5; }
+  .v1-body { padding: 24px 32px; flex: 1; display: flex; flex-direction: column; }
+  .v1-eyebrow {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-size: 11px;
+    color: #6a0000;
+    letter-spacing: 0.4em;
+    text-align: center;
+    margin-bottom: 6px;
+    text-transform: uppercase;
+  }
+  .v1-logo {
+    font-family: 'Playfair Display', serif;
+    font-size: 38px;
+    font-weight: 900;
+    text-align: center;
+    letter-spacing: -0.03em;
+    line-height: 1;
+    margin-bottom: 6px;
+  }
+  .v1-sub {
+    font-family: 'Noto Serif KR', serif;
+    font-weight: 200;
+    font-size: 11px;
+    color: #555;
+    text-align: center;
+    letter-spacing: 0.5em;
+    margin-bottom: 40px;
+    text-transform: uppercase;
+  }
+  .v1-quote {
+    font-family: 'Noto Serif KR', serif;
+    font-weight: 400;
+    font-size: 16px;
+    text-align: center;
+    color: #c8c8c8;
+    line-height: 1.7;
+    margin-bottom: 16px;
+    letter-spacing: -0.01em;
+  }
+  .v1-quote em {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    color: #8B0000;
+    font-weight: 700;
+  }
+  .v1-by {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-size: 10px;
+    color: #444;
+    text-align: center;
+    letter-spacing: 0.3em;
+    margin-bottom: 28px;
+  }
+  .v1-div {
+    width: 40px; height: 1px;
+    background: #2a0000;
+    margin: 20px auto;
+  }
+  .v1-stats {
+    display: flex;
+    justify-content: space-around;
+    padding: 14px 0;
+    border-top: 1px solid #1a1a1a;
+    border-bottom: 1px solid #1a1a1a;
+    margin-bottom: 28px;
+  }
+  .v1-stat { text-align: center; }
+  .v1-stat .v {
+    font-family: 'Playfair Display', serif;
+    font-size: 22px;
+    font-weight: 400;
+  }
+  .v1-stat .k {
+    font-family: 'Noto Serif KR', serif;
+    font-weight: 300;
+    font-size: 10px;
+    color: #555;
+    letter-spacing: 0.2em;
+    margin-top: 3px;
+  }
+  .v1-start {
+    border: 1px solid #8B0000;
+    padding: 22px 18px;
+    text-align: center;
+    margin-bottom: 24px;
+  }
+  .v1-start-ttl {
+    font-family: 'Noto Serif KR', serif;
+    font-weight: 700;
+    font-size: 18px;
+    color: #f5f5f5;
+    letter-spacing: -0.01em;
+  }
+  .v1-start-sub {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-size: 11px;
+    color: #8B0000;
+    letter-spacing: 0.3em;
+    margin-top: 6px;
+    text-transform: uppercase;
+  }
+  .v1-rows { margin-top: auto; }
+  .v1-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px 0;
+    border-bottom: 1px solid #1a1a1a;
+    font-family: 'Noto Serif KR', serif;
+    font-size: 13px;
+  }
+  .v1-row-l { color: #888; }
+  .v1-row-v { color: #f5f5f5; font-weight: 400; }
+  .v1-row-v em {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    color: #8B0000;
+    font-size: 11px;
+    letter-spacing: 0.15em;
+    margin-left: 6px;
+  }
+
+  /* ==================== V2: FILM NOIR ==================== */
+  .v2 {
+    background:
+      radial-gradient(ellipse at 30% 20%, rgba(184,150,96,0.04), transparent 50%),
+      #0D0907;
+    color: #E8DCC4;
+    font-family: 'Cormorant Garamond', serif;
+    padding: 50px 0 0;
+    height: 100%;
+    overflow-y: auto;
+  }
+  .v2::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/><feColorMatrix values='0 0 0 0 0.7 0 0 0 0 0.6 0 0 0 0 0.4 0 0 0 0.06 0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
+    pointer-events: none;
+    mix-blend-mode: overlay;
+    opacity: 0.5;
+  }
+  .v2::-webkit-scrollbar{display:none;}
+  .v2 .statusbar { color: #E8DCC4; font-family: 'Inter', sans-serif; }
+  .v2-body { padding: 26px 30px; }
+  .v2-stamp {
+    border: 1px solid #B89660;
+    display: inline-block;
+    padding: 3px 10px;
+    font-family: 'Oswald', sans-serif;
+    font-size: 10px;
+    letter-spacing: 0.3em;
+    color: #B89660;
+    margin-bottom: 16px;
+    text-transform: uppercase;
+  }
+  .v2-logo {
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-size: 46px;
+    font-weight: 700;
+    line-height: 1;
+    letter-spacing: -0.03em;
+    color: #E8DCC4;
+    margin-bottom: 4px;
+  }
+  .v2-logo-sub {
+    font-family: 'Oswald', sans-serif;
+    font-weight: 400;
+    font-size: 11px;
+    letter-spacing: 0.5em;
+    color: #B89660;
+    margin-bottom: 24px;
+    text-transform: uppercase;
+  }
+  .v2-case {
+    border-top: 1px double #2a1d10;
+    border-bottom: 1px double #2a1d10;
+    padding: 14px 0;
+    margin-bottom: 20px;
+  }
+  .v2-case-k {
+    font-family: 'Oswald', sans-serif;
+    font-size: 10px;
+    color: #B89660;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+  }
+  .v2-case-v {
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-size: 18px;
+    color: #E8DCC4;
+    line-height: 1.4;
+  }
+  .v2-case-v strong {
+    color: #8B2635;
+    font-style: italic;
+    font-weight: 700;
+  }
+  .v2-stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 6px;
+    margin-bottom: 20px;
+  }
+  .v2-stat {
+    border: 1px solid #2a1d10;
+    padding: 10px 4px;
+    text-align: center;
+  }
+  .v2-stat .v {
+    font-family: 'Cormorant Garamond', serif;
+    font-weight: 500;
+    font-size: 22px;
+    color: #E8DCC4;
+    line-height: 1;
+  }
+  .v2-stat .k {
+    font-family: 'Oswald', sans-serif;
+    font-size: 9px;
+    color: #8a7d5f;
+    letter-spacing: 0.2em;
+    margin-top: 4px;
+    text-transform: uppercase;
+  }
+  .v2-start {
+    background: linear-gradient(180deg, #1a0f08 0%, #0D0907 100%);
+    border: 1px solid #B89660;
+    padding: 18px;
+    text-align: center;
+    margin-bottom: 20px;
+    position: relative;
+  }
+  .v2-start::before, .v2-start::after {
+    content: '';
+    position: absolute;
+    width: 20px; height: 20px;
+    border: 1px solid #B89660;
+  }
+  .v2-start::before { top: -1px; left: -1px; border-right: none; border-bottom: none; }
+  .v2-start::after { bottom: -1px; right: -1px; border-left: none; border-top: none; }
+  .v2-start-ttl {
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-size: 24px;
+    font-weight: 700;
+    color: #E8DCC4;
+    letter-spacing: -0.01em;
+  }
+  .v2-start-sub {
+    font-family: 'Oswald', sans-serif;
+    font-size: 10px;
+    color: #B89660;
+    letter-spacing: 0.4em;
+    margin-top: 4px;
+    text-transform: uppercase;
+  }
+  .v2-log-ttl {
+    font-family: 'Oswald', sans-serif;
+    font-size: 10px;
+    color: #B89660;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+    padding-bottom: 6px;
+    border-bottom: 1px solid #2a1d10;
+  }
+  .v2-log {
+    display: flex;
+    justify-content: space-between;
+    padding: 8px 0;
+    font-family: 'Cormorant Garamond', serif;
+    border-bottom: 1px dotted #2a1d10;
+  }
+  .v2-log-l { color: #8a7d5f; font-size: 13px; font-style: italic; }
+  .v2-log-v { color: #E8DCC4; font-size: 14px; }
+  .v2-log-v.fail { color: #8B2635; }
+
+  /* ==================== V3: KOREAN MYSTIC HORROR ==================== */
+  .v3 {
+    background: #050302;
+    color: #F0EBE3;
+    font-family: 'Nanum Myeongjo', 'Gowun Batang', serif;
+    padding: 50px 0 0;
+    height: 100%;
+    overflow-y: auto;
+    position: relative;
+  }
+  .v3::before {
+    content: '影';
+    position: absolute;
+    top: 18%; right: -20px;
+    font-family: 'Nanum Myeongjo', serif;
+    font-size: 260px;
+    color: #1a0607;
+    line-height: 1;
+    pointer-events: none;
+    z-index: 1;
+  }
+  .v3::after {
+    content: '追';
+    position: absolute;
+    bottom: 8%; left: -30px;
+    font-family: 'Nanum Myeongjo', serif;
+    font-size: 200px;
+    color: #1a0607;
+    line-height: 1;
+    pointer-events: none;
+    z-index: 1;
+  }
+  .v3::-webkit-scrollbar{display:none;}
+  .v3 .statusbar { color: #F0EBE3; font-family: 'Inter', sans-serif; }
+  .v3-body { padding: 30px 28px; position: relative; z-index: 2; }
+  .v3-top {
+    text-align: center;
+    margin-bottom: 28px;
+  }
+  .v3-hanja {
+    font-family: 'Nanum Myeongjo', serif;
+    font-size: 15px;
+    color: #7A0A0E;
+    letter-spacing: 0.8em;
+    margin-bottom: 10px;
+  }
+  .v3-logo {
+    font-family: 'Nanum Myeongjo', serif;
+    font-size: 30px;
+    font-weight: 800;
+    letter-spacing: 0.05em;
+    line-height: 1;
+    color: #F0EBE3;
+    margin-bottom: 6px;
+  }
+  .v3-logo-kr {
+    font-family: 'Nanum Myeongjo', serif;
+    font-size: 13px;
+    color: #9a8a7a;
+    letter-spacing: 0.4em;
+    font-weight: 400;
+  }
+  .v3-brush {
+    text-align: center;
+    font-family: 'Nanum Myeongjo', serif;
+    color: #5a3a38;
+    font-size: 30px;
+    margin: 8px 0 24px;
+    letter-spacing: -0.3em;
+  }
+  .v3-quote {
+    font-family: 'Nanum Myeongjo', serif;
+    font-weight: 400;
+    font-size: 17px;
+    text-align: center;
+    color: #d8cfc3;
+    line-height: 1.8;
+    margin-bottom: 10px;
+    letter-spacing: -0.01em;
+  }
+  .v3-quote strong {
+    color: #c42029;
+    font-weight: 800;
+    font-size: 20px;
+  }
+  .v3-by {
+    font-family: 'Gowun Batang', serif;
+    font-size: 11px;
+    color: #6a5548;
+    text-align: center;
+    letter-spacing: 0.3em;
+    margin-bottom: 24px;
+  }
+  .v3-stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0;
+    border-top: 1px solid #2a1518;
+    border-bottom: 1px solid #2a1518;
+    margin-bottom: 20px;
+  }
+  .v3-stat {
+    padding: 12px 4px;
+    text-align: center;
+    border-right: 1px solid #2a1518;
+  }
+  .v3-stat:last-child { border-right: none; }
+  .v3-stat .v {
+    font-family: 'Nanum Myeongjo', serif;
+    font-weight: 700;
+    font-size: 22px;
+    color: #F0EBE3;
+    line-height: 1;
+  }
+  .v3-stat .k {
+    font-family: 'Nanum Myeongjo', serif;
+    font-weight: 400;
+    font-size: 10px;
+    color: #7a6858;
+    letter-spacing: 0.2em;
+    margin-top: 4px;
+  }
+  .v3-start {
+    background:
+      radial-gradient(ellipse at center, rgba(122,10,14,0.3), transparent 70%),
+      #0d0607;
+    border: 1px solid #7A0A0E;
+    padding: 22px 18px;
+    text-align: center;
+    margin-bottom: 24px;
+    position: relative;
+  }
+  .v3-start-hanja {
+    position: absolute;
+    top: 8px; right: 14px;
+    font-family: 'Nanum Myeongjo', serif;
+    font-size: 14px;
+    color: #7A0A0E;
+    letter-spacing: 0.3em;
+  }
+  .v3-start-ttl {
+    font-family: 'Nanum Myeongjo', serif;
+    font-weight: 800;
+    font-size: 22px;
+    color: #F0EBE3;
+    letter-spacing: 0.02em;
+  }
+  .v3-start-sub {
+    font-family: 'Gowun Batang', serif;
+    font-size: 11px;
+    color: #c42029;
+    letter-spacing: 0.4em;
+    margin-top: 6px;
+  }
+  .v3-logs { margin-top: 16px; }
+  .v3-log {
+    display: flex;
+    justify-content: space-between;
+    padding: 9px 0;
+    font-family: 'Gowun Batang', serif;
+    font-size: 13px;
+    border-bottom: 1px dotted #2a1518;
+  }
+  .v3-log-l { color: #8a7868; }
+  .v3-log-v { color: #F0EBE3; font-weight: 700; }
+  .v3-log-v.fail { color: #c42029; }
+
+  /* ==================== V4: EDITORIAL THRILLER ==================== */
+  .v4 {
+    background: #0a0a0a;
+    color: #fff;
+    font-family: 'Inter', sans-serif;
+    padding: 50px 0 0;
+    height: 100%;
+    overflow-y: auto;
+  }
+  .v4::-webkit-scrollbar{display:none;}
+  .v4 .statusbar { color: #fff; }
+  .v4-body { padding: 20px 26px; }
+  .v4-no {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-weight: 400;
+    font-size: 12px;
+    color: #DC2626;
+    letter-spacing: 0.2em;
+    margin-bottom: 4px;
+  }
+  .v4-issue {
+    font-family: 'Inter', sans-serif;
+    font-weight: 200;
+    font-size: 11px;
+    color: #666;
+    letter-spacing: 0.3em;
+    margin-bottom: 14px;
+    text-transform: uppercase;
+  }
+  .v4-divider {
+    height: 2px; background: #fff;
+    margin-bottom: 8px;
+  }
+  .v4-logo {
+    font-family: 'Playfair Display', serif;
+    font-weight: 900;
+    font-size: 56px;
+    line-height: 0.9;
+    letter-spacing: -0.05em;
+    margin-bottom: 6px;
+  }
+  .v4-tagline {
+    font-family: 'Inter', sans-serif;
+    font-weight: 300;
+    font-size: 11px;
+    color: #888;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    padding-bottom: 14px;
+    border-bottom: 2px solid #fff;
+    margin-bottom: 18px;
+  }
+  .v4-article-tag {
+    font-family: 'Inter', sans-serif;
+    font-weight: 700;
+    font-size: 10px;
+    color: #DC2626;
+    letter-spacing: 0.25em;
+    margin-bottom: 8px;
+    text-transform: uppercase;
+  }
+  .v4-article {
+    font-family: 'Playfair Display', serif;
+    font-weight: 400;
+    font-size: 22px;
+    line-height: 1.25;
+    letter-spacing: -0.02em;
+    color: #fff;
+    margin-bottom: 8px;
+  }
+  .v4-article strong {
+    font-weight: 900;
+    color: #DC2626;
+    font-style: italic;
+  }
+  .v4-meta {
+    font-family: 'Inter', sans-serif;
+    font-weight: 300;
+    font-size: 10px;
+    color: #666;
+    letter-spacing: 0.2em;
+    margin-bottom: 20px;
+    text-transform: uppercase;
+    padding-bottom: 14px;
+    border-bottom: 1px solid #222;
+  }
+  .v4-stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0;
+    margin-bottom: 20px;
+  }
+  .v4-stat { padding: 0 8px; border-right: 1px solid #222; }
+  .v4-stat:last-child { border-right: none; }
+  .v4-stat .k {
+    font-family: 'Inter', sans-serif;
+    font-weight: 700;
+    font-size: 9px;
+    color: #666;
+    letter-spacing: 0.2em;
+    margin-bottom: 6px;
+    text-transform: uppercase;
+  }
+  .v4-stat .v {
+    font-family: 'Playfair Display', serif;
+    font-weight: 400;
+    font-size: 26px;
+    letter-spacing: -0.03em;
+    line-height: 1;
+  }
+  .v4-stat .v small {
+    font-family: 'Inter', sans-serif;
+    font-weight: 300;
+    font-size: 10px;
+    color: #666;
+    margin-left: 2px;
+  }
+  .v4-start {
+    background: #DC2626;
+    padding: 20px 18px;
+    margin-bottom: 20px;
+    position: relative;
+    color: #fff;
+  }
+  .v4-start-no {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-size: 10px;
+    color: rgba(255,255,255,0.7);
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+  }
+  .v4-start-ttl {
+    font-family: 'Playfair Display', serif;
+    font-weight: 900;
+    font-style: italic;
+    font-size: 26px;
+    line-height: 1.05;
+    letter-spacing: -0.02em;
+  }
+  .v4-start-cta {
+    margin-top: 10px;
+    font-family: 'Inter', sans-serif;
+    font-weight: 700;
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .v4-logs-ttl {
+    font-family: 'Inter', sans-serif;
+    font-weight: 700;
+    font-size: 10px;
+    color: #DC2626;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    padding-bottom: 8px;
+    border-bottom: 2px solid #fff;
+    margin-bottom: 8px;
+  }
+  .v4-log {
+    display: flex;
+    gap: 10px;
+    align-items: baseline;
+    padding: 9px 0;
+    border-bottom: 1px solid #222;
+  }
+  .v4-log-no {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-weight: 400;
+    font-size: 20px;
+    color: #444;
+    width: 32px;
+  }
+  .v4-log-info { flex: 1; }
+  .v4-log-ttl {
+    font-family: 'Playfair Display', serif;
+    font-size: 14px;
+    font-weight: 400;
+  }
+  .v4-log-meta {
+    font-family: 'Inter', sans-serif;
+    font-size: 10px;
+    color: #666;
+    letter-spacing: 0.1em;
+    margin-top: 2px;
+    text-transform: uppercase;
+  }
+  .v4-log-v {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-size: 15px;
+    font-weight: 700;
+    color: #DC2626;
+  }
+  .v4-log-v.neg { color: #888; text-decoration: line-through; }
+
+  /* ==================== V5: NEO-NOIR CYBER ==================== */
+  .v5 {
+    background:
+      radial-gradient(ellipse at 80% 0%, rgba(255,23,68,0.18), transparent 50%),
+      radial-gradient(ellipse at 0% 80%, rgba(77,208,225,0.08), transparent 55%),
+      #04040A;
+    color: #E8E8F0;
+    font-family: 'Inter', sans-serif;
+    padding: 50px 0 0;
+    height: 100%;
+    overflow-y: auto;
+    position: relative;
+  }
+  .v5::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(0deg, transparent 0, transparent 3px, rgba(77,208,225,0.02) 3px, rgba(77,208,225,0.02) 4px);
+    pointer-events: none;
+  }
+  .v5::-webkit-scrollbar{display:none;}
+  .v5 .statusbar { color: #4DD0E1; font-family: 'JetBrains Mono', monospace; font-size: 11px; }
+  .v5-body { padding: 24px 24px; position: relative; z-index: 2; }
+  .v5-tag {
+    display: inline-block;
+    padding: 2px 8px;
+    border: 1px solid #FF1744;
+    color: #FF1744;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.2em;
+    margin-bottom: 14px;
+  }
+  .v5-tag::before { content: '● '; animation: blinkPink 1s infinite; }
+  @keyframes blinkPink { 0%, 50% { opacity: 1; } 51%, 100% { opacity: 0.3; } }
+  .v5-logo {
+    font-family: 'Playfair Display', serif;
+    font-weight: 900;
+    font-style: italic;
+    font-size: 42px;
+    line-height: 0.95;
+    letter-spacing: -0.04em;
+    color: #E8E8F0;
+    text-shadow: 0 0 20px rgba(255,23,68,0.4), 2px 0 0 rgba(77,208,225,0.3);
+    margin-bottom: 6px;
+  }
+  .v5-sub {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    color: #4DD0E1;
+    letter-spacing: 0.25em;
+    margin-bottom: 22px;
+  }
+  .v5-sub span { color: #666; margin: 0 6px; }
+  .v5-quote {
+    border-left: 2px solid #FF1744;
+    padding-left: 14px;
+    margin-bottom: 22px;
+  }
+  .v5-quote-t {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-size: 17px;
+    font-weight: 400;
+    line-height: 1.5;
+    color: #E8E8F0;
+    letter-spacing: -0.01em;
+    margin-bottom: 6px;
+  }
+  .v5-quote-t strong {
+    color: #FF1744;
+    font-weight: 700;
+  }
+  .v5-quote-by {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    color: #4DD0E1;
+    letter-spacing: 0.25em;
+  }
+  .v5-stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    margin-bottom: 20px;
+  }
+  .v5-stat {
+    background: rgba(77,208,225,0.04);
+    border: 1px solid rgba(77,208,225,0.15);
+    padding: 12px 8px;
+    position: relative;
+  }
+  .v5-stat::before {
+    content: '';
+    position: absolute;
+    top: 4px; right: 4px;
+    width: 4px; height: 4px;
+    background: #4DD0E1;
+    box-shadow: 0 0 6px #4DD0E1;
+  }
+  .v5-stat .k {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    color: #4DD0E1;
+    letter-spacing: 0.2em;
+    margin-bottom: 4px;
+  }
+  .v5-stat .v {
+    font-family: 'Playfair Display', serif;
+    font-weight: 700;
+    font-style: italic;
+    font-size: 24px;
+    color: #E8E8F0;
+    line-height: 1;
+  }
+  .v5-stat .v small {
+    font-family: 'JetBrains Mono', monospace;
+    font-style: normal;
+    font-size: 10px;
+    color: #666;
+    margin-left: 2px;
+  }
+  .v5-start {
+    background:
+      linear-gradient(135deg, rgba(255,23,68,0.9) 0%, rgba(170,10,40,1) 100%);
+    padding: 18px;
+    margin-bottom: 20px;
+    position: relative;
+    overflow: hidden;
+    border: 1px solid #FF1744;
+    box-shadow: 0 0 24px rgba(255,23,68,0.3);
+  }
+  .v5-start::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(0deg, transparent 0, transparent 2px, rgba(0,0,0,0.08) 2px, rgba(0,0,0,0.08) 3px);
+  }
+  .v5-start-tag {
+    position: relative;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    color: rgba(255,255,255,0.75);
+    letter-spacing: 0.3em;
+    margin-bottom: 6px;
+  }
+  .v5-start-ttl {
+    position: relative;
+    font-family: 'Playfair Display', serif;
+    font-weight: 900;
+    font-style: italic;
+    font-size: 24px;
+    color: #fff;
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+  }
+  .v5-start-cta {
+    position: relative;
+    margin-top: 8px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .v5-start-cta .l {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    color: #fff;
+    letter-spacing: 0.2em;
+  }
+  .v5-start-cta .a {
+    width: 28px; height: 28px;
+    background: rgba(0,0,0,0.35);
+    border: 1px solid rgba(255,255,255,0.4);
+    display: flex; align-items: center; justify-content: center;
+    color: #fff;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 14px;
+  }
+  .v5-log-ttl {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    color: #4DD0E1;
+    letter-spacing: 0.25em;
+    margin-bottom: 8px;
+    padding-bottom: 6px;
+    border-bottom: 1px solid rgba(77,208,225,0.15);
+  }
+  .v5-log {
+    display: flex;
+    gap: 10px;
+    padding: 8px 0;
+    border-bottom: 1px dashed rgba(77,208,225,0.1);
+    align-items: baseline;
+  }
+  .v5-log-id {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    color: #4DD0E1;
+    letter-spacing: 0.1em;
+    width: 28px;
+  }
+  .v5-log-info { flex: 1; }
+  .v5-log-t {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-size: 13px;
+    color: #E8E8F0;
+  }
+  .v5-log-m {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    color: #666;
+    letter-spacing: 0.1em;
+    margin-top: 1px;
+  }
+  .v5-log-v {
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 700;
+    font-size: 13px;
+  }
+  .v5-log-v.pos { color: #4DD0E1; }
+  .v5-log-v.neg { color: #FF1744; }
+</style>
+</head>
+<body>
+
+<div class="page-header">
+  <h1>SHADOW RUN · <em>Cinematic Variants</em></h1>
+  <p>MOOD 02 Cinematic Thriller를 5가지 서브 무드로 변주.<br>
+     한국어 본문 · 장식 영문 세리프 유지 · 각 변주마다 폰트/컬러/질감만 교체</p>
+</div>
+
+<div class="grid">
+
+  <!-- ========== V1: PURE CINEMATIC ========== -->
+  <div class="card">
+    <div class="phone"><div class="notch"></div><div class="screen v1">
+      <div class="statusbar"><span>9:41</span><span>●●●●  ●●</span></div>
+      <div class="v1-body">
+        <div class="v1-eyebrow">A Shadow Never Rests</div>
+        <div class="v1-logo">Shadow Run</div>
+        <div class="v1-sub">에피소드 028</div>
+        <div class="v1-quote">어젯밤, 그는 당신보다<br><em>312미터</em> 더 가까이 다가왔다.</div>
+        <div class="v1-by">— previously on shadow run</div>
+        <div class="v1-stats">
+          <div class="v1-stat"><div class="v">12.4</div><div class="k">km · week</div></div>
+          <div class="v1-stat"><div class="v">28</div><div class="k">chapters</div></div>
+          <div class="v1-stat"><div class="v">412m</div><div class="k">best escape</div></div>
+        </div>
+        <div class="v1-start">
+          <div class="v1-start-ttl">오늘의 도주</div>
+          <div class="v1-start-sub">begin tonight's run</div>
+        </div>
+        <div class="v1-rows">
+          <div class="v1-row"><span class="v1-row-l">4월 16일 · 성동구</span><span class="v1-row-v">3.42 km <em>escaped</em></span></div>
+          <div class="v1-row"><span class="v1-row-l">4월 15일 · 한강</span><span class="v1-row-v">2.18 km <em style="color:#aa5c64">caught</em></span></div>
+        </div>
+      </div>
+    </div></div>
+    <div class="card-label">
+      <div class="card-num">Variant 01</div>
+      <div class="card-title">Pure Cinematic</div>
+      <div class="card-desc">순검정 + Noto Serif KR + Playfair Italic. 여백과 정적. 가장 우아하고 미니멀. 경고 없이 오직 나레이션.</div>
+    </div>
+  </div>
+
+  <!-- ========== V2: FILM NOIR ========== -->
+  <div class="card">
+    <div class="phone"><div class="notch"></div><div class="screen v2">
+      <div class="statusbar"><span>9:41</span><span>●●●●  ●●</span></div>
+      <div class="v2-body">
+        <div class="v2-stamp">Case No. 028</div>
+        <div class="v2-logo">Shadow Run</div>
+        <div class="v2-logo-sub">A Nightly Chase</div>
+        <div class="v2-case">
+          <div class="v2-case-k">Last Reported</div>
+          <div class="v2-case-v">"용의자, 피해자로부터 <strong>312미터</strong>. 추적 지속 중."</div>
+        </div>
+        <div class="v2-stats">
+          <div class="v2-stat"><div class="v">12.4</div><div class="k">km</div></div>
+          <div class="v2-stat"><div class="v">28</div><div class="k">cases</div></div>
+          <div class="v2-stat"><div class="v">412m</div><div class="k">max gap</div></div>
+        </div>
+        <div class="v2-start">
+          <div class="v2-start-ttl">오늘의 사건</div>
+          <div class="v2-start-sub">open the file</div>
+        </div>
+        <div class="v2-log-ttl">Previous Files</div>
+        <div class="v2-log"><span class="v2-log-l">case 028 · 성동구</span><span class="v2-log-v">escaped</span></div>
+        <div class="v2-log"><span class="v2-log-l">case 027 · 한강</span><span class="v2-log-v fail">caught</span></div>
+        <div class="v2-log"><span class="v2-log-l">case 026 · 남산길</span><span class="v2-log-v">escaped</span></div>
+      </div>
+    </div></div>
+    <div class="card-label">
+      <div class="card-num">Variant 02</div>
+      <div class="card-title">Film Noir</div>
+      <div class="card-desc">1940년대 탐정 영화. 크림+골드+와인 레드. Cormorant Italic + Oswald. 러닝 = 사건 파일. 세련됨의 극치.</div>
+    </div>
+  </div>
+
+  <!-- ========== V3: KOREAN MYSTIC HORROR ========== -->
+  <div class="card">
+    <div class="phone"><div class="notch"></div><div class="screen v3">
+      <div class="statusbar"><span>9:41</span><span>●●●●  ●●</span></div>
+      <div class="v3-body">
+        <div class="v3-top">
+          <div class="v3-hanja">影 追 夜</div>
+          <div class="v3-logo">쉐도우런</div>
+          <div class="v3-logo-kr">제 028 밤</div>
+        </div>
+        <div class="v3-brush">·ᐟ̤̀ ⟂⟂ ᐟ̤̀·</div>
+        <div class="v3-quote">어젯밤, 그 놈이<br><strong>삼백 열두 걸음</strong><br>가까워졌다.</div>
+        <div class="v3-by">─ 지난 밤의 기록 ─</div>
+        <div class="v3-stats">
+          <div class="v3-stat"><div class="v">十二</div><div class="k">이번 주</div></div>
+          <div class="v3-stat"><div class="v">廿八</div><div class="k">밤의 기록</div></div>
+          <div class="v3-stat"><div class="v">四一二</div><div class="k">최장 거리</div></div>
+        </div>
+        <div class="v3-start">
+          <div class="v3-start-hanja">始</div>
+          <div class="v3-start-ttl">오늘 밤,<br>다시 뛰어라</div>
+          <div class="v3-start-sub">지 금 시 작</div>
+        </div>
+        <div class="v3-logs">
+          <div class="v3-log"><span class="v3-log-l">4월 16일 밤 · 성동</span><span class="v3-log-v">살았다</span></div>
+          <div class="v3-log"><span class="v3-log-l">4월 15일 밤 · 한강</span><span class="v3-log-v fail">잡혔다</span></div>
+          <div class="v3-log"><span class="v3-log-l">4월 14일 밤 · 남산</span><span class="v3-log-v">살았다</span></div>
+        </div>
+      </div>
+    </div></div>
+    <div class="card-label">
+      <div class="card-num">Variant 03</div>
+      <div class="card-title">Korean Mystic Horror</div>
+      <div class="card-desc">곡성·파묘 감성. 검정+먹빛 한자(影·追·始) 워터마크, 나눔명조, 한자 숫자(十二). "살았다/잡혔다" 한국적 공포 어휘.</div>
+    </div>
+  </div>
+
+  <!-- ========== V4: EDITORIAL THRILLER ========== -->
+  <div class="card">
+    <div class="phone"><div class="notch"></div><div class="screen v4">
+      <div class="statusbar"><span>9:41</span><span>●●●●  ●●</span></div>
+      <div class="v4-body">
+        <div class="v4-no">No. 028</div>
+        <div class="v4-issue">APRIL ISSUE · 17.04.2026</div>
+        <div class="v4-divider"></div>
+        <div class="v4-logo">Shadow<br>Run.</div>
+        <div class="v4-tagline">The Chase Never Sleeps</div>
+        <div class="v4-article-tag">◆ Cover Story</div>
+        <div class="v4-article">그는 어젯밤, 당신의 <strong>312미터</strong> 뒤까지 따라붙었다.</div>
+        <div class="v4-meta">Seongdong · 04:12 AM · 28m chapters</div>
+        <div class="v4-stats">
+          <div class="v4-stat"><div class="k">Week</div><div class="v">12.4<small>km</small></div></div>
+          <div class="v4-stat"><div class="k">Total</div><div class="v">28</div></div>
+          <div class="v4-stat"><div class="k">Best</div><div class="v">412<small>m</small></div></div>
+        </div>
+        <div class="v4-start">
+          <div class="v4-start-no">TONIGHT'S ISSUE · 029</div>
+          <div class="v4-start-ttl">Chapter Twenty-Nine<br>begins now.</div>
+          <div class="v4-start-cta">지금 시작 →</div>
+        </div>
+        <div class="v4-logs-ttl">◆ Back Issues</div>
+        <div class="v4-log">
+          <div class="v4-log-no">028</div>
+          <div class="v4-log-info"><div class="v4-log-ttl">성동구의 밤</div><div class="v4-log-meta">3.42km · escaped</div></div>
+          <div class="v4-log-v">+312</div>
+        </div>
+        <div class="v4-log">
+          <div class="v4-log-no">027</div>
+          <div class="v4-log-info"><div class="v4-log-ttl">한강의 그림자</div><div class="v4-log-meta">2.18km · caught</div></div>
+          <div class="v4-log-v neg">−018</div>
+        </div>
+      </div>
+    </div></div>
+    <div class="card-label">
+      <div class="card-num">Variant 04</div>
+      <div class="card-title">Editorial Thriller</div>
+      <div class="card-desc">GQ/Vogue 잡지 에디토리얼. 거대 Playfair 로고, No.028 매거진 이슈 넘버링. 각 러닝이 "이달의 기사". 가장 글로벌한 톤.</div>
+    </div>
+  </div>
+
+  <!-- ========== V5: NEO-NOIR CYBER ========== -->
+  <div class="card">
+    <div class="phone"><div class="notch"></div><div class="screen v5">
+      <div class="statusbar"><span>09:41</span><span>●●●●  ●●</span></div>
+      <div class="v5-body">
+        <div class="v5-tag">TRACKING · 028</div>
+        <div class="v5-logo">Shadow<br>Run.</div>
+        <div class="v5-sub">ep.028 <span>/</span> 17.04.2026 <span>/</span> seoul</div>
+        <div class="v5-quote">
+          <div class="v5-quote-t">그는 어젯밤 당신을 <strong>312m</strong>까지 추적했다. 오늘은 더 가까울 것이다.</div>
+          <div class="v5-quote-by">— system log · 04:12</div>
+        </div>
+        <div class="v5-stats">
+          <div class="v5-stat"><div class="k">WEEK</div><div class="v">12.4<small>km</small></div></div>
+          <div class="v5-stat"><div class="k">RUNS</div><div class="v">28</div></div>
+          <div class="v5-stat"><div class="k">BEST</div><div class="v">412<small>m</small></div></div>
+        </div>
+        <div class="v5-start">
+          <div class="v5-start-tag">TONIGHT'S PROTOCOL</div>
+          <div class="v5-start-ttl">지금,<br>도주를 시작하라.</div>
+          <div class="v5-start-cta"><div class="l">EXECUTE ›</div><div class="a">›</div></div>
+        </div>
+        <div class="v5-log-ttl">// RECENT LOGS</div>
+        <div class="v5-log">
+          <div class="v5-log-id">028</div>
+          <div class="v5-log-info"><div class="v5-log-t">성동 · escaped</div><div class="v5-log-m">3.42km / 24:18</div></div>
+          <div class="v5-log-v pos">+312</div>
+        </div>
+        <div class="v5-log">
+          <div class="v5-log-id">027</div>
+          <div class="v5-log-info"><div class="v5-log-t">한강 · caught</div><div class="v5-log-m">2.18km / 18:02</div></div>
+          <div class="v5-log-v neg">−018</div>
+        </div>
+        <div class="v5-log">
+          <div class="v5-log-id">026</div>
+          <div class="v5-log-info"><div class="v5-log-t">남산 · escaped</div><div class="v5-log-m">4.80km / 33:41</div></div>
+          <div class="v5-log-v pos">+520</div>
+        </div>
+      </div>
+    </div></div>
+    <div class="card-label">
+      <div class="card-num">Variant 05</div>
+      <div class="card-title">Neo-Noir Cyber</div>
+      <div class="card-desc">블레이드러너·사이버펑크 느와르. 붉은 네온 + 차가운 시안 블루. JetBrains Mono 시스템 로그, Playfair Italic 제목. 미래적 공포.</div>
+    </div>
+  </div>
+
+</div>
+
+<div style="max-width: 760px; margin: 60px auto 0; padding: 24px; background: #141414; border-radius: 16px; border: 1px solid #222;">
+  <div style="font-family: 'Playfair Display', serif; font-style: italic; font-size: 12px; color: #ff6b7e; letter-spacing: 0.2em; margin-bottom: 12px;">NEXT</div>
+  <p style="font-size: 14px; color: #bbb; line-height: 1.7;">
+    5개 중 끌리는 방향을 알려주세요. 앞서 만든 <b>home-final-kr</b> (하이브리드, 경고배지 있음)까지 포함하면 총 6개 후보.<br>
+    "V2 Film Noir가 제일 좋은데 V4의 번호매기기는 쓰고 싶어" 같은 조합도 환영.
+  </p>
+</div>
+
+</body>
+</html>

@@ -4,6 +4,7 @@ import 'package:flutter_naver_map/flutter_naver_map.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:audio_session/audio_session.dart';
 import 'core/theme/app_theme.dart';
+import 'core/theme/theme_manager.dart';
 import 'core/router/app_router.dart';
 import 'core/services/ad_service.dart';
 import 'core/services/purchase_service.dart';
@@ -58,6 +59,12 @@ void main() async {
     debugPrint('PurchaseService 초기화 실패: $e');
   }
 
+  try {
+    await ThemeManager.I.loadSaved();
+  } catch (e) {
+    debugPrint('ThemeManager 로드 실패: $e');
+  }
+
   final langSelected = await isLanguageSelected();
 
   if (langSelected) {
@@ -85,12 +92,17 @@ class ShadowRunApp extends StatelessWidget {
     return ValueListenableBuilder<String>(
       valueListenable: S.languageNotifier,
       builder: (context, lang, _) {
-        return MaterialApp.router(
-          key: ValueKey(lang),
-          title: 'SHADOW RUN',
-          debugShowCheckedModeBanner: false,
-          theme: SRTheme.dark,
-          routerConfig: createRouter(languageSelected),
+        return ValueListenableBuilder(
+          valueListenable: ThemeManager.I.themeIdNotifier,
+          builder: (context, themeId, _) {
+            return MaterialApp.router(
+              key: ValueKey('${lang}_${themeId.key}'),
+              title: 'SHADOW RUN',
+              debugShowCheckedModeBanner: false,
+              theme: SRTheme.dark,
+              routerConfig: createRouter(languageSelected),
+            );
+          },
         );
       },
     );

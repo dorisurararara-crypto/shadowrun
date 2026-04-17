@@ -1,0 +1,2398 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Shadow Run — Theme 05 · Neo-Noir Cyber</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700;1,900&family=Inter:wght@200;300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css" />
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg: #050507;
+    --screen-bg: #04040A;
+    --red: #FF1744;
+    --red-deep: #AA0A28;
+    --red-soft: #FF5470;
+    --cyan: #4DD0E1;
+    --cyan-dim: #2D7A85;
+    --text: #E8E8F0;
+    --text-dim: #9898A8;
+    --text-fade: #5A5A68;
+    --text-mute: #3A3A48;
+    --border-cyan: rgba(77,208,225,0.15);
+    --border-cyan-bright: rgba(77,208,225,0.3);
+    --border-red: rgba(255,23,68,0.3);
+    --panel: rgba(77,208,225,0.04);
+    --panel-dark: rgba(10,12,20,0.6);
+  }
+  html, body { background: var(--bg); }
+  body {
+    color: var(--text);
+    font-family: 'Inter', 'Pretendard', -apple-system, sans-serif;
+    min-height: 100vh;
+    padding: 36px 20px 80px;
+    font-feature-settings: "ss01", "cv01";
+    background:
+      radial-gradient(ellipse 800px 400px at 20% 0%, rgba(255,23,68,0.05), transparent 60%),
+      radial-gradient(ellipse 600px 400px at 90% 100%, rgba(77,208,225,0.04), transparent 60%),
+      var(--bg);
+  }
+
+  /* 페이지 헤더 */
+  .page-head {
+    max-width: 1300px;
+    margin: 0 auto 40px;
+    border-top: 1px solid var(--border-cyan);
+    border-bottom: 1px solid var(--border-cyan);
+    padding: 20px 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 20px;
+    flex-wrap: wrap;
+  }
+  .page-head-left {
+    display: flex;
+    align-items: baseline;
+    gap: 14px;
+    flex-wrap: wrap;
+  }
+  .ph-brand {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-weight: 900;
+    font-size: 26px;
+    letter-spacing: -0.03em;
+    color: var(--text);
+    text-shadow: 2px 0 0 rgba(77,208,225,0.4), -2px 0 0 rgba(255,23,68,0.4);
+  }
+  .ph-sep {
+    color: var(--cyan);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+  }
+  .ph-sub {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--cyan);
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+  }
+  .ph-meta {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    color: var(--text-fade);
+    letter-spacing: 0.18em;
+  }
+  .ph-meta b {
+    color: var(--red);
+    font-weight: 700;
+  }
+  .ph-dot {
+    display: inline-block;
+    width: 6px; height: 6px;
+    background: var(--red);
+    border-radius: 50%;
+    box-shadow: 0 0 8px var(--red);
+    animation: blinkRed 1.2s infinite;
+    vertical-align: middle;
+    margin-right: 6px;
+  }
+  @keyframes blinkRed { 0%, 55% { opacity: 1; } 56%, 100% { opacity: 0.25; } }
+
+  .intro {
+    max-width: 1300px;
+    margin: 0 auto 30px;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    color: var(--text-fade);
+    letter-spacing: 0.1em;
+  }
+  .intro-cell {
+    padding: 12px 14px;
+    border: 1px solid var(--border-cyan);
+    background: var(--panel);
+    position: relative;
+  }
+  .intro-cell::before {
+    content: '';
+    position: absolute;
+    top: 6px; right: 6px;
+    width: 3px; height: 3px;
+    background: var(--cyan);
+    box-shadow: 0 0 6px var(--cyan);
+  }
+  .intro-cell .k {
+    color: var(--cyan);
+    letter-spacing: 0.22em;
+    margin-bottom: 6px;
+    font-size: 9px;
+  }
+  .intro-cell .v {
+    color: var(--text);
+    font-family: 'Inter', sans-serif;
+    font-size: 12px;
+    letter-spacing: 0.02em;
+    line-height: 1.5;
+  }
+  .intro-cell .v em {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    color: var(--red-soft);
+  }
+
+  /* 그리드 */
+  .grid {
+    max-width: 1300px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 56px 32px;
+    justify-items: center;
+  }
+  .cell {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 14px;
+  }
+  .cell-label {
+    text-align: center;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    color: var(--cyan);
+    letter-spacing: 0.3em;
+    padding-top: 6px;
+  }
+  .cell-label b {
+    display: block;
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-weight: 700;
+    color: var(--text);
+    font-size: 16px;
+    letter-spacing: 0;
+    margin-top: 4px;
+    text-transform: none;
+  }
+  .cell-label span {
+    color: var(--text-fade);
+    font-size: 9px;
+  }
+
+  /* 폰 프레임 */
+  .phone {
+    width: 340px;
+    height: 720px;
+    border-radius: 44px;
+    overflow: hidden;
+    position: relative;
+    box-shadow:
+      0 24px 60px rgba(0,0,0,0.9),
+      0 0 0 8px #14141c,
+      0 0 0 9px #2a2a33,
+      0 0 80px rgba(255,23,68,0.08);
+    flex-shrink: 0;
+  }
+  .notch {
+    position: absolute;
+    top: 12px; left: 50%; transform: translateX(-50%);
+    width: 110px; height: 28px;
+    background: #000;
+    border-radius: 20px;
+    z-index: 100;
+  }
+  .screen {
+    width: 100%; height: 100%;
+    background:
+      radial-gradient(ellipse 420px 320px at 80% -5%, rgba(255,23,68,0.18), transparent 55%),
+      radial-gradient(ellipse 360px 280px at 0% 95%, rgba(77,208,225,0.1), transparent 55%),
+      var(--screen-bg);
+    position: relative;
+    overflow-y: auto;
+    overflow-x: hidden;
+  }
+  .screen::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(0deg, transparent 0, transparent 3px, rgba(77,208,225,0.025) 3px, rgba(77,208,225,0.025) 4px);
+    pointer-events: none;
+    z-index: 3;
+  }
+  .screen::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse at center, transparent 60%, rgba(0,0,0,0.4) 100%);
+    pointer-events: none;
+    z-index: 2;
+  }
+  .screen::-webkit-scrollbar { display: none; }
+  .screen > * { position: relative; z-index: 4; }
+
+  .statusbar {
+    padding: 12px 26px 0;
+    display: flex;
+    justify-content: space-between;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    font-weight: 500;
+    color: var(--cyan);
+    letter-spacing: 0.1em;
+  }
+  .statusbar .sb-r { letter-spacing: 0.15em; }
+
+  /* ===== 공통 유틸 ===== */
+  .body { padding: 38px 22px 26px; position: relative; }
+  .body-nav { padding-bottom: 14px; }
+
+  .tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 3px 10px;
+    border: 1px solid var(--red);
+    color: var(--red);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.22em;
+    font-weight: 500;
+    background: rgba(255,23,68,0.04);
+  }
+  .tag::before {
+    content: '';
+    width: 5px; height: 5px;
+    background: var(--red);
+    border-radius: 50%;
+    box-shadow: 0 0 6px var(--red);
+    animation: blinkRed 1.2s infinite;
+  }
+  .tag.cyan {
+    border-color: var(--cyan);
+    color: var(--cyan);
+    background: rgba(77,208,225,0.04);
+  }
+  .tag.cyan::before {
+    background: var(--cyan);
+    box-shadow: 0 0 6px var(--cyan);
+  }
+  .tag.solid {
+    border-color: var(--text-mute);
+    color: var(--text-dim);
+    background: transparent;
+  }
+  .tag.solid::before { display: none; }
+
+  .coord {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    color: var(--cyan);
+    letter-spacing: 0.18em;
+  }
+  .coord b { color: var(--text-dim); font-weight: 500; }
+  .coord .ok {
+    color: var(--red);
+    font-weight: 700;
+    letter-spacing: 0.22em;
+  }
+
+  /* 하단 탭 */
+  .tabs {
+    position: sticky;
+    bottom: 0;
+    margin-top: auto;
+    background: rgba(4,4,10,0.85);
+    backdrop-filter: blur(14px);
+    border-top: 1px solid var(--border-cyan);
+    padding: 10px 0 22px;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    z-index: 30;
+  }
+  .tab {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 8px;
+    color: var(--text-fade);
+    letter-spacing: 0.22em;
+    font-weight: 500;
+  }
+  .tab .ti {
+    font-size: 13px;
+    line-height: 1;
+    font-family: 'Inter', sans-serif;
+  }
+  .tab.active { color: var(--red); }
+  .tab.active .ti {
+    text-shadow: 0 0 10px var(--red);
+  }
+
+  /* ============================================================
+     SCREEN 1 — HOME
+     ============================================================ */
+  .hm-tag-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 22px;
+  }
+  .hm-icons { display: flex; gap: 6px; }
+  .hm-ico {
+    width: 26px; height: 26px;
+    border: 1px solid var(--border-cyan);
+    color: var(--cyan);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    display: flex; align-items: center; justify-content: center;
+    background: var(--panel);
+  }
+  .hm-logo {
+    font-family: 'Playfair Display', serif;
+    font-weight: 900;
+    font-style: italic;
+    font-size: 62px;
+    line-height: 0.92;
+    letter-spacing: -0.045em;
+    color: var(--text);
+    text-shadow:
+      2px 0 0 rgba(77,208,225,0.55),
+      -2px 0 0 rgba(255,23,68,0.55),
+      0 0 28px rgba(255,23,68,0.18);
+    margin-bottom: 8px;
+    position: relative;
+  }
+  .hm-logo .dot { color: var(--red); text-shadow: 2px 0 0 rgba(77,208,225,0.6), -2px 0 0 rgba(255,23,68,0.8), 0 0 20px rgba(255,23,68,0.5); }
+  .hm-sub {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    color: var(--cyan);
+    letter-spacing: 0.25em;
+    margin-bottom: 4px;
+  }
+  .hm-sub span { color: var(--text-mute); margin: 0 5px; }
+  .hm-coord {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    color: var(--text-fade);
+    letter-spacing: 0.15em;
+    margin-bottom: 22px;
+  }
+  .hm-coord b { color: var(--red); font-weight: 700; }
+
+  .hm-quote {
+    border-left: 2px solid var(--red);
+    padding: 2px 0 2px 14px;
+    margin-bottom: 22px;
+    position: relative;
+  }
+  .hm-quote::before {
+    content: '';
+    position: absolute;
+    left: -2px; top: 0;
+    width: 2px; height: 10px;
+    background: var(--red);
+    box-shadow: 0 0 8px var(--red);
+  }
+  .hm-quote-t {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-size: 17px;
+    font-weight: 400;
+    line-height: 1.55;
+    color: var(--text);
+    letter-spacing: -0.01em;
+    margin-bottom: 8px;
+  }
+  .hm-quote-t strong {
+    color: var(--red);
+    font-weight: 700;
+    text-shadow: 0 0 12px rgba(255,23,68,0.5);
+  }
+  .hm-quote-by {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    color: var(--cyan);
+    letter-spacing: 0.28em;
+  }
+  .hm-quote-by span { color: var(--text-fade); }
+
+  .hm-stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 6px;
+    margin-bottom: 22px;
+  }
+  .hm-stat {
+    background: var(--panel);
+    border: 1px solid var(--border-cyan);
+    padding: 14px 8px 12px;
+    position: relative;
+    text-align: left;
+  }
+  .hm-stat::before {
+    content: '';
+    position: absolute;
+    top: 5px; right: 5px;
+    width: 4px; height: 4px;
+    background: var(--cyan);
+    box-shadow: 0 0 8px var(--cyan);
+  }
+  .hm-stat::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--cyan), transparent);
+    opacity: 0.3;
+  }
+  .hm-stat .k {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 8px;
+    color: var(--cyan);
+    letter-spacing: 0.24em;
+    margin-bottom: 6px;
+  }
+  .hm-stat .v {
+    font-family: 'Playfair Display', serif;
+    font-weight: 700;
+    font-style: italic;
+    font-size: 26px;
+    color: var(--text);
+    line-height: 1;
+    letter-spacing: -0.02em;
+  }
+  .hm-stat .v small {
+    font-family: 'JetBrains Mono', monospace;
+    font-style: normal;
+    font-size: 9px;
+    color: var(--text-fade);
+    margin-left: 2px;
+    font-weight: 500;
+    letter-spacing: 0.1em;
+  }
+
+  .hm-start {
+    background: linear-gradient(135deg, #FF1744 0%, #8A0A1F 100%);
+    padding: 20px 18px;
+    margin-bottom: 24px;
+    position: relative;
+    overflow: hidden;
+    border: 1px solid var(--red);
+    box-shadow: 0 0 30px rgba(255,23,68,0.28), inset 0 0 40px rgba(0,0,0,0.2);
+  }
+  .hm-start::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(0deg, transparent 0, transparent 2px, rgba(0,0,0,0.1) 2px, rgba(0,0,0,0.1) 3px);
+    pointer-events: none;
+  }
+  .hm-start::after {
+    content: '';
+    position: absolute;
+    top: -50%; right: -20%;
+    width: 200px; height: 200px;
+    background: radial-gradient(circle, rgba(255,255,255,0.15), transparent 65%);
+    pointer-events: none;
+  }
+  .hm-start-tag {
+    position: relative;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    color: rgba(255,255,255,0.8);
+    letter-spacing: 0.3em;
+    margin-bottom: 8px;
+  }
+  .hm-start-tag::before {
+    content: '// ';
+    color: rgba(255,255,255,0.5);
+  }
+  .hm-start-ttl {
+    position: relative;
+    font-family: 'Playfair Display', serif;
+    font-weight: 900;
+    font-style: italic;
+    font-size: 26px;
+    color: #fff;
+    line-height: 1.05;
+    letter-spacing: -0.02em;
+    margin-bottom: 14px;
+  }
+  .hm-start-cta {
+    position: relative;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 10px;
+    border-top: 1px dashed rgba(255,255,255,0.25);
+  }
+  .hm-start-cta .l {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: #fff;
+    letter-spacing: 0.28em;
+    font-weight: 700;
+  }
+  .hm-start-cta .l::before { content: '[ '; opacity: 0.6; }
+  .hm-start-cta .l::after { content: ' ]'; opacity: 0.6; }
+  .hm-start-cta .a {
+    width: 32px; height: 32px;
+    background: rgba(0,0,0,0.35);
+    border: 1px solid rgba(255,255,255,0.5);
+    display: flex; align-items: center; justify-content: center;
+    color: #fff;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 16px;
+    font-weight: 700;
+  }
+
+  .hm-log-ttl {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    color: var(--cyan);
+    letter-spacing: 0.26em;
+    margin-bottom: 10px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--border-cyan);
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+  }
+  .hm-log-ttl .more {
+    color: var(--text-fade);
+    font-size: 8px;
+    letter-spacing: 0.22em;
+  }
+  .hm-log {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 0;
+    border-bottom: 1px dashed rgba(77,208,225,0.1);
+  }
+  .hm-log:last-child { border-bottom: none; }
+  .hm-log-id {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--cyan);
+    letter-spacing: 0.12em;
+    font-weight: 700;
+    width: 36px;
+    padding-right: 8px;
+    border-right: 1px solid var(--border-cyan);
+  }
+  .hm-log-info { flex: 1; min-width: 0; }
+  .hm-log-t {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-size: 14px;
+    color: var(--text);
+    letter-spacing: -0.01em;
+    margin-bottom: 2px;
+  }
+  .hm-log-t .status {
+    font-family: 'JetBrains Mono', monospace;
+    font-style: normal;
+    font-size: 9px;
+    letter-spacing: 0.2em;
+    margin-left: 6px;
+  }
+  .hm-log-t .status.ok { color: var(--cyan); }
+  .hm-log-t .status.fail { color: var(--red); }
+  .hm-log-m {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    color: var(--text-fade);
+    letter-spacing: 0.12em;
+  }
+  .hm-log-v {
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 700;
+    font-size: 14px;
+    letter-spacing: 0.02em;
+    text-align: right;
+  }
+  .hm-log-v.pos { color: var(--cyan); text-shadow: 0 0 10px rgba(77,208,225,0.35); }
+  .hm-log-v.neg { color: var(--red); text-shadow: 0 0 10px rgba(255,23,68,0.4); }
+  .hm-log-v small {
+    display: block;
+    font-weight: 500;
+    font-size: 8px;
+    color: var(--text-fade);
+    letter-spacing: 0.15em;
+    margin-top: 2px;
+  }
+
+  /* ============================================================
+     SCREEN 2 — PREPARE
+     ============================================================ */
+  .pp-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 22px;
+  }
+  .pp-title {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-weight: 900;
+    font-size: 34px;
+    line-height: 1.02;
+    letter-spacing: -0.035em;
+    color: var(--text);
+    text-shadow: 1.5px 0 0 rgba(77,208,225,0.4), -1.5px 0 0 rgba(255,23,68,0.4);
+    margin-bottom: 6px;
+  }
+  .pp-title em {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    color: var(--red);
+    text-shadow: 0 0 18px rgba(255,23,68,0.55);
+    display: block;
+  }
+  .pp-title-small {
+    font-family: 'Inter', 'Pretendard', sans-serif;
+    font-style: normal;
+    font-weight: 400;
+    font-size: 16px;
+    color: var(--text-dim);
+    letter-spacing: 0;
+    text-shadow: none;
+    margin-bottom: 4px;
+  }
+  .pp-coord-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 0;
+    border-top: 1px solid var(--border-cyan);
+    border-bottom: 1px solid var(--border-cyan);
+    margin-bottom: 20px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.15em;
+  }
+  .pp-coord-row .c { color: var(--cyan); }
+  .pp-coord-row .ok { color: var(--red); font-weight: 700; }
+
+  .pp-section {
+    margin-bottom: 18px;
+  }
+  .pp-sect-ttl {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    color: var(--cyan);
+    letter-spacing: 0.28em;
+    margin-bottom: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+  }
+  .pp-sect-ttl::before { content: '// '; color: var(--text-mute); }
+  .pp-sect-ttl .hint {
+    color: var(--text-fade);
+    font-size: 8px;
+    letter-spacing: 0.18em;
+  }
+  .pp-sect-ttl .hint::before { content: ''; }
+
+  .pp-velocity {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 6px;
+  }
+  .pp-vel {
+    background: var(--panel);
+    border: 1px solid var(--border-cyan);
+    padding: 14px 10px 12px;
+    position: relative;
+    cursor: pointer;
+  }
+  .pp-vel::before {
+    content: '';
+    position: absolute;
+    top: 5px; right: 5px;
+    width: 4px; height: 4px;
+    background: var(--cyan);
+    box-shadow: 0 0 8px var(--cyan);
+  }
+  .pp-vel.sel {
+    background: rgba(255,23,68,0.08);
+    border-color: var(--red);
+    box-shadow: 0 0 20px rgba(255,23,68,0.15), inset 0 0 24px rgba(255,23,68,0.08);
+  }
+  .pp-vel.sel::before {
+    background: var(--red);
+    box-shadow: 0 0 8px var(--red);
+  }
+  .pp-vel .lvl {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    color: var(--cyan);
+    letter-spacing: 0.22em;
+    margin-bottom: 8px;
+  }
+  .pp-vel.sel .lvl { color: var(--red); }
+  .pp-vel .sp {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-weight: 900;
+    font-size: 22px;
+    color: var(--text);
+    line-height: 1;
+    letter-spacing: -0.02em;
+    margin-bottom: 2px;
+  }
+  .pp-vel.sel .sp {
+    color: var(--text);
+    text-shadow: 0 0 14px rgba(255,23,68,0.4);
+  }
+  .pp-vel .sp small {
+    font-family: 'JetBrains Mono', monospace;
+    font-style: normal;
+    font-size: 8px;
+    color: var(--text-fade);
+    margin-left: 2px;
+    font-weight: 500;
+    letter-spacing: 0.12em;
+  }
+  .pp-vel .nm {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 8px;
+    color: var(--text-fade);
+    letter-spacing: 0.18em;
+    margin-top: 4px;
+  }
+  .pp-vel.sel .nm { color: var(--red-soft); }
+
+  .pp-equip {
+    background: var(--panel);
+    border: 1px solid var(--border-cyan);
+    padding: 14px 14px;
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    position: relative;
+  }
+  .pp-equip::before {
+    content: '';
+    position: absolute;
+    top: 5px; right: 5px;
+    width: 4px; height: 4px;
+    background: var(--cyan);
+    box-shadow: 0 0 8px var(--cyan);
+  }
+  .pp-equip-ico {
+    width: 44px; height: 44px;
+    border: 1px solid var(--border-cyan-bright);
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-weight: 900;
+    font-size: 16px;
+    color: var(--cyan);
+    flex-shrink: 0;
+    position: relative;
+    background: rgba(0,0,0,0.3);
+  }
+  .pp-equip-ico::after {
+    content: '';
+    position: absolute;
+    inset: 3px;
+    border: 1px dashed rgba(77,208,225,0.25);
+  }
+  .pp-equip-info { flex: 1; min-width: 0; }
+  .pp-equip-name {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-size: 14px;
+    color: var(--text);
+    margin-bottom: 2px;
+  }
+  .pp-equip-m {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    color: var(--text-fade);
+    letter-spacing: 0.14em;
+  }
+  .pp-equip-m b { color: var(--cyan); }
+  .pp-equip-v {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--cyan);
+    text-align: right;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+  }
+  .pp-equip-v small {
+    display: block;
+    color: var(--text-fade);
+    font-size: 8px;
+    font-weight: 500;
+    margin-top: 2px;
+    letter-spacing: 0.15em;
+  }
+
+  .pp-obj {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6px;
+  }
+  .pp-obj-cell {
+    background: var(--panel);
+    border: 1px solid var(--border-cyan);
+    padding: 14px 12px;
+    position: relative;
+  }
+  .pp-obj-cell::before {
+    content: '';
+    position: absolute;
+    top: 5px; right: 5px;
+    width: 4px; height: 4px;
+    background: var(--cyan);
+    box-shadow: 0 0 8px var(--cyan);
+  }
+  .pp-obj-cell .k {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 8px;
+    color: var(--cyan);
+    letter-spacing: 0.24em;
+    margin-bottom: 8px;
+  }
+  .pp-obj-cell .v {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-weight: 900;
+    font-size: 22px;
+    color: var(--text);
+    line-height: 1;
+    letter-spacing: -0.02em;
+  }
+  .pp-obj-cell .v small {
+    font-family: 'JetBrains Mono', monospace;
+    font-style: normal;
+    font-size: 9px;
+    color: var(--text-fade);
+    margin-left: 3px;
+    font-weight: 500;
+    letter-spacing: 0.1em;
+  }
+  .pp-obj-cell .v-sub {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 8px;
+    color: var(--text-fade);
+    letter-spacing: 0.18em;
+    margin-top: 6px;
+  }
+
+  .pp-execute {
+    margin-top: 24px;
+    background: linear-gradient(135deg, #FF1744 0%, #8A0A1F 100%);
+    border: 1px solid var(--red);
+    padding: 22px 18px;
+    box-shadow: 0 0 34px rgba(255,23,68,0.35), inset 0 0 50px rgba(0,0,0,0.25);
+    position: relative;
+    overflow: hidden;
+    text-align: center;
+  }
+  .pp-execute::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(0deg, transparent 0, transparent 2px, rgba(0,0,0,0.1) 2px, rgba(0,0,0,0.1) 3px);
+    pointer-events: none;
+  }
+  .pp-execute::after {
+    content: '';
+    position: absolute;
+    top: -50%; left: -10%;
+    width: 240px; height: 240px;
+    background: radial-gradient(circle, rgba(255,255,255,0.12), transparent 60%);
+  }
+  .pp-execute-t {
+    position: relative;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    color: rgba(255,255,255,0.75);
+    letter-spacing: 0.34em;
+    margin-bottom: 8px;
+  }
+  .pp-execute-b {
+    position: relative;
+    font-family: 'Playfair Display', serif;
+    font-weight: 900;
+    font-style: italic;
+    font-size: 38px;
+    color: #fff;
+    letter-spacing: -0.02em;
+    line-height: 1;
+    text-shadow: 0 0 20px rgba(255,255,255,0.3);
+  }
+  .pp-execute-b::before { content: '[ '; font-weight: 400; opacity: 0.55; }
+  .pp-execute-b::after { content: ' ]'; font-weight: 400; opacity: 0.55; }
+  .pp-execute-sub {
+    position: relative;
+    margin-top: 10px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    color: rgba(255,255,255,0.55);
+    letter-spacing: 0.28em;
+  }
+
+  /* ============================================================
+     SCREEN 3 — RUNNING
+     ============================================================ */
+  .rn-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 18px;
+  }
+  .rn-rec {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    color: var(--red);
+    letter-spacing: 0.28em;
+    font-weight: 700;
+  }
+  .rn-rec::before {
+    content: '';
+    width: 7px; height: 7px;
+    background: var(--red);
+    border-radius: 50%;
+    box-shadow: 0 0 10px var(--red);
+    animation: blinkRed 0.9s infinite;
+  }
+  .rn-ts {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    color: var(--cyan);
+    letter-spacing: 0.18em;
+  }
+
+  .rn-hero {
+    text-align: center;
+    padding: 10px 0 6px;
+    margin-bottom: 16px;
+    position: relative;
+  }
+  .rn-hero-k {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    color: var(--cyan);
+    letter-spacing: 0.32em;
+    margin-bottom: 8px;
+  }
+  .rn-hero-v {
+    font-family: 'Playfair Display', serif;
+    font-weight: 900;
+    font-style: italic;
+    font-size: 120px;
+    line-height: 0.9;
+    letter-spacing: -0.045em;
+    color: var(--text);
+    text-shadow:
+      3px 0 0 rgba(77,208,225,0.5),
+      -3px 0 0 rgba(255,23,68,0.5),
+      0 0 40px rgba(255,23,68,0.3);
+    margin: 0 0 2px;
+  }
+  .rn-hero-u {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    color: var(--text-fade);
+    letter-spacing: 0.3em;
+    margin-top: -4px;
+  }
+  .rn-hero-u span { color: var(--cyan); }
+  .rn-hero-u b { color: var(--red); font-weight: 700; }
+
+  .rn-gap {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 9px 12px;
+    margin-bottom: 16px;
+    background: rgba(255,23,68,0.06);
+    border: 1px solid var(--border-red);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.15em;
+  }
+  .rn-gap-k { color: var(--red); letter-spacing: 0.22em; }
+  .rn-gap-v { color: var(--text); font-weight: 700; font-size: 12px; }
+  .rn-gap-v b { color: var(--red); text-shadow: 0 0 8px rgba(255,23,68,0.4); }
+
+  .rn-map {
+    height: 170px;
+    border: 1px solid var(--border-cyan);
+    background:
+      linear-gradient(rgba(77,208,225,0.04), rgba(4,4,10,0.6));
+    position: relative;
+    overflow: hidden;
+    margin-bottom: 16px;
+  }
+  .rn-map::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+      linear-gradient(90deg, transparent 0, transparent 19%, rgba(77,208,225,0.08) 20%, rgba(77,208,225,0.08) 20.5%, transparent 21%),
+      linear-gradient(90deg, transparent 0, transparent 39%, rgba(77,208,225,0.08) 40%, rgba(77,208,225,0.08) 40.5%, transparent 41%),
+      linear-gradient(90deg, transparent 0, transparent 59%, rgba(77,208,225,0.08) 60%, rgba(77,208,225,0.08) 60.5%, transparent 61%),
+      linear-gradient(90deg, transparent 0, transparent 79%, rgba(77,208,225,0.08) 80%, rgba(77,208,225,0.08) 80.5%, transparent 81%),
+      linear-gradient(0deg, transparent 0, transparent 24%, rgba(77,208,225,0.08) 25%, rgba(77,208,225,0.08) 25.5%, transparent 26%),
+      linear-gradient(0deg, transparent 0, transparent 49%, rgba(77,208,225,0.08) 50%, rgba(77,208,225,0.08) 50.5%, transparent 51%),
+      linear-gradient(0deg, transparent 0, transparent 74%, rgba(77,208,225,0.08) 75%, rgba(77,208,225,0.08) 75.5%, transparent 76%);
+  }
+  .rn-map-svg {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+  }
+  .rn-map-label {
+    position: absolute;
+    bottom: 8px;
+    left: 10px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 8px;
+    color: var(--cyan);
+    letter-spacing: 0.2em;
+    z-index: 5;
+  }
+  .rn-map-label::before { content: '// '; color: var(--text-mute); }
+  .rn-map-me {
+    position: absolute;
+    top: 8px;
+    right: 10px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 8px;
+    color: var(--text-fade);
+    letter-spacing: 0.18em;
+    z-index: 5;
+    display: flex;
+    gap: 8px;
+    align-items: center;
+  }
+  .rn-map-me .dot-m { color: var(--red); }
+  .rn-map-me .dot-s { color: var(--cyan); }
+
+  .rn-stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 6px;
+    margin-bottom: 16px;
+  }
+  .rn-stat {
+    background: var(--panel);
+    border: 1px solid var(--border-cyan);
+    padding: 12px 8px 10px;
+    position: relative;
+    text-align: center;
+  }
+  .rn-stat::before {
+    content: '';
+    position: absolute;
+    top: 4px; right: 4px;
+    width: 3px; height: 3px;
+    background: var(--cyan);
+    box-shadow: 0 0 6px var(--cyan);
+  }
+  .rn-stat .k {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 8px;
+    color: var(--cyan);
+    letter-spacing: 0.22em;
+    margin-bottom: 6px;
+  }
+  .rn-stat .v {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-weight: 700;
+    font-size: 22px;
+    color: var(--text);
+    line-height: 1;
+    letter-spacing: -0.02em;
+  }
+  .rn-stat .v small {
+    font-family: 'JetBrains Mono', monospace;
+    font-style: normal;
+    font-size: 8px;
+    color: var(--text-fade);
+    margin-left: 2px;
+    letter-spacing: 0.1em;
+    font-weight: 500;
+  }
+
+  .rn-controls {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+  .rn-btn {
+    padding: 14px 0;
+    text-align: center;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    letter-spacing: 0.3em;
+    font-weight: 700;
+    cursor: pointer;
+  }
+  .rn-btn.pause {
+    border: 1px solid var(--cyan);
+    color: var(--cyan);
+    background: rgba(77,208,225,0.06);
+  }
+  .rn-btn.pause::before { content: '[ '; opacity: 0.6; }
+  .rn-btn.pause::after { content: ' ]'; opacity: 0.6; }
+  .rn-btn.stop {
+    border: 1px solid var(--red);
+    color: var(--red);
+    background: rgba(255,23,68,0.08);
+    box-shadow: 0 0 16px rgba(255,23,68,0.18);
+  }
+  .rn-btn.stop::before { content: '[ '; opacity: 0.6; }
+  .rn-btn.stop::after { content: ' ]'; opacity: 0.6; }
+
+  .rn-feed {
+    margin-top: 14px;
+    padding-top: 10px;
+    border-top: 1px dashed rgba(77,208,225,0.15);
+  }
+  .rn-feed-ttl {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 8px;
+    color: var(--cyan);
+    letter-spacing: 0.28em;
+    margin-bottom: 6px;
+  }
+  .rn-feed-ttl::before { content: '// '; color: var(--text-mute); }
+  .rn-feed-line {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    color: var(--text-dim);
+    letter-spacing: 0.08em;
+    line-height: 1.7;
+  }
+  .rn-feed-line .ts { color: var(--text-mute); }
+  .rn-feed-line b { color: var(--red); font-weight: 700; }
+  .rn-feed-line em { color: var(--cyan); font-style: normal; }
+
+  /* ============================================================
+     SCREEN 4 — RESULT
+     ============================================================ */
+  .rs-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 22px;
+  }
+  .rs-hero {
+    text-align: center;
+    margin-bottom: 14px;
+  }
+  .rs-hero-k {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    color: var(--cyan);
+    letter-spacing: 0.32em;
+    margin-bottom: 12px;
+  }
+  .rs-hero-k::before { content: '// '; color: var(--text-mute); }
+  .rs-hero-v {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-weight: 900;
+    font-size: 44px;
+    line-height: 1;
+    letter-spacing: -0.03em;
+    color: var(--text);
+    text-shadow:
+      2px 0 0 rgba(77,208,225,0.55),
+      -2px 0 0 rgba(255,23,68,0.25),
+      0 0 30px rgba(77,208,225,0.35);
+    margin-bottom: 4px;
+  }
+  .rs-hero-v .dot { color: var(--cyan); }
+  .rs-hero-sub {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    color: var(--text-fade);
+    letter-spacing: 0.18em;
+    line-height: 1.55;
+    margin-top: 10px;
+  }
+  .rs-hero-sub b { color: var(--cyan); font-weight: 700; }
+  .rs-hero-sub em { color: var(--red); font-style: normal; font-weight: 700; }
+  .rs-hero-sub .ts { color: var(--text-mute); }
+
+  .rs-stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 6px;
+    margin: 20px 0 18px;
+  }
+  .rs-stat {
+    background: var(--panel);
+    border: 1px solid var(--border-cyan);
+    padding: 12px 8px 10px;
+    position: relative;
+    text-align: left;
+  }
+  .rs-stat::before {
+    content: '';
+    position: absolute;
+    top: 4px; right: 4px;
+    width: 3px; height: 3px;
+    background: var(--cyan);
+    box-shadow: 0 0 6px var(--cyan);
+  }
+  .rs-stat .k {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 8px;
+    color: var(--cyan);
+    letter-spacing: 0.22em;
+    margin-bottom: 6px;
+  }
+  .rs-stat .v {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-weight: 700;
+    font-size: 22px;
+    color: var(--text);
+    line-height: 1;
+    letter-spacing: -0.02em;
+  }
+  .rs-stat .v small {
+    font-family: 'JetBrains Mono', monospace;
+    font-style: normal;
+    font-size: 8px;
+    color: var(--text-fade);
+    margin-left: 2px;
+    letter-spacing: 0.1em;
+    font-weight: 500;
+  }
+
+  .rs-chart {
+    background: var(--panel);
+    border: 1px solid var(--border-cyan);
+    padding: 12px 10px 8px;
+    margin-bottom: 18px;
+    position: relative;
+  }
+  .rs-chart::before {
+    content: '';
+    position: absolute;
+    top: 5px; right: 5px;
+    width: 4px; height: 4px;
+    background: var(--cyan);
+    box-shadow: 0 0 8px var(--cyan);
+  }
+  .rs-chart-ttl {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 8px;
+    color: var(--cyan);
+    letter-spacing: 0.26em;
+    margin-bottom: 6px;
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+  }
+  .rs-chart-ttl::before { content: '// '; color: var(--text-mute); }
+  .rs-chart-ttl .leg {
+    font-size: 8px;
+    color: var(--text-fade);
+    letter-spacing: 0.14em;
+  }
+  .rs-chart-ttl .leg b { color: var(--cyan); margin-right: 8px; font-weight: 500; }
+  .rs-chart-ttl .leg em { color: var(--red); font-style: normal; font-weight: 500; }
+  .rs-chart-svg { width: 100%; height: 94px; display: block; }
+  .rs-chart-foot {
+    display: flex;
+    justify-content: space-between;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 8px;
+    color: var(--text-mute);
+    letter-spacing: 0.18em;
+    margin-top: 2px;
+  }
+
+  .rs-detail {
+    border: 1px solid var(--border-cyan);
+    border-left: none;
+    border-right: none;
+    padding: 4px 0;
+    margin-bottom: 16px;
+  }
+  .rs-detail-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 7px 0;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    border-bottom: 1px dashed rgba(77,208,225,0.08);
+  }
+  .rs-detail-row:last-child { border-bottom: none; }
+  .rs-detail-row .k { color: var(--text-fade); }
+  .rs-detail-row .k::before { content: '> '; color: var(--cyan); }
+  .rs-detail-row .v { color: var(--text); font-weight: 700; }
+  .rs-detail-row .v b { color: var(--cyan); font-weight: 700; }
+
+  .rs-actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+  .rs-act {
+    padding: 12px 0;
+    text-align: center;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.26em;
+    font-weight: 700;
+    cursor: pointer;
+  }
+  .rs-act.ghost {
+    border: 1px solid var(--border-cyan);
+    color: var(--cyan);
+    background: var(--panel);
+  }
+  .rs-act.filled {
+    border: 1px solid var(--red);
+    color: var(--red);
+    background: rgba(255,23,68,0.08);
+    box-shadow: 0 0 16px rgba(255,23,68,0.15);
+  }
+  .rs-act::before { content: '[ '; opacity: 0.55; }
+  .rs-act::after { content: ' ]'; opacity: 0.55; }
+
+  /* ============================================================
+     SCREEN 5 — HISTORY
+     ============================================================ */
+  .hs-top { margin-bottom: 16px; }
+  .hs-title {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-weight: 900;
+    font-size: 30px;
+    letter-spacing: -0.03em;
+    color: var(--text);
+    text-shadow: 1.5px 0 0 rgba(77,208,225,0.4), -1.5px 0 0 rgba(255,23,68,0.35);
+    margin-bottom: 4px;
+  }
+  .hs-title::before { content: '// '; color: var(--text-mute); font-family: 'JetBrains Mono', monospace; font-style: normal; font-size: 12px; letter-spacing: 0.2em; font-weight: 500; }
+  .hs-sub {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    color: var(--cyan);
+    letter-spacing: 0.22em;
+    margin-bottom: 20px;
+  }
+  .hs-sub b { color: var(--text-dim); font-weight: 500; }
+
+  .hs-summary {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 6px;
+    margin-bottom: 20px;
+  }
+  .hs-sum {
+    background: var(--panel);
+    border: 1px solid var(--border-cyan);
+    padding: 12px 10px;
+    position: relative;
+    text-align: left;
+  }
+  .hs-sum::before {
+    content: '';
+    position: absolute;
+    top: 5px; right: 5px;
+    width: 4px; height: 4px;
+    background: var(--cyan);
+    box-shadow: 0 0 8px var(--cyan);
+  }
+  .hs-sum .k {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 8px;
+    color: var(--cyan);
+    letter-spacing: 0.24em;
+    margin-bottom: 6px;
+  }
+  .hs-sum .v {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-weight: 700;
+    font-size: 22px;
+    color: var(--text);
+    line-height: 1;
+    letter-spacing: -0.02em;
+  }
+  .hs-sum .v small {
+    font-family: 'JetBrains Mono', monospace;
+    font-style: normal;
+    font-size: 9px;
+    color: var(--text-fade);
+    margin-left: 2px;
+    letter-spacing: 0.1em;
+    font-weight: 500;
+  }
+  .hs-sum .v .sp { color: var(--red); font-style: normal; font-family: 'JetBrains Mono', monospace; font-size: 16px; }
+
+  .hs-list-ttl {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    color: var(--cyan);
+    letter-spacing: 0.26em;
+    margin-bottom: 8px;
+    padding-bottom: 6px;
+    border-bottom: 1px solid var(--border-cyan);
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+  }
+  .hs-list-ttl::before { content: '// '; color: var(--text-mute); }
+  .hs-list-ttl .sort {
+    color: var(--text-fade);
+    font-size: 8px;
+    letter-spacing: 0.2em;
+  }
+
+  .hs-row {
+    display: grid;
+    grid-template-columns: 36px 1fr auto;
+    gap: 10px;
+    align-items: center;
+    padding: 12px 0;
+    border-bottom: 1px dashed rgba(77,208,225,0.1);
+  }
+  .hs-row:last-child { border-bottom: none; }
+  .hs-row-id {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--cyan);
+    letter-spacing: 0.1em;
+    font-weight: 700;
+    padding-right: 8px;
+    border-right: 1px solid var(--border-cyan);
+  }
+  .hs-row-info { min-width: 0; }
+  .hs-row-t {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-size: 13px;
+    color: var(--text);
+    letter-spacing: -0.01em;
+    margin-bottom: 2px;
+  }
+  .hs-row-t .st {
+    font-family: 'JetBrains Mono', monospace;
+    font-style: normal;
+    font-size: 8px;
+    letter-spacing: 0.22em;
+    margin-left: 6px;
+  }
+  .hs-row-t .st.ok { color: var(--cyan); }
+  .hs-row-t .st.fail { color: var(--red); }
+  .hs-row-m {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    color: var(--text-fade);
+    letter-spacing: 0.12em;
+  }
+  .hs-row-m .ts { color: var(--text-mute); }
+  .hs-row-v {
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 700;
+    font-size: 13px;
+    text-align: right;
+    letter-spacing: 0.02em;
+  }
+  .hs-row-v.pos { color: var(--cyan); text-shadow: 0 0 8px rgba(77,208,225,0.35); }
+  .hs-row-v.neg { color: var(--red); text-shadow: 0 0 8px rgba(255,23,68,0.45); }
+  .hs-row-v small {
+    display: block;
+    font-size: 8px;
+    color: var(--text-fade);
+    font-weight: 500;
+    letter-spacing: 0.15em;
+    margin-top: 2px;
+  }
+
+  /* ============================================================
+     SCREEN 6 — SETTINGS
+     ============================================================ */
+  .st-title {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-weight: 900;
+    font-size: 30px;
+    letter-spacing: -0.03em;
+    color: var(--text);
+    text-shadow: 1.5px 0 0 rgba(77,208,225,0.4), -1.5px 0 0 rgba(255,23,68,0.35);
+    margin-bottom: 4px;
+  }
+  .st-title::before { content: '// '; color: var(--text-mute); font-family: 'JetBrains Mono', monospace; font-style: normal; font-size: 12px; letter-spacing: 0.2em; font-weight: 500; }
+  .st-sub {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    color: var(--cyan);
+    letter-spacing: 0.22em;
+    margin-bottom: 20px;
+  }
+
+  .st-user {
+    border: 1px solid var(--border-cyan);
+    background: linear-gradient(135deg, rgba(77,208,225,0.05), rgba(255,23,68,0.04));
+    padding: 16px 14px;
+    display: flex;
+    gap: 14px;
+    align-items: center;
+    margin-bottom: 20px;
+    position: relative;
+    overflow: hidden;
+  }
+  .st-user::before {
+    content: '';
+    position: absolute;
+    top: 6px; right: 8px;
+    width: 5px; height: 5px;
+    background: var(--cyan);
+    box-shadow: 0 0 10px var(--cyan);
+  }
+  .st-user::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(0deg, transparent 0, transparent 2px, rgba(77,208,225,0.02) 2px, rgba(77,208,225,0.02) 3px);
+    pointer-events: none;
+  }
+  .st-user-avatar {
+    width: 52px; height: 52px;
+    border: 1px solid var(--border-cyan-bright);
+    background: rgba(0,0,0,0.4);
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-weight: 900;
+    font-size: 22px;
+    color: var(--cyan);
+    flex-shrink: 0;
+    text-shadow: 0 0 14px rgba(77,208,225,0.45);
+    position: relative;
+  }
+  .st-user-avatar::after {
+    content: '';
+    position: absolute;
+    inset: 4px;
+    border: 1px dashed rgba(77,208,225,0.3);
+  }
+  .st-user-info { flex: 1; min-width: 0; position: relative; }
+  .st-user-n {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-size: 16px;
+    color: var(--text);
+    margin-bottom: 3px;
+  }
+  .st-user-n .pro {
+    font-family: 'JetBrains Mono', monospace;
+    font-style: normal;
+    font-size: 9px;
+    letter-spacing: 0.22em;
+    color: var(--red);
+    border: 1px solid var(--red);
+    padding: 1px 5px;
+    margin-left: 8px;
+    text-shadow: 0 0 6px rgba(255,23,68,0.5);
+  }
+  .st-user-m {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    color: var(--text-fade);
+    letter-spacing: 0.18em;
+  }
+  .st-user-m b { color: var(--cyan); }
+
+  .st-sect {
+    margin-bottom: 16px;
+  }
+  .st-sect-ttl {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    color: var(--cyan);
+    letter-spacing: 0.28em;
+    margin-bottom: 6px;
+    padding-bottom: 6px;
+    border-bottom: 1px solid var(--border-cyan);
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+  }
+  .st-sect-ttl::before { content: '// '; color: var(--text-mute); }
+  .st-sect-ttl .c {
+    color: var(--text-fade);
+    letter-spacing: 0.14em;
+    font-size: 8px;
+  }
+
+  .st-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 0;
+    border-bottom: 1px dashed rgba(77,208,225,0.08);
+  }
+  .st-row:last-child { border-bottom: none; }
+  .st-row-l {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+  }
+  .st-row-l .k {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    color: var(--cyan);
+    letter-spacing: 0.12em;
+    font-weight: 500;
+    min-width: 82px;
+  }
+  .st-row-l .k::before { content: '> '; color: var(--text-mute); }
+  .st-row-l .n {
+    font-family: 'Inter', 'Pretendard', sans-serif;
+    font-size: 12px;
+    color: var(--text);
+    letter-spacing: -0.01em;
+  }
+  .st-row-r {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    color: var(--text-dim);
+    letter-spacing: 0.14em;
+    font-weight: 500;
+  }
+  .st-row-r b { color: var(--cyan); font-weight: 700; }
+  .st-row-r.on { color: var(--red); font-weight: 700; text-shadow: 0 0 6px rgba(255,23,68,0.4); }
+
+  .st-toggle {
+    width: 32px; height: 16px;
+    border: 1px solid var(--cyan);
+    background: rgba(77,208,225,0.08);
+    position: relative;
+    display: inline-block;
+  }
+  .st-toggle::after {
+    content: '';
+    position: absolute;
+    top: 1px; right: 1px;
+    width: 12px; height: 12px;
+    background: var(--cyan);
+    box-shadow: 0 0 8px var(--cyan);
+  }
+  .st-toggle.off {
+    border-color: var(--text-mute);
+    background: transparent;
+  }
+  .st-toggle.off::after {
+    right: auto; left: 1px;
+    background: var(--text-mute);
+    box-shadow: none;
+  }
+
+  .st-version {
+    margin-top: 20px;
+    padding-top: 14px;
+    border-top: 1px solid var(--border-cyan);
+    text-align: center;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    color: var(--text-fade);
+    letter-spacing: 0.2em;
+    line-height: 1.7;
+  }
+  .st-version .v { color: var(--cyan); }
+  .st-version .hint {
+    font-size: 8px;
+    color: var(--text-mute);
+    letter-spacing: 0.18em;
+  }
+
+  @media (max-width: 1100px) {
+    .grid { grid-template-columns: repeat(2, 1fr); }
+    .intro { grid-template-columns: repeat(2, 1fr); }
+  }
+  @media (max-width: 720px) {
+    .grid { grid-template-columns: 1fr; }
+    .intro { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<div class="page-head">
+  <div class="page-head-left">
+    <span class="ph-brand">Shadow Run.</span>
+    <span class="ph-sep">//</span>
+    <span class="ph-sub">Theme 05 · Neo-Noir Cyber</span>
+  </div>
+  <div class="ph-meta">
+    <span class="ph-dot"></span>SYSTEM ONLINE · 04:12 UTC+9 · ep.028 · <b>TRACKING</b>
+  </div>
+</div>
+
+<div class="intro">
+  <div class="intro-cell">
+    <div class="k">// PALETTE</div>
+    <div class="v">Deep Navy <em>#04040A</em> · Neon Red <em>#FF1744</em> · Cold Cyan <em>#4DD0E1</em></div>
+  </div>
+  <div class="intro-cell">
+    <div class="k">// TYPEFACE</div>
+    <div class="v">Inter (본문) · JetBrains Mono (system log) · Playfair Italic (title)</div>
+  </div>
+  <div class="intro-cell">
+    <div class="k">// TEXTURE</div>
+    <div class="v">CRT 스캔라인 + RGB 글리치 + 시안 데이터 포인트</div>
+  </div>
+  <div class="intro-cell">
+    <div class="k">// LEXICON</div>
+    <div class="v">Episode → <em>ep.028</em> · 탈출 → <em>SUBJECT · SAFE</em> · 잡힘 → <em>SUBJECT · LOST</em></div>
+  </div>
+</div>
+
+<div class="grid">
+
+  <!-- ============================================================
+       SCREEN 1 — HOME
+       ============================================================ -->
+  <div class="cell">
+    <div class="phone">
+      <div class="notch"></div>
+      <div class="screen">
+        <div class="statusbar">
+          <span>04:12</span>
+          <span class="sb-r">GPS · 5G · ●●●</span>
+        </div>
+        <div class="body">
+          <div class="hm-tag-row">
+            <div class="tag">TRACKING · 028</div>
+            <div class="hm-icons">
+              <div class="hm-ico">◇</div>
+              <div class="hm-ico">≡</div>
+              <div class="hm-ico">⚙</div>
+            </div>
+          </div>
+
+          <div class="hm-logo">Shadow<br>Run<span class="dot">.</span></div>
+          <div class="hm-sub">ep.028 <span>/</span> 17.04.2026 <span>/</span> seoul</div>
+          <div class="hm-coord">37.5658°N · 127.0450°E · <b>ENTITY ACTIVE</b></div>
+
+          <div class="hm-quote">
+            <div class="hm-quote-t">그는 어젯밤 당신을 <strong>312m</strong>까지 추적했다. 오늘은 더 가까울 것이다.</div>
+            <div class="hm-quote-by">— SYSTEM LOG <span>·</span> 04:12 UTC+9</div>
+          </div>
+
+          <div class="hm-stats">
+            <div class="hm-stat">
+              <div class="k">WEEK</div>
+              <div class="v">12.4<small>km</small></div>
+            </div>
+            <div class="hm-stat">
+              <div class="k">RUNS</div>
+              <div class="v">28</div>
+            </div>
+            <div class="hm-stat">
+              <div class="k">BEST</div>
+              <div class="v">412<small>m</small></div>
+            </div>
+          </div>
+
+          <div class="hm-start">
+            <div class="hm-start-tag">TONIGHT'S PROTOCOL</div>
+            <div class="hm-start-ttl">지금,<br>도주를 시작하라.</div>
+            <div class="hm-start-cta">
+              <div class="l">EXECUTE</div>
+              <div class="a">›</div>
+            </div>
+          </div>
+
+          <div class="hm-log-ttl">
+            <span>// RECENT LOGS</span>
+            <span class="more">VIEW ALL ›</span>
+          </div>
+
+          <div class="hm-log">
+            <div class="hm-log-id">028</div>
+            <div class="hm-log-info">
+              <div class="hm-log-t">성동 <span class="status ok">ESCAPED</span></div>
+              <div class="hm-log-m">04.16 · 3.42km / 24:18</div>
+            </div>
+            <div class="hm-log-v pos">+312<small>METERS</small></div>
+          </div>
+          <div class="hm-log">
+            <div class="hm-log-id">027</div>
+            <div class="hm-log-info">
+              <div class="hm-log-t">한강 <span class="status fail">CAPTURED</span></div>
+              <div class="hm-log-m">04.15 · 2.18km / 18:02</div>
+            </div>
+            <div class="hm-log-v neg">−018<small>METERS</small></div>
+          </div>
+          <div class="hm-log">
+            <div class="hm-log-id">026</div>
+            <div class="hm-log-info">
+              <div class="hm-log-t">남산 <span class="status ok">ESCAPED</span></div>
+              <div class="hm-log-m">04.14 · 4.80km / 33:41</div>
+            </div>
+            <div class="hm-log-v pos">+520<small>METERS</small></div>
+          </div>
+        </div>
+
+        <div class="tabs">
+          <div class="tab active"><div class="ti">●</div>HOME</div>
+          <div class="tab"><div class="ti">◷</div>LOGS</div>
+          <div class="tab"><div class="ti">◎</div>STATS</div>
+          <div class="tab"><div class="ti">⚙</div>SYS</div>
+        </div>
+      </div>
+    </div>
+    <div class="cell-label">01 <span>·</span> HOME <b>— 오늘의 프로토콜</b></div>
+  </div>
+
+  <!-- ============================================================
+       SCREEN 2 — PREPARE
+       ============================================================ -->
+  <div class="cell">
+    <div class="phone">
+      <div class="notch"></div>
+      <div class="screen">
+        <div class="statusbar">
+          <span>04:13</span>
+          <span class="sb-r">GPS · 5G · ●●●</span>
+        </div>
+        <div class="body">
+          <div class="hm-tag-row">
+            <div class="tag">PROTOCOL · 029</div>
+            <div class="hm-icons">
+              <div class="hm-ico">←</div>
+              <div class="hm-ico">?</div>
+            </div>
+          </div>
+
+          <div class="pp-title-small">도주 시작을 위한</div>
+          <div class="pp-title">PROTOCOL<em>PREPARATION</em></div>
+
+          <div class="pp-coord-row">
+            <span class="c">37.5658°N · 127.0450°E</span>
+            <span class="ok">● GPS OK</span>
+          </div>
+
+          <div class="pp-section">
+            <div class="pp-sect-ttl">SUBJECT · VELOCITY <span class="hint">SELECT TIER</span></div>
+            <div class="pp-velocity">
+              <div class="pp-vel">
+                <div class="lvl">v1</div>
+                <div class="sp">5.0<small>km/h</small></div>
+                <div class="nm">WALK</div>
+              </div>
+              <div class="pp-vel sel">
+                <div class="lvl">v2 · SEL</div>
+                <div class="sp">7.5<small>km/h</small></div>
+                <div class="nm">JOG</div>
+              </div>
+              <div class="pp-vel">
+                <div class="lvl">v3</div>
+                <div class="sp">10.0<small>km/h</small></div>
+                <div class="nm">SPRINT</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="pp-section">
+            <div class="pp-sect-ttl">EQUIPMENT <span class="hint">LOADED</span></div>
+            <div class="pp-equip">
+              <div class="pp-equip-ico">R</div>
+              <div class="pp-equip-info">
+                <div class="pp-equip-name">Runner X · v3</div>
+                <div class="pp-equip-m">SERIAL <b>#SR-2024-002</b> · wear 73%</div>
+              </div>
+              <div class="pp-equip-v">73.0<small>KM USED</small></div>
+            </div>
+          </div>
+
+          <div class="pp-section">
+            <div class="pp-sect-ttl">OBJECTIVE <span class="hint">TARGET</span></div>
+            <div class="pp-obj">
+              <div class="pp-obj-cell">
+                <div class="k">DISTANCE</div>
+                <div class="v">3.0<small>KM</small></div>
+                <div class="v-sub">— EST. 22 MIN —</div>
+              </div>
+              <div class="pp-obj-cell">
+                <div class="k">ENTITY GAP</div>
+                <div class="v">+150<small>M</small></div>
+                <div class="v-sub">— SAFE MARGIN —</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="pp-execute">
+            <div class="pp-execute-t">// EXECUTE PROTOCOL</div>
+            <div class="pp-execute-b">ENGAGE</div>
+            <div class="pp-execute-sub">HOLD TO START · T-00:03</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="cell-label">02 <span>·</span> PREPARE <b>— PROTOCOL PREP</b></div>
+  </div>
+
+  <!-- ============================================================
+       SCREEN 3 — RUNNING
+       ============================================================ -->
+  <div class="cell">
+    <div class="phone">
+      <div class="notch"></div>
+      <div class="screen">
+        <div class="statusbar">
+          <span>04:27</span>
+          <span class="sb-r">GPS · 5G · ●●●</span>
+        </div>
+        <div class="body">
+          <div class="rn-top">
+            <div class="rn-rec">REC · 028 RUNNING</div>
+            <div class="rn-ts">T+14:32 · 04:27 UTC+9</div>
+          </div>
+
+          <div class="rn-hero">
+            <div class="rn-hero-k">// DISTANCE · ENTITY GAP</div>
+            <div class="rn-hero-v">152</div>
+            <div class="rn-hero-u">METERS <span>·</span> SUBJECT <b>AHEAD</b></div>
+          </div>
+
+          <div class="rn-gap">
+            <span class="rn-gap-k">▲ ENTITY PROXIMITY</span>
+            <span class="rn-gap-v">closing · <b>0.3m/s</b></span>
+          </div>
+
+          <div class="rn-map">
+            <svg class="rn-map-svg" viewBox="0 0 340 170" preserveAspectRatio="none">
+              <defs>
+                <filter id="glow5" x="-50%" y="-50%" width="200%" height="200%">
+                  <feGaussianBlur stdDeviation="2"/>
+                </filter>
+                <filter id="glowR" x="-50%" y="-50%" width="200%" height="200%">
+                  <feGaussianBlur stdDeviation="3"/>
+                </filter>
+              </defs>
+              <!-- Shadow entity trail (blue dashed) -->
+              <path d="M 30 140 C 60 130, 80 110, 110 100 S 170 70, 210 60 L 250 50" fill="none" stroke="#4DD0E1" stroke-width="1.5" stroke-dasharray="3 3" opacity="0.55" filter="url(#glow5)"/>
+              <path d="M 30 140 C 60 130, 80 110, 110 100 S 170 70, 210 60 L 250 50" fill="none" stroke="#4DD0E1" stroke-width="1" stroke-dasharray="3 3" opacity="0.85"/>
+              <!-- Player trail (red solid) -->
+              <path d="M 30 140 C 65 125, 95 115, 128 98 S 195 58, 245 34 L 290 22" fill="none" stroke="#FF1744" stroke-width="3" opacity="0.35" filter="url(#glowR)"/>
+              <path d="M 30 140 C 65 125, 95 115, 128 98 S 195 58, 245 34 L 290 22" fill="none" stroke="#FF1744" stroke-width="1.4" opacity="0.95"/>
+              <!-- Start marker -->
+              <circle cx="30" cy="140" r="3" fill="#4DD0E1" opacity="0.7"/>
+              <circle cx="30" cy="140" r="6" fill="none" stroke="#4DD0E1" stroke-width="0.5" opacity="0.5"/>
+              <!-- Shadow entity (cyan dot) -->
+              <circle cx="250" cy="50" r="4" fill="#4DD0E1" filter="url(#glow5)"/>
+              <circle cx="250" cy="50" r="2.5" fill="#4DD0E1"/>
+              <circle cx="250" cy="50" r="10" fill="none" stroke="#4DD0E1" stroke-width="0.6" opacity="0.5"/>
+              <!-- Player (red glowing dot) -->
+              <circle cx="290" cy="22" r="6" fill="#FF1744" filter="url(#glowR)"/>
+              <circle cx="290" cy="22" r="3.5" fill="#FF1744"/>
+              <circle cx="290" cy="22" r="12" fill="none" stroke="#FF1744" stroke-width="0.7" opacity="0.6"/>
+              <!-- Tick marks -->
+              <text x="32" y="158" font-family="JetBrains Mono" font-size="7" fill="#4DD0E1" opacity="0.6" letter-spacing="1">T+0</text>
+              <text x="260" y="66" font-family="JetBrains Mono" font-size="7" fill="#4DD0E1" opacity="0.8" letter-spacing="1">ENT</text>
+              <text x="260" y="18" font-family="JetBrains Mono" font-size="7" fill="#FF1744" opacity="0.9" letter-spacing="1">YOU</text>
+            </svg>
+            <div class="rn-map-label">LIVE TRACK · ZONE 3</div>
+            <div class="rn-map-me">
+              <span class="dot-s">◆ ENT</span>
+              <span class="dot-m">● YOU</span>
+            </div>
+          </div>
+
+          <div class="rn-stats">
+            <div class="rn-stat">
+              <div class="k">TIME</div>
+              <div class="v">14:32</div>
+            </div>
+            <div class="rn-stat">
+              <div class="k">DIST</div>
+              <div class="v">1.82<small>km</small></div>
+            </div>
+            <div class="rn-stat">
+              <div class="k">PACE</div>
+              <div class="v">7'58"</div>
+            </div>
+          </div>
+
+          <div class="rn-controls">
+            <div class="rn-btn pause">PAUSE</div>
+            <div class="rn-btn stop">ABORT</div>
+          </div>
+
+          <div class="rn-feed">
+            <div class="rn-feed-ttl">SYSTEM FEED</div>
+            <div class="rn-feed-line"><span class="ts">[04:27:08]</span> entity within <b>200M</b> threshold</div>
+            <div class="rn-feed-line"><span class="ts">[04:26:41]</span> subject velocity <em>7.5 km/h</em> stable</div>
+            <div class="rn-feed-line"><span class="ts">[04:25:02]</span> protocol <em>028</em> · checkpoint passed</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="cell-label">03 <span>·</span> RUNNING <b>— LIVE TRACK</b></div>
+  </div>
+
+  <!-- ============================================================
+       SCREEN 4 — RESULT
+       ============================================================ -->
+  <div class="cell">
+    <div class="phone">
+      <div class="notch"></div>
+      <div class="screen">
+        <div class="statusbar">
+          <span>04:38</span>
+          <span class="sb-r">GPS · 5G · ●●●</span>
+        </div>
+        <div class="body">
+          <div class="rs-top">
+            <div class="tag">● COMPLETE · 028</div>
+            <div class="coord"><b>04:38</b> · <span class="ok">SIGNED</span></div>
+          </div>
+
+          <div class="rs-hero">
+            <div class="rs-hero-k">PROTOCOL 028 · RESULT</div>
+            <div class="rs-hero-v">SUBJECT<span class="dot"> · </span>SAFE</div>
+            <div class="rs-hero-sub">
+              <span class="ts">//</span> 04:12 <span class="ts">—</span> subject escaped entity by <b>+312M</b><br>
+              <span class="ts">//</span> protocol <b>ep.028</b> · seoul <em>seongdong</em> · tier v2
+            </div>
+          </div>
+
+          <div class="rs-stats">
+            <div class="rs-stat">
+              <div class="k">DIST</div>
+              <div class="v">3.42<small>km</small></div>
+            </div>
+            <div class="rs-stat">
+              <div class="k">TIME</div>
+              <div class="v">24:18</div>
+            </div>
+            <div class="rs-stat">
+              <div class="k">PACE</div>
+              <div class="v">7'06"</div>
+            </div>
+          </div>
+
+          <div class="rs-chart">
+            <div class="rs-chart-ttl">
+              <span>ENTITY DISTANCE CHART</span>
+              <span class="leg"><b>▬ YOU</b><em>▬ DANGER ZONE</em></span>
+            </div>
+            <svg class="rs-chart-svg" viewBox="0 0 300 94" preserveAspectRatio="none">
+              <!-- grid -->
+              <line x1="0" y1="23" x2="300" y2="23" stroke="#4DD0E1" stroke-width="0.4" stroke-dasharray="2 3" opacity="0.18"/>
+              <line x1="0" y1="47" x2="300" y2="47" stroke="#4DD0E1" stroke-width="0.4" stroke-dasharray="2 3" opacity="0.18"/>
+              <line x1="0" y1="71" x2="300" y2="71" stroke="#4DD0E1" stroke-width="0.4" stroke-dasharray="2 3" opacity="0.18"/>
+              <!-- danger zone (red fill below line) -->
+              <path d="M 60 76 L 80 82 L 110 86 L 130 80 L 60 76 Z" fill="#FF1744" opacity="0.18"/>
+              <path d="M 60 76 L 80 82 L 110 86 L 130 80" stroke="#FF1744" stroke-width="1" fill="none" stroke-dasharray="3 2" opacity="0.9"/>
+              <!-- safe zone fill -->
+              <path d="M 0 58 L 20 52 L 40 60 L 60 76 L 80 82 L 110 86 L 130 80 L 160 62 L 190 44 L 220 30 L 250 22 L 280 16 L 300 12 L 300 94 L 0 94 Z" fill="url(#safeGrad5)" opacity="0.15"/>
+              <defs>
+                <linearGradient id="safeGrad5" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stop-color="#4DD0E1"/>
+                  <stop offset="100%" stop-color="#4DD0E1" stop-opacity="0"/>
+                </linearGradient>
+                <filter id="cyanGlow" x="-50%" y="-50%" width="200%" height="200%">
+                  <feGaussianBlur stdDeviation="2"/>
+                </filter>
+              </defs>
+              <!-- cyan player line -->
+              <path d="M 0 58 L 20 52 L 40 60 L 60 76 L 80 82 L 110 86 L 130 80 L 160 62 L 190 44 L 220 30 L 250 22 L 280 16 L 300 12" stroke="#4DD0E1" stroke-width="3" fill="none" opacity="0.35" filter="url(#cyanGlow)"/>
+              <path d="M 0 58 L 20 52 L 40 60 L 60 76 L 80 82 L 110 86 L 130 80 L 160 62 L 190 44 L 220 30 L 250 22 L 280 16 L 300 12" stroke="#4DD0E1" stroke-width="1.4" fill="none"/>
+              <!-- closest point marker -->
+              <circle cx="110" cy="86" r="3" fill="#FF1744" filter="url(#cyanGlow)"/>
+              <circle cx="110" cy="86" r="1.5" fill="#FF1744"/>
+              <text x="110" y="78" font-family="JetBrains Mono" font-size="7" fill="#FF1744" text-anchor="middle" letter-spacing="1">CLOSEST</text>
+              <!-- final marker -->
+              <circle cx="300" cy="12" r="3" fill="#4DD0E1"/>
+              <circle cx="300" cy="12" r="6" fill="none" stroke="#4DD0E1" stroke-width="0.5" opacity="0.5"/>
+              <!-- axis labels -->
+              <text x="2" y="22" font-family="JetBrains Mono" font-size="6.5" fill="#4DD0E1" letter-spacing="1">+400M</text>
+              <text x="2" y="90" font-family="JetBrains Mono" font-size="6.5" fill="#FF1744" letter-spacing="1">−0M</text>
+            </svg>
+            <div class="rs-chart-foot">
+              <span>T+0</span>
+              <span>T+12:00 · CLOSEST</span>
+              <span>T+24:18</span>
+            </div>
+          </div>
+
+          <div class="rs-detail">
+            <div class="rs-detail-row">
+              <span class="k">MIN_GAP</span><span class="v"><b>+8m</b> @ T+12:14</span>
+            </div>
+            <div class="rs-detail-row">
+              <span class="k">MAX_GAP</span><span class="v"><b>+348m</b> @ T+22:02</span>
+            </div>
+            <div class="rs-detail-row">
+              <span class="k">AVG_PACE</span><span class="v">7'06" / km</span>
+            </div>
+            <div class="rs-detail-row">
+              <span class="k">KCAL</span><span class="v">276 <b>kcal</b></span>
+            </div>
+            <div class="rs-detail-row">
+              <span class="k">ELEVATION</span><span class="v">+48m / −52m</span>
+            </div>
+          </div>
+
+          <div class="rs-actions">
+            <div class="rs-act ghost">SHARE</div>
+            <div class="rs-act filled">CLOSE LOG</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="cell-label">04 <span>·</span> RESULT <b>— PROTOCOL COMPLETE</b></div>
+  </div>
+
+  <!-- ============================================================
+       SCREEN 5 — HISTORY
+       ============================================================ -->
+  <div class="cell">
+    <div class="phone">
+      <div class="notch"></div>
+      <div class="screen">
+        <div class="statusbar">
+          <span>04:40</span>
+          <span class="sb-r">GPS · 5G · ●●●</span>
+        </div>
+        <div class="body">
+          <div class="hm-tag-row">
+            <div class="tag cyan">LOGS · ARCHIVE</div>
+            <div class="hm-icons">
+              <div class="hm-ico">⌕</div>
+              <div class="hm-ico">▽</div>
+            </div>
+          </div>
+
+          <div class="hs-title">LOGS · APR 2026</div>
+          <div class="hs-sub">28 ENTRIES <b>·</b> FROM 04.01 <b>TO</b> 04.17</div>
+
+          <div class="hs-summary">
+            <div class="hs-sum">
+              <div class="k">RUNS</div>
+              <div class="v">028</div>
+            </div>
+            <div class="hs-sum">
+              <div class="k">DIST</div>
+              <div class="v">64.8<small>km</small></div>
+            </div>
+            <div class="hs-sum">
+              <div class="k">W/L</div>
+              <div class="v">22<span class="sp"> : </span>6</div>
+            </div>
+          </div>
+
+          <div class="hs-list-ttl">
+            <span>RECENT ENTRIES</span>
+            <span class="sort">↓ LATEST</span>
+          </div>
+
+          <div class="hs-row">
+            <div class="hs-row-id">028</div>
+            <div class="hs-row-info">
+              <div class="hs-row-t">성동 <span class="st ok">ESCAPED</span></div>
+              <div class="hs-row-m"><span class="ts">04.16 ·</span> 3.42km / 24:18 · v2</div>
+            </div>
+            <div class="hs-row-v pos">+312<small>METERS</small></div>
+          </div>
+          <div class="hs-row">
+            <div class="hs-row-id">027</div>
+            <div class="hs-row-info">
+              <div class="hs-row-t">한강 <span class="st fail">CAPTURED</span></div>
+              <div class="hs-row-m"><span class="ts">04.15 ·</span> 2.18km / 18:02 · v3</div>
+            </div>
+            <div class="hs-row-v neg">−018<small>METERS</small></div>
+          </div>
+          <div class="hs-row">
+            <div class="hs-row-id">026</div>
+            <div class="hs-row-info">
+              <div class="hs-row-t">남산 <span class="st ok">ESCAPED</span></div>
+              <div class="hs-row-m"><span class="ts">04.14 ·</span> 4.80km / 33:41 · v2</div>
+            </div>
+            <div class="hs-row-v pos">+520<small>METERS</small></div>
+          </div>
+          <div class="hs-row">
+            <div class="hs-row-id">025</div>
+            <div class="hs-row-info">
+              <div class="hs-row-t">연남 <span class="st ok">ESCAPED</span></div>
+              <div class="hs-row-m"><span class="ts">04.12 ·</span> 2.90km / 21:04 · v1</div>
+            </div>
+            <div class="hs-row-v pos">+142<small>METERS</small></div>
+          </div>
+          <div class="hs-row">
+            <div class="hs-row-id">024</div>
+            <div class="hs-row-info">
+              <div class="hs-row-t">망원 <span class="st fail">CAPTURED</span></div>
+              <div class="hs-row-m"><span class="ts">04.11 ·</span> 1.62km / 13:50 · v3</div>
+            </div>
+            <div class="hs-row-v neg">−062<small>METERS</small></div>
+          </div>
+          <div class="hs-row">
+            <div class="hs-row-id">023</div>
+            <div class="hs-row-info">
+              <div class="hs-row-t">을지 <span class="st ok">ESCAPED</span></div>
+              <div class="hs-row-m"><span class="ts">04.09 ·</span> 5.10km / 38:22 · v2</div>
+            </div>
+            <div class="hs-row-v pos">+412<small>METERS</small></div>
+          </div>
+        </div>
+
+        <div class="tabs">
+          <div class="tab"><div class="ti">●</div>HOME</div>
+          <div class="tab active"><div class="ti">◷</div>LOGS</div>
+          <div class="tab"><div class="ti">◎</div>STATS</div>
+          <div class="tab"><div class="ti">⚙</div>SYS</div>
+        </div>
+      </div>
+    </div>
+    <div class="cell-label">05 <span>·</span> HISTORY <b>— LOGS ARCHIVE</b></div>
+  </div>
+
+  <!-- ============================================================
+       SCREEN 6 — SETTINGS
+       ============================================================ -->
+  <div class="cell">
+    <div class="phone">
+      <div class="notch"></div>
+      <div class="screen">
+        <div class="statusbar">
+          <span>04:42</span>
+          <span class="sb-r">GPS · 5G · ●●●</span>
+        </div>
+        <div class="body">
+          <div class="hm-tag-row">
+            <div class="tag cyan">SYSTEM · v1.0.0</div>
+            <div class="hm-icons">
+              <div class="hm-ico">←</div>
+              <div class="hm-ico">?</div>
+            </div>
+          </div>
+
+          <div class="st-title">SYSTEM</div>
+          <div class="st-sub">USER · PREFS · DIAGNOSTICS</div>
+
+          <div class="st-user">
+            <div class="st-user-avatar">K</div>
+            <div class="st-user-info">
+              <div class="st-user-n">K. Doppel <span class="pro">PRO</span></div>
+              <div class="st-user-m">SERIAL <b>#SR-0928-411</b> · since 2026.03</div>
+            </div>
+          </div>
+
+          <div class="st-sect">
+            <div class="st-sect-ttl"><span>APPEARANCE</span><span class="c">04 keys</span></div>
+            <div class="st-row">
+              <div class="st-row-l"><span class="k">THEME</span><span class="n">Neo-Noir Cyber</span></div>
+              <div class="st-row-r on">ACTIVE ›</div>
+            </div>
+            <div class="st-row">
+              <div class="st-row-l"><span class="k">ACCENT</span><span class="n">Neon Red</span></div>
+              <div class="st-row-r"><b>#FF1744</b></div>
+            </div>
+            <div class="st-row">
+              <div class="st-row-l"><span class="k">GLITCH</span><span class="n">로고 RGB 분리</span></div>
+              <div class="st-row-r"><span class="st-toggle"></span></div>
+            </div>
+            <div class="st-row">
+              <div class="st-row-l"><span class="k">SCANLINE</span><span class="n">CRT 스캔라인</span></div>
+              <div class="st-row-r"><span class="st-toggle"></span></div>
+            </div>
+          </div>
+
+          <div class="st-sect">
+            <div class="st-sect-ttl"><span>AUDIO</span><span class="c">03 keys</span></div>
+            <div class="st-row">
+              <div class="st-row-l"><span class="k">VOICE</span><span class="n">ENTITY · KR-M01</span></div>
+              <div class="st-row-r">0.85 ›</div>
+            </div>
+            <div class="st-row">
+              <div class="st-row-l"><span class="k">BREATH_FX</span><span class="n">심장·숨소리</span></div>
+              <div class="st-row-r"><span class="st-toggle"></span></div>
+            </div>
+            <div class="st-row">
+              <div class="st-row-l"><span class="k">JUMPSCARE</span><span class="n">점프스케어</span></div>
+              <div class="st-row-r on">HIGH ›</div>
+            </div>
+          </div>
+
+          <div class="st-sect">
+            <div class="st-sect-ttl"><span>GAME</span><span class="c">03 keys</span></div>
+            <div class="st-row">
+              <div class="st-row-l"><span class="k">DIFFICULTY</span><span class="n">HUNTER · v3</span></div>
+              <div class="st-row-r on">HARD ›</div>
+            </div>
+            <div class="st-row">
+              <div class="st-row-l"><span class="k">UNITS</span><span class="n">KM · METRIC</span></div>
+              <div class="st-row-r">km ›</div>
+            </div>
+            <div class="st-row">
+              <div class="st-row-l"><span class="k">HAPTIC</span><span class="n">진동 피드백</span></div>
+              <div class="st-row-r"><span class="st-toggle"></span></div>
+            </div>
+          </div>
+
+          <div class="st-sect">
+            <div class="st-sect-ttl"><span>SUPPORT</span><span class="c">03 keys</span></div>
+            <div class="st-row">
+              <div class="st-row-l"><span class="k">HELP</span><span class="n">자주 묻는 질문</span></div>
+              <div class="st-row-r">›</div>
+            </div>
+            <div class="st-row">
+              <div class="st-row-l"><span class="k">CONTACT</span><span class="n">개발자에게 보고</span></div>
+              <div class="st-row-r">›</div>
+            </div>
+            <div class="st-row">
+              <div class="st-row-l"><span class="k">PRIVACY</span><span class="n">개인정보 처리방침</span></div>
+              <div class="st-row-r">›</div>
+            </div>
+          </div>
+
+          <div class="st-version">
+            <div>Shadow Run <span class="v">v1.0.0</span> · build <span class="v">12</span></div>
+            <div class="hint">// tap version ×7 to unlock debug</div>
+          </div>
+        </div>
+
+        <div class="tabs">
+          <div class="tab"><div class="ti">●</div>HOME</div>
+          <div class="tab"><div class="ti">◷</div>LOGS</div>
+          <div class="tab"><div class="ti">◎</div>STATS</div>
+          <div class="tab active"><div class="ti">⚙</div>SYS</div>
+        </div>
+      </div>
+    </div>
+    <div class="cell-label">06 <span>·</span> SETTINGS <b>— SYSTEM</b></div>
+  </div>
+
+</div>
+
+</body>
+</html>

@@ -1,0 +1,2453 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SHADOW RUN — Theme 03 · Korean Mystic Horror</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Nanum+Myeongjo:wght@400;700;800&family=Gowun+Batang:wght@400;700&family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css" />
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --ink: #050302;           /* 먹빛 배경 (살짝 갈색) */
+    --ink-2: #0a0606;         /* 한 단계 위 */
+    --ink-3: #120a0a;         /* 카드 */
+    --rice: #F0EBE3;          /* 쌀빛 텍스트 */
+    --rice-dim: #a9a09a;      /* 쌀빛 디머 */
+    --rice-fade: #6a5e57;     /* 쌀빛 더 디머 */
+    --rice-ghost: #3a322d;    /* 회색 그림자 */
+    --blood-dry: #7A0A0E;     /* 마른 피 */
+    --blood-fresh: #C42029;   /* 산뜻 피 (경고) */
+    --blood-deep: #3d0508;    /* 깊은 피얼룩 */
+    --line: #241618;          /* 먹선 */
+    --line-2: #1a1010;        /* 먹선 희미 */
+  }
+
+  html, body { background: #050507; }
+  body {
+    color: var(--rice);
+    font-family: 'Nanum Myeongjo', 'Gowun Batang', 'Pretendard', serif;
+    min-height: 100vh;
+    padding: 48px 24px 120px;
+    font-feature-settings: "palt" on;
+  }
+
+  /* 페이지 배경 — 먹 얼룩 */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 800px 500px at 20% 10%, rgba(122,10,14,0.06), transparent 60%),
+      radial-gradient(ellipse 600px 400px at 85% 85%, rgba(61,5,8,0.08), transparent 60%);
+    pointer-events: none;
+    z-index: 0;
+  }
+  body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background: repeating-linear-gradient(0deg, transparent 0, transparent 2px, rgba(255,255,255,0.008) 2px, rgba(255,255,255,0.008) 3px);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* ===== 페이지 헤더 ===== */
+  .page-header {
+    position: relative;
+    z-index: 2;
+    max-width: 1320px;
+    margin: 0 auto 36px;
+    text-align: center;
+  }
+  .page-header .hanja-line {
+    font-family: 'Nanum Myeongjo', serif;
+    font-size: 13px;
+    color: var(--blood-dry);
+    letter-spacing: 0.8em;
+    margin-bottom: 14px;
+  }
+  .page-header h1 {
+    font-family: 'Nanum Myeongjo', serif;
+    font-weight: 800;
+    font-size: 32px;
+    letter-spacing: 0.02em;
+    margin-bottom: 8px;
+    color: var(--rice);
+  }
+  .page-header h1 em {
+    font-style: italic;
+    color: var(--blood-fresh);
+    font-weight: 700;
+  }
+  .page-header .tagline {
+    font-family: 'Gowun Batang', serif;
+    color: var(--rice-dim);
+    font-size: 13px;
+    line-height: 1.7;
+    max-width: 680px;
+    margin: 0 auto;
+    letter-spacing: 0.02em;
+  }
+  .page-header .double-rule {
+    width: 120px;
+    height: 4px;
+    margin: 18px auto 0;
+    border-top: 1px solid var(--blood-dry);
+    border-bottom: 1px solid var(--blood-dry);
+  }
+
+  /* ===== 그리드 2x3 ===== */
+  .stage {
+    position: relative;
+    z-index: 2;
+    display: grid;
+    grid-template-columns: repeat(3, 340px);
+    grid-auto-rows: auto;
+    gap: 56px 40px;
+    justify-content: center;
+    margin-top: 40px;
+  }
+  .phone-cell {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 14px;
+  }
+  .phone-label {
+    text-align: center;
+    font-family: 'Gowun Batang', serif;
+    color: var(--rice-dim);
+    font-size: 12px;
+    letter-spacing: 0.25em;
+  }
+  .phone-label .num {
+    display: block;
+    font-family: 'Nanum Myeongjo', serif;
+    font-style: italic;
+    color: var(--blood-fresh);
+    font-size: 11px;
+    letter-spacing: 0.3em;
+    margin-bottom: 4px;
+  }
+
+  /* ===== iPhone 프레임 ===== */
+  .phone {
+    width: 340px;
+    height: 720px;
+    border-radius: 44px;
+    overflow: hidden;
+    position: relative;
+    box-shadow:
+      0 30px 80px rgba(0,0,0,0.9),
+      0 0 0 8px #0d0908,
+      0 0 0 9px #2a1f1c,
+      0 0 40px rgba(122,10,14,0.08);
+    flex-shrink: 0;
+    background: #000;
+  }
+  .notch {
+    position: absolute;
+    top: 12px; left: 50%; transform: translateX(-50%);
+    width: 112px; height: 28px;
+    background: #000;
+    border-radius: 20px;
+    z-index: 100;
+  }
+  .screen {
+    width: 100%; height: 100%;
+    position: relative;
+    overflow: hidden;
+    background: var(--ink);
+  }
+  .screen::-webkit-scrollbar { display: none; }
+
+  /* 배경 한자 워터마크 */
+  .hanja-mark {
+    position: absolute;
+    font-family: 'Nanum Myeongjo', serif;
+    font-weight: 800;
+    line-height: 0.85;
+    color: #1a0a0a;
+    opacity: 0.55;
+    pointer-events: none;
+    user-select: none;
+    z-index: 1;
+    letter-spacing: -0.02em;
+    text-shadow: 0 0 60px rgba(122,10,14,0.1);
+  }
+
+  /* 스크롤 영역 */
+  .scroll {
+    position: absolute;
+    inset: 0;
+    overflow-y: auto;
+    overflow-x: hidden;
+    z-index: 2;
+  }
+  .scroll::-webkit-scrollbar { display: none; }
+
+  /* 스캔라인 & 필름 그레인 */
+  .screen::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(0deg, transparent 0, transparent 2px, rgba(255,255,255,0.009) 2px, rgba(255,255,255,0.009) 3px);
+    pointer-events: none;
+    z-index: 50;
+  }
+  .screen::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(circle at 50% -10%, rgba(122,10,14,0.12), transparent 55%),
+      radial-gradient(circle at 50% 110%, rgba(61,5,8,0.25), transparent 55%);
+    pointer-events: none;
+    z-index: 3;
+  }
+
+  /* 상단바 */
+  .statusbar {
+    position: relative;
+    padding: 14px 24px 0;
+    display: flex;
+    justify-content: space-between;
+    font-family: 'Inter', sans-serif;
+    font-size: 12.5px;
+    font-weight: 600;
+    color: var(--rice);
+    z-index: 10;
+    letter-spacing: -0.02em;
+  }
+
+  /* 붓터치 장식 라인 */
+  .brush {
+    display: block;
+    height: 2px;
+    background: linear-gradient(90deg,
+      transparent 0%,
+      rgba(122,10,14,0.05) 8%,
+      var(--blood-dry) 30%,
+      var(--blood-fresh) 50%,
+      var(--blood-dry) 70%,
+      rgba(122,10,14,0.05) 92%,
+      transparent 100%);
+    opacity: 0.6;
+    clip-path: polygon(
+      0% 50%, 4% 0%, 6% 100%, 10% 20%, 14% 80%,
+      20% 40%, 30% 0%, 40% 70%, 50% 30%, 60% 80%,
+      70% 20%, 80% 60%, 86% 30%, 92% 70%, 96% 40%, 100% 50%);
+    margin: 0 auto;
+    width: 70%;
+  }
+  .brush.thin {
+    height: 1px;
+    opacity: 0.4;
+    background: linear-gradient(90deg, transparent, var(--blood-dry) 50%, transparent);
+    clip-path: none;
+  }
+
+  /* 이중 괘선 */
+  .double-rule {
+    border-top: 1px solid var(--line);
+    border-bottom: 1px solid var(--line);
+    height: 4px;
+    margin: 14px 24px;
+  }
+  .double-rule.blood {
+    border-color: rgba(122,10,14,0.35);
+  }
+
+  /* 공통 — 세로 한자 카테고리 */
+  .vert-hanja {
+    position: absolute;
+    writing-mode: vertical-rl;
+    font-family: 'Nanum Myeongjo', serif;
+    color: var(--rice-ghost);
+    font-size: 11px;
+    letter-spacing: 0.6em;
+    z-index: 5;
+  }
+
+  /* ===========================================
+     SCREEN 1 — HOME
+     =========================================== */
+  .s-home .hanja-mark.big {
+    top: 12%; left: -40px;
+    font-size: 220px;
+    opacity: 0.7;
+  }
+  .s-home .hanja-mark.small {
+    bottom: 12%; right: -30px;
+    font-size: 160px;
+    color: #180808;
+    opacity: 0.6;
+  }
+
+  .home-header {
+    position: relative;
+    padding: 32px 24px 0;
+    z-index: 10;
+  }
+  .home-top-hanja {
+    text-align: center;
+    font-family: 'Nanum Myeongjo', serif;
+    font-size: 14px;
+    color: var(--blood-dry);
+    letter-spacing: 0.9em;
+    margin-bottom: 18px;
+    padding-right: 0.9em;
+  }
+  .home-logo {
+    text-align: center;
+    font-family: 'Nanum Myeongjo', serif;
+    font-weight: 800;
+    font-size: 36px;
+    letter-spacing: 0.08em;
+    color: var(--rice);
+    line-height: 1;
+    text-shadow: 0 0 30px rgba(122,10,14,0.35);
+  }
+  .home-logo-en {
+    text-align: center;
+    font-family: 'Inter', sans-serif;
+    font-weight: 300;
+    font-size: 10px;
+    color: var(--rice-fade);
+    letter-spacing: 0.5em;
+    margin-top: 6px;
+    text-transform: uppercase;
+  }
+  .home-eye {
+    text-align: center;
+    font-family: 'Nanum Myeongjo', serif;
+    font-style: italic;
+    font-size: 12px;
+    color: var(--blood-fresh);
+    letter-spacing: 0.2em;
+    margin: 14px 0 4px;
+  }
+  .home-ep {
+    text-align: center;
+    font-family: 'Gowun Batang', serif;
+    font-size: 13px;
+    color: var(--rice-dim);
+    letter-spacing: 0.35em;
+    margin-bottom: 8px;
+  }
+  .home-date {
+    text-align: center;
+    font-family: 'Gowun Batang', serif;
+    font-size: 11px;
+    color: var(--rice-fade);
+    letter-spacing: 0.2em;
+    margin-bottom: 18px;
+  }
+
+  .home-quote {
+    position: relative;
+    z-index: 10;
+    margin: 20px 28px 0;
+    padding: 18px 16px 16px;
+  }
+  .home-quote::before {
+    content: '「';
+    position: absolute;
+    top: -4px; left: -6px;
+    font-family: 'Nanum Myeongjo', serif;
+    font-size: 38px;
+    color: var(--blood-dry);
+    line-height: 1;
+    opacity: 0.6;
+  }
+  .home-quote::after {
+    content: '」';
+    position: absolute;
+    bottom: -4px; right: -6px;
+    font-family: 'Nanum Myeongjo', serif;
+    font-size: 38px;
+    color: var(--blood-dry);
+    line-height: 1;
+    opacity: 0.6;
+  }
+  .home-quote .q {
+    font-family: 'Nanum Myeongjo', serif;
+    font-weight: 400;
+    font-size: 16px;
+    line-height: 1.85;
+    color: var(--rice);
+    text-align: center;
+    letter-spacing: -0.005em;
+  }
+  .home-quote .q strong {
+    font-weight: 800;
+    color: var(--blood-fresh);
+    font-size: 18px;
+    letter-spacing: 0.02em;
+  }
+  .home-quote .q-by {
+    margin-top: 12px;
+    text-align: center;
+    font-family: 'Gowun Batang', serif;
+    font-size: 10px;
+    color: var(--rice-fade);
+    letter-spacing: 0.35em;
+  }
+
+  .home-stats {
+    margin: 20px 24px 0;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    border-top: 1px solid var(--line);
+    border-bottom: 1px solid var(--line);
+    position: relative;
+    z-index: 10;
+  }
+  .home-stats::before,
+  .home-stats::after {
+    content: '';
+    position: absolute;
+    left: 0; right: 0;
+    height: 1px;
+    background: var(--line);
+  }
+  .home-stats::before { top: -3px; }
+  .home-stats::after { bottom: -3px; }
+
+  .home-stat {
+    padding: 16px 4px 14px;
+    text-align: center;
+    border-right: 1px solid var(--line);
+  }
+  .home-stat:last-child { border-right: none; }
+  .home-stat .k {
+    font-family: 'Gowun Batang', serif;
+    font-size: 10px;
+    color: var(--rice-fade);
+    letter-spacing: 0.25em;
+    margin-bottom: 8px;
+  }
+  .home-stat .v {
+    font-family: 'Nanum Myeongjo', serif;
+    font-weight: 800;
+    font-size: 24px;
+    color: var(--rice);
+    line-height: 1;
+    letter-spacing: 0.04em;
+  }
+  .home-stat .v small {
+    font-family: 'Gowun Batang', serif;
+    font-weight: 400;
+    font-size: 10px;
+    color: var(--rice-fade);
+    margin-left: 3px;
+    letter-spacing: 0.1em;
+  }
+  .home-stat .unit {
+    font-family: 'Gowun Batang', serif;
+    font-size: 10px;
+    color: var(--rice-fade);
+    margin-top: 4px;
+    letter-spacing: 0.2em;
+  }
+
+  .home-start {
+    position: relative;
+    z-index: 10;
+    margin: 22px 24px 0;
+    padding: 24px 20px 22px;
+    background:
+      radial-gradient(ellipse at 30% 30%, rgba(196,32,41,0.18), transparent 60%),
+      linear-gradient(145deg, #180608 0%, #0a0303 100%);
+    border: 1px solid var(--blood-dry);
+    box-shadow:
+      inset 0 0 40px rgba(122,10,14,0.2),
+      0 14px 34px rgba(0,0,0,0.5);
+  }
+  .home-start::before {
+    content: '';
+    position: absolute;
+    top: 6px; left: 6px; right: 6px; bottom: 6px;
+    border: 1px solid rgba(122,10,14,0.4);
+    pointer-events: none;
+  }
+  .home-start-hanja {
+    position: absolute;
+    top: 12px; right: 16px;
+    font-family: 'Nanum Myeongjo', serif;
+    font-size: 20px;
+    font-weight: 800;
+    color: var(--blood-fresh);
+    letter-spacing: 0;
+    z-index: 2;
+  }
+  .home-start-title {
+    font-family: 'Nanum Myeongjo', serif;
+    font-weight: 800;
+    font-size: 22px;
+    color: var(--rice);
+    line-height: 1.25;
+    letter-spacing: 0.02em;
+    position: relative;
+    z-index: 2;
+  }
+  .home-start-cta {
+    margin-top: 14px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: relative;
+    z-index: 2;
+  }
+  .home-start-sub {
+    font-family: 'Gowun Batang', serif;
+    font-size: 13px;
+    color: var(--blood-fresh);
+    letter-spacing: 0.4em;
+    font-weight: 700;
+  }
+  .home-start-arr {
+    font-family: 'Nanum Myeongjo', serif;
+    font-size: 18px;
+    color: var(--rice);
+    opacity: 0.9;
+  }
+
+  .home-recent {
+    position: relative;
+    z-index: 10;
+    margin: 28px 24px 24px;
+  }
+  .home-recent-head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    margin-bottom: 4px;
+  }
+  .home-recent-head .title {
+    font-family: 'Nanum Myeongjo', serif;
+    font-weight: 700;
+    font-size: 14px;
+    color: var(--rice);
+    letter-spacing: 0.15em;
+  }
+  .home-recent-head .more {
+    font-family: 'Gowun Batang', serif;
+    font-size: 11px;
+    color: var(--rice-fade);
+    letter-spacing: 0.2em;
+  }
+
+  .home-run {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 11px 0;
+    border-bottom: 1px dotted var(--line);
+  }
+  .home-run:last-child { border-bottom: none; }
+  .home-run-no {
+    width: 38px; flex-shrink: 0;
+    font-family: 'Nanum Myeongjo', serif;
+    font-weight: 800;
+    font-size: 14px;
+    color: var(--rice-fade);
+    letter-spacing: 0.05em;
+    text-align: center;
+  }
+  .home-run-body { flex: 1; min-width: 0; }
+  .home-run-date {
+    font-family: 'Gowun Batang', serif;
+    font-size: 12.5px;
+    color: var(--rice);
+    margin-bottom: 2px;
+    letter-spacing: 0.02em;
+  }
+  .home-run-loc {
+    font-family: 'Gowun Batang', serif;
+    font-size: 10.5px;
+    color: var(--rice-fade);
+    letter-spacing: 0.1em;
+  }
+  .home-run-v {
+    font-family: 'Nanum Myeongjo', serif;
+    font-weight: 700;
+    font-size: 13px;
+    letter-spacing: 0.1em;
+    flex-shrink: 0;
+  }
+  .home-run-v.alive { color: var(--rice); }
+  .home-run-v.dead  { color: var(--blood-fresh); }
+
+  /* 하단 탭 (공통) */
+  .tabs {
+    position: absolute;
+    left: 0; right: 0; bottom: 0;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    padding: 10px 0 20px;
+    background: linear-gradient(180deg, rgba(5,3,2,0) 0%, rgba(5,3,2,0.9) 40%, rgba(5,3,2,0.98) 100%);
+    border-top: 1px solid var(--line);
+    z-index: 30;
+    backdrop-filter: blur(12px);
+  }
+  .tabs::before {
+    content: '';
+    position: absolute;
+    left: 24px; right: 24px;
+    top: -1px;
+    height: 1px;
+    background: var(--line);
+  }
+  .tab {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+  }
+  .tab .hz {
+    font-family: 'Nanum Myeongjo', serif;
+    font-size: 15px;
+    color: var(--rice-ghost);
+    font-weight: 700;
+  }
+  .tab .lb {
+    font-family: 'Gowun Batang', serif;
+    font-size: 9px;
+    color: var(--rice-fade);
+    letter-spacing: 0.25em;
+  }
+  .tab.active .hz { color: var(--blood-fresh); }
+  .tab.active .lb { color: var(--blood-fresh); }
+
+  /* ===========================================
+     SCREEN 2 — PREPARE
+     =========================================== */
+  .s-prep .hanja-mark {
+    top: 30%; left: -20px;
+    font-size: 260px;
+  }
+
+  .prep-header {
+    position: relative;
+    padding: 24px 24px 0;
+    z-index: 10;
+  }
+  .prep-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 14px;
+  }
+  .prep-back {
+    font-family: 'Nanum Myeongjo', serif;
+    font-size: 18px;
+    color: var(--rice-dim);
+    font-weight: 400;
+  }
+  .prep-hanja-badge {
+    font-family: 'Nanum Myeongjo', serif;
+    font-size: 22px;
+    font-weight: 800;
+    color: var(--blood-fresh);
+    width: 38px; height: 38px;
+    border: 1px solid var(--blood-dry);
+    display: flex; align-items: center; justify-content: center;
+  }
+  .prep-title {
+    font-family: 'Nanum Myeongjo', serif;
+    font-weight: 800;
+    font-size: 28px;
+    color: var(--rice);
+    line-height: 1.2;
+    letter-spacing: 0.01em;
+    text-align: center;
+    margin-bottom: 6px;
+  }
+  .prep-sub {
+    text-align: center;
+    font-family: 'Gowun Batang', serif;
+    font-size: 11px;
+    color: var(--rice-fade);
+    letter-spacing: 0.35em;
+    margin-bottom: 20px;
+  }
+
+  .prep-gps {
+    position: relative;
+    z-index: 10;
+    margin: 0 24px 18px;
+    padding: 12px 14px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: rgba(196,32,41,0.05);
+    border: 1px solid rgba(196,32,41,0.2);
+  }
+  .prep-gps-dot {
+    width: 7px; height: 7px;
+    background: #4ade80;
+    border-radius: 50%;
+    box-shadow: 0 0 10px #4ade80;
+    animation: blink-g 1.6s infinite;
+  }
+  @keyframes blink-g { 0%, 60% { opacity: 1; } 61%, 100% { opacity: 0.3; } }
+  .prep-gps-t {
+    flex: 1;
+    font-family: 'Gowun Batang', serif;
+    font-size: 12px;
+    color: var(--rice-dim);
+    letter-spacing: 0.05em;
+  }
+  .prep-gps-t b { color: var(--rice); font-weight: 700; }
+  .prep-gps-n {
+    font-family: 'Nanum Myeongjo', serif;
+    font-size: 11px;
+    color: var(--blood-fresh);
+    letter-spacing: 0.2em;
+  }
+
+  .prep-section {
+    position: relative;
+    z-index: 10;
+    margin: 0 24px 18px;
+  }
+  .prep-section-t {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 10px;
+  }
+  .prep-section-t .l {
+    font-family: 'Nanum Myeongjo', serif;
+    font-weight: 700;
+    font-size: 13px;
+    color: var(--rice);
+    letter-spacing: 0.15em;
+  }
+  .prep-section-t .r {
+    font-family: 'Gowun Batang', serif;
+    font-size: 10px;
+    color: var(--rice-fade);
+    letter-spacing: 0.25em;
+  }
+  .prep-speed {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 6px;
+  }
+  .prep-speed-opt {
+    padding: 10px 6px;
+    text-align: center;
+    border: 1px solid var(--line);
+    background: rgba(10,6,6,0.6);
+  }
+  .prep-speed-opt.on {
+    border-color: var(--blood-dry);
+    background:
+      radial-gradient(ellipse at center, rgba(196,32,41,0.15), transparent 70%),
+      #0f0505;
+    box-shadow: inset 0 0 20px rgba(122,10,14,0.25);
+  }
+  .prep-speed-opt .hz {
+    font-family: 'Nanum Myeongjo', serif;
+    font-weight: 800;
+    font-size: 18px;
+    color: var(--rice-ghost);
+    margin-bottom: 4px;
+    letter-spacing: 0.02em;
+  }
+  .prep-speed-opt.on .hz { color: var(--blood-fresh); }
+  .prep-speed-opt .l {
+    font-family: 'Gowun Batang', serif;
+    font-size: 11px;
+    color: var(--rice-dim);
+    margin-bottom: 2px;
+    letter-spacing: 0.05em;
+  }
+  .prep-speed-opt.on .l { color: var(--rice); }
+  .prep-speed-opt .s {
+    font-family: 'Gowun Batang', serif;
+    font-size: 9px;
+    color: var(--rice-fade);
+    letter-spacing: 0.15em;
+  }
+
+  .prep-shoe {
+    display: flex;
+    gap: 10px;
+  }
+  .prep-shoe-opt {
+    flex: 1;
+    padding: 12px 10px;
+    border: 1px solid var(--line);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: rgba(10,6,6,0.4);
+  }
+  .prep-shoe-opt.on {
+    border-color: var(--blood-dry);
+    background: rgba(122,10,14,0.08);
+  }
+  .prep-shoe-ico {
+    width: 26px; height: 26px;
+    border: 1px solid var(--rice-fade);
+    font-family: 'Nanum Myeongjo', serif;
+    font-size: 13px;
+    display: flex; align-items: center; justify-content: center;
+    color: var(--rice-dim);
+  }
+  .prep-shoe-opt.on .prep-shoe-ico { border-color: var(--blood-fresh); color: var(--blood-fresh); }
+  .prep-shoe-name {
+    flex: 1;
+    font-family: 'Gowun Batang', serif;
+    font-size: 12px;
+    color: var(--rice);
+    letter-spacing: 0.02em;
+  }
+  .prep-shoe-name small {
+    display: block;
+    font-size: 9.5px;
+    color: var(--rice-fade);
+    letter-spacing: 0.15em;
+    margin-top: 2px;
+  }
+
+  .prep-dist {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 18px 16px;
+    border: 1px solid var(--line);
+    background: rgba(10,6,6,0.4);
+  }
+  .prep-dist-num {
+    font-family: 'Nanum Myeongjo', serif;
+    font-weight: 800;
+    font-size: 42px;
+    color: var(--rice);
+    line-height: 1;
+    letter-spacing: 0.02em;
+  }
+  .prep-dist-num small {
+    font-family: 'Gowun Batang', serif;
+    font-size: 12px;
+    color: var(--rice-fade);
+    font-weight: 400;
+    margin-left: 4px;
+    letter-spacing: 0.2em;
+  }
+  .prep-dist-ctrl {
+    display: flex;
+    gap: 10px;
+  }
+  .prep-dist-btn {
+    width: 36px; height: 36px;
+    border: 1px solid var(--line);
+    font-family: 'Nanum Myeongjo', serif;
+    font-size: 16px;
+    color: var(--rice-dim);
+    display: flex; align-items: center; justify-content: center;
+    background: rgba(15,8,8,0.6);
+  }
+  .prep-dist-hanja {
+    font-family: 'Nanum Myeongjo', serif;
+    font-size: 10px;
+    color: var(--blood-dry);
+    letter-spacing: 0.3em;
+    margin-top: 6px;
+    text-align: right;
+  }
+
+  .prep-go {
+    margin: 22px 24px 18px;
+    padding: 28px 20px 26px;
+    background:
+      radial-gradient(ellipse at center, rgba(196,32,41,0.25), transparent 65%),
+      linear-gradient(145deg, #1d0609 0%, #080202 100%);
+    border: 1px solid var(--blood-fresh);
+    text-align: center;
+    position: relative;
+    box-shadow:
+      inset 0 0 50px rgba(122,10,14,0.3),
+      0 16px 40px rgba(122,10,14,0.3);
+  }
+  .prep-go::before {
+    content: '';
+    position: absolute;
+    top: 8px; left: 8px; right: 8px; bottom: 8px;
+    border: 1px solid rgba(196,32,41,0.4);
+    pointer-events: none;
+  }
+  .prep-go-hanja {
+    font-family: 'Nanum Myeongjo', serif;
+    font-weight: 800;
+    font-size: 38px;
+    color: var(--blood-fresh);
+    letter-spacing: 0.1em;
+    margin-bottom: 4px;
+  }
+  .prep-go-big {
+    font-family: 'Nanum Myeongjo', serif;
+    font-weight: 800;
+    font-size: 32px;
+    color: var(--rice);
+    letter-spacing: 0.15em;
+    line-height: 1.1;
+    margin-bottom: 10px;
+    text-shadow: 0 0 20px rgba(196,32,41,0.3);
+  }
+  .prep-go-sub {
+    font-family: 'Gowun Batang', serif;
+    font-size: 12px;
+    color: var(--blood-fresh);
+    letter-spacing: 0.6em;
+    font-weight: 700;
+    padding-left: 0.6em;
+  }
+
+  /* ===========================================
+     SCREEN 3 — RUNNING
+     =========================================== */
+  .s-run { background: #040202; }
+  .s-run .hanja-mark {
+    top: 18%; right: -50px;
+    font-size: 280px;
+    color: #150606;
+    opacity: 0.9;
+  }
+  .s-run .hanja-mark-2 {
+    position: absolute;
+    bottom: -40px; left: -30px;
+    font-family: 'Nanum Myeongjo', serif;
+    font-weight: 800;
+    font-size: 200px;
+    color: #0e0404;
+    opacity: 0.7;
+    z-index: 1;
+    pointer-events: none;
+    line-height: 0.85;
+  }
+
+  .run-header {
+    position: relative;
+    padding: 30px 24px 0;
+    z-index: 10;
+    text-align: center;
+  }
+  .run-hanja-top {
+    font-family: 'Nanum Myeongjo', serif;
+    font-weight: 800;
+    font-size: 22px;
+    color: var(--blood-fresh);
+    letter-spacing: 0.2em;
+    margin-bottom: 8px;
+    padding-left: 0.2em;
+  }
+  .run-warn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 14px;
+    background: rgba(196,32,41,0.1);
+    border: 1px solid rgba(196,32,41,0.35);
+    margin-bottom: 18px;
+  }
+  .run-warn-dot {
+    width: 7px; height: 7px;
+    background: var(--blood-fresh);
+    border-radius: 50%;
+    box-shadow: 0 0 10px var(--blood-fresh);
+    animation: blink-r 1.2s infinite;
+  }
+  @keyframes blink-r { 0%, 55% { opacity: 1; } 56%, 100% { opacity: 0.25; } }
+  .run-warn-t {
+    font-family: 'Gowun Batang', serif;
+    font-size: 11px;
+    color: var(--blood-fresh);
+    letter-spacing: 0.3em;
+    font-weight: 700;
+  }
+
+  .run-dist {
+    position: relative;
+    z-index: 10;
+    text-align: center;
+    margin: 16px 0 12px;
+  }
+  .run-dist-label {
+    font-family: 'Gowun Batang', serif;
+    font-size: 10px;
+    color: var(--rice-fade);
+    letter-spacing: 0.4em;
+    margin-bottom: 2px;
+  }
+  .run-dist-wrap {
+    position: relative;
+    display: inline-flex;
+    align-items: baseline;
+    gap: 10px;
+  }
+  .run-dist-num {
+    font-family: 'Nanum Myeongjo', serif;
+    font-weight: 800;
+    font-size: 140px;
+    color: var(--rice);
+    line-height: 0.9;
+    letter-spacing: -0.02em;
+    text-shadow:
+      0 0 40px rgba(196,32,41,0.4),
+      0 0 80px rgba(196,32,41,0.2);
+  }
+  .run-dist-unit {
+    font-family: 'Nanum Myeongjo', serif;
+    font-weight: 800;
+    font-size: 36px;
+    color: var(--blood-fresh);
+    line-height: 1;
+  }
+  .run-dist-sub {
+    font-family: 'Gowun Batang', serif;
+    font-size: 11px;
+    color: var(--blood-fresh);
+    letter-spacing: 0.35em;
+    margin-top: 4px;
+  }
+
+  /* 미니맵 */
+  .run-map {
+    position: relative;
+    z-index: 10;
+    margin: 18px 24px 0;
+    height: 120px;
+    background:
+      radial-gradient(ellipse at 70% 30%, rgba(196,32,41,0.15), transparent 60%),
+      linear-gradient(180deg, #0c0506 0%, #050202 100%);
+    border: 1px solid var(--line);
+    overflow: hidden;
+  }
+  .run-map svg { width: 100%; height: 100%; display: block; }
+  .run-map-legend {
+    position: absolute;
+    top: 8px; right: 10px;
+    display: flex;
+    gap: 10px;
+    font-family: 'Gowun Batang', serif;
+    font-size: 9px;
+    letter-spacing: 0.15em;
+    z-index: 2;
+  }
+  .run-map-legend span { color: var(--rice-fade); }
+  .run-map-legend .me { color: var(--rice); }
+  .run-map-legend .me::before { content: '●'; color: var(--rice); margin-right: 4px; }
+  .run-map-legend .sh { color: var(--blood-fresh); }
+  .run-map-legend .sh::before { content: '●'; color: var(--blood-fresh); margin-right: 4px; }
+
+  /* 하단 통계 */
+  .run-stats {
+    position: relative;
+    z-index: 10;
+    margin: 18px 24px 0;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    border-top: 1px solid var(--line);
+    border-bottom: 1px solid var(--line);
+  }
+  .run-stat {
+    padding: 14px 4px;
+    text-align: center;
+    border-right: 1px solid var(--line);
+  }
+  .run-stat:last-child { border-right: none; }
+  .run-stat .k {
+    font-family: 'Gowun Batang', serif;
+    font-size: 9.5px;
+    color: var(--rice-fade);
+    letter-spacing: 0.3em;
+    margin-bottom: 6px;
+  }
+  .run-stat .v {
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 700;
+    font-size: 20px;
+    color: var(--rice);
+    letter-spacing: -0.02em;
+    line-height: 1;
+  }
+  .run-stat .v.red { color: var(--blood-fresh); }
+
+  .run-bottom {
+    position: absolute;
+    left: 0; right: 0; bottom: 0;
+    padding: 16px 24px 28px;
+    display: flex;
+    gap: 12px;
+    z-index: 30;
+    background: linear-gradient(180deg, transparent 0%, rgba(5,3,2,0.9) 30%, rgba(5,3,2,1) 100%);
+  }
+  .run-pause {
+    flex: 1;
+    padding: 14px 10px;
+    border: 1px solid var(--line);
+    background: rgba(10,6,6,0.6);
+    text-align: center;
+    font-family: 'Gowun Batang', serif;
+    font-size: 12px;
+    color: var(--rice);
+    letter-spacing: 0.35em;
+  }
+  .run-stop {
+    flex: 1;
+    padding: 14px 10px;
+    border: 1px solid var(--blood-fresh);
+    background: rgba(196,32,41,0.12);
+    text-align: center;
+    font-family: 'Nanum Myeongjo', serif;
+    font-weight: 700;
+    font-size: 13px;
+    color: var(--blood-fresh);
+    letter-spacing: 0.3em;
+  }
+
+  /* ===========================================
+     SCREEN 4 — RESULT
+     =========================================== */
+  .s-result { background: #050302; }
+  .s-result .hanja-mark {
+    top: 8%; right: -30px;
+    font-size: 240px;
+    opacity: 0.75;
+  }
+
+  .res-bar {
+    position: relative;
+    z-index: 10;
+    padding: 24px 24px 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .res-x {
+    width: 28px; height: 28px;
+    font-family: 'Inter', sans-serif;
+    font-size: 20px;
+    font-weight: 300;
+    color: var(--rice-dim);
+    display: flex; align-items: center; justify-content: center;
+  }
+  .res-hanja-top {
+    font-family: 'Nanum Myeongjo', serif;
+    font-weight: 800;
+    font-size: 20px;
+    color: var(--blood-dry);
+    letter-spacing: 0.1em;
+  }
+  .res-share {
+    font-family: 'Gowun Batang', serif;
+    font-size: 11px;
+    color: var(--rice-dim);
+    letter-spacing: 0.3em;
+  }
+
+  .res-verdict-wrap {
+    position: relative;
+    z-index: 10;
+    margin-top: 22px;
+    text-align: center;
+  }
+  .res-verdict-eye {
+    font-family: 'Gowun Batang', serif;
+    font-size: 11px;
+    color: var(--rice-fade);
+    letter-spacing: 0.4em;
+    margin-bottom: 10px;
+  }
+  .res-verdict {
+    font-family: 'Nanum Myeongjo', serif;
+    font-weight: 800;
+    font-size: 42px;
+    color: var(--rice);
+    letter-spacing: 0.3em;
+    line-height: 1;
+    padding-left: 0.3em;
+    text-shadow:
+      0 0 40px rgba(196,32,41,0.3),
+      0 0 80px rgba(196,32,41,0.15);
+  }
+  .res-verdict em {
+    color: var(--blood-fresh);
+    font-style: normal;
+  }
+  .res-brush-wrap {
+    margin: 14px auto 14px;
+    width: 80%;
+  }
+  .res-quote {
+    font-family: 'Nanum Myeongjo', serif;
+    font-size: 13px;
+    color: var(--rice-dim);
+    text-align: center;
+    line-height: 1.8;
+    margin: 10px 32px 0;
+    letter-spacing: 0.02em;
+  }
+  .res-quote em {
+    font-style: italic;
+    color: var(--blood-fresh);
+  }
+  .res-quote-by {
+    margin-top: 10px;
+    font-family: 'Gowun Batang', serif;
+    font-size: 10px;
+    color: var(--rice-fade);
+    text-align: center;
+    letter-spacing: 0.35em;
+  }
+
+  .res-stats {
+    position: relative;
+    z-index: 10;
+    margin: 24px 24px 0;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    border-top: 1px solid var(--line);
+    border-bottom: 1px solid var(--line);
+  }
+  .res-stat {
+    padding: 14px 4px 12px;
+    text-align: center;
+    border-right: 1px solid var(--line);
+  }
+  .res-stat:last-child { border-right: none; }
+  .res-stat .k {
+    font-family: 'Gowun Batang', serif;
+    font-size: 9.5px;
+    color: var(--rice-fade);
+    letter-spacing: 0.3em;
+    margin-bottom: 6px;
+  }
+  .res-stat .v {
+    font-family: 'Nanum Myeongjo', serif;
+    font-weight: 800;
+    font-size: 22px;
+    color: var(--rice);
+    line-height: 1;
+    letter-spacing: 0.02em;
+  }
+  .res-stat .v small {
+    font-family: 'Gowun Batang', serif;
+    font-size: 10px;
+    color: var(--rice-fade);
+    font-weight: 400;
+    margin-left: 2px;
+    letter-spacing: 0.1em;
+  }
+
+  .res-chart-wrap {
+    position: relative;
+    z-index: 10;
+    margin: 20px 24px 0;
+    padding: 14px 0 10px;
+    border: 1px solid var(--line);
+    background: rgba(10,6,6,0.4);
+  }
+  .res-chart-head {
+    display: flex;
+    justify-content: space-between;
+    padding: 0 14px;
+    margin-bottom: 10px;
+  }
+  .res-chart-title {
+    font-family: 'Nanum Myeongjo', serif;
+    font-weight: 700;
+    font-size: 11px;
+    color: var(--rice);
+    letter-spacing: 0.2em;
+  }
+  .res-chart-legend {
+    font-family: 'Gowun Batang', serif;
+    font-size: 9px;
+    color: var(--rice-fade);
+    letter-spacing: 0.2em;
+  }
+  .res-chart {
+    width: 100%;
+    height: 120px;
+  }
+  .res-chart-foot {
+    display: flex;
+    justify-content: space-between;
+    padding: 6px 14px 0;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    color: var(--rice-fade);
+    letter-spacing: 0.1em;
+  }
+
+  .res-detail {
+    position: relative;
+    z-index: 10;
+    margin: 18px 24px 28px;
+  }
+  .res-detail-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px 0;
+    border-bottom: 1px dotted var(--line);
+    font-family: 'Gowun Batang', serif;
+    font-size: 12px;
+  }
+  .res-detail-row:last-child { border-bottom: none; }
+  .res-detail-row .l {
+    color: var(--rice-fade);
+    letter-spacing: 0.15em;
+  }
+  .res-detail-row .v {
+    color: var(--rice);
+    letter-spacing: 0.05em;
+    font-weight: 700;
+  }
+  .res-detail-row .v.red { color: var(--blood-fresh); }
+
+  /* ===========================================
+     SCREEN 5 — HISTORY
+     =========================================== */
+  .s-hist .hanja-mark {
+    top: 5%; right: -40px;
+    font-size: 230px;
+    opacity: 0.7;
+  }
+  .s-hist .hanja-mark-2 {
+    position: absolute;
+    bottom: 8%; left: -20px;
+    font-family: 'Nanum Myeongjo', serif;
+    font-weight: 800;
+    font-size: 180px;
+    color: #140707;
+    opacity: 0.6;
+    z-index: 1;
+    pointer-events: none;
+    line-height: 0.85;
+  }
+
+  .hist-header {
+    position: relative;
+    z-index: 10;
+    padding: 24px 24px 0;
+  }
+  .hist-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+  }
+  .hist-bar-hz {
+    font-family: 'Nanum Myeongjo', serif;
+    font-size: 14px;
+    color: var(--blood-dry);
+    letter-spacing: 0.7em;
+    padding-left: 0.7em;
+  }
+  .hist-bar-ico {
+    display: flex; gap: 10px;
+  }
+  .hist-bar-ico span {
+    width: 26px; height: 26px;
+    border: 1px solid var(--line);
+    font-family: 'Nanum Myeongjo', serif;
+    font-size: 12px;
+    color: var(--rice-dim);
+    display: flex; align-items: center; justify-content: center;
+  }
+
+  .hist-title {
+    font-family: 'Nanum Myeongjo', serif;
+    font-weight: 800;
+    font-size: 26px;
+    color: var(--rice);
+    letter-spacing: 0.02em;
+    margin-bottom: 4px;
+  }
+  .hist-title em {
+    font-style: italic;
+    color: var(--blood-fresh);
+    font-size: 18px;
+    margin-left: 6px;
+  }
+  .hist-sub {
+    font-family: 'Gowun Batang', serif;
+    font-size: 11px;
+    color: var(--rice-fade);
+    letter-spacing: 0.25em;
+    margin-bottom: 18px;
+  }
+
+  .hist-summary {
+    position: relative;
+    z-index: 10;
+    margin: 0 24px 18px;
+    padding: 16px 14px;
+    background:
+      radial-gradient(ellipse at right, rgba(122,10,14,0.12), transparent 70%),
+      #0b0505;
+    border: 1px solid var(--blood-dry);
+    position: relative;
+  }
+  .hist-summary::before {
+    content: '四月';
+    position: absolute;
+    top: 8px; right: 12px;
+    font-family: 'Nanum Myeongjo', serif;
+    font-weight: 800;
+    font-size: 34px;
+    color: rgba(122,10,14,0.35);
+    line-height: 1;
+    letter-spacing: 0.02em;
+  }
+  .hist-summary .l {
+    font-family: 'Gowun Batang', serif;
+    font-size: 10px;
+    color: var(--blood-fresh);
+    letter-spacing: 0.35em;
+    margin-bottom: 8px;
+  }
+  .hist-summary .big {
+    font-family: 'Nanum Myeongjo', serif;
+    font-weight: 800;
+    font-size: 18px;
+    color: var(--rice);
+    line-height: 1.45;
+    letter-spacing: 0.02em;
+  }
+  .hist-summary .big strong {
+    color: var(--blood-fresh);
+    font-weight: 800;
+  }
+  .hist-summary .meta {
+    margin-top: 8px;
+    font-family: 'Gowun Batang', serif;
+    font-size: 11px;
+    color: var(--rice-dim);
+    letter-spacing: 0.1em;
+  }
+  .hist-summary .meta .sep { color: var(--blood-dry); margin: 0 8px; }
+
+  .hist-toolbar {
+    position: relative;
+    z-index: 10;
+    margin: 0 24px 8px;
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+  }
+  .hist-toolbar .t {
+    font-family: 'Nanum Myeongjo', serif;
+    font-weight: 700;
+    font-size: 13px;
+    color: var(--rice);
+    letter-spacing: 0.15em;
+  }
+  .hist-toolbar .t em {
+    font-style: italic;
+    color: var(--rice-fade);
+    font-size: 10px;
+    margin-left: 8px;
+    letter-spacing: 0.25em;
+  }
+  .hist-toolbar .f {
+    font-family: 'Gowun Batang', serif;
+    font-size: 10px;
+    color: var(--rice-fade);
+    letter-spacing: 0.2em;
+  }
+
+  .hist-list {
+    position: relative;
+    z-index: 10;
+    margin: 0 24px 24px;
+  }
+  .hist-ep {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 0 13px;
+    border-bottom: 1px solid var(--line);
+  }
+  .hist-ep:last-child { border-bottom: none; }
+  .hist-ep-no {
+    flex-shrink: 0;
+    width: 46px;
+    text-align: left;
+  }
+  .hist-ep-no .hz {
+    font-family: 'Nanum Myeongjo', serif;
+    font-weight: 800;
+    font-size: 10px;
+    color: var(--blood-dry);
+    letter-spacing: 0.15em;
+  }
+  .hist-ep-no .n {
+    font-family: 'Nanum Myeongjo', serif;
+    font-weight: 800;
+    font-size: 20px;
+    color: var(--rice);
+    line-height: 1;
+    letter-spacing: 0.02em;
+    margin-top: 2px;
+  }
+  .hist-ep-body { flex: 1; min-width: 0; }
+  .hist-ep-ttl {
+    font-family: 'Nanum Myeongjo', serif;
+    font-weight: 700;
+    font-size: 13px;
+    color: var(--rice);
+    letter-spacing: 0.05em;
+    margin-bottom: 3px;
+  }
+  .hist-ep-meta {
+    font-family: 'Gowun Batang', serif;
+    font-size: 10.5px;
+    color: var(--rice-fade);
+    letter-spacing: 0.12em;
+  }
+  .hist-ep-meta .sep { margin: 0 6px; color: var(--line); }
+  .hist-ep-v {
+    text-align: right;
+    flex-shrink: 0;
+  }
+  .hist-ep-v .tag {
+    font-family: 'Nanum Myeongjo', serif;
+    font-weight: 800;
+    font-size: 12px;
+    letter-spacing: 0.15em;
+  }
+  .hist-ep-v .tag.alive { color: var(--rice); }
+  .hist-ep-v .tag.dead { color: var(--blood-fresh); }
+  .hist-ep-v .dist {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    color: var(--rice-fade);
+    margin-top: 3px;
+    letter-spacing: 0.05em;
+  }
+
+  /* ===========================================
+     SCREEN 6 — SETTINGS
+     =========================================== */
+  .s-set .hanja-mark {
+    top: 20%; right: -60px;
+    font-size: 260px;
+    opacity: 0.7;
+  }
+
+  .set-header {
+    position: relative;
+    z-index: 10;
+    padding: 24px 24px 0;
+  }
+  .set-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 14px;
+  }
+  .set-bar-hz {
+    font-family: 'Nanum Myeongjo', serif;
+    font-weight: 800;
+    font-size: 22px;
+    color: var(--blood-dry);
+    width: 38px; height: 38px;
+    border: 1px solid var(--line);
+    display: flex; align-items: center; justify-content: center;
+  }
+  .set-bar-back {
+    font-family: 'Nanum Myeongjo', serif;
+    font-size: 18px;
+    color: var(--rice-dim);
+  }
+  .set-title {
+    font-family: 'Nanum Myeongjo', serif;
+    font-weight: 800;
+    font-size: 28px;
+    color: var(--rice);
+    letter-spacing: 0.1em;
+    padding-left: 0.1em;
+    margin-bottom: 2px;
+  }
+  .set-sub {
+    font-family: 'Gowun Batang', serif;
+    font-size: 11px;
+    color: var(--rice-fade);
+    letter-spacing: 0.3em;
+    margin-bottom: 18px;
+  }
+
+  .set-profile {
+    position: relative;
+    z-index: 10;
+    margin: 0 24px 22px;
+    padding: 16px 14px;
+    border: 1px solid var(--line);
+    background:
+      linear-gradient(135deg, rgba(122,10,14,0.1), transparent 70%),
+      rgba(10,6,6,0.6);
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+  .set-avatar {
+    width: 48px; height: 48px;
+    border: 1px solid var(--blood-dry);
+    background: #0e0505;
+    font-family: 'Nanum Myeongjo', serif;
+    font-weight: 800;
+    font-size: 22px;
+    color: var(--blood-fresh);
+    display: flex; align-items: center; justify-content: center;
+    letter-spacing: 0.02em;
+  }
+  .set-profile-info { flex: 1; min-width: 0; }
+  .set-profile-name {
+    font-family: 'Nanum Myeongjo', serif;
+    font-weight: 800;
+    font-size: 15px;
+    color: var(--rice);
+    letter-spacing: 0.1em;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .set-profile-name .pro {
+    font-family: 'Inter', sans-serif;
+    font-weight: 700;
+    font-size: 9px;
+    color: var(--ink);
+    background: var(--blood-fresh);
+    padding: 1px 5px;
+    letter-spacing: 0.1em;
+  }
+  .set-profile-meta {
+    font-family: 'Gowun Batang', serif;
+    font-size: 10.5px;
+    color: var(--rice-fade);
+    letter-spacing: 0.2em;
+    margin-top: 4px;
+  }
+  .set-profile-arr {
+    font-family: 'Nanum Myeongjo', serif;
+    font-size: 16px;
+    color: var(--rice-fade);
+  }
+
+  .set-section {
+    position: relative;
+    z-index: 10;
+    margin: 0 24px 18px;
+  }
+  .set-section-head {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    margin-bottom: 8px;
+    padding-bottom: 6px;
+    border-bottom: 1px solid var(--line);
+  }
+  .set-section-hz {
+    font-family: 'Nanum Myeongjo', serif;
+    font-weight: 800;
+    font-size: 13px;
+    color: var(--blood-dry);
+    letter-spacing: 0.1em;
+  }
+  .set-section-ttl {
+    font-family: 'Gowun Batang', serif;
+    font-size: 11px;
+    color: var(--rice-dim);
+    letter-spacing: 0.35em;
+    flex: 1;
+  }
+  .set-section-en {
+    font-family: 'Inter', sans-serif;
+    font-size: 9px;
+    color: var(--rice-ghost);
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+  }
+
+  .set-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 2px;
+    border-bottom: 1px dotted var(--line);
+  }
+  .set-row:last-child { border-bottom: none; }
+  .set-row-l {
+    font-family: 'Gowun Batang', serif;
+    font-size: 12.5px;
+    color: var(--rice);
+    letter-spacing: 0.05em;
+  }
+  .set-row-l small {
+    display: block;
+    font-size: 9.5px;
+    color: var(--rice-fade);
+    margin-top: 2px;
+    letter-spacing: 0.2em;
+  }
+  .set-row-r {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-family: 'Gowun Batang', serif;
+    font-size: 11px;
+    color: var(--rice-fade);
+    letter-spacing: 0.1em;
+  }
+  .set-row-r .val { color: var(--rice); }
+  .set-row-r .arr { color: var(--rice-ghost); }
+
+  /* 토글 */
+  .toggle {
+    width: 36px; height: 18px;
+    border: 1px solid var(--line);
+    background: #0a0505;
+    position: relative;
+    flex-shrink: 0;
+  }
+  .toggle::after {
+    content: '';
+    position: absolute;
+    top: 2px; left: 2px;
+    width: 12px; height: 12px;
+    background: var(--rice-ghost);
+  }
+  .toggle.on {
+    border-color: var(--blood-dry);
+    background: rgba(196,32,41,0.12);
+  }
+  .toggle.on::after {
+    left: 20px;
+    background: var(--blood-fresh);
+    box-shadow: 0 0 10px var(--blood-fresh);
+  }
+
+  .set-hint {
+    position: relative;
+    z-index: 10;
+    margin: 16px 24px 24px;
+    padding: 12px;
+    text-align: center;
+    border: 1px dotted var(--line);
+    background: rgba(10,5,5,0.4);
+  }
+  .set-hint .hz {
+    font-family: 'Nanum Myeongjo', serif;
+    font-size: 14px;
+    color: var(--rice-ghost);
+    letter-spacing: 0.4em;
+    margin-bottom: 4px;
+  }
+  .set-hint .t {
+    font-family: 'Gowun Batang', serif;
+    font-size: 10px;
+    color: var(--rice-fade);
+    letter-spacing: 0.25em;
+    font-style: italic;
+  }
+
+  /* 세로 한자 목록(홈 왼쪽 가장자리) */
+  .vert-list {
+    position: absolute;
+    top: 20%;
+    right: 6px;
+    writing-mode: vertical-rl;
+    font-family: 'Nanum Myeongjo', serif;
+    font-size: 10px;
+    color: var(--rice-ghost);
+    letter-spacing: 0.5em;
+    opacity: 0.7;
+    z-index: 5;
+  }
+</style>
+</head>
+<body>
+
+<div class="page-header">
+  <div class="hanja-line">影 追 夜 始 終</div>
+  <h1>SHADOW RUN &nbsp;<em>·</em>&nbsp; Theme 03</h1>
+  <div class="tagline">Korean Mystic Horror &nbsp;/&nbsp; 곡성 · 파묘 · 사바하의 결을 러닝앱으로 번역한다.<br>
+    먹빛 배경 위에 쌀빛 텍스트, 마른 피와 산뜻 피의 이중 계조. 도플갱어는 影(그림자 분신).</div>
+  <div class="double-rule"></div>
+</div>
+
+<div class="stage">
+
+  <!-- =========================================
+       1 · HOME
+       ========================================= -->
+  <div class="phone-cell">
+    <div class="phone">
+      <div class="notch"></div>
+      <div class="screen s-home">
+        <div class="hanja-mark big">影</div>
+        <div class="hanja-mark small">夜</div>
+        <div class="vert-list">十二 &nbsp; 廿八 &nbsp; 四一二</div>
+
+        <div class="statusbar"><span>9:41</span><span>●●●● &nbsp; ●●</span></div>
+
+        <div class="scroll">
+          <div class="home-header">
+            <div class="home-top-hanja">影 追 夜</div>
+            <div class="home-logo">쉐도우런</div>
+            <div class="home-logo-en">S H A D O W &nbsp;&nbsp; R U N</div>
+            <div class="home-eye">— 그림자는 쉬지 않는다 —</div>
+            <div class="home-ep">제 028 밤</div>
+            <div class="home-date">수 요 일 · 四 月 十 七 日</div>
+          </div>
+
+          <div class="brush"></div>
+
+          <div class="home-quote">
+            <div class="q">어젯밤, 그 놈이<br>
+              <strong>삼백 열두 걸음</strong><br>
+              가까워졌다.</div>
+            <div class="q-by">─ 지 난 밤 의 기 록 ─</div>
+          </div>
+
+          <div class="double-rule blood"></div>
+
+          <div class="home-stats">
+            <div class="home-stat">
+              <div class="k">이번 주</div>
+              <div class="v">十二<small>km</small></div>
+              <div class="unit">十二 킬로미터</div>
+            </div>
+            <div class="home-stat">
+              <div class="k">밤의 기록</div>
+              <div class="v">廿八<small>회</small></div>
+              <div class="unit">스물 여덟 밤</div>
+            </div>
+            <div class="home-stat">
+              <div class="k">최장 거리</div>
+              <div class="v">四一二<small>m</small></div>
+              <div class="unit">사백 열두 걸음</div>
+            </div>
+          </div>
+
+          <div class="home-start">
+            <div class="home-start-hanja">始</div>
+            <div class="home-start-title">오늘 밤,<br>다시 뛰어라.</div>
+            <div class="home-start-cta">
+              <div class="home-start-sub">지 금 시 작</div>
+              <div class="home-start-arr">›</div>
+            </div>
+          </div>
+
+          <div class="home-recent">
+            <div class="home-recent-head">
+              <div class="title">지난 밤들</div>
+              <div class="more">전 체 ›</div>
+            </div>
+            <div class="brush thin"></div>
+
+            <div class="home-run">
+              <div class="home-run-no">廿八</div>
+              <div class="home-run-body">
+                <div class="home-run-date">四月 十六日 밤 · 성동</div>
+                <div class="home-run-loc">三·四二 km · 二四:一八</div>
+              </div>
+              <div class="home-run-v alive">살았다</div>
+            </div>
+            <div class="home-run">
+              <div class="home-run-no">廿七</div>
+              <div class="home-run-body">
+                <div class="home-run-date">四月 十五日 밤 · 한강</div>
+                <div class="home-run-loc">二·一八 km · 一八:〇二</div>
+              </div>
+              <div class="home-run-v dead">잡혔다</div>
+            </div>
+            <div class="home-run">
+              <div class="home-run-no">廿六</div>
+              <div class="home-run-body">
+                <div class="home-run-date">四月 十四日 밤 · 남산</div>
+                <div class="home-run-loc">四·八〇 km · 三三:四一</div>
+              </div>
+              <div class="home-run-v alive">살았다</div>
+            </div>
+          </div>
+
+          <div style="height: 84px;"></div>
+        </div>
+
+        <div class="tabs">
+          <div class="tab active"><span class="hz">家</span><span class="lb">오늘</span></div>
+          <div class="tab"><span class="hz">夜</span><span class="lb">지난밤</span></div>
+          <div class="tab"><span class="hz">分</span><span class="lb">분석</span></div>
+          <div class="tab"><span class="hz">設</span><span class="lb">설정</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="phone-label"><span class="num">01 · HOME</span>오늘 밤의 집</div>
+  </div>
+
+  <!-- =========================================
+       2 · PREPARE
+       ========================================= -->
+  <div class="phone-cell">
+    <div class="phone">
+      <div class="notch"></div>
+      <div class="screen s-prep">
+        <div class="hanja-mark">始</div>
+
+        <div class="statusbar"><span>9:41</span><span>●●●● &nbsp; ●●</span></div>
+
+        <div class="scroll">
+          <div class="prep-header">
+            <div class="prep-bar">
+              <div class="prep-back">‹ 돌아가기</div>
+              <div class="prep-hanja-badge">始</div>
+            </div>
+            <div class="prep-title">오늘 밤의<br>준비</div>
+            <div class="prep-sub">─ P R E P A R A T I O N ─</div>
+          </div>
+
+          <div class="brush thin"></div>
+          <div style="height: 14px;"></div>
+
+          <div class="prep-gps">
+            <div class="prep-gps-dot"></div>
+            <div class="prep-gps-t">위치 확인됨 · <b>서울 성동구</b></div>
+            <div class="prep-gps-n">正 常</div>
+          </div>
+
+          <div class="prep-section">
+            <div class="prep-section-t">
+              <div class="l">그림자의 속도</div>
+              <div class="r">S H A D O W &nbsp; S P E E D</div>
+            </div>
+            <div class="prep-speed">
+              <div class="prep-speed-opt">
+                <div class="hz">緩</div>
+                <div class="l">느린 그림자</div>
+                <div class="s">6:30 / km</div>
+              </div>
+              <div class="prep-speed-opt on">
+                <div class="hz">中</div>
+                <div class="l">보통</div>
+                <div class="s">5:30 / km</div>
+              </div>
+              <div class="prep-speed-opt">
+                <div class="hz">急</div>
+                <div class="l">빠른 그림자</div>
+                <div class="s">4:30 / km</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="prep-section">
+            <div class="prep-section-t">
+              <div class="l">신 발</div>
+              <div class="r">S H O E S</div>
+            </div>
+            <div class="prep-shoe">
+              <div class="prep-shoe-opt on">
+                <div class="prep-shoe-ico">鞋</div>
+                <div class="prep-shoe-name">나이키 벌컨
+                  <small>NIKE VAPORFLY · 二八四 km</small>
+                </div>
+              </div>
+              <div class="prep-shoe-opt">
+                <div class="prep-shoe-ico">履</div>
+                <div class="prep-shoe-name">아디다스 보스턴
+                  <small>ADIDAS BOSTON · 一二 km</small>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="prep-section">
+            <div class="prep-section-t">
+              <div class="l">목표 거리</div>
+              <div class="r">T A R G E T</div>
+            </div>
+            <div class="prep-dist">
+              <div>
+                <div class="prep-dist-num">5.0<small>km</small></div>
+                <div class="prep-dist-hanja">五 킬로미터</div>
+              </div>
+              <div class="prep-dist-ctrl">
+                <div class="prep-dist-btn">−</div>
+                <div class="prep-dist-btn">+</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="prep-go">
+            <div class="prep-go-hanja">走</div>
+            <div class="prep-go-big">뛰 어 라</div>
+            <div class="prep-go-sub">지 금 시 작</div>
+          </div>
+
+          <div style="height: 40px;"></div>
+        </div>
+      </div>
+    </div>
+    <div class="phone-label"><span class="num">02 · PREPARE</span>오늘 밤의 준비</div>
+  </div>
+
+  <!-- =========================================
+       3 · RUNNING
+       ========================================= -->
+  <div class="phone-cell">
+    <div class="phone">
+      <div class="notch"></div>
+      <div class="screen s-run">
+        <div class="hanja-mark">追</div>
+        <div class="hanja-mark-2">走</div>
+
+        <div class="statusbar"><span>9:41</span><span>●●●● &nbsp; ●●</span></div>
+
+        <div class="scroll">
+          <div class="run-header">
+            <div class="run-hanja-top">追</div>
+            <div class="run-warn">
+              <div class="run-warn-dot"></div>
+              <div class="run-warn-t">지 금 · 경 고</div>
+            </div>
+          </div>
+
+          <div class="run-dist">
+            <div class="run-dist-label">그 림 자 까 지</div>
+            <div class="run-dist-wrap">
+              <div class="run-dist-num">152</div>
+              <div class="run-dist-unit">米</div>
+            </div>
+            <div class="run-dist-sub">M E T E R S &nbsp; B E H I N D</div>
+          </div>
+
+          <div class="run-map">
+            <div class="run-map-legend">
+              <span class="me">나</span>
+              <span class="sh">影</span>
+            </div>
+            <svg viewBox="0 0 300 120" preserveAspectRatio="none">
+              <defs>
+                <pattern id="grid" width="20" height="20" patternUnits="userSpaceOnUse">
+                  <path d="M 20 0 L 0 0 0 20" fill="none" stroke="#1a0a0a" stroke-width="0.5" opacity="0.6"/>
+                </pattern>
+                <linearGradient id="trail" x1="0" y1="0" x2="1" y2="0">
+                  <stop offset="0%" stop-color="#7A0A0E" stop-opacity="0"/>
+                  <stop offset="100%" stop-color="#C42029" stop-opacity="0.8"/>
+                </linearGradient>
+              </defs>
+              <rect width="300" height="120" fill="url(#grid)"/>
+              <!-- 도플갱어 자취 (빨강) -->
+              <path d="M 20 80 Q 60 40, 100 60 T 180 50 Q 210 70, 240 40" stroke="url(#trail)" stroke-width="1.5" fill="none" stroke-dasharray="2 3" opacity="0.9"/>
+              <!-- 내 자취 (흰) -->
+              <path d="M 20 80 Q 60 40, 100 60 T 180 50 Q 210 70, 240 40 L 262 52" stroke="#F0EBE3" stroke-width="1.8" fill="none" opacity="0.9"/>
+              <!-- 도플갱어 위치 -->
+              <circle cx="240" cy="40" r="4" fill="#C42029"/>
+              <circle cx="240" cy="40" r="8" fill="none" stroke="#C42029" stroke-width="0.8" opacity="0.5"/>
+              <text x="230" y="32" fill="#C42029" font-family="Nanum Myeongjo" font-size="10" font-weight="800">影</text>
+              <!-- 내 위치 -->
+              <circle cx="262" cy="52" r="4" fill="#F0EBE3"/>
+              <circle cx="262" cy="52" r="8" fill="none" stroke="#F0EBE3" stroke-width="0.8" opacity="0.4"/>
+              <text x="268" y="48" fill="#F0EBE3" font-family="Inter" font-size="8">나</text>
+            </svg>
+          </div>
+
+          <div class="run-stats">
+            <div class="run-stat">
+              <div class="k">거 리</div>
+              <div class="v">2.18<small style="font-family:'Gowun Batang'; font-size:10px; color:var(--rice-fade); margin-left:3px;">km</small></div>
+            </div>
+            <div class="run-stat">
+              <div class="k">시 간</div>
+              <div class="v">12:04</div>
+            </div>
+            <div class="run-stat">
+              <div class="k">페 이 스</div>
+              <div class="v red">5'32"</div>
+            </div>
+          </div>
+
+          <div style="height: 10px;"></div>
+          <div class="brush thin"></div>
+
+          <div style="padding: 18px 24px 0; font-family:'Nanum Myeongjo',serif; text-align:center; font-size:13px; color: var(--rice-dim); line-height:1.8; letter-spacing:0.04em; position:relative; z-index:10;">
+            「 그 놈이 숨을 고르지 않는다. 」<br>
+            <span style="font-family:'Gowun Batang',serif; font-size:10px; color:var(--rice-fade); letter-spacing:0.35em;">— 0 4 : 1 2 A M</span>
+          </div>
+        </div>
+
+        <div class="run-bottom">
+          <div class="run-pause">숨 고르기</div>
+          <div class="run-stop">멈 춘 다</div>
+        </div>
+      </div>
+    </div>
+    <div class="phone-label"><span class="num">03 · RUNNING</span>추 격 중</div>
+  </div>
+
+  <!-- =========================================
+       4 · RESULT
+       ========================================= -->
+  <div class="phone-cell">
+    <div class="phone">
+      <div class="notch"></div>
+      <div class="screen s-result">
+        <div class="hanja-mark">終</div>
+
+        <div class="statusbar"><span>9:41</span><span>●●●● &nbsp; ●●</span></div>
+
+        <div class="scroll">
+          <div class="res-bar">
+            <div class="res-x">×</div>
+            <div class="res-hanja-top">終</div>
+            <div class="res-share">공 유</div>
+          </div>
+
+          <div class="res-verdict-wrap">
+            <div class="res-verdict-eye">제 028 밤 · 판 결</div>
+            <div class="res-verdict">살 아 <em>남</em> 았 다</div>
+            <div class="res-brush-wrap"><div class="brush"></div></div>
+            <div class="res-quote">
+              오늘 밤은 <em>그 그림자</em>가<br>당신을 놓쳤다.<br>내일 밤은 아무도 모른다.
+            </div>
+            <div class="res-quote-by">─ 四 月 十 七 日 · 밤 의 기 록 ─</div>
+          </div>
+
+          <div class="res-stats">
+            <div class="res-stat">
+              <div class="k">거 리</div>
+              <div class="v">3.42<small>km</small></div>
+            </div>
+            <div class="res-stat">
+              <div class="k">시 간</div>
+              <div class="v">24:18</div>
+            </div>
+            <div class="res-stat">
+              <div class="k">여 유</div>
+              <div class="v">+312<small>m</small></div>
+            </div>
+          </div>
+
+          <div class="res-chart-wrap">
+            <div class="res-chart-head">
+              <div class="res-chart-title">그 림 자 와 의 거 리</div>
+              <div class="res-chart-legend">── 米 / 분</div>
+            </div>
+            <svg class="res-chart" viewBox="0 0 300 120" preserveAspectRatio="none">
+              <defs>
+                <linearGradient id="chartFill" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stop-color="#C42029" stop-opacity="0.35"/>
+                  <stop offset="100%" stop-color="#C42029" stop-opacity="0"/>
+                </linearGradient>
+                <linearGradient id="dangerBand" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stop-color="#7A0A0E" stop-opacity="0.25"/>
+                  <stop offset="100%" stop-color="#7A0A0E" stop-opacity="0"/>
+                </linearGradient>
+              </defs>
+              <!-- 위험 구역 (0~40m) -->
+              <rect x="0" y="90" width="300" height="30" fill="url(#dangerBand)"/>
+              <line x1="0" y1="90" x2="300" y2="90" stroke="#7A0A0E" stroke-width="0.6" stroke-dasharray="2 3" opacity="0.6"/>
+              <text x="6" y="100" fill="#7A0A0E" font-family="Nanum Myeongjo" font-size="8" opacity="0.8">危</text>
+
+              <!-- 그리드 라인 -->
+              <line x1="0" y1="30" x2="300" y2="30" stroke="#241618" stroke-width="0.5" stroke-dasharray="1 3"/>
+              <line x1="0" y1="60" x2="300" y2="60" stroke="#241618" stroke-width="0.5" stroke-dasharray="1 3"/>
+
+              <!-- 채우기 -->
+              <path d="M 0 70 L 20 55 L 40 75 L 60 85 L 80 72 L 100 95 L 120 78 L 140 88 L 160 58 L 180 42 L 200 35 L 220 28 L 240 22 L 260 18 L 280 20 L 300 15 L 300 120 L 0 120 Z" fill="url(#chartFill)"/>
+
+              <!-- 라인 -->
+              <path d="M 0 70 L 20 55 L 40 75 L 60 85 L 80 72 L 100 95 L 120 78 L 140 88 L 160 58 L 180 42 L 200 35 L 220 28 L 240 22 L 260 18 L 280 20 L 300 15"
+                    stroke="#C42029" stroke-width="1.8" fill="none" stroke-linejoin="round"/>
+
+              <!-- 가장 위험했던 지점 표시 (100,95) -->
+              <circle cx="100" cy="95" r="3" fill="#C42029"/>
+              <line x1="100" y1="95" x2="100" y2="110" stroke="#C42029" stroke-width="0.5" stroke-dasharray="1 2"/>
+              <text x="86" y="118" fill="#C42029" font-family="Nanum Myeongjo" font-size="8">最危</text>
+
+              <!-- 끝점 (탈출) -->
+              <circle cx="300" cy="15" r="3" fill="#F0EBE3"/>
+              <text x="275" y="12" fill="#F0EBE3" font-family="Nanum Myeongjo" font-size="8">活</text>
+            </svg>
+            <div class="res-chart-foot">
+              <span>0:00</span>
+              <span>12:00</span>
+              <span>24:18</span>
+            </div>
+          </div>
+
+          <div class="res-detail">
+            <div class="res-detail-row"><span class="l">최 소 거 리</span><span class="v red">八米 · 12:03</span></div>
+            <div class="res-detail-row"><span class="l">최 대 거 리</span><span class="v">三一二米 · 23:40</span></div>
+            <div class="res-detail-row"><span class="l">평 균 페 이 스</span><span class="v">7'06"</span></div>
+            <div class="res-detail-row"><span class="l">심 박 · 평 균</span><span class="v">148 bpm</span></div>
+            <div class="res-detail-row"><span class="l">고 도</span><span class="v">↑ 42 m</span></div>
+            <div class="res-detail-row"><span class="l">코 스</span><span class="v">성동 · 서울숲 →  응봉</span></div>
+          </div>
+
+          <div style="height: 20px;"></div>
+        </div>
+      </div>
+    </div>
+    <div class="phone-label"><span class="num">04 · RESULT</span>판 결</div>
+  </div>
+
+  <!-- =========================================
+       5 · HISTORY
+       ========================================= -->
+  <div class="phone-cell">
+    <div class="phone">
+      <div class="notch"></div>
+      <div class="screen s-hist">
+        <div class="hanja-mark">夜</div>
+        <div class="hanja-mark-2">過</div>
+
+        <div class="statusbar"><span>9:41</span><span>●●●● &nbsp; ●●</span></div>
+
+        <div class="scroll">
+          <div class="hist-header">
+            <div class="hist-bar">
+              <div class="hist-bar-hz">過 去</div>
+              <div class="hist-bar-ico">
+                <span>≡</span>
+                <span>⌕</span>
+              </div>
+            </div>
+            <div class="hist-title">지난 밤들<em>· 四月</em></div>
+            <div class="hist-sub">R E C O R D S &nbsp;·&nbsp; 二〇二六 · 四月</div>
+          </div>
+
+          <div class="hist-summary">
+            <div class="l">이 달 의 기 록</div>
+            <div class="big">스물 여덟 밤 동안<br><strong>六四·八</strong> 킬로미터 도주.</div>
+            <div class="meta">스물둘 살고<span class="sep">·</span>여섯 잡혔다</div>
+          </div>
+
+          <div class="brush thin"></div>
+
+          <div class="hist-toolbar">
+            <div class="t">에 피 소 드 <em>E P I S O D E S</em></div>
+            <div class="f">전 체 ▾</div>
+          </div>
+
+          <div class="hist-list">
+            <div class="hist-ep">
+              <div class="hist-ep-no">
+                <div class="hz">제 / 밤</div>
+                <div class="n">廿八</div>
+              </div>
+              <div class="hist-ep-body">
+                <div class="hist-ep-ttl">성 동 구 의 밤</div>
+                <div class="hist-ep-meta">四月 十六日<span class="sep">·</span>三·四二 km<span class="sep">·</span>二四:一八</div>
+              </div>
+              <div class="hist-ep-v">
+                <div class="tag alive">살았다</div>
+                <div class="dist">+312 m</div>
+              </div>
+            </div>
+
+            <div class="hist-ep">
+              <div class="hist-ep-no">
+                <div class="hz">제 / 밤</div>
+                <div class="n">廿七</div>
+              </div>
+              <div class="hist-ep-body">
+                <div class="hist-ep-ttl">한 강 의 그 림 자</div>
+                <div class="hist-ep-meta">四月 十五日<span class="sep">·</span>二·一八 km<span class="sep">·</span>一八:〇二</div>
+              </div>
+              <div class="hist-ep-v">
+                <div class="tag dead">잡혔다</div>
+                <div class="dist">−18 m</div>
+              </div>
+            </div>
+
+            <div class="hist-ep">
+              <div class="hist-ep-no">
+                <div class="hz">제 / 밤</div>
+                <div class="n">廿六</div>
+              </div>
+              <div class="hist-ep-body">
+                <div class="hist-ep-ttl">남 산 길</div>
+                <div class="hist-ep-meta">四月 十四日<span class="sep">·</span>四·八〇 km<span class="sep">·</span>三三:四一</div>
+              </div>
+              <div class="hist-ep-v">
+                <div class="tag alive">살았다</div>
+                <div class="dist">+520 m</div>
+              </div>
+            </div>
+
+            <div class="hist-ep">
+              <div class="hist-ep-no">
+                <div class="hz">제 / 밤</div>
+                <div class="n">廿五</div>
+              </div>
+              <div class="hist-ep-body">
+                <div class="hist-ep-ttl">응 봉 산 새 벽</div>
+                <div class="hist-ep-meta">四月 十二日<span class="sep">·</span>三·〇四 km<span class="sep">·</span>二一:〇八</div>
+              </div>
+              <div class="hist-ep-v">
+                <div class="tag alive">살았다</div>
+                <div class="dist">+184 m</div>
+              </div>
+            </div>
+
+            <div class="hist-ep">
+              <div class="hist-ep-no">
+                <div class="hz">제 / 밤</div>
+                <div class="n">廿四</div>
+              </div>
+              <div class="hist-ep-body">
+                <div class="hist-ep-ttl">잠 수 교 야 밤</div>
+                <div class="hist-ep-meta">四月 十日<span class="sep">·</span>一·四八 km<span class="sep">·</span>一二:三七</div>
+              </div>
+              <div class="hist-ep-v">
+                <div class="tag dead">잡혔다</div>
+                <div class="dist">−42 m</div>
+              </div>
+            </div>
+          </div>
+
+          <div style="height: 40px;"></div>
+        </div>
+      </div>
+    </div>
+    <div class="phone-label"><span class="num">05 · HISTORY</span>지 난 밤 들</div>
+  </div>
+
+  <!-- =========================================
+       6 · SETTINGS
+       ========================================= -->
+  <div class="phone-cell">
+    <div class="phone">
+      <div class="notch"></div>
+      <div class="screen s-set">
+        <div class="hanja-mark">設</div>
+
+        <div class="statusbar"><span>9:41</span><span>●●●● &nbsp; ●●</span></div>
+
+        <div class="scroll">
+          <div class="set-header">
+            <div class="set-bar">
+              <div class="set-bar-back">‹</div>
+              <div class="set-bar-hz">設</div>
+            </div>
+            <div class="set-title">설 정</div>
+            <div class="set-sub">S E T T I N G S</div>
+          </div>
+
+          <div class="brush thin"></div>
+          <div style="height: 16px;"></div>
+
+          <div class="set-profile">
+            <div class="set-avatar">影</div>
+            <div class="set-profile-info">
+              <div class="set-profile-name">도리수라 <span class="pro">PRO</span></div>
+              <div class="set-profile-meta">제 028 밤<span style="color:var(--blood-dry); margin:0 6px;">·</span>64.8 km</div>
+            </div>
+            <div class="set-profile-arr">›</div>
+          </div>
+
+          <div class="set-section">
+            <div class="set-section-head">
+              <div class="set-section-hz">貌</div>
+              <div class="set-section-ttl">외 관</div>
+              <div class="set-section-en">APPEARANCE</div>
+            </div>
+            <div class="set-row">
+              <div class="set-row-l">테마<small>T H E M E</small></div>
+              <div class="set-row-r"><span class="val">먹빛 호러</span><span class="arr">›</span></div>
+            </div>
+            <div class="set-row">
+              <div class="set-row-l">폰트<small>T Y P E F A C E</small></div>
+              <div class="set-row-r"><span class="val">나눔명조</span><span class="arr">›</span></div>
+            </div>
+            <div class="set-row">
+              <div class="set-row-l">한자 숫자 표기<small>H A N J A &nbsp; N U M E R A L S</small></div>
+              <div class="toggle on"></div>
+            </div>
+          </div>
+
+          <div class="set-section">
+            <div class="set-section-head">
+              <div class="set-section-hz">音</div>
+              <div class="set-section-ttl">소 리</div>
+              <div class="set-section-en">AUDIO</div>
+            </div>
+            <div class="set-row">
+              <div class="set-row-l">나레이션 목소리<small>V O I C E &nbsp; O F &nbsp; S H A D O W</small></div>
+              <div class="set-row-r"><span class="val">저음 · 남성</span><span class="arr">›</span></div>
+            </div>
+            <div class="set-row">
+              <div class="set-row-l">점프스케어<small>J U M P &nbsp; S C A R E</small></div>
+              <div class="toggle on"></div>
+            </div>
+            <div class="set-row">
+              <div class="set-row-l">배경 소리<small>A M B I E N T</small></div>
+              <div class="toggle on"></div>
+            </div>
+          </div>
+
+          <div class="set-section">
+            <div class="set-section-head">
+              <div class="set-section-hz">戱</div>
+              <div class="set-section-ttl">게 임</div>
+              <div class="set-section-en">GAME</div>
+            </div>
+            <div class="set-row">
+              <div class="set-row-l">기본 난이도<small>D E F A U L T &nbsp; S P E E D</small></div>
+              <div class="set-row-r"><span class="val">보통 · 5:30</span><span class="arr">›</span></div>
+            </div>
+            <div class="set-row">
+              <div class="set-row-l">자동 일시정지<small>A U T O &nbsp; P A U S E</small></div>
+              <div class="toggle"></div>
+            </div>
+            <div class="set-row">
+              <div class="set-row-l">GPS 정확도<small>G P S &nbsp; A C C U R A C Y</small></div>
+              <div class="set-row-r"><span class="val">높음</span><span class="arr">›</span></div>
+            </div>
+          </div>
+
+          <div class="set-section">
+            <div class="set-section-head">
+              <div class="set-section-hz">助</div>
+              <div class="set-section-ttl">도 움</div>
+              <div class="set-section-en">SUPPORT</div>
+            </div>
+            <div class="set-row">
+              <div class="set-row-l">자주 묻는 질문<small>F A Q</small></div>
+              <div class="set-row-r"><span class="arr">›</span></div>
+            </div>
+            <div class="set-row">
+              <div class="set-row-l">개인정보 처리방침<small>P R I V A C Y</small></div>
+              <div class="set-row-r"><span class="arr">›</span></div>
+            </div>
+            <div class="set-row">
+              <div class="set-row-l">버전<small>V E R S I O N</small></div>
+              <div class="set-row-r"><span class="val" style="font-family:'JetBrains Mono',monospace;">1.0.0 · 011</span></div>
+            </div>
+          </div>
+
+          <div class="set-hint">
+            <div class="hz">影 影 影 影 影 影 影</div>
+            <div class="t">tap × 7 to unlock</div>
+          </div>
+
+          <div style="height: 40px;"></div>
+        </div>
+      </div>
+    </div>
+    <div class="phone-label"><span class="num">06 · SETTINGS</span>설 정</div>
+  </div>
+
+</div>
+
+</body>
+</html>

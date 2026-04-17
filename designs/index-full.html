@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Shadow Run — 5 Themes Index</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,700;1,400;1,700&family=Nanum+Myeongjo:wght@400;700;800&family=Noto+Serif+KR:wght@200;400;700&family=Playfair+Display:ital,wght@0,400;0,900;1,400;1,700;1,900&family=Inter:wght@200;400;600;700;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css" />
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: #050507;
+    color: #fff;
+    font-family: 'Pretendard', sans-serif;
+    min-height: 100vh;
+    padding: 60px 24px 80px;
+  }
+  header { max-width: 1000px; margin: 0 auto 40px; text-align: center; }
+  header h1 {
+    font-family: 'Playfair Display', serif;
+    font-weight: 900;
+    font-style: italic;
+    font-size: 48px;
+    letter-spacing: -0.02em;
+    margin-bottom: 12px;
+  }
+  header p { color: #888; font-size: 14px; line-height: 1.6; max-width: 680px; margin: 0 auto; }
+
+  .grid {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 20px;
+  }
+
+  .tile {
+    background: #0e0e12;
+    border: 1px solid #1e1e22;
+    border-radius: 16px;
+    padding: 28px 24px;
+    text-decoration: none;
+    color: inherit;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    transition: all 0.2s;
+    position: relative;
+    overflow: hidden;
+  }
+  .tile:hover { border-color: #ff6b7e; transform: translateY(-2px); }
+  .tile::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: var(--accent);
+  }
+  .tile-num {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-size: 12px;
+    color: var(--accent);
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+  }
+  .tile-name {
+    font-family: var(--heroFont);
+    font-size: 26px;
+    font-weight: 900;
+    letter-spacing: -0.02em;
+    color: var(--accent);
+  }
+  .tile-name em { font-style: italic; font-weight: 400; }
+  .tile-desc { color: #999; font-size: 13px; line-height: 1.55; }
+  .tile-badges {
+    margin-top: auto;
+    display: flex;
+    gap: 8px;
+    padding-top: 14px;
+    border-top: 1px solid #1e1e22;
+    flex-wrap: wrap;
+  }
+  .badge {
+    padding: 3px 10px;
+    border-radius: 4px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.1em;
+  }
+  .badge-free { background: rgba(107,217,199,0.1); color: #6BD9C7; border: 1px solid rgba(107,217,199,0.3); }
+  .badge-paid { background: rgba(212,175,55,0.1); color: #D4AF37; border: 1px solid rgba(212,175,55,0.3); }
+  .badge-open { background: transparent; color: #888; border: 1px solid #333; margin-left: auto; }
+
+  .tile-sample {
+    background: var(--sample-bg);
+    padding: 14px;
+    border-radius: 8px;
+    margin-top: 4px;
+    font-family: var(--bodyFont);
+    font-size: 13px;
+    color: var(--sample-fg);
+    border: 1px solid var(--sample-border);
+    position: relative;
+    overflow: hidden;
+    min-height: 60px;
+  }
+  .tile-sample em { color: var(--accent); font-weight: 700; }
+
+  /* 테마별 색상 */
+  .t1 { --accent: #ff6b7e; --heroFont: 'Playfair Display', serif; --bodyFont: 'Noto Serif KR', serif;
+        --sample-bg: #000; --sample-fg: #f5f5f5; --sample-border: #1a0000; }
+  .t2 { --accent: #B89660; --heroFont: 'Cormorant Garamond', serif; --bodyFont: 'Cormorant Garamond', serif;
+        --sample-bg: #0D0907; --sample-fg: #E8DCC4; --sample-border: #2a1d10; }
+  .t3 { --accent: #C42029; --heroFont: 'Nanum Myeongjo', serif; --bodyFont: 'Nanum Myeongjo', serif;
+        --sample-bg: #050302; --sample-fg: #F0EBE3; --sample-border: #2a1518; }
+  .t4 { --accent: #DC2626; --heroFont: 'Playfair Display', serif; --bodyFont: 'Inter', sans-serif;
+        --sample-bg: #0a0a0a; --sample-fg: #fff; --sample-border: #222; }
+  .t5 { --accent: #FF1744; --heroFont: 'Playfair Display', serif; --bodyFont: 'Inter', sans-serif;
+        --sample-bg: #04040A; --sample-fg: #E8E8F0; --sample-border: rgba(77,208,225,0.15); }
+
+  footer {
+    max-width: 1000px;
+    margin: 48px auto 0;
+    padding: 24px;
+    border: 1px solid #222;
+    border-radius: 12px;
+    background: #0e0e12;
+    font-size: 13px;
+    color: #aaa;
+    line-height: 1.7;
+  }
+  footer .k {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    color: #ff6b7e;
+    font-size: 11px;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Shadow Run · 5 Themes</h1>
+  <p>각 테마는 6개 화면(Home/Prepare/Running/Result/History/Settings)으로 풀 디자인됨.<br>
+     각 타일 클릭 → 새 탭에서 해당 테마 전체 화면 열림.</p>
+</header>
+
+<div class="grid">
+
+  <a class="tile t1" href="full-t1-pure.html" target="_blank">
+    <div class="tile-num">Theme 01</div>
+    <div class="tile-name">Pure <em>Cinematic</em></div>
+    <div class="tile-desc">순검정 + Noto Serif KR + Playfair Italic. 여백과 정적. 자막체 나레이션. 우아한 미니멀 영화.</div>
+    <div class="tile-sample">
+      어젯밤, 그는 당신보다 <em>312미터</em><br>더 가까이 다가왔다.
+    </div>
+    <div class="tile-badges">
+      <span class="badge badge-free">FREE · 기본</span>
+      <span class="badge badge-open">OPEN ›</span>
+    </div>
+  </a>
+
+  <a class="tile t2" href="full-t2-noir.html" target="_blank">
+    <div class="tile-num">Theme 02</div>
+    <div class="tile-name"><em>Film</em> Noir</div>
+    <div class="tile-desc">1940년대 탐정. 크림+골드+와인. Cormorant Italic + Oswald. 러닝 = 사건 파일(CASE).</div>
+    <div class="tile-sample">
+      <span style="font-family:'Oswald';font-size:10px;letter-spacing:0.3em;color:#B89660;">CASE NO. 028 · LAST REPORTED</span><br>
+      "용의자, 피해자로부터 <em>312미터</em>."
+    </div>
+    <div class="tile-badges">
+      <span class="badge badge-paid">₩1,500 · PAID</span>
+      <span class="badge badge-open">OPEN ›</span>
+    </div>
+  </a>
+
+  <a class="tile t3" href="full-t3-mystic.html" target="_blank">
+    <div class="tile-num">Theme 03</div>
+    <div class="tile-name">Korean <em>Mystic</em></div>
+    <div class="tile-desc">곡성·파묘 감성. 나눔명조 + 한자 워터마크(影·追·始). "살았다/잡혔다" 한국 호러.</div>
+    <div class="tile-sample">
+      <span style="color:#7A0A0E;letter-spacing:0.5em;font-size:11px;">影 追 夜</span><br>
+      그 놈이 <em>삼백 열두 걸음</em><br>가까워졌다.
+    </div>
+    <div class="tile-badges">
+      <span class="badge badge-paid">₩1,500 · PAID</span>
+      <span class="badge badge-open">OPEN ›</span>
+    </div>
+  </a>
+
+  <a class="tile t4" href="full-t4-editorial.html" target="_blank">
+    <div class="tile-num">Theme 04</div>
+    <div class="tile-name">Editorial <em>Thriller</em></div>
+    <div class="tile-desc">GQ/Vogue 매거진. 거대 Playfair 로고, No.028 이슈 번호. "Cover Story" "Back Issues" 프레임.</div>
+    <div class="tile-sample">
+      <span style="font-size:10px;letter-spacing:0.2em;color:#DC2626;font-weight:700;">◆ COVER STORY</span><br>
+      그는 어젯밤, 당신의<br><em>312미터</em> 뒤까지 따라붙었다.
+    </div>
+    <div class="tile-badges">
+      <span class="badge badge-paid">₩1,500 · PAID</span>
+      <span class="badge badge-open">OPEN ›</span>
+    </div>
+  </a>
+
+  <a class="tile t5" href="full-t5-cyber.html" target="_blank">
+    <div class="tile-num">Theme 05</div>
+    <div class="tile-name">Neo-Noir <em>Cyber</em></div>
+    <div class="tile-desc">블레이드러너·사이버펑크. 붉은 네온 + 시안 블루. CRT 스캔라인, 글리치 로고, 시스템 로그.</div>
+    <div class="tile-sample">
+      <span style="font-family:'JetBrains Mono';font-size:10px;color:#4DD0E1;letter-spacing:0.2em;">// SYSTEM LOG · 04:12</span><br>
+      subject escaped entity by <em>312m</em>
+    </div>
+    <div class="tile-badges">
+      <span class="badge badge-paid">₩1,500 · PAID</span>
+      <span class="badge badge-open">OPEN ›</span>
+    </div>
+  </a>
+
+</div>
+
+<footer>
+  <div class="k">Next Step</div>
+  끌리는 테마 알려주세요 — 하나만 좋아도, 여러 개 섞고 싶어도 OK.<br>
+  방향 확정되면 <b>Step 1: 테마 인프라 구축</b>부터 Flutter 코딩 시작합니다.<br>
+  <br>
+  <b>확인 필요:</b><br>
+  ① `ganzinam95` = 개발자 모드 비밀번호 맞나요?<br>
+  ② 테마팩 판매: 번들 한 번에 ₩3,300 vs 개별 각 ₩1,500 × 4개?
+</footer>
+
+</body>
+</html>

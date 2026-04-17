@@ -1,0 +1,894 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Shadow Run — 홈화면 무드 비교</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;700;800&family=Playfair+Display:wght@400;700;900&family=Cormorant+Garamond:wght@300;400;600;700&family=VT323&family=Orbitron:wght@400;700;900&family=Space+Grotesk:wght@300;500;700;900&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: #0a0a0a;
+    color: #eaeaea;
+    font-family: 'Inter', sans-serif;
+    min-height: 100vh;
+    padding: 40px 20px 80px;
+  }
+  .page-header {
+    max-width: 1400px;
+    margin: 0 auto 40px;
+    text-align: center;
+  }
+  .page-header h1 {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 42px;
+    font-weight: 900;
+    letter-spacing: -0.02em;
+    margin-bottom: 12px;
+  }
+  .page-header p {
+    color: #888;
+    font-size: 15px;
+    max-width: 760px;
+    margin: 0 auto;
+    line-height: 1.6;
+  }
+  .grid {
+    max-width: 1400px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 24px;
+  }
+  @media (max-width: 1400px) { .grid { grid-template-columns: repeat(2, 1fr); max-width: 760px; } }
+  @media (max-width: 760px)  { .grid { grid-template-columns: 1fr; max-width: 360px; } }
+
+  .card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+  }
+  .card-label {
+    text-align: center;
+    max-width: 320px;
+  }
+  .card-num {
+    color: #666;
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    font-weight: 600;
+    margin-bottom: 4px;
+  }
+  .card-title { font-size: 18px; font-weight: 700; margin-bottom: 6px; }
+  .card-desc { color: #888; font-size: 13px; line-height: 1.5; }
+
+  .phone {
+    width: 320px;
+    height: 660px;
+    border-radius: 44px;
+    overflow: hidden;
+    position: relative;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.8), 0 0 0 8px #1a1a1a, 0 0 0 9px #333;
+  }
+  .phone .screen {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    overflow: hidden;
+  }
+  .notch {
+    position: absolute;
+    top: 12px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 110px;
+    height: 28px;
+    background: #000;
+    border-radius: 20px;
+    z-index: 100;
+  }
+  .statusbar {
+    position: absolute; top: 0; left: 0; right: 0;
+    height: 44px;
+    padding: 14px 24px 0;
+    display: flex;
+    justify-content: space-between;
+    font-size: 12px;
+    font-weight: 600;
+    z-index: 50;
+  }
+
+  /* ============ MOOD 1: URBAN RED CHASE ============ */
+  .m1 {
+    background:
+      radial-gradient(ellipse 500px 400px at 50% 0%, rgba(255,46,74,0.18), transparent 60%),
+      linear-gradient(180deg, #12070c 0%, #05050a 100%);
+    color: #fff;
+    font-family: 'Inter', sans-serif;
+  }
+  .m1::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(0deg, transparent 0, transparent 2px, rgba(255,46,74,0.025) 2px, rgba(255,46,74,0.025) 3px);
+    pointer-events: none;
+  }
+  .m1 .statusbar { color: #fff; }
+  .m1-header {
+    padding: 60px 20px 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .m1-logo {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 20px;
+    font-weight: 900;
+    color: #ff2e4a;
+    letter-spacing: -0.02em;
+    text-shadow: 0 0 12px rgba(255,46,74,0.5);
+  }
+  .m1-icons {
+    display: flex;
+    gap: 14px;
+    font-size: 16px;
+    color: rgba(255,255,255,0.6);
+  }
+  .m1-body { padding: 20px; }
+  .m1-status {
+    background: rgba(255,46,74,0.08);
+    border: 1px solid rgba(255,46,74,0.3);
+    border-radius: 12px;
+    padding: 12px 14px;
+    margin-bottom: 18px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .m1-status-dot {
+    width: 8px; height: 8px;
+    background: #ff2e4a;
+    border-radius: 50%;
+    box-shadow: 0 0 10px #ff2e4a;
+    animation: blink 1.2s infinite;
+  }
+  @keyframes blink { 0%, 50% { opacity: 1; } 51%, 100% { opacity: 0.3; } }
+  .m1-status-text {
+    flex: 1;
+    font-size: 12px;
+    color: #ffb3b8;
+    letter-spacing: 0.05em;
+  }
+  .m1-status-text strong { color: #ff2e4a; font-weight: 700; }
+  .m1-stats-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 8px;
+    margin-bottom: 20px;
+  }
+  .m1-stat-cell {
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 10px;
+    padding: 12px 8px;
+    text-align: center;
+  }
+  .m1-stat-cell .k {
+    font-size: 9px;
+    color: #888;
+    letter-spacing: 0.15em;
+    font-weight: 600;
+    margin-bottom: 4px;
+  }
+  .m1-stat-cell .v {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 18px;
+    font-weight: 700;
+    color: #fff;
+  }
+  .m1-start {
+    background: linear-gradient(135deg, #ff2e4a 0%, #c81233 100%);
+    border-radius: 16px;
+    padding: 20px;
+    margin-bottom: 18px;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 10px 30px rgba(255,46,74,0.4);
+  }
+  .m1-start::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at 70% 50%, rgba(255,255,255,0.15), transparent 60%);
+  }
+  .m1-start-top {
+    font-size: 10px;
+    color: rgba(255,255,255,0.7);
+    letter-spacing: 0.25em;
+    margin-bottom: 6px;
+    font-weight: 700;
+  }
+  .m1-start-main {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 26px;
+    font-weight: 900;
+    letter-spacing: -0.02em;
+    line-height: 1.1;
+  }
+  .m1-start-sub {
+    font-size: 12px;
+    color: rgba(255,255,255,0.8);
+    margin-top: 6px;
+  }
+  .m1-start-arrow {
+    position: absolute;
+    right: 20px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 28px;
+    color: #fff;
+  }
+  .m1-section-title {
+    font-size: 10px;
+    color: #888;
+    letter-spacing: 0.25em;
+    font-weight: 700;
+    margin-bottom: 10px;
+  }
+  .m1-run {
+    background: rgba(255,255,255,0.03);
+    border-radius: 10px;
+    padding: 12px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 6px;
+  }
+  .m1-run-result {
+    width: 36px; height: 36px;
+    border-radius: 8px;
+    background: rgba(255,46,74,0.15);
+    color: #ff2e4a;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px;
+    font-weight: 700;
+  }
+  .m1-run-info { flex: 1; }
+  .m1-run-date { font-size: 11px; color: #888; }
+  .m1-run-dist {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 14px;
+    font-weight: 700;
+  }
+  .m1-run-esc {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    color: #ff6b85;
+  }
+
+  /* ============ MOOD 2: CINEMATIC THRILLER ============ */
+  .m2 {
+    background: #000;
+    color: #f5f5f5;
+    font-family: 'Inter', sans-serif;
+    padding: 44px 0 0;
+  }
+  .m2 .statusbar { color: #f5f5f5; }
+  .m2-body { padding: 30px 32px 24px; }
+  .m2-eyebrow {
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-size: 12px;
+    color: #6a0000;
+    letter-spacing: 0.35em;
+    text-align: center;
+    margin-bottom: 8px;
+    text-transform: uppercase;
+  }
+  .m2-logo {
+    font-family: 'Playfair Display', serif;
+    font-size: 34px;
+    font-weight: 900;
+    text-align: center;
+    letter-spacing: -0.02em;
+    line-height: 1;
+    margin-bottom: 28px;
+  }
+  .m2-logo small {
+    display: block;
+    font-size: 11px;
+    color: #555;
+    letter-spacing: 0.5em;
+    font-weight: 300;
+    margin-top: 8px;
+  }
+  .m2-quote {
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-size: 15px;
+    text-align: center;
+    color: #888;
+    line-height: 1.5;
+    margin-bottom: 30px;
+    padding: 0 10px;
+  }
+  .m2-quote strong {
+    color: #8B0000;
+    font-weight: 700;
+  }
+  .m2-divider {
+    width: 40px;
+    height: 1px;
+    background: #333;
+    margin: 20px auto;
+  }
+  .m2-stats {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 4px;
+    margin-bottom: 28px;
+    padding: 18px 0;
+    border-top: 1px solid #1a1a1a;
+    border-bottom: 1px solid #1a1a1a;
+  }
+  .m2-stat { text-align: center; }
+  .m2-stat .v {
+    font-family: 'Playfair Display', serif;
+    font-size: 22px;
+    font-weight: 400;
+    color: #f5f5f5;
+  }
+  .m2-stat .k {
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-size: 10px;
+    color: #555;
+    letter-spacing: 0.3em;
+    margin-top: 2px;
+    text-transform: uppercase;
+  }
+  .m2-start {
+    background: transparent;
+    border: 1px solid #8B0000;
+    border-radius: 0;
+    padding: 20px;
+    text-align: center;
+    margin-bottom: 28px;
+    position: relative;
+  }
+  .m2-start-main {
+    font-family: 'Playfair Display', serif;
+    font-size: 22px;
+    font-weight: 700;
+    letter-spacing: 0.2em;
+    color: #f5f5f5;
+  }
+  .m2-start-sub {
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-size: 11px;
+    color: #8B0000;
+    margin-top: 4px;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+  }
+  .m2-run-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    padding: 10px 0;
+    border-bottom: 1px solid #1a1a1a;
+  }
+  .m2-run-date {
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-size: 13px;
+    color: #888;
+    letter-spacing: 0.1em;
+  }
+  .m2-run-v {
+    font-family: 'Playfair Display', serif;
+    font-size: 14px;
+    color: #f5f5f5;
+  }
+  .m2-run-v small { color: #8B0000; margin-left: 6px; }
+
+  /* ============ MOOD 3: RETRO VHS HORROR ============ */
+  .m3 {
+    background: #0d0520;
+    color: #e0d0ff;
+    font-family: 'VT323', monospace;
+    padding: 44px 0 0;
+  }
+  .m3 .statusbar { color: #00ffff; font-family: 'VT323', monospace; font-size: 14px; }
+  .m3::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(0deg, rgba(255,255,255,0.05) 0, rgba(255,255,255,0.05) 1px, transparent 1px, transparent 3px);
+    pointer-events: none;
+    z-index: 3;
+  }
+  .m3::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse at center, transparent 55%, rgba(0,0,0,0.6) 100%);
+    pointer-events: none;
+    z-index: 4;
+  }
+  .m3-body { padding: 18px; position: relative; z-index: 2; }
+  .m3-top-bar {
+    display: flex;
+    justify-content: space-between;
+    font-size: 14px;
+    color: #ff0080;
+    letter-spacing: 0.08em;
+    padding-bottom: 6px;
+    border-bottom: 1px dashed #5a1a7a;
+    margin-bottom: 14px;
+  }
+  .m3-rec {
+    display: flex; align-items: center; gap: 6px;
+  }
+  .m3-rec::before {
+    content: '';
+    width: 8px; height: 8px;
+    background: #ff0080;
+    border-radius: 50%;
+    animation: blink 1s infinite;
+  }
+  .m3-title {
+    font-family: 'Orbitron', sans-serif;
+    font-weight: 900;
+    text-align: center;
+    font-size: 28px;
+    color: #00ffff;
+    text-shadow: 2px 0 0 #ff0080, -2px 0 0 #00ff88, 0 0 15px rgba(0,255,255,0.6);
+    letter-spacing: 0.05em;
+    margin: 10px 0;
+  }
+  .m3-subtitle {
+    text-align: center;
+    font-size: 14px;
+    color: #ffcc00;
+    letter-spacing: 0.3em;
+    margin-bottom: 14px;
+  }
+  .m3-ascii {
+    text-align: center;
+    font-size: 14px;
+    color: #5a1a7a;
+    letter-spacing: 0.05em;
+    margin-bottom: 10px;
+  }
+  .m3-warn {
+    border: 1px solid #00ff88;
+    padding: 8px;
+    text-align: center;
+    color: #00ff88;
+    font-size: 15px;
+    letter-spacing: 0.1em;
+    margin-bottom: 16px;
+    text-shadow: 0 0 6px #00ff88;
+    background: rgba(0,255,136,0.05);
+  }
+  .m3-stats {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 4px;
+    margin-bottom: 16px;
+  }
+  .m3-stat {
+    border: 1px solid #5a1a7a;
+    padding: 8px 4px;
+    text-align: center;
+    background: rgba(0,0,0,0.3);
+  }
+  .m3-stat .k {
+    font-size: 11px;
+    color: #ff0080;
+    letter-spacing: 0.2em;
+    margin-bottom: 2px;
+  }
+  .m3-stat .v {
+    font-family: 'VT323', monospace;
+    font-size: 24px;
+    color: #00ffff;
+    text-shadow: 0 0 6px #00ffff;
+  }
+  .m3-start {
+    background: linear-gradient(180deg, #ff0080 0%, #8a0055 100%);
+    color: #fff;
+    text-align: center;
+    padding: 14px;
+    margin-bottom: 16px;
+    border: 2px solid #ff0080;
+    box-shadow: 0 0 20px rgba(255,0,128,0.5), inset 0 0 20px rgba(0,0,0,0.3);
+    animation: blink 1.4s infinite;
+    font-family: 'Orbitron', sans-serif;
+    font-weight: 900;
+    font-size: 18px;
+    letter-spacing: 0.3em;
+  }
+  .m3-start small {
+    display: block;
+    font-family: 'VT323', monospace;
+    font-weight: 400;
+    font-size: 13px;
+    color: #ffcc00;
+    margin-top: 4px;
+    letter-spacing: 0.1em;
+  }
+  .m3-log-title {
+    font-size: 14px;
+    color: #ff0080;
+    letter-spacing: 0.2em;
+    margin-bottom: 6px;
+  }
+  .m3-log {
+    font-family: 'VT323', monospace;
+    font-size: 14px;
+    color: #00ff88;
+    line-height: 1.5;
+    letter-spacing: 0.05em;
+  }
+  .m3-log .fail { color: #ff0080; }
+  .m3-log .ok { color: #00ff88; }
+
+  /* ============ MOOD 4: COLD MINIMAL (APPLE) ============ */
+  .m4 {
+    background: linear-gradient(180deg, #0f0f11 0%, #1a1a1f 100%);
+    color: #fff;
+    font-family: 'Inter', -apple-system, sans-serif;
+    padding: 44px 0 0;
+  }
+  .m4 .statusbar { color: #fff; }
+  .m4-body { padding: 20px 24px 24px; }
+  .m4-greet {
+    font-size: 14px;
+    color: #6e6e73;
+    font-weight: 500;
+    letter-spacing: 0.01em;
+    margin-bottom: 2px;
+  }
+  .m4-logo {
+    font-size: 28px;
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    margin-bottom: 24px;
+  }
+  .m4-ring-wrap {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 24px;
+    padding: 22px;
+    margin-bottom: 18px;
+    display: flex;
+    align-items: center;
+    gap: 18px;
+  }
+  .m4-ring {
+    width: 92px;
+    height: 92px;
+    border-radius: 50%;
+    background:
+      conic-gradient(from 0deg, #a8d8ff 0% 68%, rgba(255,255,255,0.08) 68% 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    flex-shrink: 0;
+  }
+  .m4-ring::before {
+    content: '';
+    position: absolute;
+    inset: 8px;
+    border-radius: 50%;
+    background: #141417;
+  }
+  .m4-ring-val {
+    position: relative;
+    font-size: 22px;
+    font-weight: 300;
+    letter-spacing: -0.03em;
+  }
+  .m4-ring-val small {
+    font-size: 10px;
+    color: #6e6e73;
+    display: block;
+    letter-spacing: 0.1em;
+    margin-top: -2px;
+    font-weight: 500;
+  }
+  .m4-goal {
+    flex: 1;
+  }
+  .m4-goal-k {
+    font-size: 11px;
+    color: #6e6e73;
+    letter-spacing: 0.1em;
+    font-weight: 600;
+    text-transform: uppercase;
+  }
+  .m4-goal-v {
+    font-size: 22px;
+    font-weight: 300;
+    letter-spacing: -0.02em;
+    margin-top: 4px;
+  }
+  .m4-goal-v small {
+    color: #6e6e73;
+    font-size: 13px;
+  }
+  .m4-goal-sub {
+    font-size: 11px;
+    color: #a8d8ff;
+    margin-top: 6px;
+    font-weight: 500;
+  }
+  .m4-stats {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 18px;
+  }
+  .m4-stat {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 16px;
+    padding: 14px;
+  }
+  .m4-stat .k {
+    font-size: 10px;
+    color: #6e6e73;
+    letter-spacing: 0.12em;
+    font-weight: 600;
+    text-transform: uppercase;
+  }
+  .m4-stat .v {
+    font-size: 24px;
+    font-weight: 300;
+    letter-spacing: -0.02em;
+    margin-top: 4px;
+  }
+  .m4-stat .v small { font-size: 12px; color: #6e6e73; }
+  .m4-start {
+    background: #fff;
+    color: #000;
+    border-radius: 18px;
+    padding: 18px;
+    text-align: center;
+    margin-bottom: 20px;
+  }
+  .m4-start-main {
+    font-size: 18px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+  }
+  .m4-start-sub {
+    font-size: 11px;
+    color: #666;
+    margin-top: 2px;
+    letter-spacing: 0.02em;
+  }
+  .m4-recent-h {
+    display: flex; justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 10px;
+  }
+  .m4-recent-t {
+    font-size: 14px;
+    font-weight: 600;
+  }
+  .m4-recent-see { font-size: 12px; color: #a8d8ff; }
+  .m4-run {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 0;
+    border-top: 1px solid rgba(255,255,255,0.06);
+  }
+  .m4-run-date { font-size: 13px; color: #ccc; }
+  .m4-run-sub { font-size: 11px; color: #6e6e73; margin-top: 2px; }
+  .m4-run-v {
+    font-size: 15px;
+    font-weight: 500;
+    letter-spacing: -0.01em;
+  }
+</style>
+</head>
+<body>
+
+<div class="page-header">
+  <h1>SHADOW RUN — 홈화면 무드 4종</h1>
+  <p>"앱을 열었을 때 첫 화면"을 4가지 무드로 그렸습니다. 같은 정보(헤더/시작 버튼/통계/최근 러닝)인데 스타일만 다릅니다. 마음에 드는 걸 골라주세요.</p>
+</div>
+
+<div class="grid">
+
+  <!-- ============ MOOD 1: URBAN RED CHASE ============ -->
+  <div class="card">
+    <div class="phone"><div class="notch"></div><div class="screen m1">
+      <div class="statusbar"><span>9:41</span><span>●●●●  ●●</span></div>
+      <div class="m1-header">
+        <div class="m1-logo">SHADOW RUN</div>
+        <div class="m1-icons">◷  ≡  ⚙</div>
+      </div>
+      <div class="m1-body">
+        <div class="m1-status">
+          <div class="m1-status-dot"></div>
+          <div class="m1-status-text">도플갱어가 <strong>깨어있다</strong>. 오늘 두 번 놓쳤음.</div>
+        </div>
+        <div class="m1-stats-row">
+          <div class="m1-stat-cell"><div class="k">THIS WEEK</div><div class="v">12.4<span style="font-size:10px;color:#888">km</span></div></div>
+          <div class="m1-stat-cell"><div class="k">TOTAL RUNS</div><div class="v">28</div></div>
+          <div class="m1-stat-cell"><div class="k">BEST ESC.</div><div class="v">412<span style="font-size:10px;color:#888">m</span></div></div>
+        </div>
+        <div class="m1-start">
+          <div class="m1-start-top">▸ START MISSION</div>
+          <div class="m1-start-main">뛰어라.</div>
+          <div class="m1-start-sub">놈은 이미 널 추적중이다.</div>
+          <div class="m1-start-arrow">›</div>
+        </div>
+        <div class="m1-section-title">LAST ENCOUNTER</div>
+        <div class="m1-run">
+          <div class="m1-run-result">✓</div>
+          <div class="m1-run-info">
+            <div class="m1-run-date">4월 16일 · 서울 성동구</div>
+            <div class="m1-run-dist">3.42 km · 24:18</div>
+          </div>
+          <div class="m1-run-esc">+312m</div>
+        </div>
+        <div class="m1-run">
+          <div class="m1-run-result" style="background:rgba(255,100,100,0.2);color:#ff8b9e">✗</div>
+          <div class="m1-run-info">
+            <div class="m1-run-date">4월 15일 · 한강</div>
+            <div class="m1-run-dist">2.18 km · 18:02</div>
+          </div>
+          <div class="m1-run-esc" style="color:#ff2e4a">잡힘</div>
+        </div>
+      </div>
+    </div></div>
+    <div class="card-label">
+      <div class="card-num">MOOD 01</div>
+      <div class="card-title">Urban Red Chase</div>
+      <div class="card-desc">도시 밤거리 + 사이렌 레드. 큰 START 버튼이 "임무" 느낌. 홈에서부터 추격의 긴장감이 시작됨.</div>
+    </div>
+  </div>
+
+  <!-- ============ MOOD 2: CINEMATIC THRILLER ============ -->
+  <div class="card">
+    <div class="phone"><div class="notch"></div><div class="screen m2">
+      <div class="statusbar"><span>9:41</span><span>●●●●  ●●</span></div>
+      <div class="m2-body">
+        <div class="m2-eyebrow">— a shadow never rests —</div>
+        <div class="m2-logo">Shadow Run<small>E P I S O D E &nbsp; 0 2 8</small></div>
+        <div class="m2-quote">"지난밤, 그는 당신보다 <strong>312미터</strong> 가까이 다가왔다."</div>
+        <div class="m2-stats">
+          <div class="m2-stat"><div class="v">12.4</div><div class="k">km · week</div></div>
+          <div class="m2-stat"><div class="v">28</div><div class="k">chapters</div></div>
+          <div class="m2-stat"><div class="v">412m</div><div class="k">best escape</div></div>
+        </div>
+        <div class="m2-start">
+          <div class="m2-start-main">B E G I N</div>
+          <div class="m2-start-sub">Tonight's run</div>
+        </div>
+        <div class="m2-run-row">
+          <div class="m2-run-date">April 16 · Seongdong</div>
+          <div class="m2-run-v">3.42 km <small>escaped</small></div>
+        </div>
+        <div class="m2-run-row">
+          <div class="m2-run-date">April 15 · Han River</div>
+          <div class="m2-run-v">2.18 km <small>caught</small></div>
+        </div>
+      </div>
+    </div></div>
+    <div class="card-label">
+      <div class="card-num">MOOD 02</div>
+      <div class="card-title">Cinematic Thriller</div>
+      <div class="card-desc">영화 포스터 느낌. 러닝을 "에피소드"로 취급. 세리프 + 여백 + 인용구. 고급 독립영화 감성, 어른 취향.</div>
+    </div>
+  </div>
+
+  <!-- ============ MOOD 3: RETRO VHS HORROR ============ -->
+  <div class="card">
+    <div class="phone"><div class="notch"></div><div class="screen m3">
+      <div class="statusbar"><span>09:41</span><span>■■■■  ■■</span></div>
+      <div class="m3-body">
+        <div class="m3-top-bar">
+          <span>&gt; SHADOW_RUN.exe</span>
+          <span class="m3-rec">REC [04-17]</span>
+        </div>
+        <div class="m3-ascii">████████████████████</div>
+        <div class="m3-title">SHADOW RUN</div>
+        <div class="m3-subtitle">V.1.0 · S U B J E C T  #28</div>
+        <div class="m3-ascii">════════════════════</div>
+        <div class="m3-warn">&gt; ENTITY DETECTED &lt;<br><span style="color:#ffcc00;font-size:12px;letter-spacing:0.2em">&nbsp;&nbsp;312M FROM YOU&nbsp;&nbsp;</span></div>
+        <div class="m3-stats">
+          <div class="m3-stat"><div class="k">WEEK</div><div class="v">12.4</div></div>
+          <div class="m3-stat"><div class="k">RUNS</div><div class="v">28</div></div>
+          <div class="m3-stat"><div class="k">ESC</div><div class="v">412</div></div>
+        </div>
+        <div class="m3-start">
+          &gt; PRESS START &lt;
+          <small>INSERT COIN TO RUN</small>
+        </div>
+        <div class="m3-log-title">// RECENT LOGS</div>
+        <div class="m3-log">
+          [04-16] <span class="ok">ESCAPED</span> · 3.42km · +312m<br>
+          [04-15] <span class="fail">CAUGHT_</span> · 2.18km · -018m<br>
+          [04-14] <span class="ok">ESCAPED</span> · 4.80km · +520m
+        </div>
+      </div>
+    </div></div>
+    <div class="card-label">
+      <div class="card-num">MOOD 03</div>
+      <div class="card-title">Retro VHS Horror</div>
+      <div class="card-desc">80년대 아케이드 게임 + VHS 호러. 컬트 힙함. 바이럴 잘 나갈 수 있음(MZ, Z세대 취향). 다만 호불호 큼.</div>
+    </div>
+  </div>
+
+  <!-- ============ MOOD 4: COLD MINIMAL (APPLE) ============ -->
+  <div class="card">
+    <div class="phone"><div class="notch"></div><div class="screen m4">
+      <div class="statusbar"><span>9:41</span><span>●●●●  ●●</span></div>
+      <div class="m4-body">
+        <div class="m4-greet">수요일, 4월 17일</div>
+        <div class="m4-logo">Shadow Run</div>
+        <div class="m4-ring-wrap">
+          <div class="m4-ring"><div class="m4-ring-val">68%<small>WEEK</small></div></div>
+          <div class="m4-goal">
+            <div class="m4-goal-k">주간 목표</div>
+            <div class="m4-goal-v">12.4<small> / 18 km</small></div>
+            <div class="m4-goal-sub">↑ 5.6km 남음</div>
+          </div>
+        </div>
+        <div class="m4-stats">
+          <div class="m4-stat"><div class="k">Total Runs</div><div class="v">28</div></div>
+          <div class="m4-stat"><div class="k">Best Escape</div><div class="v">412<small> m</small></div></div>
+        </div>
+        <div class="m4-start">
+          <div class="m4-start-main">Start Run</div>
+          <div class="m4-start-sub">도플갱어 준비됨</div>
+        </div>
+        <div class="m4-recent-h">
+          <div class="m4-recent-t">최근 러닝</div>
+          <div class="m4-recent-see">전체 보기</div>
+        </div>
+        <div class="m4-run">
+          <div>
+            <div class="m4-run-date">4월 16일</div>
+            <div class="m4-run-sub">Escaped · 3.42 km</div>
+          </div>
+          <div class="m4-run-v">+312 m</div>
+        </div>
+        <div class="m4-run">
+          <div>
+            <div class="m4-run-date">4월 15일</div>
+            <div class="m4-run-sub" style="color:#ff6b85">Caught · 2.18 km</div>
+          </div>
+          <div class="m4-run-v" style="color:#ff6b85">−18 m</div>
+        </div>
+      </div>
+    </div></div>
+    <div class="card-label">
+      <div class="card-num">MOOD 04</div>
+      <div class="card-title">Cold Minimal (Apple)</div>
+      <div class="card-desc">Apple Fitness/Health 스타일. 큰 링, 얇은 숫자, 흰 시작 버튼. 프리미엄 + 매일 쓰기 편함. 가장 "보편적으로 예쁨".</div>
+    </div>
+  </div>
+
+</div>
+
+<div style="max-width: 760px; margin: 60px auto 0; padding: 24px; background: #141414; border-radius: 16px; border: 1px solid #222;">
+  <div style="font-size: 12px; color: #888; letter-spacing: 0.2em; margin-bottom: 12px;">NEXT STEP</div>
+  <p style="font-size: 14px; color: #bbb; line-height: 1.7;">
+    1~4 중 끌리는 걸 골라주세요. "전체 분위기는 1번인데 숫자 스타일은 4번처럼" 같은 조합도 OK.<br>
+    선택 후 → 홈 외에 <b>러닝 시작 / 러닝 중 / 러닝 결과</b> 화면까지 같은 무드로 확장 → Flutter 코드에 반영.
+  </p>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,684 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Shadow Run — 홈화면 (한국어 최종안)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@400;700&family=Playfair+Display:ital,wght@0,400;0,700;1,400;1,700&family=Space+Grotesk:wght@400;500;700;900&family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css" />
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg: #07070a;
+    --card: #0e0e12;
+    --border: rgba(255,255,255,0.06);
+    --border-red: rgba(255,46,74,0.22);
+    --red: #ff2e4a;
+    --red-deep: #8B0000;
+    --red-soft: #ff6b7e;
+    --text: #f2f2f3;
+    --text-dim: #8a8a91;
+    --text-fade: #5a5a60;
+  }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Pretendard', -apple-system, sans-serif;
+    min-height: 100vh;
+    padding: 40px 20px 80px;
+    font-feature-settings: "ss01", "ss02", "cv01";
+  }
+  .page-header {
+    max-width: 1200px;
+    margin: 0 auto 32px;
+    text-align: center;
+  }
+  .page-header h1 {
+    font-family: 'Gowun Batang', 'Pretendard', serif;
+    font-weight: 700;
+    font-size: 32px;
+    letter-spacing: -0.02em;
+    margin-bottom: 10px;
+  }
+  .page-header h1 em {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    color: var(--red-soft);
+    font-weight: 400;
+  }
+  .page-header p {
+    color: var(--text-dim);
+    font-size: 14px;
+    line-height: 1.6;
+    max-width: 680px;
+    margin: 0 auto;
+  }
+
+  .stage {
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    gap: 40px;
+    flex-wrap: wrap;
+    margin-top: 32px;
+  }
+
+  /* 사이드 패널 (선택 근거) */
+  .side-notes {
+    max-width: 320px;
+    padding-top: 40px;
+    display: flex;
+    flex-direction: column;
+    gap: 22px;
+  }
+  .note {
+    border-left: 2px solid var(--red);
+    padding: 2px 0 2px 14px;
+  }
+  .note-k {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-size: 11px;
+    color: var(--red-soft);
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+  }
+  .note-v {
+    font-size: 14px;
+    color: var(--text-dim);
+    line-height: 1.55;
+  }
+  .note-v strong { color: var(--text); font-weight: 600; }
+
+  /* 폰 프레임 */
+  .phone {
+    width: 360px;
+    height: 760px;
+    border-radius: 48px;
+    overflow: hidden;
+    position: relative;
+    box-shadow: 0 30px 80px rgba(0,0,0,0.9), 0 0 0 9px #141416, 0 0 0 10px #2a2a2d;
+    flex-shrink: 0;
+  }
+  .notch {
+    position: absolute;
+    top: 14px; left: 50%; transform: translateX(-50%);
+    width: 120px; height: 30px;
+    background: #000;
+    border-radius: 20px;
+    z-index: 100;
+  }
+  .screen {
+    width: 100%; height: 100%;
+    background:
+      radial-gradient(ellipse 600px 500px at 50% -5%, rgba(255,46,74,0.14), transparent 55%),
+      radial-gradient(ellipse 400px 300px at 100% 40%, rgba(139,0,0,0.08), transparent 60%),
+      linear-gradient(180deg, #090909 0%, #050506 100%);
+    position: relative;
+    overflow-y: auto;
+    overflow-x: hidden;
+  }
+  .screen::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(0deg, transparent 0, transparent 2px, rgba(255,255,255,0.01) 2px, rgba(255,255,255,0.01) 3px);
+    pointer-events: none;
+    z-index: 2;
+  }
+  .screen::-webkit-scrollbar { display: none; }
+
+  .statusbar {
+    position: relative;
+    padding: 14px 28px 0;
+    display: flex;
+    justify-content: space-between;
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text);
+    z-index: 50;
+    letter-spacing: -0.02em;
+  }
+
+  /* 헤더 */
+  .header {
+    position: relative;
+    padding: 48px 24px 16px;
+    z-index: 10;
+  }
+  .header-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 14px;
+  }
+  .eyebrow {
+    font-family: 'Gowun Batang', serif;
+    font-weight: 400;
+    font-size: 13px;
+    color: var(--red-soft);
+    letter-spacing: 0.05em;
+    font-style: italic;
+  }
+  .eyebrow::before { content: '— '; }
+  .eyebrow::after { content: ' —'; }
+  .header-icons {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+  }
+  .ico {
+    width: 34px; height: 34px;
+    border-radius: 10px;
+    background: rgba(255,255,255,0.03);
+    border: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-dim);
+    font-size: 16px;
+  }
+  .logo {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 34px;
+    font-weight: 900;
+    letter-spacing: -0.04em;
+    line-height: 1;
+    color: var(--text);
+    margin-bottom: 8px;
+    text-shadow: 0 0 24px rgba(255,46,74,0.25);
+  }
+  .logo-red { color: var(--red); }
+  .sub {
+    font-size: 12px;
+    color: var(--text-fade);
+    font-weight: 500;
+    letter-spacing: 0.02em;
+  }
+  .sub .epi {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    color: var(--red-soft);
+    margin-right: 8px;
+  }
+
+  /* 경고 배지 */
+  .warn {
+    margin: 14px 24px 0;
+    padding: 12px 14px;
+    background: linear-gradient(90deg, rgba(255,46,74,0.12), rgba(255,46,74,0.02));
+    border: 1px solid var(--border-red);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    position: relative;
+    z-index: 10;
+  }
+  .warn-dot {
+    width: 8px; height: 8px;
+    background: var(--red);
+    border-radius: 50%;
+    box-shadow: 0 0 12px var(--red);
+    animation: blink 1.4s infinite;
+    flex-shrink: 0;
+  }
+  @keyframes blink { 0%, 55% { opacity: 1; } 56%, 100% { opacity: 0.3; } }
+  .warn-txt {
+    flex: 1;
+    font-size: 12.5px;
+    color: #ffc4cc;
+    letter-spacing: -0.01em;
+  }
+  .warn-txt b {
+    color: var(--red);
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 800;
+  }
+  .warn-arrow {
+    color: var(--red);
+    font-family: 'Inter', sans-serif;
+    font-size: 18px;
+    font-weight: 300;
+  }
+
+  /* 영화적 인용구 */
+  .quote-block {
+    margin: 24px 24px 0;
+    padding: 24px 18px;
+    position: relative;
+    z-index: 10;
+  }
+  .quote-block::before {
+    content: '"';
+    position: absolute;
+    top: -12px; left: 0;
+    font-family: 'Playfair Display', serif;
+    font-size: 96px;
+    color: var(--red-deep);
+    opacity: 0.4;
+    line-height: 1;
+    font-weight: 900;
+  }
+  .quote-block .q {
+    font-family: 'Gowun Batang', serif;
+    font-weight: 400;
+    font-size: 17px;
+    line-height: 1.6;
+    color: var(--text);
+    letter-spacing: -0.01em;
+    position: relative;
+  }
+  .quote-block .q strong {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-weight: 700;
+    color: var(--red);
+    font-size: 19px;
+  }
+  .quote-block .q-by {
+    margin-top: 10px;
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-size: 11px;
+    color: var(--text-fade);
+    letter-spacing: 0.15em;
+  }
+
+  /* 통계 3칸 */
+  .stats {
+    margin: 22px 24px 0;
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 8px;
+    position: relative;
+    z-index: 10;
+  }
+  .stat {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 14px 10px;
+    text-align: center;
+  }
+  .stat .k {
+    font-size: 10px;
+    color: var(--text-fade);
+    letter-spacing: 0.02em;
+    font-weight: 600;
+    margin-bottom: 4px;
+  }
+  .stat .v {
+    font-family: 'Inter', sans-serif;
+    font-size: 22px;
+    font-weight: 700;
+    letter-spacing: -0.03em;
+    color: var(--text);
+  }
+  .stat .v small {
+    font-size: 11px;
+    color: var(--text-fade);
+    font-weight: 500;
+    margin-left: 2px;
+  }
+
+  /* 시작 버튼 */
+  .start {
+    margin: 22px 24px 0;
+    background: linear-gradient(135deg, #ff2e4a 0%, #b1001e 100%);
+    border-radius: 20px;
+    padding: 22px 20px;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 16px 40px rgba(255,46,74,0.28);
+    z-index: 10;
+  }
+  .start::before {
+    content: '';
+    position: absolute;
+    top: -40%; right: -10%;
+    width: 180px; height: 180px;
+    background: radial-gradient(circle, rgba(255,255,255,0.22), transparent 60%);
+    pointer-events: none;
+  }
+  .start::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(0deg, transparent 0, transparent 2px, rgba(0,0,0,0.04) 2px, rgba(0,0,0,0.04) 3px);
+    pointer-events: none;
+  }
+  .start-eyebrow {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-size: 12px;
+    color: rgba(255,255,255,0.75);
+    letter-spacing: 0.12em;
+    margin-bottom: 4px;
+    position: relative;
+  }
+  .start-title {
+    font-family: 'Gowun Batang', serif;
+    font-size: 24px;
+    font-weight: 700;
+    color: #fff;
+    letter-spacing: -0.02em;
+    line-height: 1.15;
+    position: relative;
+  }
+  .start-cta {
+    margin-top: 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    position: relative;
+  }
+  .start-cta .lbl {
+    font-size: 13px;
+    color: rgba(255,255,255,0.92);
+    font-weight: 600;
+  }
+  .start-cta .arr {
+    width: 28px; height: 28px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.18);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px;
+    color: #fff;
+    font-weight: 700;
+  }
+
+  /* 최근 기록 */
+  .recent {
+    margin: 26px 24px 28px;
+    position: relative;
+    z-index: 10;
+  }
+  .recent-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 12px;
+  }
+  .recent-title {
+    font-family: 'Gowun Batang', serif;
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--text);
+    letter-spacing: -0.01em;
+  }
+  .recent-title em {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-weight: 400;
+    color: var(--red-soft);
+    font-size: 12px;
+    margin-left: 8px;
+    letter-spacing: 0.1em;
+  }
+  .recent-more {
+    font-size: 12px;
+    color: var(--text-dim);
+    font-weight: 500;
+  }
+
+  .run {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 4px;
+    border-bottom: 1px solid var(--border);
+  }
+  .run:last-child { border-bottom: none; }
+  .run-badge {
+    width: 40px; height: 40px;
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-weight: 700;
+    font-size: 13px;
+    letter-spacing: 0.02em;
+    flex-shrink: 0;
+  }
+  .run-badge.ok {
+    background: rgba(255,46,74,0.1);
+    color: var(--red-soft);
+    border: 1px solid var(--border-red);
+  }
+  .run-badge.fail {
+    background: rgba(255,46,74,0.35);
+    color: #fff;
+    border: 1px solid var(--red);
+  }
+  .run-info { flex: 1; min-width: 0; }
+  .run-date {
+    font-size: 12.5px;
+    color: var(--text);
+    font-weight: 600;
+    margin-bottom: 2px;
+    letter-spacing: -0.01em;
+  }
+  .run-loc {
+    font-size: 11px;
+    color: var(--text-fade);
+    font-weight: 400;
+  }
+  .run-dist {
+    text-align: right;
+    flex-shrink: 0;
+  }
+  .run-dist .v {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+  }
+  .run-dist .v.neg { color: var(--red); }
+  .run-dist .v.pos { color: var(--text); }
+  .run-dist .sub {
+    font-size: 10px;
+    color: var(--text-fade);
+    margin-top: 2px;
+    letter-spacing: 0.02em;
+  }
+
+  /* 하단 탭 */
+  .tabs {
+    position: sticky;
+    bottom: 0;
+    margin-top: auto;
+    background: rgba(5,5,8,0.92);
+    backdrop-filter: blur(16px);
+    border-top: 1px solid var(--border);
+    padding: 10px 0 24px;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    z-index: 20;
+  }
+  .tab {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+    font-size: 10px;
+    color: var(--text-fade);
+    font-weight: 500;
+    letter-spacing: 0.02em;
+  }
+  .tab.active { color: var(--red); }
+  .tab .ti {
+    font-size: 18px;
+    line-height: 1;
+  }
+</style>
+</head>
+<body>
+
+<div class="page-header">
+  <h1>SHADOW RUN · <em>홈 최종안</em></h1>
+  <p>한국어 우선. 장식 타이포(로고·에피소드·인용 강조)만 영문 세리프(Playfair Italic) 사용.<br>
+     MOOD 01 구조(붉은 경고·정보 밀도) + MOOD 02 카피·타이포(고운바탕 · 영화 인용) 하이브리드.</p>
+</div>
+
+<div class="stage">
+
+  <div class="side-notes">
+    <div class="note">
+      <div class="note-k">01 · Fonts</div>
+      <div class="note-v"><strong>한글</strong> Pretendard(본문) / Gowun Batang(제목·인용) <br><strong>영문</strong> Space Grotesk(로고) · Playfair Italic(장식) · JetBrains Mono(숫자)</div>
+    </div>
+    <div class="note">
+      <div class="note-k">02 · Color</div>
+      <div class="note-v"><strong>Blood Red</strong> #FF2E4A 경고 · #8B0000 인용 강조<br><strong>Off-black</strong> #07070A 배경 · 카드 #0E0E12</div>
+    </div>
+    <div class="note">
+      <div class="note-k">03 · Copy tone</div>
+      <div class="note-v">"멋진 운동이었습니다" 같은 응원 대신, <strong>영화 자막체 섬뜩 나레이션</strong>. 숫자는 감정 없이 기계적으로.</div>
+    </div>
+    <div class="note">
+      <div class="note-k">04 · Benchmark</div>
+      <div class="note-v">나이키의 <strong>페이스 히트맵</strong> → Shadow Run은 <strong>추격 거리 히트맵</strong>으로 변환(러닝 결과 화면에 적용 예정).</div>
+    </div>
+  </div>
+
+  <div class="phone">
+    <div class="notch"></div>
+    <div class="screen">
+
+      <div class="statusbar"><span>9:41</span><span>●●●● &nbsp; ●●</span></div>
+
+      <div class="header">
+        <div class="header-top">
+          <div class="eyebrow">그림자는 쉬지 않는다</div>
+          <div class="header-icons">
+            <div class="ico">◷</div>
+            <div class="ico">≡</div>
+            <div class="ico">⚙</div>
+          </div>
+        </div>
+        <div class="logo">SHADOW <span class="logo-red">RUN</span></div>
+        <div class="sub"><span class="epi">Episode 028</span>수요일 · 4월 17일</div>
+      </div>
+
+      <div class="warn">
+        <div class="warn-dot"></div>
+        <div class="warn-txt">도플갱어가 깨어있다 · 마지막 거리 <b>312m</b></div>
+        <div class="warn-arrow">›</div>
+      </div>
+
+      <div class="quote-block">
+        <div class="q">어젯밤, 그는 당신보다<br>
+          <strong>312미터</strong> 더 가까이 다가왔다.
+        </div>
+        <div class="q-by">— previously on shadow run</div>
+      </div>
+
+      <div class="stats">
+        <div class="stat">
+          <div class="k">이번 주</div>
+          <div class="v">12.4<small>km</small></div>
+        </div>
+        <div class="stat">
+          <div class="k">누적 도주</div>
+          <div class="v">28<small>회</small></div>
+        </div>
+        <div class="stat">
+          <div class="k">최장 탈출</div>
+          <div class="v">412<small>m</small></div>
+        </div>
+      </div>
+
+      <div class="start">
+        <div class="start-eyebrow">TONIGHT'S RUN</div>
+        <div class="start-title">오늘의 도주를<br>시작할 시간이다.</div>
+        <div class="start-cta">
+          <div class="lbl">지금 시작</div>
+          <div class="arr">›</div>
+        </div>
+      </div>
+
+      <div class="recent">
+        <div class="recent-head">
+          <div class="recent-title">최근의 밤 <em>RECENT CHAPTERS</em></div>
+          <div class="recent-more">전체 ›</div>
+        </div>
+
+        <div class="run">
+          <div class="run-badge ok">E28</div>
+          <div class="run-info">
+            <div class="run-date">4월 16일 · 서울 성동구</div>
+            <div class="run-loc">3.42 km · 24:18 · 탈출</div>
+          </div>
+          <div class="run-dist">
+            <div class="v pos">+312<small style="font-size:10px;color:var(--text-fade)">m</small></div>
+            <div class="sub">escaped</div>
+          </div>
+        </div>
+
+        <div class="run">
+          <div class="run-badge fail">E27</div>
+          <div class="run-info">
+            <div class="run-date">4월 15일 · 한강 북단</div>
+            <div class="run-loc">2.18 km · 18:02 · 따라잡힘</div>
+          </div>
+          <div class="run-dist">
+            <div class="v neg">−18<small style="font-size:10px;color:var(--text-fade)">m</small></div>
+            <div class="sub">caught</div>
+          </div>
+        </div>
+
+        <div class="run">
+          <div class="run-badge ok">E26</div>
+          <div class="run-info">
+            <div class="run-date">4월 14일 · 남산길</div>
+            <div class="run-loc">4.80 km · 33:41 · 탈출</div>
+          </div>
+          <div class="run-dist">
+            <div class="v pos">+520<small style="font-size:10px;color:var(--text-fade)">m</small></div>
+            <div class="sub">escaped</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="tabs">
+        <div class="tab active"><div class="ti">●</div>홈</div>
+        <div class="tab"><div class="ti">◷</div>기록</div>
+        <div class="tab"><div class="ti">◎</div>분석</div>
+        <div class="tab"><div class="ti">⚙</div>설정</div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="side-notes">
+    <div class="note">
+      <div class="note-k">Copy · 헤더</div>
+      <div class="note-v">"그림자는 쉬지 않는다 —" 는 에피소드 시리즈의 <strong>오프닝 크레딧 느낌</strong>. 매일 보는 홈이지만 드라마 한 편 여는 무드.</div>
+    </div>
+    <div class="note">
+      <div class="note-k">Copy · 경고</div>
+      <div class="note-v">"도플갱어가 깨어있다 · 마지막 거리 <strong>312m</strong>" — 이전 세션을 홈에서 상기. 런데이의 "BEST 말풍선"을 호러 버전으로 뒤집음.</div>
+    </div>
+    <div class="note">
+      <div class="note-k">Copy · 인용</div>
+      <div class="note-v">"어젯밤, 그는 당신보다 <strong>312미터</strong> 더 가까이…" — 영화 자막체. 숫자는 한글로("312미터") 쓰면 문학적, 숫자로("312m") 쓰면 건조함. 여기선 <strong>문학적</strong> 선택.</div>
+    </div>
+    <div class="note">
+      <div class="note-k">Copy · 시작 버튼</div>
+      <div class="note-v"><strong>영문 에피소드 + 한글 본문</strong>. "TONIGHT'S RUN" 장식, "오늘의 도주를 시작할 시간이다." 액션. 버튼 레이블 "지금 시작" 명확.</div>
+    </div>
+    <div class="note">
+      <div class="note-k">Copy · 기록 리스트</div>
+      <div class="note-v">각 러닝을 <strong>에피소드 번호</strong>(E28, E27...)로 호칭. 드라마틱함 + 중독성. "탈출/따라잡힘" 한글, "escaped/caught" 영문 서브 동시 노출.</div>
+    </div>
+  </div>
+
+</div>
+
+</body>
+</html>

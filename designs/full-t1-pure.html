@@ -1,0 +1,2280 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Shadow Run — Theme 01 · Pure Cinematic</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@200;300;400;500;600;700;900&family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700;1,900&family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;700&family=Space+Grotesk:wght@400;500;700;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css" />
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg: #000000;
+    --bg-page: #050507;
+    --ink: #F5F5F5;
+    --ink-dim: #9a9a9a;
+    --ink-fade: #5a5a5e;
+    --ink-ghost: #3a3a3e;
+    --red: #8B0000;
+    --red-sub: #C83030;
+    --red-ember: #5a0000;
+    --hair: rgba(245,245,245,0.08);
+    --hair-red: rgba(139,0,0,0.32);
+  }
+  html, body { background: var(--bg-page); }
+  body {
+    color: var(--ink);
+    font-family: 'Noto Serif KR', 'Pretendard', serif;
+    font-weight: 300;
+    min-height: 100vh;
+    padding: 60px 24px 120px;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ================= PAGE HEADER ================= */
+  .page-header {
+    max-width: 1400px;
+    margin: 0 auto 56px;
+    text-align: center;
+    padding-bottom: 44px;
+    border-bottom: 1px solid var(--hair);
+    position: relative;
+  }
+  .page-header::after {
+    content: '';
+    position: absolute;
+    left: 50%; bottom: -1px;
+    transform: translateX(-50%);
+    width: 60px; height: 2px;
+    background: var(--red);
+  }
+  .page-header .kicker {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-weight: 400;
+    font-size: 12px;
+    letter-spacing: 0.5em;
+    color: var(--red-sub);
+    text-transform: uppercase;
+    margin-bottom: 18px;
+  }
+  .page-header h1 {
+    font-family: 'Playfair Display', serif;
+    font-weight: 900;
+    font-size: 46px;
+    letter-spacing: -0.03em;
+    line-height: 1.05;
+    color: var(--ink);
+    margin-bottom: 14px;
+  }
+  .page-header h1 em {
+    font-style: italic;
+    font-weight: 400;
+    color: var(--red-sub);
+  }
+  .page-header .sep {
+    display: inline-block;
+    width: 6px; height: 6px;
+    background: var(--red);
+    transform: rotate(45deg);
+    margin: 0 10px 3px;
+    vertical-align: middle;
+  }
+  .page-header p {
+    font-family: 'Noto Serif KR', serif;
+    font-weight: 300;
+    color: var(--ink-dim);
+    font-size: 14px;
+    line-height: 1.8;
+    max-width: 640px;
+    margin: 0 auto;
+    letter-spacing: -0.01em;
+  }
+  .page-header p em {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    color: var(--ink);
+  }
+
+  /* ================= GRID ================= */
+  .grid {
+    max-width: 1300px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 70px 48px;
+    justify-items: center;
+  }
+  .cell {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+  }
+  .cell-label {
+    text-align: center;
+  }
+  .cell-num {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-weight: 400;
+    font-size: 11px;
+    color: var(--red-sub);
+    letter-spacing: 0.4em;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+  }
+  .cell-ttl {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-weight: 400;
+    font-size: 22px;
+    color: var(--ink);
+    letter-spacing: 0.01em;
+  }
+  .cell-desc {
+    font-family: 'Noto Serif KR', serif;
+    font-weight: 300;
+    font-size: 11.5px;
+    color: var(--ink-fade);
+    margin-top: 6px;
+    letter-spacing: -0.01em;
+  }
+
+  /* ================= PHONE FRAME ================= */
+  .phone {
+    width: 340px;
+    height: 720px;
+    border-radius: 44px;
+    overflow: hidden;
+    position: relative;
+    box-shadow:
+      0 40px 90px rgba(0,0,0,0.95),
+      0 0 0 8px #141416,
+      0 0 0 9px #26262a,
+      inset 0 0 0 1px rgba(255,255,255,0.02);
+    flex-shrink: 0;
+    background: #000;
+  }
+  .notch {
+    position: absolute;
+    top: 12px; left: 50%;
+    transform: translateX(-50%);
+    width: 110px; height: 28px;
+    background: #000;
+    border-radius: 18px;
+    z-index: 100;
+  }
+  .screen {
+    width: 100%; height: 100%;
+    background: var(--bg);
+    position: relative;
+    overflow-y: auto;
+    overflow-x: hidden;
+    font-family: 'Noto Serif KR', serif;
+    color: var(--ink);
+  }
+  .screen::-webkit-scrollbar { display: none; }
+  .screen { scrollbar-width: none; }
+  .screen::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(0deg, transparent 0, transparent 2px, rgba(255,255,255,0.012) 2px, rgba(255,255,255,0.012) 3px);
+    pointer-events: none;
+    z-index: 2;
+  }
+  .screen::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='180' height='180'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.95' numOctaves='2'/><feColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0.035 0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
+    pointer-events: none;
+    z-index: 3;
+    mix-blend-mode: overlay;
+  }
+
+  .statusbar {
+    position: relative;
+    padding: 14px 26px 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-family: 'Inter', sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--ink);
+    letter-spacing: -0.02em;
+    z-index: 50;
+  }
+  .statusbar .sig {
+    font-family: 'Inter', sans-serif;
+    letter-spacing: 0.05em;
+  }
+
+  /* ================= COMMON: top bar ================= */
+  .topbar {
+    position: relative;
+    padding: 46px 24px 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    z-index: 10;
+  }
+  .topbar .back,
+  .topbar .close {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-weight: 400;
+    font-size: 20px;
+    color: var(--ink-dim);
+    letter-spacing: -0.02em;
+    line-height: 1;
+  }
+  .topbar .back span,
+  .topbar .close span {
+    font-family: 'Noto Serif KR', serif;
+    font-weight: 300;
+    font-size: 11px;
+    color: var(--ink-fade);
+    letter-spacing: 0.2em;
+    margin-left: 6px;
+    text-transform: uppercase;
+  }
+  .topbar .tb-icons {
+    display: flex;
+    gap: 14px;
+    align-items: center;
+  }
+  .tb-ico {
+    font-family: 'Noto Serif KR', serif;
+    font-weight: 300;
+    font-size: 14px;
+    color: var(--ink-dim);
+    letter-spacing: 0.04em;
+  }
+
+  /* ========================================================
+     ============== SCREEN 1 · HOME =========================
+     ======================================================== */
+  .s-home {
+    padding-bottom: 30px;
+  }
+  .home-head {
+    position: relative;
+    padding: 52px 28px 10px;
+    text-align: center;
+    z-index: 10;
+  }
+  .home-head .corner-ico {
+    position: absolute;
+    top: 52px;
+    font-family: 'Noto Serif KR', serif;
+    font-weight: 300;
+    font-size: 15px;
+    color: var(--ink-fade);
+    letter-spacing: 0.05em;
+  }
+  .home-head .corner-ico.left { left: 24px; }
+  .home-head .corner-ico.right { right: 24px; }
+  .home-eyebrow {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-weight: 400;
+    font-size: 10.5px;
+    letter-spacing: 0.45em;
+    color: var(--red-sub);
+    text-transform: uppercase;
+    margin-bottom: 16px;
+  }
+  .home-eyebrow::before,
+  .home-eyebrow::after {
+    content: '—';
+    color: var(--red);
+    margin: 0 8px;
+    opacity: 0.7;
+  }
+  .home-logo {
+    font-family: 'Playfair Display', serif;
+    font-weight: 900;
+    font-size: 42px;
+    line-height: 1;
+    letter-spacing: -0.035em;
+    color: var(--ink);
+    margin-bottom: 6px;
+  }
+  .home-logo em {
+    font-style: italic;
+    font-weight: 400;
+    color: var(--red-sub);
+  }
+  .home-sub {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-weight: 400;
+    font-size: 11px;
+    color: var(--ink-fade);
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    margin-top: 8px;
+  }
+  .home-sub .dot {
+    display: inline-block;
+    width: 3px; height: 3px;
+    background: var(--red);
+    border-radius: 50%;
+    margin: 0 10px 2px;
+    vertical-align: middle;
+  }
+
+  .home-div {
+    width: 28px; height: 1px;
+    background: var(--red-ember);
+    margin: 28px auto 22px;
+    position: relative;
+    z-index: 10;
+  }
+
+  .home-quote {
+    padding: 0 36px;
+    text-align: center;
+    position: relative;
+    z-index: 10;
+  }
+  .home-quote .q {
+    font-family: 'Noto Serif KR', serif;
+    font-weight: 300;
+    font-size: 16px;
+    line-height: 1.85;
+    color: var(--ink);
+    letter-spacing: -0.01em;
+  }
+  .home-quote .q em {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-weight: 700;
+    color: var(--red-sub);
+    font-size: 19px;
+    letter-spacing: -0.01em;
+  }
+  .home-quote .q-by {
+    margin-top: 16px;
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-weight: 400;
+    font-size: 10px;
+    color: var(--ink-ghost);
+    letter-spacing: 0.35em;
+    text-transform: lowercase;
+  }
+
+  .home-stats {
+    margin: 32px 28px 0;
+    padding: 18px 0;
+    border-top: 1px solid var(--hair);
+    border-bottom: 1px solid var(--hair);
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    position: relative;
+    z-index: 10;
+  }
+  .home-stat {
+    text-align: center;
+    position: relative;
+  }
+  .home-stat + .home-stat::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 20%;
+    width: 1px; height: 60%;
+    background: var(--hair);
+  }
+  .home-stat .v {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-weight: 400;
+    font-size: 26px;
+    color: var(--ink);
+    letter-spacing: -0.01em;
+    line-height: 1;
+  }
+  .home-stat .v small {
+    font-size: 11px;
+    color: var(--ink-fade);
+    font-weight: 400;
+    margin-left: 2px;
+    font-style: normal;
+    letter-spacing: 0;
+  }
+  .home-stat .k {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-weight: 400;
+    font-size: 9.5px;
+    color: var(--ink-fade);
+    letter-spacing: 0.25em;
+    margin-top: 6px;
+    text-transform: uppercase;
+  }
+
+  .home-start {
+    margin: 24px 28px 0;
+    border: 1px solid var(--red);
+    padding: 22px 20px 20px;
+    text-align: center;
+    position: relative;
+    z-index: 10;
+    background:
+      radial-gradient(ellipse 120% 80% at 50% 100%, rgba(139,0,0,0.18), transparent 70%);
+  }
+  .home-start::before,
+  .home-start::after {
+    content: '';
+    position: absolute;
+    width: 10px; height: 10px;
+    border: 1px solid var(--red-sub);
+  }
+  .home-start::before {
+    top: -1px; left: -1px;
+    border-right: none; border-bottom: none;
+  }
+  .home-start::after {
+    bottom: -1px; right: -1px;
+    border-left: none; border-top: none;
+  }
+  .home-start .eye {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-weight: 400;
+    font-size: 10px;
+    color: var(--red-sub);
+    letter-spacing: 0.4em;
+    margin-bottom: 8px;
+    text-transform: uppercase;
+  }
+  .home-start .ttl {
+    font-family: 'Noto Serif KR', serif;
+    font-weight: 600;
+    font-size: 19px;
+    color: var(--ink);
+    letter-spacing: -0.01em;
+    line-height: 1.3;
+  }
+  .home-start .cta {
+    margin-top: 10px;
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-weight: 400;
+    font-size: 11px;
+    color: var(--ink-dim);
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+  }
+
+  .home-recent {
+    margin: 30px 28px 0;
+    position: relative;
+    z-index: 10;
+  }
+  .home-recent-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 8px;
+  }
+  .home-recent-ttl {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-weight: 400;
+    font-size: 13px;
+    color: var(--ink);
+    letter-spacing: 0.2em;
+    text-transform: lowercase;
+  }
+  .home-recent-more {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-weight: 400;
+    font-size: 10px;
+    color: var(--ink-fade);
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+  }
+  .home-run {
+    padding: 14px 0;
+    border-bottom: 1px solid var(--hair);
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 10px;
+  }
+  .home-run:last-child { border-bottom: none; }
+  .home-run-l { min-width: 0; flex: 1; }
+  .home-run-date {
+    font-family: 'Noto Serif KR', serif;
+    font-weight: 400;
+    font-size: 13px;
+    color: var(--ink);
+    letter-spacing: -0.01em;
+    margin-bottom: 3px;
+  }
+  .home-run-loc {
+    font-family: 'Noto Serif KR', serif;
+    font-weight: 300;
+    font-size: 10.5px;
+    color: var(--ink-fade);
+    letter-spacing: 0;
+  }
+  .home-run-r { text-align: right; flex-shrink: 0; }
+  .home-run-dist {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-weight: 400;
+    font-size: 15px;
+    color: var(--ink);
+    line-height: 1;
+  }
+  .home-run-result {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-weight: 400;
+    font-size: 10px;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    margin-top: 4px;
+  }
+  .home-run-result.ok { color: var(--ink-dim); }
+  .home-run-result.fail { color: var(--red-sub); }
+
+  /* ========================================================
+     ============== SCREEN 2 · PREPARE ======================
+     ======================================================== */
+  .s-prep { padding-bottom: 40px; }
+  .prep-title-wrap {
+    padding: 28px 28px 0;
+    text-align: center;
+    position: relative;
+    z-index: 10;
+  }
+  .prep-eyebrow {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-weight: 400;
+    font-size: 10.5px;
+    letter-spacing: 0.45em;
+    color: var(--red-sub);
+    text-transform: uppercase;
+    margin-bottom: 10px;
+  }
+  .prep-title {
+    font-family: 'Noto Serif KR', serif;
+    font-weight: 600;
+    font-size: 22px;
+    color: var(--ink);
+    letter-spacing: -0.02em;
+    line-height: 1.25;
+  }
+  .prep-title em {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-weight: 400;
+    color: var(--red-sub);
+  }
+  .prep-divline {
+    width: 28px; height: 1px;
+    background: var(--red-ember);
+    margin: 20px auto 0;
+  }
+
+  .prep-section {
+    padding: 22px 28px 0;
+    position: relative;
+    z-index: 10;
+  }
+  .prep-sec-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 12px;
+  }
+  .prep-sec-k {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-weight: 400;
+    font-size: 10px;
+    color: var(--red-sub);
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+  }
+  .prep-sec-v {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-weight: 400;
+    font-size: 11px;
+    color: var(--ink-dim);
+    letter-spacing: 0.04em;
+  }
+  .prep-sec-v .pulse {
+    display: inline-block;
+    width: 5px; height: 5px;
+    background: var(--ink);
+    border-radius: 50%;
+    margin-right: 6px;
+    box-shadow: 0 0 6px rgba(245,245,245,0.5);
+    animation: breathe 2s infinite;
+  }
+  @keyframes breathe {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.35; }
+  }
+
+  .prep-speeds {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 8px;
+  }
+  .prep-speed {
+    padding: 14px 8px;
+    text-align: center;
+    border: 1px solid var(--hair);
+    background: transparent;
+    position: relative;
+  }
+  .prep-speed.on {
+    border-color: var(--red);
+    background:
+      linear-gradient(180deg, rgba(139,0,0,0.18), rgba(139,0,0,0.04));
+  }
+  .prep-speed .lvl {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-weight: 400;
+    font-size: 11px;
+    color: var(--ink-fade);
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+  .prep-speed.on .lvl { color: var(--red-sub); }
+  .prep-speed .nm {
+    font-family: 'Noto Serif KR', serif;
+    font-weight: 500;
+    font-size: 14px;
+    color: var(--ink);
+    letter-spacing: -0.01em;
+    margin-bottom: 4px;
+  }
+  .prep-speed .pc {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-weight: 400;
+    font-size: 11px;
+    color: var(--ink-dim);
+    letter-spacing: 0.04em;
+  }
+
+  .prep-shoe {
+    border: 1px solid var(--hair);
+    padding: 14px 16px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+  .prep-shoe .thumb {
+    width: 48px; height: 48px;
+    border: 1px solid var(--hair);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-weight: 400;
+    font-size: 22px;
+    color: var(--ink-dim);
+    flex-shrink: 0;
+  }
+  .prep-shoe .info { flex: 1; }
+  .prep-shoe .nm {
+    font-family: 'Noto Serif KR', serif;
+    font-weight: 500;
+    font-size: 13px;
+    color: var(--ink);
+    letter-spacing: -0.01em;
+  }
+  .prep-shoe .mi {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-weight: 400;
+    font-size: 11px;
+    color: var(--ink-fade);
+    letter-spacing: 0.1em;
+    margin-top: 3px;
+  }
+  .prep-shoe .mi strong {
+    color: var(--red-sub);
+    font-weight: 400;
+  }
+  .prep-shoe .chev {
+    color: var(--ink-fade);
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-size: 18px;
+  }
+
+  .prep-goal-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+  .prep-goal {
+    padding: 16px 12px;
+    text-align: center;
+    border: 1px solid var(--hair);
+  }
+  .prep-goal.on {
+    border-color: var(--red);
+    background: linear-gradient(180deg, rgba(139,0,0,0.15), rgba(139,0,0,0.02));
+  }
+  .prep-goal .top {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-weight: 400;
+    font-size: 10px;
+    color: var(--ink-fade);
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    margin-bottom: 5px;
+  }
+  .prep-goal.on .top { color: var(--red-sub); }
+  .prep-goal .val {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-weight: 400;
+    font-size: 18px;
+    color: var(--ink);
+    letter-spacing: -0.01em;
+  }
+  .prep-goal .val small {
+    font-size: 11px;
+    color: var(--ink-fade);
+    margin-left: 2px;
+    font-style: normal;
+  }
+
+  .prep-go {
+    margin: 32px 28px 0;
+    background: linear-gradient(180deg, #8B0000 0%, #5a0000 100%);
+    padding: 28px 20px 24px;
+    text-align: center;
+    position: relative;
+    box-shadow: 0 18px 44px rgba(139,0,0,0.35);
+  }
+  .prep-go::before,
+  .prep-go::after {
+    content: '';
+    position: absolute;
+    width: 12px; height: 12px;
+    border: 1px solid rgba(245,245,245,0.5);
+  }
+  .prep-go::before {
+    top: 6px; left: 6px;
+    border-right: none; border-bottom: none;
+  }
+  .prep-go::after {
+    bottom: 6px; right: 6px;
+    border-left: none; border-top: none;
+  }
+  .prep-go .eye {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-weight: 400;
+    font-size: 10px;
+    color: rgba(245,245,245,0.65);
+    letter-spacing: 0.5em;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+  .prep-go .t {
+    font-family: 'Noto Serif KR', serif;
+    font-weight: 700;
+    font-size: 24px;
+    color: #fff;
+    letter-spacing: -0.02em;
+  }
+  .prep-go .sub {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-weight: 400;
+    font-size: 12px;
+    color: rgba(245,245,245,0.7);
+    margin-top: 6px;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+  }
+
+  /* ========================================================
+     ============== SCREEN 3 · RUNNING ======================
+     ======================================================== */
+  .s-run {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+  }
+  .run-warn {
+    margin: 26px 28px 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 10px 0;
+    border-top: 1px solid var(--hair-red);
+    border-bottom: 1px solid var(--hair-red);
+    position: relative;
+    z-index: 10;
+  }
+  .run-warn .dot {
+    width: 7px; height: 7px;
+    background: var(--red-sub);
+    border-radius: 50%;
+    box-shadow: 0 0 10px var(--red-sub);
+    animation: blinkPulse 1.3s infinite;
+  }
+  @keyframes blinkPulse {
+    0%, 60% { opacity: 1; transform: scale(1); }
+    61%, 100% { opacity: 0.2; transform: scale(0.8); }
+  }
+  .run-warn .lbl {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-weight: 700;
+    font-size: 11px;
+    color: var(--red-sub);
+    letter-spacing: 0.5em;
+    text-transform: uppercase;
+  }
+
+  .run-center {
+    padding: 28px 20px 10px;
+    text-align: center;
+    position: relative;
+    z-index: 10;
+  }
+  .run-cap {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-weight: 400;
+    font-size: 11px;
+    color: var(--ink-fade);
+    letter-spacing: 0.35em;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+  }
+  .run-big {
+    font-family: 'Playfair Display', serif;
+    font-weight: 400;
+    font-style: italic;
+    font-size: 118px;
+    color: var(--ink);
+    line-height: 0.9;
+    letter-spacing: -0.06em;
+    margin-bottom: 2px;
+    text-shadow: 0 0 40px rgba(139,0,0,0.25);
+  }
+  .run-unit {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-weight: 400;
+    font-size: 18px;
+    color: var(--red-sub);
+    letter-spacing: 0.08em;
+  }
+  .run-sub-narr {
+    margin-top: 10px;
+    font-family: 'Noto Serif KR', serif;
+    font-weight: 300;
+    font-size: 12px;
+    color: var(--ink-dim);
+    letter-spacing: -0.01em;
+    line-height: 1.5;
+  }
+  .run-sub-narr em {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    color: var(--red-sub);
+  }
+
+  .run-map {
+    margin: 18px 28px 0;
+    height: 150px;
+    position: relative;
+    border: 1px solid var(--hair);
+    overflow: hidden;
+    z-index: 10;
+    background:
+      radial-gradient(circle at 65% 45%, rgba(200,48,48,0.28), transparent 35%),
+      radial-gradient(circle at 35% 62%, rgba(245,245,245,0.08), transparent 40%),
+      linear-gradient(180deg, #050506 0%, #0a0a0c 100%);
+  }
+  .run-map::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image:
+      linear-gradient(0deg, rgba(245,245,245,0.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(245,245,245,0.04) 1px, transparent 1px);
+    background-size: 22px 22px;
+    pointer-events: none;
+  }
+  .run-map::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 90% 60% at 50% 100%, rgba(0,0,0,0.5), transparent 60%),
+      radial-gradient(ellipse 90% 60% at 50% 0%, rgba(0,0,0,0.5), transparent 60%);
+    pointer-events: none;
+  }
+  .run-map .me {
+    position: absolute;
+    left: 35%; top: 62%;
+    width: 12px; height: 12px;
+    background: var(--ink);
+    border-radius: 50%;
+    box-shadow: 0 0 0 3px rgba(245,245,245,0.12), 0 0 16px rgba(245,245,245,0.4);
+    z-index: 3;
+  }
+  .run-map .me::after {
+    content: '';
+    position: absolute;
+    inset: -8px;
+    border: 1px solid rgba(245,245,245,0.2);
+    border-radius: 50%;
+    animation: ringOut 2.5s infinite;
+  }
+  @keyframes ringOut {
+    0% { transform: scale(0.6); opacity: 1; }
+    100% { transform: scale(2.2); opacity: 0; }
+  }
+  .run-map .him {
+    position: absolute;
+    right: 33%; top: 43%;
+    width: 10px; height: 10px;
+    background: var(--red-sub);
+    border-radius: 50%;
+    box-shadow: 0 0 18px var(--red-sub);
+    animation: blinkPulse 1s infinite;
+    z-index: 3;
+  }
+  .run-map .path {
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+  }
+  .run-map .path svg { width: 100%; height: 100%; }
+
+  .run-bottom {
+    margin-top: auto;
+    padding: 20px 0 26px;
+    border-top: 1px solid var(--hair);
+    position: relative;
+    z-index: 10;
+    background: linear-gradient(0deg, #000 60%, rgba(0,0,0,0.5));
+  }
+  .run-cells {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    padding: 0 12px 18px;
+  }
+  .run-cell {
+    text-align: center;
+    padding: 0 6px;
+    position: relative;
+  }
+  .run-cell + .run-cell::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 15%;
+    width: 1px; height: 70%;
+    background: var(--hair);
+  }
+  .run-cell .v {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-weight: 400;
+    font-size: 22px;
+    color: var(--ink);
+    letter-spacing: -0.02em;
+    line-height: 1;
+  }
+  .run-cell .v small {
+    font-size: 11px;
+    color: var(--ink-fade);
+    font-style: normal;
+    margin-left: 2px;
+  }
+  .run-cell .k {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-weight: 400;
+    font-size: 9.5px;
+    color: var(--ink-fade);
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    margin-top: 6px;
+  }
+  .run-pause {
+    margin: 0 28px;
+    padding: 12px 0;
+    border: 1px solid var(--hair);
+    text-align: center;
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-weight: 400;
+    font-size: 12px;
+    color: var(--ink-dim);
+    letter-spacing: 0.4em;
+    text-transform: uppercase;
+  }
+  .run-pause .bar {
+    display: inline-block;
+    width: 3px; height: 11px;
+    background: var(--ink-dim);
+    margin: 0 2px 2px;
+    vertical-align: middle;
+  }
+
+  /* ========================================================
+     ============== SCREEN 4 · RESULT =======================
+     ======================================================== */
+  .s-result { padding-bottom: 40px; }
+  .result-tag {
+    padding: 14px 28px 0;
+    text-align: center;
+    position: relative;
+    z-index: 10;
+  }
+  .result-ep {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-weight: 400;
+    font-size: 11px;
+    color: var(--red-sub);
+    letter-spacing: 0.45em;
+    text-transform: uppercase;
+    margin-top: 16px;
+  }
+  .result-ep::before,
+  .result-ep::after {
+    content: '—';
+    margin: 0 8px;
+    color: var(--red-ember);
+  }
+  .result-big {
+    padding: 14px 20px 6px;
+    text-align: center;
+    position: relative;
+    z-index: 10;
+  }
+  .result-verdict {
+    font-family: 'Playfair Display', serif;
+    font-weight: 900;
+    font-style: italic;
+    font-size: 64px;
+    color: var(--ink);
+    letter-spacing: 0.04em;
+    line-height: 1;
+    text-shadow: 0 0 40px rgba(139,0,0,0.35);
+  }
+  .result-kr {
+    margin-top: 8px;
+    font-family: 'Noto Serif KR', serif;
+    font-weight: 500;
+    font-size: 13px;
+    color: var(--red-sub);
+    letter-spacing: 0.5em;
+  }
+  .result-narr {
+    margin-top: 16px;
+    padding: 0 30px;
+    font-family: 'Noto Serif KR', serif;
+    font-weight: 300;
+    font-size: 13.5px;
+    line-height: 1.75;
+    color: var(--ink-dim);
+    letter-spacing: -0.01em;
+  }
+  .result-narr em {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    color: var(--ink);
+  }
+
+  .result-stats {
+    margin: 24px 28px 0;
+    padding: 18px 0;
+    border-top: 1px solid var(--hair);
+    border-bottom: 1px solid var(--hair);
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    position: relative;
+    z-index: 10;
+  }
+  .result-stat {
+    text-align: center;
+    position: relative;
+  }
+  .result-stat + .result-stat::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 15%;
+    width: 1px; height: 70%;
+    background: var(--hair);
+  }
+  .result-stat .v {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-weight: 400;
+    font-size: 22px;
+    color: var(--ink);
+    letter-spacing: -0.01em;
+    line-height: 1;
+  }
+  .result-stat .v small {
+    font-size: 11px;
+    color: var(--ink-fade);
+    font-style: normal;
+    margin-left: 2px;
+  }
+  .result-stat .v.pos { color: var(--ink); }
+  .result-stat .k {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-weight: 400;
+    font-size: 9px;
+    color: var(--ink-fade);
+    letter-spacing: 0.25em;
+    margin-top: 6px;
+    text-transform: uppercase;
+  }
+
+  .result-chart-wrap {
+    margin: 24px 28px 0;
+    padding: 14px 0 0;
+    position: relative;
+    z-index: 10;
+  }
+  .result-chart-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 10px;
+  }
+  .result-chart-ttl {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-weight: 400;
+    font-size: 11px;
+    color: var(--red-sub);
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+  }
+  .result-chart-sub {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-weight: 400;
+    font-size: 10px;
+    color: var(--ink-fade);
+    letter-spacing: 0.1em;
+  }
+  .result-chart {
+    height: 120px;
+    border: 1px solid var(--hair);
+    position: relative;
+    background:
+      linear-gradient(180deg, rgba(139,0,0,0.04), transparent 60%);
+  }
+  .result-chart svg {
+    width: 100%; height: 100%;
+    display: block;
+  }
+  .result-chart .axis-lbl {
+    position: absolute;
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-weight: 400;
+    font-size: 9px;
+    color: var(--ink-fade);
+    letter-spacing: 0.1em;
+  }
+  .result-chart .axis-lbl.tl { top: 6px; left: 8px; }
+  .result-chart .axis-lbl.tr { top: 6px; right: 8px; color: var(--red-sub); }
+  .result-chart .axis-lbl.bl { bottom: 5px; left: 8px; }
+  .result-chart .axis-lbl.br { bottom: 5px; right: 8px; }
+
+  .result-chart-caption {
+    margin-top: 10px;
+    text-align: center;
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-weight: 400;
+    font-size: 11px;
+    color: var(--ink-fade);
+    letter-spacing: 0.05em;
+  }
+  .result-chart-caption em {
+    color: var(--red-sub);
+  }
+
+  .result-details {
+    margin: 26px 28px 0;
+    position: relative;
+    z-index: 10;
+  }
+  .result-det-ttl {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-weight: 400;
+    font-size: 11px;
+    color: var(--red-sub);
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    margin-bottom: 12px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--hair);
+  }
+  .result-det-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--hair);
+  }
+  .result-det-row:last-child { border-bottom: none; }
+  .result-det-k {
+    font-family: 'Noto Serif KR', serif;
+    font-weight: 300;
+    font-size: 12.5px;
+    color: var(--ink-dim);
+    letter-spacing: -0.01em;
+  }
+  .result-det-v {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-weight: 400;
+    font-size: 14px;
+    color: var(--ink);
+    letter-spacing: -0.01em;
+  }
+  .result-det-v small {
+    font-size: 10px;
+    color: var(--ink-fade);
+    margin-left: 2px;
+    font-style: normal;
+  }
+
+  /* ========================================================
+     ============== SCREEN 5 · HISTORY ======================
+     ======================================================== */
+  .s-hist { padding-bottom: 40px; }
+  .hist-head {
+    padding: 22px 28px 0;
+    text-align: center;
+    position: relative;
+    z-index: 10;
+  }
+  .hist-title {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-weight: 400;
+    font-size: 38px;
+    color: var(--ink);
+    letter-spacing: 0;
+    line-height: 1;
+  }
+  .hist-month {
+    margin-top: 10px;
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-weight: 400;
+    font-size: 11px;
+    color: var(--red-sub);
+    letter-spacing: 0.45em;
+    text-transform: uppercase;
+  }
+  .hist-divline {
+    width: 28px; height: 1px;
+    background: var(--red-ember);
+    margin: 18px auto 20px;
+  }
+
+  .hist-summary {
+    margin: 0 28px;
+    padding: 14px 0;
+    border-top: 1px solid var(--hair);
+    border-bottom: 1px solid var(--hair);
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    position: relative;
+    z-index: 10;
+  }
+  .hist-sum {
+    text-align: center;
+    position: relative;
+  }
+  .hist-sum + .hist-sum::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 15%;
+    width: 1px; height: 70%;
+    background: var(--hair);
+  }
+  .hist-sum .v {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-weight: 400;
+    font-size: 22px;
+    color: var(--ink);
+    letter-spacing: -0.01em;
+    line-height: 1;
+  }
+  .hist-sum .v small {
+    font-size: 10px;
+    color: var(--ink-fade);
+    margin-left: 2px;
+    font-style: normal;
+  }
+  .hist-sum .k {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-weight: 400;
+    font-size: 9px;
+    color: var(--ink-fade);
+    letter-spacing: 0.25em;
+    margin-top: 6px;
+    text-transform: uppercase;
+  }
+  .hist-sum .wl {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-weight: 400;
+    font-size: 20px;
+    color: var(--ink);
+    letter-spacing: 0.02em;
+  }
+  .hist-sum .wl .sep {
+    color: var(--red-ember);
+    margin: 0 3px;
+  }
+  .hist-sum .wl .lo { color: var(--red-sub); }
+
+  .hist-list {
+    margin: 22px 28px 0;
+    position: relative;
+    z-index: 10;
+  }
+  .hist-list-ttl {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-weight: 400;
+    font-size: 10px;
+    color: var(--ink-fade);
+    letter-spacing: 0.35em;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--hair);
+  }
+  .hist-item {
+    padding: 14px 0 12px;
+    border-bottom: 1px solid var(--hair);
+    display: grid;
+    grid-template-columns: 42px 1fr auto;
+    gap: 12px;
+    align-items: center;
+  }
+  .hist-ep {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-weight: 400;
+    font-size: 22px;
+    color: var(--ink-dim);
+    letter-spacing: -0.02em;
+    line-height: 1;
+  }
+  .hist-mid .d {
+    font-family: 'Noto Serif KR', serif;
+    font-weight: 400;
+    font-size: 13px;
+    color: var(--ink);
+    letter-spacing: -0.01em;
+    margin-bottom: 3px;
+  }
+  .hist-mid .d em {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    color: var(--ink-fade);
+    font-size: 11px;
+    margin-left: 6px;
+    letter-spacing: 0.05em;
+  }
+  .hist-mid .l {
+    font-family: 'Noto Serif KR', serif;
+    font-weight: 300;
+    font-size: 10.5px;
+    color: var(--ink-fade);
+  }
+  .hist-right { text-align: right; }
+  .hist-right .delta {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-weight: 400;
+    font-size: 15px;
+    color: var(--ink);
+    line-height: 1;
+  }
+  .hist-right .delta.neg { color: var(--red-sub); }
+  .hist-right .res {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-weight: 400;
+    font-size: 9.5px;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    margin-top: 4px;
+    color: var(--ink-fade);
+  }
+  .hist-right .res.fail { color: var(--red-sub); }
+
+  /* ========================================================
+     ============== SCREEN 6 · SETTINGS =====================
+     ======================================================== */
+  .s-set { padding-bottom: 40px; }
+  .set-head {
+    padding: 22px 28px 0;
+    text-align: center;
+    position: relative;
+    z-index: 10;
+  }
+  .set-title {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-weight: 400;
+    font-size: 34px;
+    color: var(--ink);
+    line-height: 1;
+  }
+  .set-sub {
+    margin-top: 6px;
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-weight: 400;
+    font-size: 10.5px;
+    color: var(--red-sub);
+    letter-spacing: 0.4em;
+    text-transform: uppercase;
+  }
+  .set-divline {
+    width: 28px; height: 1px;
+    background: var(--red-ember);
+    margin: 18px auto 20px;
+  }
+
+  .set-profile {
+    margin: 0 28px;
+    padding: 16px 16px;
+    border: 1px solid var(--hair);
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    position: relative;
+    z-index: 10;
+    background: linear-gradient(180deg, rgba(139,0,0,0.08), transparent 80%);
+  }
+  .set-avatar {
+    width: 46px; height: 46px;
+    border: 1px solid var(--red);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-weight: 900;
+    font-size: 22px;
+    color: var(--ink);
+    flex-shrink: 0;
+  }
+  .set-pf-info { flex: 1; }
+  .set-pf-name {
+    font-family: 'Noto Serif KR', serif;
+    font-weight: 500;
+    font-size: 14px;
+    color: var(--ink);
+    letter-spacing: -0.01em;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .set-pro-badge {
+    display: inline-block;
+    padding: 2px 8px;
+    border: 1px solid var(--red);
+    color: var(--red-sub);
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-weight: 700;
+    font-size: 9px;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+  }
+  .set-pf-meta {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-weight: 400;
+    font-size: 10.5px;
+    color: var(--ink-fade);
+    letter-spacing: 0.04em;
+    margin-top: 4px;
+  }
+  .set-pf-chev {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    color: var(--ink-fade);
+    font-size: 20px;
+  }
+
+  .set-sec {
+    margin: 26px 28px 0;
+    position: relative;
+    z-index: 10;
+  }
+  .set-sec-ttl {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-weight: 400;
+    font-size: 10px;
+    color: var(--red-sub);
+    letter-spacing: 0.4em;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--hair);
+  }
+  .set-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 11px 0;
+    border-bottom: 1px solid var(--hair);
+  }
+  .set-row:last-child { border-bottom: none; }
+  .set-row-k {
+    font-family: 'Noto Serif KR', serif;
+    font-weight: 400;
+    font-size: 13px;
+    color: var(--ink);
+    letter-spacing: -0.01em;
+  }
+  .set-row-v {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-weight: 400;
+    font-size: 12px;
+    color: var(--ink-dim);
+    letter-spacing: 0.02em;
+  }
+  .set-row-v.accent { color: var(--red-sub); }
+  .set-row .chev {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    color: var(--ink-fade);
+    font-size: 16px;
+    margin-left: 8px;
+  }
+  .set-toggle {
+    width: 34px; height: 18px;
+    border: 1px solid var(--hair);
+    border-radius: 10px;
+    position: relative;
+    background: transparent;
+  }
+  .set-toggle.on {
+    border-color: var(--red);
+    background: rgba(139,0,0,0.3);
+  }
+  .set-toggle::after {
+    content: '';
+    position: absolute;
+    top: 2px; left: 2px;
+    width: 12px; height: 12px;
+    background: var(--ink-fade);
+    border-radius: 50%;
+    transition: left 0.2s;
+  }
+  .set-toggle.on::after {
+    left: 18px;
+    background: var(--red-sub);
+  }
+
+  .set-foot {
+    margin: 36px 28px 0;
+    text-align: center;
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-weight: 400;
+    font-size: 10.5px;
+    color: var(--ink-ghost);
+    letter-spacing: 0.15em;
+    line-height: 1.7;
+    position: relative;
+    z-index: 10;
+  }
+  .set-foot .tap {
+    display: block;
+    margin-top: 4px;
+    color: var(--ink-ghost);
+    letter-spacing: 0.1em;
+  }
+  .set-foot em {
+    color: var(--red-ember);
+    font-style: italic;
+  }
+
+  @media (max-width: 1200px) {
+    .grid { grid-template-columns: repeat(2, 1fr); }
+  }
+  @media (max-width: 780px) {
+    .grid { grid-template-columns: 1fr; }
+    body { padding: 40px 12px 80px; }
+    .page-header h1 { font-size: 32px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="page-header">
+  <div class="kicker">Shadow Run · Design Exploration</div>
+  <h1>Theme 01 <em>Pure Cinematic</em></h1>
+  <p>순검정 <em>#000</em>과 오프화이트 <em>#F5F5F5</em>의 정적 위에,<br>
+     말린 피의 <em>#8B0000</em>이 한 줄의 자막처럼 스며드는 무드.<br>
+     <span class="sep"></span> 영화 한 편. 매일 밤 한 편의 러닝이 한 챕터. <span class="sep"></span></p>
+</div>
+
+<div class="grid">
+
+  <!-- ========================================================
+       CELL 1 · HOME
+       ======================================================== -->
+  <div class="cell">
+    <div class="phone">
+      <div class="notch"></div>
+      <div class="screen s-home">
+        <div class="statusbar"><span>9:41</span><span class="sig">●●●●   ●●</span></div>
+
+        <div class="home-head">
+          <div class="corner-ico left">◷</div>
+          <div class="corner-ico right">⚙</div>
+          <div class="home-eyebrow">그림자는 쉬지 않는다</div>
+          <div class="home-logo">Shadow <em>Run</em></div>
+          <div class="home-sub">Episode 028 <span class="dot"></span> Apr 17, Wed</div>
+        </div>
+
+        <div class="home-div"></div>
+
+        <div class="home-quote">
+          <div class="q">어젯밤 그는 당신보다<br><em>312미터</em> 더 가까이<br>다가왔다.</div>
+          <div class="q-by">— previously on shadow run</div>
+        </div>
+
+        <div class="home-stats">
+          <div class="home-stat">
+            <div class="v">12.4<small>km</small></div>
+            <div class="k">this week</div>
+          </div>
+          <div class="home-stat">
+            <div class="v">28</div>
+            <div class="k">chapters</div>
+          </div>
+          <div class="home-stat">
+            <div class="v">412<small>m</small></div>
+            <div class="k">best escape</div>
+          </div>
+        </div>
+
+        <div class="home-start">
+          <div class="eye">Tonight's Run</div>
+          <div class="ttl">오늘의 도주</div>
+          <div class="cta">begin the chase ›</div>
+        </div>
+
+        <div class="home-recent">
+          <div class="home-recent-head">
+            <div class="home-recent-ttl">recent chapters</div>
+            <div class="home-recent-more">all ›</div>
+          </div>
+
+          <div class="home-run">
+            <div class="home-run-l">
+              <div class="home-run-date">4월 16일 · 성동구</div>
+              <div class="home-run-loc">3.42 km · 24:18</div>
+            </div>
+            <div class="home-run-r">
+              <div class="home-run-dist">+312m</div>
+              <div class="home-run-result ok">escaped</div>
+            </div>
+          </div>
+
+          <div class="home-run">
+            <div class="home-run-l">
+              <div class="home-run-date">4월 15일 · 한강 북단</div>
+              <div class="home-run-loc">2.18 km · 18:02</div>
+            </div>
+            <div class="home-run-r">
+              <div class="home-run-dist">−18m</div>
+              <div class="home-run-result fail">caught</div>
+            </div>
+          </div>
+
+          <div class="home-run">
+            <div class="home-run-l">
+              <div class="home-run-date">4월 14일 · 남산길</div>
+              <div class="home-run-loc">4.80 km · 33:41</div>
+            </div>
+            <div class="home-run-r">
+              <div class="home-run-dist">+520m</div>
+              <div class="home-run-result ok">escaped</div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+    <div class="cell-label">
+      <div class="cell-num">— Screen 01 —</div>
+      <div class="cell-ttl">Home</div>
+      <div class="cell-desc">오늘 밤의 오프닝 크레딧</div>
+    </div>
+  </div>
+
+  <!-- ========================================================
+       CELL 2 · PREPARE
+       ======================================================== -->
+  <div class="cell">
+    <div class="phone">
+      <div class="notch"></div>
+      <div class="screen s-prep">
+        <div class="statusbar"><span>9:41</span><span class="sig">●●●●   ●●</span></div>
+
+        <div class="topbar">
+          <div class="back">← <span>back</span></div>
+          <div class="tb-icons">
+            <div class="tb-ico">?</div>
+          </div>
+        </div>
+
+        <div class="prep-title-wrap">
+          <div class="prep-eyebrow">Pre-game</div>
+          <div class="prep-title">오늘 밤의 <em>준비</em></div>
+          <div class="prep-divline"></div>
+        </div>
+
+        <div class="prep-section">
+          <div class="prep-sec-head">
+            <div class="prep-sec-k">signal</div>
+            <div class="prep-sec-v"><span class="pulse"></span>GPS connected · ±4m</div>
+          </div>
+        </div>
+
+        <div class="prep-section">
+          <div class="prep-sec-head">
+            <div class="prep-sec-k">Doppelgänger Pace</div>
+            <div class="prep-sec-v">tap to change</div>
+          </div>
+          <div class="prep-speeds">
+            <div class="prep-speed">
+              <div class="lvl">slow</div>
+              <div class="nm">느림</div>
+              <div class="pc">5′30″/km</div>
+            </div>
+            <div class="prep-speed on">
+              <div class="lvl">normal</div>
+              <div class="nm">보통</div>
+              <div class="pc">5′00″/km</div>
+            </div>
+            <div class="prep-speed">
+              <div class="lvl">fast</div>
+              <div class="nm">빠름</div>
+              <div class="pc">4′30″/km</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="prep-section">
+          <div class="prep-sec-head">
+            <div class="prep-sec-k">Footwear</div>
+            <div class="prep-sec-v">swap</div>
+          </div>
+          <div class="prep-shoe">
+            <div class="thumb">◐</div>
+            <div class="info">
+              <div class="nm">Nike Pegasus 40</div>
+              <div class="mi"><strong>73 km</strong> walked together</div>
+            </div>
+            <div class="chev">›</div>
+          </div>
+        </div>
+
+        <div class="prep-section">
+          <div class="prep-sec-head">
+            <div class="prep-sec-k">Target Distance</div>
+            <div class="prep-sec-v">edit</div>
+          </div>
+          <div class="prep-goal-row">
+            <div class="prep-goal on">
+              <div class="top">free run</div>
+              <div class="val">자유<small></small></div>
+            </div>
+            <div class="prep-goal">
+              <div class="top">set goal</div>
+              <div class="val">5.0<small>km</small></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="prep-go">
+          <div class="eye">Tonight's Chase</div>
+          <div class="t">뛴다.</div>
+          <div class="sub">go</div>
+        </div>
+
+      </div>
+    </div>
+    <div class="cell-label">
+      <div class="cell-num">— Screen 02 —</div>
+      <div class="cell-ttl">Prepare</div>
+      <div class="cell-desc">막이 오르기 직전의 정적</div>
+    </div>
+  </div>
+
+  <!-- ========================================================
+       CELL 3 · RUNNING
+       ======================================================== -->
+  <div class="cell">
+    <div class="phone">
+      <div class="notch"></div>
+      <div class="screen s-run">
+        <div class="statusbar"><span>9:41</span><span class="sig">●●●●   ●●</span></div>
+
+        <div class="run-warn">
+          <div class="dot"></div>
+          <div class="lbl">Chasing</div>
+          <div class="dot"></div>
+        </div>
+
+        <div class="run-center">
+          <div class="run-cap">Distance from the Doppelgänger</div>
+          <div class="run-big">152</div>
+          <div class="run-unit">meters · behind you</div>
+          <div class="run-sub-narr">그는 점점 <em>가까워지고</em> 있다.</div>
+        </div>
+
+        <div class="run-map">
+          <div class="path">
+            <svg viewBox="0 0 300 150" preserveAspectRatio="none">
+              <defs>
+                <linearGradient id="trail" x1="0" x2="1">
+                  <stop offset="0" stop-color="#C83030" stop-opacity="0.65"/>
+                  <stop offset="0.6" stop-color="#F5F5F5" stop-opacity="0.35"/>
+                  <stop offset="1" stop-color="#F5F5F5" stop-opacity="0"/>
+                </linearGradient>
+              </defs>
+              <path d="M 200 65 C 180 72, 155 76, 135 82 S 115 92, 105 93" stroke="url(#trail)" stroke-width="1.5" fill="none" stroke-dasharray="3 3" />
+            </svg>
+          </div>
+          <div class="me"></div>
+          <div class="him"></div>
+        </div>
+
+        <div class="run-bottom">
+          <div class="run-cells">
+            <div class="run-cell">
+              <div class="v">24:18</div>
+              <div class="k">elapsed</div>
+            </div>
+            <div class="run-cell">
+              <div class="v">3.42<small>km</small></div>
+              <div class="k">distance</div>
+            </div>
+            <div class="run-cell">
+              <div class="v">5:41</div>
+              <div class="k">pace /km</div>
+            </div>
+          </div>
+          <div class="run-pause">
+            <span class="bar"></span><span class="bar"></span> &nbsp; pause the chase
+          </div>
+        </div>
+
+      </div>
+    </div>
+    <div class="cell-label">
+      <div class="cell-num">— Screen 03 —</div>
+      <div class="cell-ttl">Running</div>
+      <div class="cell-desc">정적 속 추격의 한 장면</div>
+    </div>
+  </div>
+
+  <!-- ========================================================
+       CELL 4 · RESULT
+       ======================================================== -->
+  <div class="cell">
+    <div class="phone">
+      <div class="notch"></div>
+      <div class="screen s-result">
+        <div class="statusbar"><span>9:41</span><span class="sig">●●●●   ●●</span></div>
+
+        <div class="topbar">
+          <div class="close">×<span>close</span></div>
+          <div class="tb-icons">
+            <div class="tb-ico">↗</div>
+          </div>
+        </div>
+
+        <div class="result-tag">
+          <div class="result-ep">Episode 028 · End Credits</div>
+        </div>
+
+        <div class="result-big">
+          <div class="result-verdict">ESCAPED</div>
+          <div class="result-kr">탈 출</div>
+          <div class="result-narr">
+            그는 당신을 잡지 못했다.<br>
+            오늘 밤, <em>어둠 속에서 당신이 이겼다.</em>
+          </div>
+        </div>
+
+        <div class="result-stats">
+          <div class="result-stat">
+            <div class="v">3.42<small>km</small></div>
+            <div class="k">distance</div>
+          </div>
+          <div class="result-stat">
+            <div class="v">24:18</div>
+            <div class="k">elapsed</div>
+          </div>
+          <div class="result-stat">
+            <div class="v pos">+312<small>m</small></div>
+            <div class="k">final gap</div>
+          </div>
+        </div>
+
+        <div class="result-chart-wrap">
+          <div class="result-chart-head">
+            <div class="result-chart-ttl">distance from the shadow</div>
+            <div class="result-chart-sub">00:00 → 24:18</div>
+          </div>
+          <div class="result-chart">
+            <div class="axis-lbl tl">+400m</div>
+            <div class="axis-lbl tr">safe</div>
+            <div class="axis-lbl bl">0m</div>
+            <div class="axis-lbl br">caught</div>
+            <svg viewBox="0 0 300 120" preserveAspectRatio="none">
+              <defs>
+                <linearGradient id="fillGrad" x1="0" x2="0" y1="0" y2="1">
+                  <stop offset="0" stop-color="#8B0000" stop-opacity="0.45"/>
+                  <stop offset="1" stop-color="#8B0000" stop-opacity="0"/>
+                </linearGradient>
+                <linearGradient id="lineGrad" x1="0" x2="1">
+                  <stop offset="0" stop-color="#C83030"/>
+                  <stop offset="0.5" stop-color="#F5F5F5"/>
+                  <stop offset="1" stop-color="#F5F5F5"/>
+                </linearGradient>
+              </defs>
+              <line x1="0" y1="60" x2="300" y2="60" stroke="#2a2a2e" stroke-width="0.5" stroke-dasharray="2 3" />
+              <line x1="0" y1="30" x2="300" y2="30" stroke="#1a1a1e" stroke-width="0.5" stroke-dasharray="2 4" />
+              <line x1="0" y1="90" x2="300" y2="90" stroke="#1a1a1e" stroke-width="0.5" stroke-dasharray="2 4" />
+              <path d="M 0 78 L 20 82 L 45 88 L 70 95 L 95 92 L 120 80 L 145 64 L 170 52 L 195 44 L 220 38 L 250 28 L 280 22 L 300 18 L 300 120 L 0 120 Z" fill="url(#fillGrad)" />
+              <path d="M 0 78 L 20 82 L 45 88 L 70 95 L 95 92 L 120 80 L 145 64 L 170 52 L 195 44 L 220 38 L 250 28 L 280 22 L 300 18" stroke="url(#lineGrad)" stroke-width="1.8" fill="none" stroke-linejoin="round" stroke-linecap="round" />
+              <circle cx="70" cy="95" r="2.5" fill="#C83030" />
+              <circle cx="300" cy="18" r="3" fill="#F5F5F5" />
+              <circle cx="300" cy="18" r="5" fill="none" stroke="#F5F5F5" stroke-opacity="0.3" />
+            </svg>
+          </div>
+          <div class="result-chart-caption">
+            가장 가까웠던 순간 <em>06:12</em>, 단 <em>22m</em>.
+          </div>
+        </div>
+
+        <div class="result-details">
+          <div class="result-det-ttl">the fine print</div>
+          <div class="result-det-row">
+            <div class="result-det-k">평균 페이스</div>
+            <div class="result-det-v">5:41<small> /km</small></div>
+          </div>
+          <div class="result-det-row">
+            <div class="result-det-k">최고 페이스</div>
+            <div class="result-det-v">4:28<small> /km</small></div>
+          </div>
+          <div class="result-det-row">
+            <div class="result-det-k">심박 · 평균</div>
+            <div class="result-det-v">168<small> bpm</small></div>
+          </div>
+          <div class="result-det-row">
+            <div class="result-det-k">소모 칼로리</div>
+            <div class="result-det-v">284<small> kcal</small></div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+    <div class="cell-label">
+      <div class="cell-num">— Screen 04 —</div>
+      <div class="cell-ttl">Result</div>
+      <div class="cell-desc">엔딩 크레딧과 함께 내려오는 판결</div>
+    </div>
+  </div>
+
+  <!-- ========================================================
+       CELL 5 · HISTORY
+       ======================================================== -->
+  <div class="cell">
+    <div class="phone">
+      <div class="notch"></div>
+      <div class="screen s-hist">
+        <div class="statusbar"><span>9:41</span><span class="sig">●●●●   ●●</span></div>
+
+        <div class="topbar">
+          <div class="back">← <span>home</span></div>
+          <div class="tb-icons">
+            <div class="tb-ico">◷</div>
+          </div>
+        </div>
+
+        <div class="hist-head">
+          <div class="hist-title">Chronicles</div>
+          <div class="hist-month">April 2026</div>
+          <div class="hist-divline"></div>
+        </div>
+
+        <div class="hist-summary">
+          <div class="hist-sum">
+            <div class="v">28</div>
+            <div class="k">runs</div>
+          </div>
+          <div class="hist-sum">
+            <div class="v">64.8<small>km</small></div>
+            <div class="k">distance</div>
+          </div>
+          <div class="hist-sum">
+            <div class="wl">22<span class="sep">·</span><span class="lo">6</span></div>
+            <div class="k">won · lost</div>
+          </div>
+        </div>
+
+        <div class="hist-list">
+          <div class="hist-list-ttl">chapters this month</div>
+
+          <div class="hist-item">
+            <div class="hist-ep">E28</div>
+            <div class="hist-mid">
+              <div class="d">4월 16일 <em>wed</em></div>
+              <div class="l">성동구 · 3.42 km · 24:18</div>
+            </div>
+            <div class="hist-right">
+              <div class="delta">+312m</div>
+              <div class="res">escaped</div>
+            </div>
+          </div>
+
+          <div class="hist-item">
+            <div class="hist-ep">E27</div>
+            <div class="hist-mid">
+              <div class="d">4월 15일 <em>tue</em></div>
+              <div class="l">한강 북단 · 2.18 km · 18:02</div>
+            </div>
+            <div class="hist-right">
+              <div class="delta neg">−18m</div>
+              <div class="res fail">caught</div>
+            </div>
+          </div>
+
+          <div class="hist-item">
+            <div class="hist-ep">E26</div>
+            <div class="hist-mid">
+              <div class="d">4월 14일 <em>mon</em></div>
+              <div class="l">남산길 · 4.80 km · 33:41</div>
+            </div>
+            <div class="hist-right">
+              <div class="delta">+520m</div>
+              <div class="res">escaped</div>
+            </div>
+          </div>
+
+          <div class="hist-item">
+            <div class="hist-ep">E25</div>
+            <div class="hist-mid">
+              <div class="d">4월 12일 <em>sat</em></div>
+              <div class="l">석촌호수 · 5.20 km · 37:10</div>
+            </div>
+            <div class="hist-right">
+              <div class="delta">+188m</div>
+              <div class="res">escaped</div>
+            </div>
+          </div>
+
+          <div class="hist-item">
+            <div class="hist-ep">E24</div>
+            <div class="hist-mid">
+              <div class="d">4월 11일 <em>fri</em></div>
+              <div class="l">올림픽공원 · 3.05 km · 22:48</div>
+            </div>
+            <div class="hist-right">
+              <div class="delta neg">−42m</div>
+              <div class="res fail">caught</div>
+            </div>
+          </div>
+
+          <div class="hist-item">
+            <div class="hist-ep">E23</div>
+            <div class="hist-mid">
+              <div class="d">4월 09일 <em>wed</em></div>
+              <div class="l">청계천 · 4.14 km · 30:12</div>
+            </div>
+            <div class="hist-right">
+              <div class="delta">+260m</div>
+              <div class="res">escaped</div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+    <div class="cell-label">
+      <div class="cell-num">— Screen 05 —</div>
+      <div class="cell-ttl">History</div>
+      <div class="cell-desc">지난 밤들의 연대기</div>
+    </div>
+  </div>
+
+  <!-- ========================================================
+       CELL 6 · SETTINGS
+       ======================================================== -->
+  <div class="cell">
+    <div class="phone">
+      <div class="notch"></div>
+      <div class="screen s-set">
+        <div class="statusbar"><span>9:41</span><span class="sig">●●●●   ●●</span></div>
+
+        <div class="topbar">
+          <div class="back">← <span>back</span></div>
+        </div>
+
+        <div class="set-head">
+          <div class="set-title">Settings</div>
+          <div class="set-sub">설 정</div>
+          <div class="set-divline"></div>
+        </div>
+
+        <div class="set-profile">
+          <div class="set-avatar">D</div>
+          <div class="set-pf-info">
+            <div class="set-pf-name">도리스 <span class="set-pro-badge">Pro</span></div>
+            <div class="set-pf-meta">since march · 28 chapters</div>
+          </div>
+          <div class="set-pf-chev">›</div>
+        </div>
+
+        <div class="set-sec">
+          <div class="set-sec-ttl">Appearance</div>
+          <div class="set-row">
+            <div class="set-row-k">테마</div>
+            <div>
+              <span class="set-row-v accent">Pure Cinematic</span>
+              <span class="chev">›</span>
+            </div>
+          </div>
+          <div class="set-row">
+            <div class="set-row-k">언어</div>
+            <div>
+              <span class="set-row-v">한국어</span>
+              <span class="chev">›</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="set-sec">
+          <div class="set-sec-ttl">Audio</div>
+          <div class="set-row">
+            <div class="set-row-k">음성 안내</div>
+            <div class="set-toggle on"></div>
+          </div>
+          <div class="set-row">
+            <div class="set-row-k">효과음</div>
+            <div class="set-toggle on"></div>
+          </div>
+          <div class="set-row">
+            <div class="set-row-k">나레이터 목소리</div>
+            <div>
+              <span class="set-row-v">깊은 남성</span>
+              <span class="chev">›</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="set-sec">
+          <div class="set-sec-ttl">Game</div>
+          <div class="set-row">
+            <div class="set-row-k">기본 속도</div>
+            <div>
+              <span class="set-row-v">보통 · 5′00″/km</span>
+              <span class="chev">›</span>
+            </div>
+          </div>
+          <div class="set-row">
+            <div class="set-row-k">목표 설정</div>
+            <div>
+              <span class="set-row-v">자유</span>
+              <span class="chev">›</span>
+            </div>
+          </div>
+          <div class="set-row">
+            <div class="set-row-k">진동 피드백</div>
+            <div class="set-toggle on"></div>
+          </div>
+        </div>
+
+        <div class="set-sec">
+          <div class="set-sec-ttl">Support</div>
+          <div class="set-row">
+            <div class="set-row-k">리뷰 남기기</div>
+            <span class="chev">›</span>
+          </div>
+          <div class="set-row">
+            <div class="set-row-k">이용 약관</div>
+            <span class="chev">›</span>
+          </div>
+          <div class="set-row">
+            <div class="set-row-k">개인정보 처리방침</div>
+            <span class="chev">›</span>
+          </div>
+        </div>
+
+        <div class="set-foot">
+          <em>v1.0.0</em> · build 12
+          <span class="tap">tap ×7 to unlock</span>
+        </div>
+
+      </div>
+    </div>
+    <div class="cell-label">
+      <div class="cell-num">— Screen 06 —</div>
+      <div class="cell-ttl">Settings</div>
+      <div class="cell-desc">무대 뒤의 조용한 조작 패널</div>
+    </div>
+  </div>
+
+</div>
+
+</body>
+</html>

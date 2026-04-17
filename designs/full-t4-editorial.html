@@ -1,0 +1,1665 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Shadow Run — Theme 04 · Editorial Thriller</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700;1,900&family=Inter:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css" />
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg-page: #050507;
+    --ink: #0A0A0A;
+    --paper: #F5F2EA;
+    --paper-ink: #111;
+    --line: #fff;
+    --line-hair: rgba(255,255,255,0.12);
+    --line-hair-dark: rgba(0,0,0,0.14);
+    --red: #DC2626;
+    --red-soft: #f87171;
+    --muted: #6a6a70;
+    --muted-dark: #3a3a40;
+    --muted-dim: #8a8a8f;
+  }
+  html, body { background: var(--bg-page); color: #fff; }
+  body {
+    font-family: 'Pretendard', 'Inter', -apple-system, sans-serif;
+    min-height: 100vh;
+    padding: 52px 20px 80px;
+  }
+
+  /* ================= PAGE HEADER ================= */
+  .page-header {
+    max-width: 1280px;
+    margin: 0 auto 40px;
+    text-align: center;
+    position: relative;
+    padding: 0 20px 28px;
+  }
+  .page-header .mast-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    max-width: 1100px;
+    margin: 0 auto 14px;
+    font-family: 'Inter', sans-serif;
+    font-weight: 300;
+    font-size: 10px;
+    letter-spacing: 0.4em;
+    text-transform: uppercase;
+    color: #7a7a7f;
+  }
+  .page-header .mast-top em {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-weight: 400;
+    font-size: 11px;
+    color: var(--red-soft);
+    letter-spacing: 0.2em;
+  }
+  .page-header .mast-rule { height: 2px; background: #fff; max-width: 1100px; margin: 0 auto 18px; }
+  .page-header h1 {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-weight: 900;
+    font-size: 56px;
+    letter-spacing: -0.03em;
+    line-height: 0.95;
+    color: #fff;
+  }
+  .page-header h1 b { font-style: normal; color: var(--red); font-weight: 900; }
+  .page-header .mast-sub {
+    margin-top: 10px;
+    font-family: 'Inter', sans-serif;
+    font-weight: 300;
+    font-size: 11px;
+    letter-spacing: 0.35em;
+    text-transform: uppercase;
+    color: #9a9a9f;
+  }
+  .page-header .mast-sub span { color: var(--red); margin: 0 10px; }
+  .page-header .mast-rule-bot {
+    height: 1px; background: rgba(255,255,255,0.25);
+    max-width: 1100px; margin: 18px auto 0;
+  }
+  .page-header .mast-foot {
+    max-width: 1100px;
+    margin: 10px auto 0;
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-size: 12px;
+    color: #666;
+    letter-spacing: 0.08em;
+  }
+
+  /* ================= GRID ================= */
+  .stage {
+    max-width: 1280px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 54px 36px;
+    justify-items: center;
+  }
+  .cell { width: 100%; max-width: 360px; display: flex; flex-direction: column; align-items: center; }
+  .cell-label {
+    width: 340px;
+    margin-top: 18px;
+    padding-top: 10px;
+    border-top: 1px solid rgba(255,255,255,0.2);
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+  }
+  .cell-label .no {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-weight: 400;
+    font-size: 20px;
+    color: var(--red);
+    letter-spacing: 0.02em;
+    line-height: 1;
+  }
+  .cell-label .tt {
+    flex: 1;
+    min-width: 0;
+  }
+  .cell-label .tt .kicker {
+    font-family: 'Inter', sans-serif;
+    font-weight: 700;
+    font-size: 9px;
+    color: #fff;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    margin-bottom: 2px;
+  }
+  .cell-label .tt .name {
+    font-family: 'Playfair Display', serif;
+    font-weight: 400;
+    font-style: italic;
+    font-size: 14px;
+    color: #bbb;
+    letter-spacing: 0.01em;
+  }
+
+  /* ================= PHONE ================= */
+  .phone {
+    width: 340px;
+    height: 720px;
+    border-radius: 44px;
+    overflow: hidden;
+    position: relative;
+    box-shadow: 0 28px 70px rgba(0,0,0,0.9), 0 0 0 9px #141416, 0 0 0 10px #2a2a2d;
+    flex-shrink: 0;
+  }
+  .notch {
+    position: absolute;
+    top: 12px; left: 50%; transform: translateX(-50%);
+    width: 112px; height: 28px;
+    background: #000;
+    border-radius: 18px;
+    z-index: 100;
+  }
+  .screen {
+    width: 100%; height: 100%;
+    background: var(--ink);
+    color: #fff;
+    position: relative;
+    overflow-y: auto;
+    overflow-x: hidden;
+    font-family: 'Pretendard', 'Inter', sans-serif;
+  }
+  .screen::-webkit-scrollbar { display: none; }
+  .screen::before {
+    /* subtle grain */
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(0deg, transparent 0, transparent 2px, rgba(255,255,255,0.012) 2px, rgba(255,255,255,0.012) 3px);
+    pointer-events: none;
+    z-index: 2;
+  }
+
+  .statusbar {
+    position: relative;
+    padding: 12px 26px 0;
+    display: flex;
+    justify-content: space-between;
+    font-family: 'Inter', sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    color: #fff;
+    z-index: 50;
+    letter-spacing: -0.02em;
+  }
+  .statusbar .dots { letter-spacing: -1px; font-size: 10px; }
+
+  /* ================= SHARED ED ELEMENTS ================= */
+  .ed-body { padding: 20px 24px 28px; position: relative; z-index: 3; }
+  .ed-no {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-weight: 400;
+    font-size: 11px;
+    color: var(--red);
+    letter-spacing: 0.22em;
+    margin-bottom: 3px;
+  }
+  .ed-issue {
+    font-family: 'Inter', sans-serif;
+    font-weight: 200;
+    font-size: 10px;
+    color: #888;
+    letter-spacing: 0.32em;
+    text-transform: uppercase;
+  }
+  .rule-thick { height: 2px; background: #fff; margin: 10px 0 8px; }
+  .rule-thin { height: 1px; background: rgba(255,255,255,0.15); margin: 12px 0; }
+  .rule-hair { height: 1px; background: rgba(255,255,255,0.08); margin: 10px 0; }
+  .rule-short {
+    width: 28px; height: 2px; background: #fff;
+    display: block; margin-bottom: 10px;
+  }
+  .section-tag {
+    font-family: 'Inter', sans-serif;
+    font-weight: 700;
+    font-size: 9.5px;
+    color: var(--red);
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .section-tag::before { content: '◆'; color: var(--red); font-size: 9px; }
+  .section-tag .sp { flex: 1; height: 1px; background: rgba(255,255,255,0.12); margin-left: 6px; }
+
+  /* Ornamental top line + page number */
+  .pagehead {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    font-family: 'Inter', sans-serif;
+    font-weight: 300;
+    font-size: 9px;
+    color: #7a7a7f;
+    letter-spacing: 0.35em;
+    text-transform: uppercase;
+    padding-bottom: 6px;
+    border-bottom: 1px solid rgba(255,255,255,0.12);
+    margin-bottom: 16px;
+  }
+  .pagehead em {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    color: var(--red-soft);
+    letter-spacing: 0.15em;
+    font-size: 10px;
+  }
+
+  /* ==================================================== */
+  /* =========== 1. HOME — No.028 Cover ================= */
+  /* ==================================================== */
+  .s-home {}
+  .home-logo {
+    font-family: 'Playfair Display', serif;
+    font-weight: 900;
+    font-style: italic;
+    font-size: 60px;
+    line-height: 0.88;
+    letter-spacing: -0.05em;
+    color: #fff;
+    margin-bottom: 6px;
+  }
+  .home-logo .dot { color: var(--red); }
+  .home-tagline {
+    font-family: 'Inter', sans-serif;
+    font-weight: 300;
+    font-size: 10px;
+    color: #9a9a9f;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    padding-bottom: 12px;
+    border-bottom: 2px solid #fff;
+    margin-bottom: 18px;
+  }
+  .home-tagline::before { content: '— '; color: var(--red); letter-spacing: 0; }
+  .home-tagline::after { content: ' —'; color: var(--red); letter-spacing: 0; }
+
+  .cover-lede {
+    font-family: 'Playfair Display', serif;
+    font-weight: 400;
+    font-size: 22px;
+    line-height: 1.3;
+    letter-spacing: -0.015em;
+    color: #fff;
+    margin-bottom: 10px;
+    text-indent: 14px; /* editorial indent */
+  }
+  .cover-lede strong {
+    font-weight: 900;
+    color: var(--red);
+    font-style: italic;
+  }
+  .cover-lede::first-letter {
+    font-family: 'Playfair Display', serif;
+    font-weight: 900;
+    font-style: italic;
+    font-size: 40px;
+    color: var(--red);
+    float: left;
+    line-height: 0.9;
+    margin: 4px 6px 0 0;
+    text-indent: 0;
+  }
+  .cover-meta {
+    font-family: 'Inter', sans-serif;
+    font-weight: 300;
+    font-size: 9.5px;
+    color: #777;
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
+    padding-bottom: 14px;
+    border-bottom: 1px solid rgba(255,255,255,0.12);
+    margin-bottom: 18px;
+  }
+  .cover-meta span { color: var(--red-soft); margin: 0 8px; font-family: 'Playfair Display', serif; font-style: italic; }
+
+  .stat-row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0;
+    padding: 4px 0;
+  }
+  .stat-row .st { padding: 0 10px; border-right: 1px solid rgba(255,255,255,0.12); }
+  .stat-row .st:first-child { padding-left: 0; }
+  .stat-row .st:last-child { padding-right: 0; border-right: none; }
+  .stat-row .k {
+    font-family: 'Inter', sans-serif;
+    font-weight: 700;
+    font-size: 8.5px;
+    color: #7a7a7f;
+    letter-spacing: 0.28em;
+    margin-bottom: 6px;
+    text-transform: uppercase;
+  }
+  .stat-row .v {
+    font-family: 'Playfair Display', serif;
+    font-weight: 400;
+    font-style: italic;
+    font-size: 28px;
+    letter-spacing: -0.03em;
+    line-height: 1;
+    color: #fff;
+  }
+  .stat-row .v small {
+    font-family: 'Inter', sans-serif;
+    font-style: normal;
+    font-weight: 300;
+    font-size: 10px;
+    color: #777;
+    margin-left: 2px;
+  }
+
+  .today-box {
+    margin: 22px 0 22px;
+    background: var(--red);
+    color: #fff;
+    padding: 22px 20px 20px;
+    position: relative;
+  }
+  .today-box::before {
+    content: '';
+    position: absolute;
+    top: 8px; left: 8px; right: 8px; bottom: 8px;
+    border: 1px solid rgba(255,255,255,0.25);
+    pointer-events: none;
+  }
+  .today-kicker {
+    position: relative;
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-size: 10px;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.78);
+    margin-bottom: 6px;
+  }
+  .today-title {
+    position: relative;
+    font-family: 'Playfair Display', serif;
+    font-weight: 900;
+    font-style: italic;
+    font-size: 26px;
+    line-height: 1.05;
+    letter-spacing: -0.02em;
+  }
+  .today-cta {
+    position: relative;
+    margin-top: 14px;
+    padding-top: 10px;
+    border-top: 1px solid rgba(255,255,255,0.3);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-family: 'Inter', sans-serif;
+    font-weight: 700;
+    font-size: 10px;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+  }
+  .today-cta .arr {
+    font-family: 'Playfair Display', serif;
+    font-weight: 400;
+    font-style: italic;
+    font-size: 22px;
+    letter-spacing: 0;
+  }
+
+  .back-head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    margin-bottom: 10px;
+  }
+  .back-head .kicker {
+    font-family: 'Inter', sans-serif;
+    font-weight: 700;
+    font-size: 9.5px;
+    color: var(--red);
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+  }
+  .back-head .kicker::before { content: '◆ '; color: var(--red); }
+  .back-head .more {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-size: 11px;
+    color: #aaa;
+  }
+  .back-rule { height: 2px; background: #fff; margin-bottom: 4px; }
+
+  .issue {
+    display: flex;
+    gap: 12px;
+    align-items: baseline;
+    padding: 12px 0 11px;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+  }
+  .issue:last-child { border-bottom: none; }
+  .issue-no {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-weight: 400;
+    font-size: 22px;
+    color: #4a4a4f;
+    width: 40px;
+    letter-spacing: -0.02em;
+    line-height: 1;
+  }
+  .issue-body { flex: 1; min-width: 0; }
+  .issue-ttl {
+    font-family: 'Playfair Display', serif;
+    font-weight: 400;
+    font-size: 14px;
+    color: #fff;
+    letter-spacing: -0.01em;
+    line-height: 1.15;
+  }
+  .issue-ttl b { font-weight: 900; font-style: italic; }
+  .issue-meta {
+    font-family: 'Inter', sans-serif;
+    font-weight: 300;
+    font-size: 9px;
+    color: #777;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    margin-top: 3px;
+  }
+  .issue-v {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-weight: 700;
+    font-size: 15px;
+    color: var(--red);
+    letter-spacing: -0.01em;
+  }
+  .issue-v.neg { color: #555; text-decoration: line-through; text-decoration-thickness: 1px; }
+
+  /* ==================================================== */
+  /* ========== 2. PREPARE — This Issue ================== */
+  /* ==================================================== */
+  .prep-back {
+    font-family: 'Inter', sans-serif;
+    font-weight: 400;
+    font-size: 10px;
+    color: #888;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    margin-bottom: 20px;
+  }
+  .prep-back::before { content: '←  '; color: var(--red); font-family: 'Playfair Display', serif; font-style: italic; }
+  .prep-kicker {
+    font-family: 'Inter', sans-serif;
+    font-weight: 700;
+    font-size: 10px;
+    color: var(--red);
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+  }
+  .prep-issue {
+    font-family: 'Inter', sans-serif;
+    font-weight: 200;
+    font-size: 10px;
+    color: #777;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+  }
+  .prep-title {
+    font-family: 'Playfair Display', serif;
+    font-weight: 900;
+    font-style: italic;
+    font-size: 36px;
+    line-height: 0.98;
+    letter-spacing: -0.04em;
+    color: #fff;
+    margin-bottom: 6px;
+  }
+  .prep-deck {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-weight: 400;
+    font-size: 13px;
+    color: #bcbcbf;
+    line-height: 1.5;
+    padding-bottom: 14px;
+    border-bottom: 2px solid #fff;
+    margin-bottom: 18px;
+  }
+
+  .article-row {
+    display: grid;
+    grid-template-columns: 92px 1fr;
+    gap: 14px;
+    padding: 14px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.12);
+  }
+  .article-row:last-of-type { border-bottom: 1px solid rgba(255,255,255,0.4); }
+  .article-row .lbl {
+    font-family: 'Inter', sans-serif;
+    font-weight: 700;
+    font-size: 9px;
+    color: var(--red);
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    padding-top: 4px;
+  }
+  .article-row .bd .v {
+    font-family: 'Playfair Display', serif;
+    font-weight: 400;
+    font-style: italic;
+    font-size: 19px;
+    color: #fff;
+    letter-spacing: -0.01em;
+    line-height: 1.1;
+  }
+  .article-row .bd .v b { font-weight: 900; color: var(--red); }
+  .article-row .bd .d {
+    font-family: 'Inter', sans-serif;
+    font-weight: 300;
+    font-size: 10.5px;
+    color: #888;
+    letter-spacing: 0.04em;
+    margin-top: 4px;
+    line-height: 1.4;
+  }
+
+  .prep-option {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 10px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+    font-family: 'Inter', sans-serif;
+  }
+  .prep-option .l {
+    font-weight: 300; font-size: 11px; color: #aaa; letter-spacing: 0.1em;
+  }
+  .prep-option .r {
+    font-family: 'Playfair Display', serif;
+    font-style: italic; font-weight: 700; font-size: 13px; color: #fff;
+  }
+
+  .begin-btn {
+    margin-top: 22px;
+    background: var(--red);
+    color: #fff;
+    padding: 22px;
+    position: relative;
+    text-align: center;
+  }
+  .begin-btn::before {
+    content: '';
+    position: absolute;
+    top: 6px; left: 6px; right: 6px; bottom: 6px;
+    border: 1px solid rgba(255,255,255,0.3);
+  }
+  .begin-btn .t {
+    position: relative;
+    font-family: 'Playfair Display', serif;
+    font-weight: 900;
+    font-style: italic;
+    font-size: 28px;
+    letter-spacing: -0.02em;
+    line-height: 1;
+  }
+  .begin-btn .s {
+    position: relative;
+    margin-top: 6px;
+    font-family: 'Inter', sans-serif;
+    font-weight: 700;
+    font-size: 9px;
+    color: rgba(255,255,255,0.78);
+    letter-spacing: 0.35em;
+    text-transform: uppercase;
+  }
+
+  /* ==================================================== */
+  /* ========== 3. RUNNING — Live Edition ================ */
+  /* ==================================================== */
+  .live-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    padding-bottom: 8px;
+    border-bottom: 2px solid #fff;
+    margin-bottom: 18px;
+  }
+  .live-head .l {
+    font-family: 'Inter', sans-serif;
+    font-weight: 700;
+    font-size: 10px;
+    color: var(--red);
+    letter-spacing: 0.32em;
+    text-transform: uppercase;
+    display: flex; align-items: center; gap: 6px;
+  }
+  .live-head .l .dot {
+    width: 7px; height: 7px; background: var(--red); border-radius: 50%;
+    box-shadow: 0 0 10px var(--red);
+    animation: blink 1.2s infinite;
+  }
+  @keyframes blink { 0%, 55% { opacity: 1; } 56%, 100% { opacity: 0.25; } }
+  .live-head .r {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-size: 12px;
+    color: #bbb;
+    letter-spacing: 0.08em;
+  }
+
+  .live-kicker {
+    font-family: 'Inter', sans-serif;
+    font-weight: 700;
+    font-size: 9px;
+    color: #888;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    margin-bottom: 2px;
+  }
+  .live-number {
+    font-family: 'Playfair Display', serif;
+    font-weight: 900;
+    font-style: italic;
+    font-size: 140px;
+    line-height: 0.85;
+    letter-spacing: -0.065em;
+    color: #fff;
+    text-align: left;
+    margin: 4px 0 0;
+  }
+  .live-number .m {
+    font-family: 'Inter', sans-serif;
+    font-style: normal;
+    font-weight: 300;
+    font-size: 22px;
+    color: var(--red);
+    letter-spacing: 0.2em;
+    margin-left: 6px;
+    vertical-align: top;
+    display: inline-block;
+    transform: translateY(14px);
+  }
+  .live-caption {
+    font-family: 'Inter', sans-serif;
+    font-weight: 700;
+    font-size: 9px;
+    color: var(--red);
+    letter-spacing: 0.35em;
+    text-transform: uppercase;
+    padding-top: 10px;
+    border-top: 1px solid rgba(255,255,255,0.3);
+    margin-top: 10px;
+  }
+  .live-deck {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-size: 12px;
+    color: #9a9a9f;
+    margin-top: 4px;
+    margin-bottom: 16px;
+  }
+
+  .map-frame {
+    position: relative;
+    height: 150px;
+    background:
+      linear-gradient(180deg, rgba(220,38,38,0.06), transparent 70%),
+      #0f0f12;
+    border: 1px solid rgba(255,255,255,0.18);
+    margin-bottom: 18px;
+    overflow: hidden;
+  }
+  .map-frame::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+      repeating-linear-gradient(0deg, transparent 0, transparent 14px, rgba(255,255,255,0.06) 14px, rgba(255,255,255,0.06) 15px),
+      repeating-linear-gradient(90deg, transparent 0, transparent 14px, rgba(255,255,255,0.06) 14px, rgba(255,255,255,0.06) 15px);
+  }
+  .map-frame .label-tl {
+    position: absolute; top: 8px; left: 10px;
+    font-family: 'Inter', sans-serif;
+    font-weight: 700; font-size: 8.5px;
+    color: rgba(255,255,255,0.45); letter-spacing: 0.3em;
+  }
+  .map-frame .label-br {
+    position: absolute; bottom: 8px; right: 10px;
+    font-family: 'Playfair Display', serif;
+    font-style: italic; font-size: 11px; color: rgba(255,255,255,0.5);
+  }
+  .dot-you, .dot-them {
+    position: absolute;
+    width: 12px; height: 12px; border-radius: 50%;
+  }
+  .dot-you {
+    top: 46%; left: 32%;
+    background: #fff;
+    box-shadow: 0 0 0 2px rgba(255,255,255,0.25), 0 0 14px rgba(255,255,255,0.6);
+  }
+  .dot-them {
+    top: 68%; left: 58%;
+    background: var(--red);
+    box-shadow: 0 0 0 2px rgba(220,38,38,0.25), 0 0 18px rgba(220,38,38,0.9);
+    animation: pulseR 1.6s infinite;
+  }
+  @keyframes pulseR { 0%,100% { transform: scale(1); } 50% { transform: scale(1.25); } }
+  .map-line {
+    position: absolute;
+    top: 49%; left: 37%;
+    width: 28%; height: 1px;
+    background: repeating-linear-gradient(90deg, var(--red) 0, var(--red) 4px, transparent 4px, transparent 8px);
+    transform: rotate(22deg);
+    transform-origin: left center;
+  }
+
+  .live-stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    padding: 10px 0;
+    border-top: 2px solid #fff;
+    border-bottom: 1px solid rgba(255,255,255,0.3);
+  }
+  .live-stats .st { padding: 6px 8px; border-right: 1px solid rgba(255,255,255,0.12); text-align: left; }
+  .live-stats .st:last-child { border-right: none; padding-right: 0; }
+  .live-stats .st:first-child { padding-left: 0; }
+  .live-stats .k {
+    font-family: 'Inter', sans-serif;
+    font-weight: 700; font-size: 8.5px;
+    color: #777; letter-spacing: 0.28em;
+    text-transform: uppercase; margin-bottom: 5px;
+  }
+  .live-stats .v {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-weight: 400; font-size: 22px; line-height: 1;
+    color: #fff; letter-spacing: -0.02em;
+  }
+  .live-stats .v small {
+    font-family: 'Inter', sans-serif; font-style: normal;
+    font-weight: 300; font-size: 9px; color: #777;
+    letter-spacing: 0.05em; margin-left: 2px;
+  }
+
+  .interrupt {
+    margin-top: 18px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 14px 4px;
+    border-top: 1px solid rgba(255,255,255,0.2);
+  }
+  .interrupt .l {
+    font-family: 'Inter', sans-serif;
+    font-weight: 700; font-size: 10px;
+    color: #fff; letter-spacing: 0.35em; text-transform: uppercase;
+  }
+  .interrupt .icn {
+    font-family: 'Playfair Display', serif;
+    font-style: italic; font-weight: 900;
+    font-size: 20px; color: var(--red);
+    width: 42px; height: 42px; border: 1px solid rgba(255,255,255,0.3);
+    display: flex; align-items: center; justify-content: center;
+    border-radius: 50%;
+  }
+
+  /* ==================================================== */
+  /* ========== 4. RESULT — Cover Story · Closed ========= */
+  /* ==================================================== */
+  .res-meta {
+    font-family: 'Inter', sans-serif;
+    font-weight: 300;
+    font-size: 10px;
+    color: #888;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    padding-bottom: 10px;
+    border-bottom: 2px solid #fff;
+    margin-bottom: 16px;
+  }
+  .res-meta em {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    color: var(--red);
+    margin-right: 6px;
+    letter-spacing: 0.1em;
+  }
+  .res-kicker {
+    font-family: 'Inter', sans-serif;
+    font-weight: 700;
+    font-size: 9.5px;
+    color: var(--red);
+    letter-spacing: 0.35em;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+  .res-verdict {
+    font-family: 'Playfair Display', serif;
+    font-weight: 900;
+    font-style: italic;
+    font-size: 64px;
+    line-height: 0.9;
+    letter-spacing: -0.05em;
+    color: #fff;
+    margin-bottom: 6px;
+  }
+  .res-dek {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-weight: 400;
+    font-size: 13.5px;
+    line-height: 1.5;
+    color: #bbb;
+    padding-bottom: 14px;
+    border-bottom: 1px solid rgba(255,255,255,0.15);
+    margin-bottom: 18px;
+  }
+  .res-dek b { color: var(--red); font-weight: 900; }
+
+  .chart-wrap { margin: 16px 0 20px; }
+  .chart-ttl {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-size: 13px;
+    color: #fff;
+    letter-spacing: -0.01em;
+    margin-bottom: 6px;
+  }
+  .chart-ttl small {
+    font-family: 'Inter', sans-serif;
+    font-style: normal;
+    font-size: 8.5px;
+    color: #777;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    margin-left: 8px;
+  }
+  .chart-box {
+    border-top: 2px solid #fff;
+    border-bottom: 2px solid #fff;
+    padding: 10px 0 6px;
+    position: relative;
+  }
+  .chart-box svg { display: block; width: 100%; height: 100px; }
+  .chart-axis {
+    display: flex; justify-content: space-between;
+    font-family: 'Inter', sans-serif;
+    font-weight: 300;
+    font-size: 8.5px;
+    color: #777;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    padding-top: 6px;
+  }
+
+  .detail-row {
+    display: flex; justify-content: space-between;
+    padding: 10px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+    font-family: 'Inter', sans-serif;
+  }
+  .detail-row .k {
+    font-weight: 700; font-size: 9px;
+    color: #888; letter-spacing: 0.3em;
+    text-transform: uppercase;
+  }
+  .detail-row .v {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-size: 13px;
+    font-weight: 400;
+    color: #fff;
+  }
+
+  /* ==================================================== */
+  /* ========== 5. HISTORY — The Archive ================ */
+  /* ==================================================== */
+  .hist-title {
+    font-family: 'Playfair Display', serif;
+    font-weight: 900;
+    font-style: italic;
+    font-size: 46px;
+    line-height: 0.95;
+    letter-spacing: -0.04em;
+    color: #fff;
+  }
+  .hist-deck {
+    font-family: 'Inter', sans-serif;
+    font-weight: 300;
+    font-size: 10px;
+    color: #888;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    padding-bottom: 12px;
+    border-bottom: 2px solid #fff;
+    margin-bottom: 16px;
+  }
+  .hist-summary {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    padding: 10px 0 16px;
+    border-bottom: 1px solid rgba(255,255,255,0.12);
+    margin-bottom: 14px;
+  }
+  .hist-summary .st { padding: 0 8px; border-right: 1px solid rgba(255,255,255,0.12); }
+  .hist-summary .st:first-child { padding-left: 0; }
+  .hist-summary .st:last-child { border-right: none; padding-right: 0; }
+  .hist-summary .k {
+    font-family: 'Inter', sans-serif; font-weight: 700;
+    font-size: 8px; color: #777; letter-spacing: 0.3em;
+    text-transform: uppercase; margin-bottom: 6px;
+  }
+  .hist-summary .v {
+    font-family: 'Playfair Display', serif; font-style: italic;
+    font-size: 22px; font-weight: 400; color: #fff;
+    line-height: 1; letter-spacing: -0.02em;
+  }
+  .hist-summary .v small {
+    font-family: 'Inter', sans-serif; font-style: normal;
+    font-weight: 300; font-size: 9px; color: #777; margin-left: 1px;
+  }
+
+  .month-label {
+    font-family: 'Inter', sans-serif;
+    font-weight: 700;
+    font-size: 9px;
+    color: var(--red);
+    letter-spacing: 0.35em;
+    text-transform: uppercase;
+    margin: 14px 0 6px;
+  }
+  .month-label::before { content: '◆ '; }
+
+  .arc-row {
+    display: grid;
+    grid-template-columns: 36px 1fr auto;
+    gap: 10px;
+    align-items: baseline;
+    padding: 10px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+  }
+  .arc-row .no {
+    font-family: 'Playfair Display', serif;
+    font-style: italic; font-weight: 400;
+    font-size: 18px; color: #4a4a4f;
+    line-height: 1;
+  }
+  .arc-row .tt {
+    font-family: 'Playfair Display', serif;
+    font-size: 13px; font-weight: 400;
+    color: #fff; line-height: 1.2;
+  }
+  .arc-row .mt {
+    font-family: 'Inter', sans-serif;
+    font-weight: 300; font-size: 9px;
+    color: #777; letter-spacing: 0.22em;
+    text-transform: uppercase; margin-top: 2px;
+  }
+  .arc-row .st {
+    font-family: 'Playfair Display', serif; font-style: italic;
+    font-weight: 700; font-size: 11px;
+    color: var(--red); letter-spacing: 0.1em;
+    text-align: right; min-width: 78px;
+  }
+  .arc-row .st.caught { color: #555; }
+  .arc-row .st small {
+    display: block;
+    font-family: 'Inter', sans-serif;
+    font-style: normal; font-weight: 700;
+    font-size: 8px; letter-spacing: 0.3em;
+    text-transform: uppercase; color: #888;
+    margin-top: 2px;
+  }
+
+  /* ==================================================== */
+  /* ========== 6. SETTINGS — Masthead =================== */
+  /* ==================================================== */
+  .mast-title {
+    font-family: 'Playfair Display', serif;
+    font-weight: 900;
+    font-style: italic;
+    font-size: 50px;
+    line-height: 0.95;
+    letter-spacing: -0.04em;
+    color: #fff;
+  }
+  .mast-deck {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-weight: 400;
+    font-size: 12.5px;
+    color: #bbb;
+    padding-bottom: 14px;
+    border-bottom: 2px solid #fff;
+    margin-bottom: 18px;
+  }
+
+  .profile-card {
+    border: 1px solid rgba(255,255,255,0.16);
+    padding: 18px 16px;
+    margin-bottom: 20px;
+    display: flex;
+    gap: 14px;
+    align-items: center;
+    position: relative;
+  }
+  .profile-card::before {
+    content: 'NO. 028'; position: absolute;
+    top: 6px; right: 10px;
+    font-family: 'Playfair Display', serif; font-style: italic;
+    font-size: 9px; color: #444; letter-spacing: 0.25em;
+  }
+  .profile-avatar {
+    width: 52px; height: 52px; border-radius: 50%;
+    border: 1px solid var(--red);
+    background: #111;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Playfair Display', serif;
+    font-style: italic; font-weight: 900; font-size: 22px;
+    color: var(--red);
+    flex-shrink: 0;
+  }
+  .profile-info .n {
+    font-family: 'Playfair Display', serif;
+    font-weight: 400;
+    font-size: 18px;
+    letter-spacing: -0.01em;
+    color: #fff;
+  }
+  .profile-info .n b { font-weight: 900; font-style: italic; }
+  .profile-info .tag {
+    display: inline-block;
+    margin-top: 4px;
+    padding: 2px 7px;
+    background: var(--red);
+    color: #fff;
+    font-family: 'Inter', sans-serif;
+    font-weight: 800;
+    font-size: 8.5px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+  }
+  .profile-info .e {
+    font-family: 'Inter', sans-serif;
+    font-weight: 300;
+    font-size: 10px;
+    color: #777;
+    letter-spacing: 0.05em;
+    margin-top: 4px;
+  }
+
+  .set-group { margin-bottom: 16px; }
+  .set-head {
+    display: flex; align-items: baseline; gap: 10px;
+    margin-bottom: 4px;
+  }
+  .set-head .lbl {
+    font-family: 'Inter', sans-serif;
+    font-weight: 700; font-size: 9.5px;
+    color: var(--red); letter-spacing: 0.32em;
+    text-transform: uppercase;
+  }
+  .set-head .lbl::before { content: '◆ '; }
+  .set-head .sp { flex: 1; height: 1px; background: rgba(255,255,255,0.25); }
+  .set-head .pg {
+    font-family: 'Playfair Display', serif;
+    font-style: italic; font-size: 11px; color: #666;
+  }
+
+  .set-row {
+    display: flex; justify-content: space-between;
+    align-items: center; padding: 11px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+  }
+  .set-row:last-child { border-bottom: none; }
+  .set-row .l {
+    font-family: 'Inter', sans-serif;
+    font-weight: 400; font-size: 12px;
+    color: #ddd; letter-spacing: 0.01em;
+  }
+  .set-row .r {
+    font-family: 'Playfair Display', serif;
+    font-style: italic; font-size: 12.5px;
+    color: #999;
+  }
+  .set-row .r.on { color: var(--red); font-weight: 700; }
+
+  .mast-foot-print {
+    margin-top: 26px;
+    padding-top: 14px;
+    border-top: 2px solid #fff;
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-size: 10.5px;
+    line-height: 1.6;
+    color: #666;
+    text-align: center;
+    letter-spacing: 0.05em;
+  }
+  .mast-foot-print b {
+    font-family: 'Inter', sans-serif;
+    font-style: normal; font-weight: 700;
+    letter-spacing: 0.25em; text-transform: uppercase;
+    color: var(--red); font-size: 9.5px;
+  }
+
+  /* Responsive */
+  @media (max-width: 1180px) {
+    .stage { grid-template-columns: repeat(2, 1fr); gap: 50px 28px; }
+  }
+  @media (max-width: 780px) {
+    .stage { grid-template-columns: 1fr; }
+    .page-header h1 { font-size: 40px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ============== PAGE MASTHEAD ============== -->
+<div class="page-header">
+  <div class="mast-top">
+    <span>Shadow Run Magazine</span>
+    <em>No. 04 / Editorial Thriller</em>
+    <span>17.04.2026</span>
+  </div>
+  <div class="mast-rule"></div>
+  <h1><b>SHADOW RUN.</b></h1>
+  <div class="mast-sub">Theme 04 <span>·</span> Editorial Thriller <span>·</span> Full Screens</div>
+  <div class="mast-rule-bot"></div>
+  <div class="mast-foot">"The Chase Never Sleeps" — a monthly issue of pursuit, paced in chapters.</div>
+</div>
+
+<div class="stage">
+
+  <!-- ================================================ -->
+  <!-- ============= 1. HOME / COVER ================== -->
+  <!-- ================================================ -->
+  <div class="cell">
+    <div class="phone">
+      <div class="notch"></div>
+      <div class="screen s-home">
+        <div class="statusbar"><span>9:41</span><span class="dots">●●●●  ●●</span></div>
+        <div class="ed-body">
+          <div class="pagehead">
+            <span>Cover · P. 01</span>
+            <em>April</em>
+            <span>shadowrun / home</span>
+          </div>
+
+          <div class="ed-no">No. 028</div>
+          <div class="ed-issue">April Issue · 17.04.2026</div>
+          <div class="rule-thick"></div>
+
+          <div class="home-logo">Shadow<br>Run<span class="dot">.</span></div>
+          <div class="home-tagline">The Chase Never Sleeps</div>
+
+          <div class="section-tag">Cover Story <span class="sp"></span></div>
+          <div class="cover-lede">그는 어젯밤, 당신의 <strong>312미터</strong> 뒤까지 따라붙었다.</div>
+          <div class="cover-meta">Seongdong <span>·</span> 04:12 AM <span>·</span> Ch. 28</div>
+
+          <div class="stat-row">
+            <div class="st"><div class="k">Week</div><div class="v">12.4<small>km</small></div></div>
+            <div class="st"><div class="k">Chapters</div><div class="v">28</div></div>
+            <div class="st"><div class="k">Best</div><div class="v">412<small>m</small></div></div>
+          </div>
+
+          <div class="today-box">
+            <div class="today-kicker">Today's Issue · No. 029</div>
+            <div class="today-title">Chapter Twenty-Nine<br>begins now.</div>
+            <div class="today-cta"><span>Begin Reading</span><span class="arr">›</span></div>
+          </div>
+
+          <div class="back-head">
+            <div class="kicker">Back Issues</div>
+            <div class="more">all issues ›</div>
+          </div>
+          <div class="back-rule"></div>
+
+          <div class="issue">
+            <div class="issue-no">028</div>
+            <div class="issue-body">
+              <div class="issue-ttl">성동구의 <b>밤</b></div>
+              <div class="issue-meta">3.42km · 04.16 · Escaped</div>
+            </div>
+            <div class="issue-v">+312</div>
+          </div>
+          <div class="issue">
+            <div class="issue-no">027</div>
+            <div class="issue-body">
+              <div class="issue-ttl">한강의 <b>그림자</b></div>
+              <div class="issue-meta">2.18km · 04.15 · Caught</div>
+            </div>
+            <div class="issue-v neg">−018</div>
+          </div>
+          <div class="issue">
+            <div class="issue-no">026</div>
+            <div class="issue-body">
+              <div class="issue-ttl">남산의 <b>긴 숨</b></div>
+              <div class="issue-meta">4.80km · 04.14 · Escaped</div>
+            </div>
+            <div class="issue-v">+520</div>
+          </div>
+          <div class="issue">
+            <div class="issue-no">025</div>
+            <div class="issue-body">
+              <div class="issue-ttl">종로의 <b>빈 골목</b></div>
+              <div class="issue-meta">3.02km · 04.13 · Escaped</div>
+            </div>
+            <div class="issue-v">+208</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="cell-label">
+      <div class="no">01</div>
+      <div class="tt">
+        <div class="kicker">Home · The Cover</div>
+        <div class="name">No. 028 · April Issue</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================================================ -->
+  <!-- ============= 2. PREPARE / THIS ISSUE =========== -->
+  <!-- ================================================ -->
+  <div class="cell">
+    <div class="phone">
+      <div class="notch"></div>
+      <div class="screen">
+        <div class="statusbar"><span>9:41</span><span class="dots">●●●●  ●●</span></div>
+        <div class="ed-body">
+          <div class="pagehead">
+            <span>Feature · P. 02</span>
+            <em>Preview</em>
+            <span>shadowrun / prepare</span>
+          </div>
+
+          <div class="prep-back">Back to Home</div>
+
+          <div class="prep-kicker">Issue 029 · Preview</div>
+          <div class="prep-issue">This Month's Reading</div>
+          <div class="prep-title">Preparing<br>Chapter 29.</div>
+          <div class="prep-deck">"오늘 밤 당신을 쫓을 그림자에 대하여." — 장비를 확인하고, 거리를 정하라. 그는 이미 숨을 고르고 있다.</div>
+
+          <div class="article-row">
+            <div class="lbl">Subject</div>
+            <div class="bd">
+              <div class="v">Doppelgänger <b>V-7</b></div>
+              <div class="d">어제보다 12% 빨라진 속도. 추적 알고리즘 학습형.</div>
+            </div>
+          </div>
+          <div class="article-row">
+            <div class="lbl">Equipment</div>
+            <div class="bd">
+              <div class="v">Earbuds <i>only</i></div>
+              <div class="d">이어폰 연결 · 위치 허용 · 배터리 64%</div>
+            </div>
+          </div>
+          <div class="article-row">
+            <div class="lbl">Distance</div>
+            <div class="bd">
+              <div class="v"><b>3.0</b> kilometers</div>
+              <div class="d">예상 소요 22분 · 평균 페이스 7'20''</div>
+            </div>
+          </div>
+
+          <div class="section-tag" style="margin-top:20px;">Options <span class="sp"></span></div>
+          <div class="prep-option"><div class="l">Voice Narrator</div><div class="r">Noir · EN</div></div>
+          <div class="prep-option"><div class="l">Music</div><div class="r">System Only</div></div>
+          <div class="prep-option"><div class="l">Difficulty</div><div class="r">Adaptive</div></div>
+
+          <div class="begin-btn">
+            <div class="t">Begin.</div>
+            <div class="s">Chapter 29 · 03km · Adaptive</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="cell-label">
+      <div class="no">02</div>
+      <div class="tt">
+        <div class="kicker">Prepare · This Issue</div>
+        <div class="name">Preparing Chapter 29</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================================================ -->
+  <!-- ============= 3. RUNNING / LIVE ================= -->
+  <!-- ================================================ -->
+  <div class="cell">
+    <div class="phone">
+      <div class="notch"></div>
+      <div class="screen">
+        <div class="statusbar"><span>9:41</span><span class="dots">●●●●  ●●</span></div>
+        <div class="ed-body">
+          <div class="pagehead">
+            <span>Live · P. 03</span>
+            <em>In Progress</em>
+            <span>shadowrun / running</span>
+          </div>
+
+          <div class="live-head">
+            <div class="l"><span class="dot"></span> Live · No. 029</div>
+            <div class="r">00:08:41 <em style="font-style:normal;color:#666;letter-spacing:0.3em;font-size:9px;margin-left:6px;">ELAPSED</em></div>
+          </div>
+
+          <div class="live-kicker">Distance from Subject</div>
+          <div class="live-number">152<span class="m">m</span></div>
+          <div class="live-caption">The shadow is <span style="color:#fff;">gaining</span>. Minutes to contact · 04:20</div>
+          <div class="live-deck">"그는 한 번도 지친 적이 없다."</div>
+
+          <div class="map-frame">
+            <div class="label-tl">FIG. 01 · RELATIVE</div>
+            <div class="label-br"><em>scale 1 : 4,000</em></div>
+            <div class="map-line"></div>
+            <div class="dot-you"></div>
+            <div class="dot-them"></div>
+          </div>
+
+          <div class="live-stats">
+            <div class="st"><div class="k">Pace</div><div class="v">5'42"<small></small></div></div>
+            <div class="st"><div class="k">Distance</div><div class="v">1.48<small>km</small></div></div>
+            <div class="st"><div class="k">Heart</div><div class="v">168<small>bpm</small></div></div>
+          </div>
+
+          <div class="section-tag" style="margin-top:20px;">Column <span class="sp"></span></div>
+          <div style="font-family:'Playfair Display',serif;font-style:italic;font-size:13px;line-height:1.5;color:#bbb;margin-bottom:4px;">
+            "당신이 숨을 고르는 지금, 그 역시 숨을 고른다. 단, 그는 절대 멈추지 않는다."
+          </div>
+          <div style="font-family:'Inter',sans-serif;font-size:9px;color:#666;letter-spacing:0.25em;text-transform:uppercase;">— narrator log · 08:41</div>
+
+          <div class="interrupt">
+            <div class="l">Interrupt Chapter</div>
+            <div class="icn">II</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="cell-label">
+      <div class="no">03</div>
+      <div class="tt">
+        <div class="kicker">Running · Live Edition</div>
+        <div class="name">Chapter 29 · In Progress</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================================================ -->
+  <!-- ============= 4. RESULT / COVER STORY CLOSED ==== -->
+  <!-- ================================================ -->
+  <div class="cell">
+    <div class="phone">
+      <div class="notch"></div>
+      <div class="screen">
+        <div class="statusbar"><span>9:41</span><span class="dots">●●●●  ●●</span></div>
+        <div class="ed-body">
+          <div class="pagehead">
+            <span>Cover Story · P. 04</span>
+            <em>Closed</em>
+            <span>shadowrun / result</span>
+          </div>
+
+          <div class="res-meta"><em>No. 028</em> · Closed · 04.16.2026 · 24 min</div>
+
+          <div class="res-kicker">Cover Story · Verdict</div>
+          <div class="res-verdict">ESCAPED.</div>
+          <div class="res-dek">Tonight, the subject was <b>faster</b>. The shadow never caught up — it closed to 180m at minute nine, then fell back. The night ended, as it must, in silence.</div>
+
+          <div class="section-tag">Statistics <span class="sp"></span></div>
+          <div class="stat-row" style="padding:4px 0 10px;">
+            <div class="st"><div class="k">Distance</div><div class="v">3.42<small>km</small></div></div>
+            <div class="st"><div class="k">Pace</div><div class="v">7'06"</div></div>
+            <div class="st"><div class="k">Gap</div><div class="v">+312<small>m</small></div></div>
+          </div>
+
+          <div class="chart-wrap">
+            <div class="chart-ttl">The Distance, Minute by Minute.<small>FIG. 02</small></div>
+            <div class="chart-box">
+              <svg viewBox="0 0 300 100" preserveAspectRatio="none">
+                <!-- gridlines -->
+                <line x1="0" y1="20" x2="300" y2="20" stroke="rgba(255,255,255,0.07)" stroke-width="0.5"/>
+                <line x1="0" y1="50" x2="300" y2="50" stroke="rgba(255,255,255,0.07)" stroke-width="0.5"/>
+                <line x1="0" y1="80" x2="300" y2="80" stroke="rgba(255,255,255,0.07)" stroke-width="0.5"/>
+
+                <!-- contact threshold -->
+                <line x1="0" y1="82" x2="300" y2="82" stroke="#DC2626" stroke-width="0.6" stroke-dasharray="3 3" opacity="0.6"/>
+                <text x="4" y="79" fill="#DC2626" font-family="Inter" font-size="6" letter-spacing="1.2">CONTACT</text>
+
+                <!-- data path (distance grew, almost lost, grew again) -->
+                <path d="M 0 65 L 25 58 L 55 48 L 85 36 L 115 28 L 145 30 L 175 62 L 205 78 L 235 55 L 265 34 L 300 18"
+                      fill="none" stroke="#fff" stroke-width="1.4" stroke-linejoin="round" stroke-linecap="round"/>
+
+                <!-- near-contact marker -->
+                <circle cx="205" cy="78" r="2.5" fill="#DC2626"/>
+                <text x="210" y="76" fill="#DC2626" font-family="Playfair Display" font-style="italic" font-size="7">180m · min 9</text>
+
+                <!-- end marker -->
+                <circle cx="300" cy="18" r="2.5" fill="#fff"/>
+              </svg>
+            </div>
+            <div class="chart-axis">
+              <span>00:00</span><span>08:00</span><span>16:00</span><span>24:00</span>
+            </div>
+          </div>
+
+          <div class="section-tag">Details <span class="sp"></span></div>
+          <div class="detail-row"><div class="k">Subject</div><div class="v">Doppelgänger V-6</div></div>
+          <div class="detail-row"><div class="k">Route</div><div class="v">Seongdong Loop</div></div>
+          <div class="detail-row"><div class="k">Weather</div><div class="v">Clear · 11°C</div></div>
+          <div class="detail-row"><div class="k">Calories</div><div class="v">284 kcal</div></div>
+          <div class="detail-row"><div class="k">Started</div><div class="v">03:48 AM</div></div>
+
+          <div class="mast-foot-print" style="margin-top:20px;">
+            "오늘 밤, 그림자는 조금 더 가까워졌다."<br>
+            <b>— Filed 04:12, Seongdong</b>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="cell-label">
+      <div class="no">04</div>
+      <div class="tt">
+        <div class="kicker">Result · Cover Story Closed</div>
+        <div class="name">No. 028 · Escaped</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================================================ -->
+  <!-- ============= 5. HISTORY / ARCHIVE ============== -->
+  <!-- ================================================ -->
+  <div class="cell">
+    <div class="phone">
+      <div class="notch"></div>
+      <div class="screen">
+        <div class="statusbar"><span>9:41</span><span class="dots">●●●●  ●●</span></div>
+        <div class="ed-body">
+          <div class="pagehead">
+            <span>Archive · P. 05</span>
+            <em>2026</em>
+            <span>shadowrun / history</span>
+          </div>
+
+          <div class="ed-no">All Issues</div>
+          <div class="ed-issue">The Archive · 2026</div>
+          <div class="rule-thick"></div>
+
+          <div class="hist-title">The<br><em style="font-style:italic;color:var(--red);">Archive</em>.</div>
+          <div class="hist-deck">All issues · filed by month · back to January</div>
+
+          <div class="hist-summary">
+            <div class="st"><div class="k">Issues</div><div class="v">28</div></div>
+            <div class="st"><div class="k">Distance</div><div class="v">64.8<small>km</small></div></div>
+            <div class="st"><div class="k">Score</div><div class="v">22<small style="letter-spacing:0.1em;">:</small>6</div></div>
+          </div>
+
+          <div class="month-label">April 2026 · 12 Issues</div>
+          <div class="arc-row">
+            <div class="no">028</div>
+            <div><div class="tt">성동구의 <i>밤</i></div><div class="mt">04.16 · 3.42km</div></div>
+            <div class="st">ESCAPED<small>+312m</small></div>
+          </div>
+          <div class="arc-row">
+            <div class="no">027</div>
+            <div><div class="tt">한강의 <i>그림자</i></div><div class="mt">04.15 · 2.18km</div></div>
+            <div class="st caught">CAUGHT<small>−018m</small></div>
+          </div>
+          <div class="arc-row">
+            <div class="no">026</div>
+            <div><div class="tt">남산의 <i>긴 숨</i></div><div class="mt">04.14 · 4.80km</div></div>
+            <div class="st">ESCAPED<small>+520m</small></div>
+          </div>
+          <div class="arc-row">
+            <div class="no">025</div>
+            <div><div class="tt">종로의 <i>빈 골목</i></div><div class="mt">04.13 · 3.02km</div></div>
+            <div class="st">ESCAPED<small>+208m</small></div>
+          </div>
+          <div class="arc-row">
+            <div class="no">024</div>
+            <div><div class="tt">용산의 <i>비</i></div><div class="mt">04.12 · 2.64km</div></div>
+            <div class="st caught">CAUGHT<small>−042m</small></div>
+          </div>
+
+          <div class="month-label" style="margin-top:18px;">March 2026 · 10 Issues</div>
+          <div class="arc-row">
+            <div class="no">016</div>
+            <div><div class="tt">잠실의 <i>새벽</i></div><div class="mt">03.28 · 5.10km</div></div>
+            <div class="st">ESCAPED<small>+612m</small></div>
+          </div>
+          <div class="arc-row">
+            <div class="no">015</div>
+            <div><div class="tt">광화문 <i>후일담</i></div><div class="mt">03.24 · 3.80km</div></div>
+            <div class="st">ESCAPED<small>+180m</small></div>
+          </div>
+          <div class="arc-row">
+            <div class="no">014</div>
+            <div><div class="tt">이태원의 <i>밤비</i></div><div class="mt">03.21 · 2.40km</div></div>
+            <div class="st caught">CAUGHT<small>−084m</small></div>
+          </div>
+
+          <div class="mast-foot-print" style="margin-top:20px;">
+            "어떤 밤은 이기고, 어떤 밤은 진다. 모든 밤은 기록된다."
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="cell-label">
+      <div class="no">05</div>
+      <div class="tt">
+        <div class="kicker">History · The Archive</div>
+        <div class="name">All Issues · 2026</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================================================ -->
+  <!-- ============= 6. SETTINGS / MASTHEAD ============ -->
+  <!-- ================================================ -->
+  <div class="cell">
+    <div class="phone">
+      <div class="notch"></div>
+      <div class="screen">
+        <div class="statusbar"><span>9:41</span><span class="dots">●●●●  ●●</span></div>
+        <div class="ed-body">
+          <div class="pagehead">
+            <span>Colophon · P. 06</span>
+            <em>Masthead</em>
+            <span>shadowrun / settings</span>
+          </div>
+
+          <div class="ed-no">Vol. 01</div>
+          <div class="ed-issue">The Masthead · Staff & Settings</div>
+          <div class="rule-thick"></div>
+
+          <div class="mast-title">Masthead.</div>
+          <div class="mast-deck">"누가 이 매거진을 만들었는가" — 판권지이자 설정집.</div>
+
+          <div class="profile-card">
+            <div class="profile-avatar">D</div>
+            <div class="profile-info">
+              <div class="n">Editor · <b>Doris</b></div>
+              <div class="tag">Pro · Founding Reader</div>
+              <div class="e">dorisurararara@gmail.com</div>
+            </div>
+          </div>
+
+          <div class="set-group">
+            <div class="set-head">
+              <div class="lbl">Appearance</div>
+              <div class="sp"></div>
+              <div class="pg">§ 01</div>
+            </div>
+            <div class="set-row"><div class="l">Theme</div><div class="r on">Editorial · Noir</div></div>
+            <div class="set-row"><div class="l">Typography Scale</div><div class="r">Magazine · M</div></div>
+            <div class="set-row"><div class="l">Grain Overlay</div><div class="r on">On</div></div>
+          </div>
+
+          <div class="set-group">
+            <div class="set-head">
+              <div class="lbl">Audio</div>
+              <div class="sp"></div>
+              <div class="pg">§ 02</div>
+            </div>
+            <div class="set-row"><div class="l">Narrator Voice</div><div class="r">Noir · EN</div></div>
+            <div class="set-row"><div class="l">Music Under Chase</div><div class="r on">Enabled</div></div>
+            <div class="set-row"><div class="l">Jump-Scare Volume</div><div class="r">−6 dB</div></div>
+          </div>
+
+          <div class="set-group">
+            <div class="set-head">
+              <div class="lbl">Game</div>
+              <div class="sp"></div>
+              <div class="pg">§ 03</div>
+            </div>
+            <div class="set-row"><div class="l">Difficulty</div><div class="r">Adaptive</div></div>
+            <div class="set-row"><div class="l">Subject Type</div><div class="r">Doppelgänger</div></div>
+            <div class="set-row"><div class="l">Chapter Length</div><div class="r">03 km</div></div>
+          </div>
+
+          <div class="set-group">
+            <div class="set-head">
+              <div class="lbl">Support</div>
+              <div class="sp"></div>
+              <div class="pg">§ 04</div>
+            </div>
+            <div class="set-row"><div class="l">Help &amp; Feedback</div><div class="r">→</div></div>
+            <div class="set-row"><div class="l">Privacy</div><div class="r">→</div></div>
+            <div class="set-row"><div class="l">Terms</div><div class="r">→</div></div>
+          </div>
+
+          <div class="mast-foot-print">
+            <b>Shadow Run Magazine</b><br>
+            Founded 2026 · Published monthly from the dark<br>
+            v1.0.0 · build 12 · tap ×7 to unlock
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="cell-label">
+      <div class="no">06</div>
+      <div class="tt">
+        <div class="kicker">Settings · Masthead</div>
+        <div class="name">Colophon · Vol. 01</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+</body>
+</html>

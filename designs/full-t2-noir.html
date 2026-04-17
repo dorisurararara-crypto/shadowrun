@@ -1,0 +1,2209 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Shadow Run — Theme 02 · Film Noir</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600;1,700&family=Oswald:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700;800;900&family=Playfair+Display:ital,wght@0,400;0,700;1,400;1,700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css" />
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --ink: #0D0907;            /* 짙은 브라운블랙 */
+    --ink-2: #120C09;
+    --ink-3: #1a110c;
+    --paper: #E8DCC4;          /* 크림/상아 */
+    --paper-dim: #a89a80;
+    --paper-fade: #6a5d48;
+    --brass: #B89660;          /* 브래스 골드 */
+    --brass-dim: #8a6f48;
+    --wine: #8B2635;           /* 와인 블러드 */
+    --wine-deep: #5e1820;
+    --line: #2a1d10;
+    --line-soft: rgba(184,150,96,0.18);
+  }
+
+  body {
+    background: #050507;
+    color: var(--paper);
+    font-family: 'Cormorant Garamond', 'Pretendard', serif;
+    min-height: 100vh;
+    padding: 44px 24px 80px;
+  }
+
+  /* ---------------- PAGE HEADER ---------------- */
+  .page-header {
+    max-width: 1200px;
+    margin: 0 auto 34px;
+    text-align: center;
+    position: relative;
+  }
+  .page-header::before, .page-header::after {
+    content: '';
+    position: absolute;
+    top: 50%; width: 80px; height: 1px;
+    background: linear-gradient(90deg, transparent, var(--brass), transparent);
+  }
+  .page-header::before { left: 16%; }
+  .page-header::after { right: 16%; }
+  .page-header .kicker {
+    font-family: 'Oswald', sans-serif;
+    font-size: 11px;
+    letter-spacing: 0.5em;
+    color: var(--brass);
+    text-transform: uppercase;
+    margin-bottom: 10px;
+  }
+  .page-header h1 {
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-weight: 700;
+    font-size: 38px;
+    color: var(--paper);
+    letter-spacing: -0.01em;
+    line-height: 1;
+  }
+  .page-header h1 em {
+    color: var(--brass);
+    font-style: italic;
+    font-weight: 600;
+  }
+  .page-header p {
+    margin-top: 14px;
+    font-family: 'Oswald', sans-serif;
+    color: var(--paper-dim);
+    font-size: 11px;
+    letter-spacing: 0.4em;
+    text-transform: uppercase;
+  }
+
+  /* ---------------- GRID OF PHONES ---------------- */
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(3, auto);
+    gap: 60px 56px;
+    justify-content: center;
+    justify-items: center;
+    margin-top: 40px;
+  }
+  @media (max-width: 1240px) {
+    .grid { grid-template-columns: repeat(2, auto); }
+  }
+  @media (max-width: 820px) {
+    .grid { grid-template-columns: 1fr; }
+  }
+
+  .phone-wrap {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 14px;
+  }
+  .phone-label {
+    font-family: 'Oswald', sans-serif;
+    font-size: 10px;
+    letter-spacing: 0.5em;
+    color: var(--brass);
+    text-transform: uppercase;
+    padding: 6px 14px;
+    border: 1px solid var(--brass-dim);
+    position: relative;
+  }
+  .phone-label::before, .phone-label::after {
+    content: '';
+    position: absolute;
+    top: 50%; width: 14px; height: 1px;
+    background: var(--brass-dim);
+  }
+  .phone-label::before { right: 100%; margin-right: 8px; }
+  .phone-label::after { left: 100%; margin-left: 8px; }
+
+  /* ---------------- PHONE FRAME ---------------- */
+  .phone {
+    width: 340px;
+    height: 720px;
+    border-radius: 44px;
+    overflow: hidden;
+    position: relative;
+    box-shadow: 0 28px 70px rgba(0,0,0,0.9), 0 0 0 8px #141210, 0 0 0 9px #2a2219;
+    flex-shrink: 0;
+  }
+  .notch {
+    position: absolute;
+    top: 12px; left: 50%; transform: translateX(-50%);
+    width: 112px; height: 28px;
+    background: #000;
+    border-radius: 18px;
+    z-index: 100;
+  }
+  .screen {
+    width: 100%; height: 100%;
+    background:
+      radial-gradient(ellipse 500px 400px at 30% 0%, rgba(184,150,96,0.06), transparent 55%),
+      radial-gradient(ellipse 400px 300px at 100% 80%, rgba(139,38,53,0.06), transparent 60%),
+      linear-gradient(180deg, var(--ink) 0%, #070503 100%);
+    position: relative;
+    overflow-y: auto;
+    overflow-x: hidden;
+  }
+  /* paper grain noise */
+  .screen::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='280' height='280'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.82' numOctaves='2' seed='3'/><feColorMatrix values='0 0 0 0 0.72 0 0 0 0 0.60 0 0 0 0 0.42 0 0 0 0.18 0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
+    pointer-events: none;
+    mix-blend-mode: overlay;
+    opacity: 0.55;
+    z-index: 3;
+  }
+  /* subtle horizontal lines like old document */
+  .screen::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(0deg, transparent 0, transparent 3px, rgba(232,220,196,0.015) 3px, rgba(232,220,196,0.015) 4px);
+    pointer-events: none;
+    z-index: 2;
+  }
+  .screen::-webkit-scrollbar { display: none; }
+
+  .statusbar {
+    position: relative;
+    padding: 14px 24px 0;
+    display: flex;
+    justify-content: space-between;
+    font-family: 'Inter', sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--paper);
+    z-index: 50;
+    letter-spacing: -0.01em;
+  }
+
+  /* ================================================
+     SHARED NOIR PRIMITIVES
+     ================================================ */
+
+  /* 꺾쇠 모서리 장식 (좌상/우하) */
+  .bracket {
+    position: relative;
+  }
+  .bracket::before, .bracket::after {
+    content: '';
+    position: absolute;
+    width: 18px; height: 18px;
+    border: 1px solid var(--brass);
+    pointer-events: none;
+  }
+  .bracket::before {
+    top: -1px; left: -1px;
+    border-right: none; border-bottom: none;
+  }
+  .bracket::after {
+    bottom: -1px; right: -1px;
+    border-left: none; border-top: none;
+  }
+
+  /* 이중 선 */
+  .dbl-top { border-top: 1px solid var(--line); box-shadow: 0 -3px 0 -2px var(--line); padding-top: 6px; }
+  .dbl-bot { border-bottom: 1px solid var(--line); box-shadow: 0 3px 0 -2px var(--line); padding-bottom: 6px; }
+
+  /* 스탬프 (CASE No. 028 등) */
+  .stamp {
+    display: inline-block;
+    padding: 5px 12px;
+    border: 1px solid var(--brass);
+    font-family: 'Oswald', sans-serif;
+    font-weight: 500;
+    font-size: 10px;
+    letter-spacing: 0.35em;
+    color: var(--brass);
+    text-transform: uppercase;
+    position: relative;
+  }
+  .stamp.red {
+    border-color: var(--wine);
+    color: var(--wine);
+  }
+  .stamp.tilt { transform: rotate(-3deg); }
+
+  /* 오스월드 라벨 */
+  .label-os {
+    font-family: 'Oswald', sans-serif;
+    font-weight: 400;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--brass);
+    font-size: 10px;
+  }
+  .label-os.dim { color: var(--paper-fade); }
+  .label-os.wine { color: var(--wine); }
+
+  /* 타자기 스타일 숫자 */
+  .mono { font-family: 'JetBrains Mono', monospace; }
+
+  /* ================================================
+     SHARED SCREEN BODY
+     ================================================ */
+  .body-pad { padding: 20px 24px 40px; position: relative; z-index: 10; }
+
+  /* 상단 바(홈 아닌 화면: 뒤로가기 + 타이틀 + 액션) */
+  .topbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 22px 0;
+    position: relative;
+    z-index: 10;
+    margin-top: 4px;
+  }
+  .topbar .back {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 24px;
+    color: var(--paper);
+    line-height: 1;
+    width: 28px;
+  }
+  .topbar .t {
+    flex: 1;
+    text-align: center;
+    font-family: 'Oswald', sans-serif;
+    font-size: 10px;
+    letter-spacing: 0.35em;
+    color: var(--brass);
+    text-transform: uppercase;
+  }
+  .topbar .r {
+    width: 28px;
+    text-align: right;
+    font-family: 'Oswald', sans-serif;
+    font-size: 11px;
+    color: var(--paper-dim);
+  }
+
+  /* 구분선: 타자기 점선 */
+  .dotline {
+    border: none;
+    border-top: 1px dotted var(--line);
+    margin: 14px 0;
+  }
+  .solidline { border: none; border-top: 1px solid var(--line); margin: 14px 0; }
+  .doubleline {
+    height: 4px;
+    border-top: 1px solid var(--line);
+    border-bottom: 1px solid var(--line);
+    margin: 14px 0;
+  }
+
+  /* 통계 3칸 */
+  .stats3 {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 0;
+    border-top: 1px solid var(--line);
+    border-bottom: 1px solid var(--line);
+    margin: 14px 0;
+  }
+  .stats3 .cell {
+    padding: 12px 4px;
+    text-align: center;
+    border-right: 1px solid var(--line);
+  }
+  .stats3 .cell:last-child { border-right: none; }
+  .stats3 .cell .k {
+    font-family: 'Oswald', sans-serif;
+    font-size: 9px;
+    color: var(--paper-fade);
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+  .stats3 .cell .v {
+    font-family: 'Cormorant Garamond', serif;
+    font-weight: 500;
+    font-size: 24px;
+    color: var(--paper);
+    line-height: 1;
+    letter-spacing: -0.01em;
+  }
+  .stats3 .cell .v small {
+    font-family: 'Oswald', sans-serif;
+    font-weight: 400;
+    font-size: 9px;
+    color: var(--paper-fade);
+    letter-spacing: 0.2em;
+    margin-left: 3px;
+  }
+
+  /* ================================================
+     1) HOME SCREEN
+     ================================================ */
+  .home .header-block {
+    text-align: left;
+    padding-top: 18px;
+  }
+  .home .case-stamp-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 18px;
+  }
+  .home .case-stamp-row .day {
+    font-family: 'Oswald', sans-serif;
+    font-size: 10px;
+    letter-spacing: 0.3em;
+    color: var(--paper-fade);
+    text-transform: uppercase;
+  }
+  .home-logo {
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-weight: 700;
+    font-size: 48px;
+    line-height: 0.9;
+    letter-spacing: -0.03em;
+    color: var(--paper);
+    margin-bottom: 6px;
+    text-shadow: 0 0 30px rgba(184,150,96,0.1);
+  }
+  .home-sub {
+    font-family: 'Oswald', sans-serif;
+    font-size: 10px;
+    letter-spacing: 0.45em;
+    color: var(--brass);
+    text-transform: uppercase;
+    margin-bottom: 18px;
+    padding-bottom: 18px;
+    border-bottom: 1px solid var(--line);
+  }
+  .last-reported {
+    margin-bottom: 22px;
+    padding: 2px 0 2px 14px;
+    border-left: 2px solid var(--wine);
+    position: relative;
+  }
+  .last-reported .lbl {
+    font-family: 'Oswald', sans-serif;
+    font-size: 9px;
+    letter-spacing: 0.4em;
+    color: var(--wine);
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+  .last-reported .txt {
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-weight: 500;
+    font-size: 17px;
+    line-height: 1.45;
+    color: var(--paper);
+    letter-spacing: -0.005em;
+  }
+  .last-reported .txt strong {
+    color: var(--wine);
+    font-weight: 700;
+    font-style: italic;
+  }
+  .last-reported .foot {
+    font-family: 'Oswald', sans-serif;
+    font-size: 9px;
+    letter-spacing: 0.3em;
+    color: var(--paper-fade);
+    text-transform: uppercase;
+    margin-top: 8px;
+  }
+
+  .open-case {
+    margin: 22px 0 24px;
+    padding: 22px 20px;
+    background:
+      radial-gradient(ellipse at 20% 0%, rgba(184,150,96,0.12), transparent 60%),
+      linear-gradient(180deg, #160E08 0%, #0A0604 100%);
+    border: 1px solid var(--brass);
+    position: relative;
+  }
+  .open-case .eye {
+    font-family: 'Oswald', sans-serif;
+    font-size: 10px;
+    letter-spacing: 0.45em;
+    color: var(--brass);
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+  .open-case .ttl {
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-weight: 700;
+    font-size: 26px;
+    color: var(--paper);
+    line-height: 1.1;
+    letter-spacing: -0.015em;
+    margin-bottom: 14px;
+  }
+  .open-case .ttl em {
+    color: var(--brass);
+  }
+  .open-case .cta-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-top: 10px;
+    border-top: 1px dotted var(--brass-dim);
+  }
+  .open-case .cta-row .lbl {
+    font-family: 'Oswald', sans-serif;
+    font-size: 11px;
+    letter-spacing: 0.3em;
+    color: var(--paper);
+    text-transform: uppercase;
+  }
+  .open-case .cta-row .arr {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 26px;
+    color: var(--brass);
+    line-height: 1;
+  }
+
+  .prev-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 10px;
+  }
+  .prev-head .ttl {
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-weight: 600;
+    font-size: 18px;
+    color: var(--paper);
+  }
+  .prev-head .more {
+    font-family: 'Oswald', sans-serif;
+    font-size: 9px;
+    letter-spacing: 0.3em;
+    color: var(--brass);
+    text-transform: uppercase;
+  }
+  .prev-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 0;
+    border-bottom: 1px dotted var(--line);
+  }
+  .prev-row:last-child { border-bottom: none; }
+  .prev-badge {
+    width: 38px; height: 38px;
+    border: 1px solid var(--brass);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Oswald', sans-serif;
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    color: var(--brass);
+    flex-shrink: 0;
+    line-height: 1.1;
+    flex-direction: column;
+  }
+  .prev-badge.fail { border-color: var(--wine); color: var(--wine); }
+  .prev-badge b { font-weight: 600; font-size: 11px; }
+  .prev-badge i { font-style: normal; font-size: 7px; letter-spacing: 0.2em; }
+  .prev-info { flex: 1; min-width: 0; }
+  .prev-info .date {
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-size: 15px;
+    color: var(--paper);
+    line-height: 1.2;
+  }
+  .prev-info .loc {
+    font-family: 'Oswald', sans-serif;
+    font-size: 9px;
+    letter-spacing: 0.25em;
+    color: var(--paper-fade);
+    text-transform: uppercase;
+    margin-top: 3px;
+  }
+  .prev-dist {
+    text-align: right;
+    flex-shrink: 0;
+  }
+  .prev-dist .v {
+    font-family: 'Cormorant Garamond', serif;
+    font-weight: 600;
+    font-size: 16px;
+    color: var(--paper);
+    line-height: 1;
+  }
+  .prev-dist .v.neg { color: var(--wine); }
+  .prev-dist .lbl {
+    font-family: 'Oswald', sans-serif;
+    font-size: 8px;
+    letter-spacing: 0.3em;
+    color: var(--paper-fade);
+    text-transform: uppercase;
+    margin-top: 3px;
+  }
+
+  /* ================================================
+     2) PREPARE / BRIEFING
+     ================================================ */
+  .briefing .h-title {
+    text-align: center;
+    padding-top: 26px;
+    margin-bottom: 6px;
+  }
+  .briefing .h-title .main {
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-weight: 700;
+    font-size: 30px;
+    color: var(--paper);
+    line-height: 1;
+    letter-spacing: -0.02em;
+  }
+  .briefing .h-title .sub {
+    font-family: 'Oswald', sans-serif;
+    font-size: 9px;
+    letter-spacing: 0.4em;
+    color: var(--brass);
+    margin-top: 6px;
+    text-transform: uppercase;
+  }
+
+  .brf-section { margin: 14px 0; }
+  .brf-section .hd {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+  }
+  .brf-section .hd .label {
+    font-family: 'Oswald', sans-serif;
+    font-size: 9px;
+    letter-spacing: 0.4em;
+    color: var(--brass);
+    text-transform: uppercase;
+  }
+  .brf-section .hd .line {
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(90deg, var(--brass-dim), transparent);
+  }
+
+  .loc-row {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+  }
+  .loc-row .pin {
+    width: 34px; height: 34px;
+    border: 1px solid var(--brass-dim);
+    display: flex; align-items: center; justify-content: center;
+    color: var(--brass);
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 18px;
+  }
+  .loc-row .info .k {
+    font-family: 'Oswald', sans-serif;
+    font-size: 8px;
+    letter-spacing: 0.3em;
+    color: var(--paper-fade);
+    text-transform: uppercase;
+  }
+  .loc-row .info .v {
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-size: 15px;
+    color: var(--paper);
+    margin-top: 2px;
+  }
+  .loc-row .info .v em { color: var(--brass); font-style: italic; }
+
+  .suspect-card {
+    padding: 16px;
+    border: 1px solid var(--line);
+    background: linear-gradient(180deg, rgba(184,150,96,0.04), transparent);
+    position: relative;
+  }
+  .suspect-card .file-tag {
+    position: absolute;
+    top: -9px; left: 14px;
+    background: var(--ink);
+    padding: 0 8px;
+    font-family: 'Oswald', sans-serif;
+    font-size: 8px;
+    letter-spacing: 0.4em;
+    color: var(--brass);
+    text-transform: uppercase;
+  }
+  .suspect-head {
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+    margin-bottom: 14px;
+  }
+  .suspect-silhouette {
+    width: 58px; height: 76px;
+    border: 1px solid var(--brass-dim);
+    background:
+      radial-gradient(ellipse at 50% 30%, rgba(232,220,196,0.18) 0%, transparent 60%),
+      #0d0907;
+    position: relative;
+    flex-shrink: 0;
+  }
+  .suspect-silhouette::after {
+    content: '?';
+    position: absolute;
+    inset: 0;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-size: 34px;
+    color: var(--wine);
+    opacity: 0.7;
+  }
+  .suspect-meta { flex: 1; }
+  .suspect-meta .n {
+    font-family: 'Oswald', sans-serif;
+    font-size: 9px;
+    letter-spacing: 0.3em;
+    color: var(--paper-fade);
+    text-transform: uppercase;
+    margin-bottom: 3px;
+  }
+  .suspect-meta .v {
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-weight: 600;
+    font-size: 18px;
+    color: var(--paper);
+    margin-bottom: 10px;
+  }
+  .suspect-meta .traits {
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-size: 12px;
+    color: var(--paper-dim);
+    line-height: 1.45;
+  }
+  .speed-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 6px;
+  }
+  .speed-btn {
+    border: 1px solid var(--line);
+    padding: 8px 4px;
+    text-align: center;
+    font-family: 'Oswald', sans-serif;
+    font-size: 9px;
+    letter-spacing: 0.3em;
+    color: var(--paper-fade);
+    text-transform: uppercase;
+  }
+  .speed-btn.active {
+    border-color: var(--brass);
+    color: var(--brass);
+    background: rgba(184,150,96,0.08);
+  }
+  .speed-btn .big {
+    display: block;
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-size: 14px;
+    letter-spacing: 0;
+    text-transform: none;
+    margin-bottom: 2px;
+  }
+
+  .equipment {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 0;
+    border-bottom: 1px dotted var(--line);
+  }
+  .equipment:last-of-type { border-bottom: none; }
+  .equipment .l {
+    font-family: 'Oswald', sans-serif;
+    font-size: 9px;
+    letter-spacing: 0.3em;
+    color: var(--paper-fade);
+    text-transform: uppercase;
+  }
+  .equipment .v {
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-size: 14px;
+    color: var(--paper);
+  }
+
+  .objective-big {
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-size: 22px;
+    color: var(--paper);
+    text-align: center;
+    padding: 14px 0;
+    border-top: 1px solid var(--line);
+    border-bottom: 1px solid var(--line);
+    margin: 14px 0;
+  }
+  .objective-big em { color: var(--brass); font-weight: 700; }
+
+  .open-btn {
+    margin-top: 18px;
+    padding: 22px 18px;
+    background: linear-gradient(180deg, #1a0f08, #0b0604);
+    border: 1px solid var(--brass);
+    text-align: center;
+    position: relative;
+  }
+  .open-btn::before, .open-btn::after {
+    content: '';
+    position: absolute;
+    width: 22px; height: 22px;
+    border: 1px solid var(--brass);
+  }
+  .open-btn::before { top: -1px; left: -1px; border-right: none; border-bottom: none; }
+  .open-btn::after { bottom: -1px; right: -1px; border-left: none; border-top: none; }
+  .open-btn .ttl {
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-weight: 700;
+    font-size: 26px;
+    color: var(--paper);
+    letter-spacing: -0.01em;
+  }
+  .open-btn .sub {
+    font-family: 'Oswald', sans-serif;
+    font-size: 10px;
+    letter-spacing: 0.5em;
+    color: var(--brass);
+    margin-top: 6px;
+    text-transform: uppercase;
+  }
+
+  /* ================================================
+     3) RUNNING / LIVE SURVEILLANCE
+     ================================================ */
+  .running .live-bar {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 16px;
+    background: linear-gradient(90deg, rgba(139,38,53,0.18), rgba(139,38,53,0.02));
+    border: 1px solid var(--wine);
+    margin: 14px 20px 0;
+    position: relative;
+    z-index: 10;
+  }
+  .running .live-dot {
+    width: 8px; height: 8px;
+    background: var(--wine);
+    border-radius: 50%;
+    box-shadow: 0 0 12px var(--wine);
+    animation: blink 1.4s infinite;
+  }
+  @keyframes blink { 0%, 55% { opacity: 1; } 56%, 100% { opacity: 0.3; } }
+  .running .live-txt {
+    flex: 1;
+    font-family: 'Oswald', sans-serif;
+    font-size: 10px;
+    letter-spacing: 0.35em;
+    color: var(--wine);
+    text-transform: uppercase;
+  }
+  .running .live-t {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--brass);
+    letter-spacing: 0.1em;
+  }
+
+  .running .dist-wrap {
+    text-align: center;
+    padding: 28px 0 18px;
+    margin: 0 20px;
+    border-bottom: 1px solid var(--line);
+    position: relative;
+  }
+  .running .dist-wrap::before {
+    content: 'DISTANCE FROM SUSPECT';
+    display: block;
+    font-family: 'Oswald', sans-serif;
+    font-size: 9px;
+    letter-spacing: 0.5em;
+    color: var(--brass);
+    margin-bottom: 10px;
+  }
+  .running .dist-num {
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-weight: 700;
+    font-size: 120px;
+    line-height: 1;
+    color: var(--paper);
+    letter-spacing: -0.05em;
+    text-shadow: 0 0 40px rgba(232,220,196,0.15);
+  }
+  .running .dist-num .u {
+    font-family: 'Oswald', sans-serif;
+    font-style: normal;
+    font-size: 18px;
+    letter-spacing: 0.3em;
+    color: var(--brass);
+    vertical-align: top;
+    margin-left: 4px;
+  }
+  .running .dist-delta {
+    font-family: 'Oswald', sans-serif;
+    font-size: 10px;
+    letter-spacing: 0.4em;
+    color: var(--wine);
+    margin-top: 6px;
+    text-transform: uppercase;
+  }
+  .running .dist-delta em {
+    font-style: italic;
+    color: var(--brass);
+  }
+
+  .minimap {
+    margin: 18px 20px;
+    height: 180px;
+    border: 1px solid var(--line);
+    position: relative;
+    background:
+      radial-gradient(ellipse at 40% 55%, rgba(184,150,96,0.08), transparent 60%),
+      linear-gradient(180deg, #120b07, #08050a);
+    overflow: hidden;
+  }
+  .minimap::before {
+    content: '';
+    position: absolute; inset: 0;
+    background:
+      repeating-linear-gradient(0deg, transparent 0, transparent 22px, rgba(184,150,96,0.07) 22px, rgba(184,150,96,0.07) 23px),
+      repeating-linear-gradient(90deg, transparent 0, transparent 22px, rgba(184,150,96,0.07) 22px, rgba(184,150,96,0.07) 23px);
+  }
+  .minimap .map-label {
+    position: absolute;
+    top: 8px; left: 10px;
+    font-family: 'Oswald', sans-serif;
+    font-size: 8px;
+    letter-spacing: 0.3em;
+    color: var(--brass);
+    text-transform: uppercase;
+  }
+  .minimap .compass {
+    position: absolute;
+    top: 8px; right: 10px;
+    width: 24px; height: 24px;
+    border: 1px solid var(--brass-dim);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Oswald', sans-serif;
+    font-size: 9px;
+    color: var(--brass);
+  }
+  .minimap svg { position: absolute; inset: 0; width: 100%; height: 100%; }
+  .minimap .me {
+    position: absolute;
+    left: 40%; top: 60%;
+    width: 10px; height: 10px;
+    background: var(--paper);
+    border-radius: 50%;
+    box-shadow: 0 0 14px rgba(232,220,196,0.7);
+    transform: translate(-50%, -50%);
+  }
+  .minimap .me::after {
+    content: 'YOU';
+    position: absolute;
+    top: -18px; left: 50%;
+    transform: translateX(-50%);
+    font-family: 'Oswald', sans-serif;
+    font-size: 8px;
+    letter-spacing: 0.3em;
+    color: var(--paper);
+  }
+  .minimap .susp {
+    position: absolute;
+    left: 65%; top: 38%;
+    width: 10px; height: 10px;
+    background: var(--wine);
+    border-radius: 50%;
+    box-shadow: 0 0 14px var(--wine);
+    animation: blink 1.2s infinite;
+    transform: translate(-50%, -50%);
+  }
+  .minimap .susp::after {
+    content: 'SUSPECT';
+    position: absolute;
+    top: -18px; left: 50%;
+    transform: translateX(-50%);
+    font-family: 'Oswald', sans-serif;
+    font-size: 8px;
+    letter-spacing: 0.3em;
+    color: var(--wine);
+  }
+
+  .running .run-stats {
+    margin: 0 20px;
+  }
+  .running .stake-btn {
+    margin: 18px 20px 24px;
+    padding: 14px;
+    border: 1px dashed var(--brass);
+    text-align: center;
+    font-family: 'Oswald', sans-serif;
+    font-size: 11px;
+    letter-spacing: 0.45em;
+    color: var(--brass);
+    text-transform: uppercase;
+  }
+  .running .stake-btn em {
+    display: block;
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-size: 11px;
+    color: var(--paper-fade);
+    letter-spacing: 0.1em;
+    margin-top: 4px;
+    text-transform: none;
+  }
+
+  /* ================================================
+     4) RESULT / CASE CLOSED
+     ================================================ */
+  .result .top-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 12px 22px 0;
+    position: relative;
+    z-index: 10;
+  }
+  .result .top-row .close,
+  .result .top-row .share {
+    width: 30px; height: 30px;
+    border: 1px solid var(--brass-dim);
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 16px;
+    color: var(--paper);
+  }
+  .result .stamp-row {
+    text-align: center;
+    margin: 22px 0 10px;
+  }
+  .result .verdict-wrap {
+    text-align: center;
+    padding: 8px 20px 20px;
+    position: relative;
+    z-index: 10;
+  }
+  .result .verdict-wrap::before {
+    content: '"';
+    position: absolute;
+    top: -20px; left: 20px;
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 80px;
+    color: var(--brass);
+    opacity: 0.3;
+    font-weight: 700;
+  }
+  .result .verdict {
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-weight: 700;
+    font-size: 64px;
+    line-height: 0.95;
+    letter-spacing: -0.03em;
+    color: var(--paper);
+    margin-bottom: 8px;
+    text-shadow: 0 0 40px rgba(184,150,96,0.2);
+  }
+  .result .verdict em {
+    color: var(--brass);
+  }
+  .result .case-sub {
+    font-family: 'Oswald', sans-serif;
+    font-size: 10px;
+    letter-spacing: 0.4em;
+    color: var(--brass);
+    text-transform: uppercase;
+    margin-bottom: 18px;
+  }
+  .result .subcopy {
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-weight: 400;
+    font-size: 15px;
+    line-height: 1.55;
+    color: var(--paper-dim);
+    max-width: 260px;
+    margin: 0 auto 8px;
+    letter-spacing: -0.005em;
+  }
+  .result .subcopy strong {
+    color: var(--paper);
+    font-weight: 600;
+  }
+  .result .subcopy-by {
+    font-family: 'Oswald', sans-serif;
+    font-size: 8px;
+    letter-spacing: 0.4em;
+    color: var(--paper-fade);
+    text-transform: uppercase;
+  }
+
+  .result .chart-wrap {
+    margin: 22px 24px 10px;
+    padding: 14px 10px 10px;
+    border: 1px solid var(--line);
+    position: relative;
+    background: linear-gradient(180deg, rgba(184,150,96,0.03), transparent);
+  }
+  .result .chart-wrap .cap-tl {
+    position: absolute;
+    top: -8px; left: 12px;
+    padding: 0 8px;
+    background: var(--ink);
+    font-family: 'Oswald', sans-serif;
+    font-size: 8px;
+    letter-spacing: 0.35em;
+    color: var(--brass);
+    text-transform: uppercase;
+  }
+  .result .chart-wrap .cap-tr {
+    position: absolute;
+    top: -8px; right: 12px;
+    padding: 0 8px;
+    background: var(--ink);
+    font-family: 'Oswald', sans-serif;
+    font-size: 8px;
+    letter-spacing: 0.35em;
+    color: var(--paper-fade);
+    text-transform: uppercase;
+  }
+  .result svg.chart { width: 100%; height: 110px; display: block; }
+  .result .chart-foot {
+    display: flex;
+    justify-content: space-between;
+    font-family: 'Oswald', sans-serif;
+    font-size: 8px;
+    letter-spacing: 0.3em;
+    color: var(--paper-fade);
+    margin-top: 6px;
+    padding-top: 6px;
+    border-top: 1px dotted var(--line);
+    text-transform: uppercase;
+  }
+
+  .result .detail-list { margin: 16px 24px 24px; }
+  .result .d-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 9px 0;
+    border-bottom: 1px dotted var(--line);
+  }
+  .result .d-row .l {
+    font-family: 'Oswald', sans-serif;
+    font-size: 9px;
+    letter-spacing: 0.35em;
+    color: var(--paper-fade);
+    text-transform: uppercase;
+  }
+  .result .d-row .v {
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-weight: 500;
+    font-size: 14px;
+    color: var(--paper);
+  }
+  .result .d-row .v.wine { color: var(--wine); }
+  .result .d-row .v.brass { color: var(--brass); }
+
+  /* ================================================
+     5) HISTORY / ARCHIVE
+     ================================================ */
+  .history .arch-head {
+    padding: 24px 0 18px;
+    text-align: center;
+    border-bottom: 1px solid var(--line);
+    margin-bottom: 18px;
+  }
+  .history .arch-head .k {
+    font-family: 'Oswald', sans-serif;
+    font-size: 10px;
+    letter-spacing: 0.45em;
+    color: var(--brass);
+    margin-bottom: 6px;
+    text-transform: uppercase;
+  }
+  .history .arch-head .title {
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-weight: 700;
+    font-size: 26px;
+    color: var(--paper);
+    letter-spacing: -0.015em;
+    line-height: 1;
+    margin-bottom: 14px;
+  }
+  .history .summary {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0;
+    margin-top: 14px;
+  }
+  .history .summary .s {
+    text-align: center;
+    border-right: 1px solid var(--line);
+    padding: 0 4px;
+  }
+  .history .summary .s:last-child { border-right: none; }
+  .history .summary .v {
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-weight: 700;
+    font-size: 22px;
+    color: var(--paper);
+  }
+  .history .summary .v.solved { color: var(--brass); }
+  .history .summary .v.cold { color: var(--wine); }
+  .history .summary .k {
+    font-family: 'Oswald', sans-serif;
+    font-size: 8px;
+    letter-spacing: 0.35em;
+    color: var(--paper-fade);
+    text-transform: uppercase;
+    margin-top: 4px;
+  }
+
+  .history .case-item {
+    display: flex;
+    gap: 12px;
+    padding: 14px 0;
+    border-bottom: 1px dotted var(--line);
+    align-items: flex-start;
+  }
+  .history .case-item:last-child { border-bottom: none; }
+  .history .ci-badge {
+    width: 46px; height: 50px;
+    border: 1px solid var(--brass);
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    flex-shrink: 0;
+    padding: 3px;
+    line-height: 1;
+  }
+  .history .ci-badge.fail { border-color: var(--wine); }
+  .history .ci-badge .en {
+    font-family: 'Oswald', sans-serif;
+    font-size: 8px;
+    letter-spacing: 0.25em;
+    color: var(--brass);
+    text-transform: uppercase;
+  }
+  .history .ci-badge.fail .en { color: var(--wine); }
+  .history .ci-badge .no {
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-weight: 700;
+    font-size: 18px;
+    color: var(--paper);
+    margin-top: 1px;
+  }
+  .history .ci-body { flex: 1; min-width: 0; }
+  .history .ci-body .dt {
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-size: 15px;
+    color: var(--paper);
+    line-height: 1.2;
+  }
+  .history .ci-body .loc {
+    font-family: 'Oswald', sans-serif;
+    font-size: 8px;
+    letter-spacing: 0.3em;
+    color: var(--paper-fade);
+    text-transform: uppercase;
+    margin-top: 3px;
+  }
+  .history .ci-body .stats {
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-size: 12px;
+    color: var(--paper-dim);
+    margin-top: 4px;
+  }
+  .history .ci-verdict {
+    text-align: right;
+    flex-shrink: 0;
+  }
+  .history .ci-verdict .v {
+    font-family: 'Oswald', sans-serif;
+    font-size: 9px;
+    letter-spacing: 0.35em;
+    color: var(--brass);
+    text-transform: uppercase;
+    padding: 3px 7px;
+    border: 1px solid var(--brass);
+  }
+  .history .ci-verdict .v.cold {
+    color: var(--wine);
+    border-color: var(--wine);
+  }
+  .history .ci-verdict .d {
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-size: 13px;
+    color: var(--paper);
+    margin-top: 6px;
+  }
+  .history .ci-verdict .d.neg { color: var(--wine); }
+
+  /* ================================================
+     6) SETTINGS / AGENT PROFILE
+     ================================================ */
+  .settings .prof-head {
+    padding: 22px 0 14px;
+    text-align: center;
+  }
+  .settings .prof-head .k {
+    font-family: 'Oswald', sans-serif;
+    font-size: 10px;
+    letter-spacing: 0.5em;
+    color: var(--brass);
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+  .settings .prof-head .title {
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-weight: 700;
+    font-size: 30px;
+    color: var(--paper);
+    letter-spacing: -0.02em;
+    line-height: 1;
+  }
+
+  .agent-card {
+    margin-top: 16px;
+    padding: 18px;
+    border: 1px solid var(--brass);
+    background: linear-gradient(180deg, rgba(184,150,96,0.06), transparent);
+    position: relative;
+  }
+  .agent-card::before, .agent-card::after {
+    content: '';
+    position: absolute;
+    width: 20px; height: 20px;
+    border: 1px solid var(--brass);
+  }
+  .agent-card::before { top: -1px; left: -1px; border-right: none; border-bottom: none; }
+  .agent-card::after { bottom: -1px; right: -1px; border-left: none; border-top: none; }
+  .agent-card .row {
+    display: flex;
+    gap: 14px;
+    align-items: center;
+  }
+  .agent-avatar {
+    width: 56px; height: 56px;
+    border-radius: 50%;
+    border: 1px solid var(--brass);
+    background: radial-gradient(ellipse at 50% 40%, rgba(232,220,196,0.18), transparent 60%), var(--ink);
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-weight: 700;
+    font-size: 24px;
+    color: var(--brass);
+    flex-shrink: 0;
+  }
+  .agent-info .k {
+    font-family: 'Oswald', sans-serif;
+    font-size: 8px;
+    letter-spacing: 0.4em;
+    color: var(--paper-fade);
+    text-transform: uppercase;
+    margin-bottom: 3px;
+  }
+  .agent-info .name {
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-weight: 700;
+    font-size: 22px;
+    color: var(--paper);
+    line-height: 1;
+    margin-bottom: 6px;
+  }
+  .agent-info .pro {
+    display: inline-block;
+    font-family: 'Oswald', sans-serif;
+    font-size: 8px;
+    letter-spacing: 0.4em;
+    color: var(--wine);
+    border: 1px solid var(--wine);
+    padding: 2px 6px;
+    text-transform: uppercase;
+  }
+  .agent-card .agent-stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    margin-top: 14px;
+    padding-top: 14px;
+    border-top: 1px dotted var(--line);
+  }
+  .agent-card .agent-stats .as {
+    text-align: center;
+    border-right: 1px solid var(--line);
+  }
+  .agent-card .agent-stats .as:last-child { border-right: none; }
+  .agent-card .agent-stats .v {
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-weight: 700;
+    font-size: 20px;
+    color: var(--paper);
+  }
+  .agent-card .agent-stats .k {
+    font-family: 'Oswald', sans-serif;
+    font-size: 7px;
+    letter-spacing: 0.3em;
+    color: var(--paper-fade);
+    text-transform: uppercase;
+    margin-top: 3px;
+  }
+
+  .settings-section {
+    margin-top: 22px;
+  }
+  .settings-section .sec-head {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 8px;
+  }
+  .settings-section .sec-head .n {
+    font-family: 'Oswald', sans-serif;
+    font-size: 9px;
+    letter-spacing: 0.4em;
+    color: var(--brass);
+    text-transform: uppercase;
+  }
+  .settings-section .sec-head .num {
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-size: 11px;
+    color: var(--paper-fade);
+  }
+  .settings-section .sec-head .line {
+    flex: 1; height: 1px;
+    background: linear-gradient(90deg, var(--brass-dim), transparent);
+  }
+  .set-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 11px 0;
+    border-bottom: 1px dotted var(--line);
+  }
+  .set-item:last-of-type { border-bottom: none; }
+  .set-item .lbl {
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-size: 15px;
+    color: var(--paper);
+  }
+  .set-item .sublbl {
+    font-family: 'Oswald', sans-serif;
+    font-size: 8px;
+    letter-spacing: 0.3em;
+    color: var(--paper-fade);
+    margin-top: 2px;
+    text-transform: uppercase;
+  }
+  .set-item .v {
+    font-family: 'Oswald', sans-serif;
+    font-size: 9px;
+    letter-spacing: 0.3em;
+    color: var(--brass);
+    text-transform: uppercase;
+  }
+  .set-item .toggle {
+    width: 36px; height: 18px;
+    border: 1px solid var(--brass-dim);
+    position: relative;
+  }
+  .set-item .toggle::after {
+    content: '';
+    position: absolute;
+    top: 1px; left: 1px;
+    width: 14px; height: 14px;
+    background: var(--paper-fade);
+  }
+  .set-item .toggle.on {
+    border-color: var(--brass);
+  }
+  .set-item .toggle.on::after {
+    left: auto; right: 1px;
+    background: var(--brass);
+  }
+
+  .hidden-hint {
+    margin: 22px 0 10px;
+    padding: 14px 0;
+    text-align: center;
+    border-top: 1px dashed var(--brass-dim);
+    border-bottom: 1px dashed var(--brass-dim);
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-size: 12px;
+    color: var(--paper-fade);
+    letter-spacing: 0.05em;
+  }
+  .hidden-hint em {
+    color: var(--brass);
+    font-style: italic;
+  }
+
+  /* ================================================
+     STATUS / TAB (공통)
+     ================================================ */
+  .tabs {
+    position: sticky;
+    bottom: 0;
+    margin-top: 20px;
+    background: rgba(13,9,7,0.92);
+    backdrop-filter: blur(14px);
+    border-top: 1px solid var(--line);
+    padding: 10px 0 22px;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    z-index: 20;
+  }
+  .tab {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+  }
+  .tab .ico {
+    font-family: 'Oswald', sans-serif;
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    color: var(--paper-fade);
+    text-transform: uppercase;
+  }
+  .tab .lbl {
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-size: 10px;
+    color: var(--paper-fade);
+  }
+  .tab.active .ico, .tab.active .lbl { color: var(--brass); }
+
+</style>
+</head>
+<body>
+
+<div class="page-header">
+  <div class="kicker">Theme 02 · Film Noir</div>
+  <h1>SHADOW RUN · <em>Case Files</em></h1>
+  <p>1940s Detective · Korean Running App · 6 Screens</p>
+</div>
+
+<div class="grid">
+
+  <!-- ======================================================
+       1) HOME  —  CASE No. 028
+       ====================================================== -->
+  <div class="phone-wrap">
+    <div class="phone">
+      <div class="notch"></div>
+      <div class="screen">
+        <div class="statusbar"><span>9:41</span><span>●●●● ●●</span></div>
+
+        <div class="home body-pad">
+
+          <div class="header-block">
+            <div class="case-stamp-row">
+              <div class="stamp tilt">CASE No. 028</div>
+              <div class="day">WED · APR 17</div>
+            </div>
+            <div class="home-logo">Shadow Run</div>
+            <div class="home-sub">— A Nightly Chase —</div>
+          </div>
+
+          <div class="last-reported">
+            <div class="lbl">Last Reported</div>
+            <div class="txt">용의자, 피해자로부터<br><strong>312미터</strong>. 추적 지속 중.</div>
+            <div class="foot">— Previously on Shadow Run —</div>
+          </div>
+
+          <div class="stats3">
+            <div class="cell">
+              <div class="k">This Week</div>
+              <div class="v">12.4<small>KM</small></div>
+            </div>
+            <div class="cell">
+              <div class="k">Cases</div>
+              <div class="v">28</div>
+            </div>
+            <div class="cell">
+              <div class="k">Max Gap</div>
+              <div class="v">412<small>M</small></div>
+            </div>
+          </div>
+
+          <div class="open-case">
+            <div class="eye">Tonight · Case 029</div>
+            <div class="ttl">오늘의 <em>사건</em>을<br>열 시간이다.</div>
+            <div class="cta-row">
+              <div class="lbl">Open the File</div>
+              <div class="arr">›</div>
+            </div>
+          </div>
+
+          <div class="prev-head">
+            <div class="ttl">Previous Files</div>
+            <div class="more">VIEW ALL ›</div>
+          </div>
+
+          <div class="prev-row">
+            <div class="prev-badge">
+              <b>028</b><i>CASE</i>
+            </div>
+            <div class="prev-info">
+              <div class="date">Apr 16 · 성동구</div>
+              <div class="loc">3.42 KM · 24:18</div>
+            </div>
+            <div class="prev-dist">
+              <div class="v">+312m</div>
+              <div class="lbl">Solved</div>
+            </div>
+          </div>
+
+          <div class="prev-row">
+            <div class="prev-badge fail">
+              <b>027</b><i>CASE</i>
+            </div>
+            <div class="prev-info">
+              <div class="date">Apr 15 · 한강 북단</div>
+              <div class="loc">2.18 KM · 18:02</div>
+            </div>
+            <div class="prev-dist">
+              <div class="v neg">−18m</div>
+              <div class="lbl">Cold</div>
+            </div>
+          </div>
+
+          <div class="prev-row">
+            <div class="prev-badge">
+              <b>026</b><i>CASE</i>
+            </div>
+            <div class="prev-info">
+              <div class="date">Apr 14 · 남산길</div>
+              <div class="loc">4.80 KM · 33:41</div>
+            </div>
+            <div class="prev-dist">
+              <div class="v">+520m</div>
+              <div class="lbl">Solved</div>
+            </div>
+          </div>
+
+          <div class="tabs">
+            <div class="tab active"><div class="ico">HOME</div><div class="lbl">home</div></div>
+            <div class="tab"><div class="ico">FILES</div><div class="lbl">archive</div></div>
+            <div class="tab"><div class="ico">STATS</div><div class="lbl">report</div></div>
+            <div class="tab"><div class="ico">AGENT</div><div class="lbl">profile</div></div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+    <div class="phone-label">01 · Home</div>
+  </div>
+
+  <!-- ======================================================
+       2) PREPARE / BRIEFING
+       ====================================================== -->
+  <div class="phone-wrap">
+    <div class="phone">
+      <div class="notch"></div>
+      <div class="screen">
+        <div class="statusbar"><span>9:41</span><span>●●●● ●●</span></div>
+
+        <div class="topbar">
+          <div class="back">‹</div>
+          <div class="t">Briefing · Case 029</div>
+          <div class="r">⚙</div>
+        </div>
+
+        <div class="briefing body-pad" style="padding-top: 6px;">
+
+          <div class="h-title">
+            <div class="main">오늘 밤의 <em style="color:var(--brass);font-weight:600;">사건</em></div>
+            <div class="sub">— Case File · Pre-Briefing —</div>
+          </div>
+
+          <div class="doubleline"></div>
+
+          <div class="brf-section">
+            <div class="hd">
+              <div class="label">01 · Location</div>
+              <div class="line"></div>
+            </div>
+            <div class="loc-row">
+              <div class="pin">◎</div>
+              <div class="info">
+                <div class="k">GPS · Acquired</div>
+                <div class="v"><em>서울 · 성동구</em> 서울숲역 반경 2km</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="brf-section">
+            <div class="hd">
+              <div class="label">02 · The Suspect</div>
+              <div class="line"></div>
+            </div>
+            <div class="suspect-card">
+              <div class="file-tag">Dossier</div>
+              <div class="suspect-head">
+                <div class="suspect-silhouette"></div>
+                <div class="suspect-meta">
+                  <div class="n">Subject · Identity</div>
+                  <div class="v">The Doppelgänger</div>
+                  <div class="traits">Your shadow, walking the same streets<br>at the same pace. Never tires.</div>
+                </div>
+              </div>
+              <div class="speed-row">
+                <div class="speed-btn">
+                  <span class="big">Slow</span>
+                  4'30"
+                </div>
+                <div class="speed-btn active">
+                  <span class="big">Medium</span>
+                  5'30"
+                </div>
+                <div class="speed-btn">
+                  <span class="big">Fast</span>
+                  6'30"
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="brf-section">
+            <div class="hd">
+              <div class="label">03 · Equipment</div>
+              <div class="line"></div>
+            </div>
+            <div class="equipment">
+              <div class="l">Footwear</div>
+              <div class="v"><em>Nike</em> Pegasus 40</div>
+            </div>
+            <div class="equipment">
+              <div class="l">Device</div>
+              <div class="v">iPhone · 87% battery</div>
+            </div>
+            <div class="equipment">
+              <div class="l">Audio</div>
+              <div class="v">AirPods Pro · Connected</div>
+            </div>
+          </div>
+
+          <div class="brf-section">
+            <div class="hd">
+              <div class="label">04 · Mission Objective</div>
+              <div class="line"></div>
+            </div>
+            <div class="objective-big"><em>3.0 km</em> · Free Run</div>
+          </div>
+
+          <div class="open-btn">
+            <div class="ttl">Open the Case</div>
+            <div class="sub">— Begin Investigation —</div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+    <div class="phone-label">02 · Briefing</div>
+  </div>
+
+  <!-- ======================================================
+       3) RUNNING / LIVE SURVEILLANCE
+       ====================================================== -->
+  <div class="phone-wrap">
+    <div class="phone">
+      <div class="notch"></div>
+      <div class="screen">
+        <div class="statusbar"><span>9:41</span><span>●●●● ●●</span></div>
+
+        <div class="running">
+
+          <div class="live-bar">
+            <div class="live-dot"></div>
+            <div class="live-txt">Live Case · Surveillance</div>
+            <div class="live-t">12:04</div>
+          </div>
+
+          <div class="dist-wrap">
+            <div class="dist-num">152<span class="u">M</span></div>
+            <div class="dist-delta"><em>− 18m</em> · Closing in last 60s</div>
+          </div>
+
+          <div class="minimap">
+            <div class="map-label">Tailing Zone</div>
+            <div class="compass">N</div>
+            <svg viewBox="0 0 300 180" preserveAspectRatio="none">
+              <path d="M 20 140 Q 50 120 85 120 Q 120 120 130 95 Q 140 75 180 70" stroke="#E8DCC4" stroke-width="1.2" stroke-dasharray="3,3" fill="none" opacity="0.7"/>
+              <path d="M 180 70 Q 200 65 220 60" stroke="#8B2635" stroke-width="1.2" stroke-dasharray="3,3" fill="none" opacity="0.8"/>
+            </svg>
+            <div class="me"></div>
+            <div class="susp"></div>
+          </div>
+
+          <div class="run-stats">
+            <div class="stats3">
+              <div class="cell">
+                <div class="k">Distance</div>
+                <div class="v">1.84<small>KM</small></div>
+              </div>
+              <div class="cell">
+                <div class="k">Pace</div>
+                <div class="v">5'42"</div>
+              </div>
+              <div class="cell">
+                <div class="k">Elapsed</div>
+                <div class="v">12:04</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="stake-btn">
+            Stakeout · Pause
+            <em>"pause the investigation"</em>
+          </div>
+
+        </div>
+      </div>
+    </div>
+    <div class="phone-label">03 · Surveillance</div>
+  </div>
+
+  <!-- ======================================================
+       4) RESULT / CASE CLOSED
+       ====================================================== -->
+  <div class="phone-wrap">
+    <div class="phone">
+      <div class="notch"></div>
+      <div class="screen">
+        <div class="statusbar"><span>9:41</span><span>●●●● ●●</span></div>
+
+        <div class="result">
+
+          <div class="top-row">
+            <div class="close">×</div>
+            <div class="share">↗</div>
+          </div>
+
+          <div class="stamp-row">
+            <div class="stamp tilt">CASE No. 028 · CLOSED</div>
+          </div>
+
+          <div class="verdict-wrap">
+            <div class="verdict"><em>Escaped</em></div>
+            <div class="case-sub">— Case · Solved —</div>
+            <div class="subcopy">
+              <strong>The suspect never caught up.</strong><br>
+              Case closed at <strong>04:12 AM</strong>,<br>
+              under the streetlights of Seongsu.
+            </div>
+            <div class="subcopy-by">— final report · agent D.O.R.I —</div>
+          </div>
+
+          <div class="stats3" style="margin: 0 24px;">
+            <div class="cell">
+              <div class="k">Distance</div>
+              <div class="v">3.42<small>KM</small></div>
+            </div>
+            <div class="cell">
+              <div class="k">Max Gap</div>
+              <div class="v">+312<small>M</small></div>
+            </div>
+            <div class="cell">
+              <div class="k">Duration</div>
+              <div class="v">24:18</div>
+            </div>
+          </div>
+
+          <div class="chart-wrap">
+            <div class="cap-tl">Pursuit Timeline</div>
+            <div class="cap-tr">Distance · m</div>
+            <svg class="chart" viewBox="0 0 300 110" preserveAspectRatio="none">
+              <defs>
+                <linearGradient id="fillGrad" x1="0" x2="0" y1="0" y2="1">
+                  <stop offset="0%" stop-color="#B89660" stop-opacity="0.35"/>
+                  <stop offset="100%" stop-color="#B89660" stop-opacity="0"/>
+                </linearGradient>
+              </defs>
+              <!-- grid -->
+              <line x1="0" y1="28" x2="300" y2="28" stroke="#2a1d10" stroke-width="0.5" stroke-dasharray="2,4"/>
+              <line x1="0" y1="55" x2="300" y2="55" stroke="#2a1d10" stroke-width="0.5" stroke-dasharray="2,4"/>
+              <line x1="0" y1="82" x2="300" y2="82" stroke="#2a1d10" stroke-width="0.5" stroke-dasharray="2,4"/>
+              <!-- zero baseline -->
+              <line x1="0" y1="95" x2="300" y2="95" stroke="#6a5d48" stroke-width="0.6"/>
+              <!-- fill -->
+              <path d="M 0 90 L 20 72 L 42 58 L 65 45 L 90 32 L 120 22 L 150 14 L 185 20 L 215 36 L 245 28 L 275 22 L 300 18 L 300 110 L 0 110 Z"
+                    fill="url(#fillGrad)"/>
+              <!-- danger zone bar (closer to suspect = low line) -->
+              <path d="M 185 20 L 215 36 L 245 28" stroke="#8B2635" stroke-width="1.8" fill="none" opacity="0.9"/>
+              <!-- main line -->
+              <path d="M 0 90 L 20 72 L 42 58 L 65 45 L 90 32 L 120 22 L 150 14 L 185 20 L 215 36 L 245 28 L 275 22 L 300 18"
+                    stroke="#E8DCC4" stroke-width="1.5" fill="none"/>
+              <!-- peak marker -->
+              <circle cx="150" cy="14" r="3" fill="#B89660"/>
+              <text x="156" y="12" font-family="Oswald" font-size="8" fill="#B89660" letter-spacing="1.2">PEAK 312M</text>
+              <!-- close call marker -->
+              <circle cx="215" cy="36" r="3" fill="#8B2635"/>
+              <text x="180" y="50" font-family="Oswald" font-size="7" fill="#8B2635" letter-spacing="1.2">CLOSE CALL</text>
+            </svg>
+            <div class="chart-foot">
+              <span>00:00</span><span>12:00</span><span>24:18</span>
+            </div>
+          </div>
+
+          <div class="detail-list">
+            <div class="d-row"><div class="l">Start Time</div><div class="v">03:48 AM</div></div>
+            <div class="d-row"><div class="l">End Time</div><div class="v">04:12 AM</div></div>
+            <div class="d-row"><div class="l">Avg Pace</div><div class="v">7'06" / km</div></div>
+            <div class="d-row"><div class="l">Peak Lead</div><div class="v brass">+312m @ 14:22</div></div>
+            <div class="d-row"><div class="l">Closest Call</div><div class="v wine">−6m @ 18:05</div></div>
+            <div class="d-row"><div class="l">Suspect Speed</div><div class="v">Medium · 5'30"</div></div>
+            <div class="d-row"><div class="l">Verdict</div><div class="v brass">Solved</div></div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+    <div class="phone-label">04 · Case Closed</div>
+  </div>
+
+  <!-- ======================================================
+       5) HISTORY / ARCHIVE
+       ====================================================== -->
+  <div class="phone-wrap">
+    <div class="phone">
+      <div class="notch"></div>
+      <div class="screen">
+        <div class="statusbar"><span>9:41</span><span>●●●● ●●</span></div>
+
+        <div class="topbar">
+          <div class="back">‹</div>
+          <div class="t">Case Archive</div>
+          <div class="r">⌕</div>
+        </div>
+
+        <div class="history body-pad" style="padding-top: 4px;">
+
+          <div class="arch-head">
+            <div class="k">Monthly Report</div>
+            <div class="title">April 2026</div>
+            <div class="summary">
+              <div class="s">
+                <div class="v">28</div>
+                <div class="k">Cases</div>
+              </div>
+              <div class="s">
+                <div class="v solved">22</div>
+                <div class="k">Solved</div>
+              </div>
+              <div class="s">
+                <div class="v cold">6</div>
+                <div class="k">Cold</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="case-item">
+            <div class="ci-badge">
+              <div class="en">Case</div>
+              <div class="no">028</div>
+            </div>
+            <div class="ci-body">
+              <div class="dt">April 16 · Wednesday</div>
+              <div class="loc">서울 · 성동구</div>
+              <div class="stats">3.42 km · 24:18 · avg 7'06"</div>
+            </div>
+            <div class="ci-verdict">
+              <div class="v">Solved</div>
+              <div class="d">+312m</div>
+            </div>
+          </div>
+
+          <div class="case-item">
+            <div class="ci-badge fail">
+              <div class="en">Case</div>
+              <div class="no">027</div>
+            </div>
+            <div class="ci-body">
+              <div class="dt">April 15 · Tuesday</div>
+              <div class="loc">한강 · 북단</div>
+              <div class="stats">2.18 km · 18:02 · avg 8'16"</div>
+            </div>
+            <div class="ci-verdict">
+              <div class="v cold">Cold</div>
+              <div class="d neg">−18m</div>
+            </div>
+          </div>
+
+          <div class="case-item">
+            <div class="ci-badge">
+              <div class="en">Case</div>
+              <div class="no">026</div>
+            </div>
+            <div class="ci-body">
+              <div class="dt">April 14 · Monday</div>
+              <div class="loc">남산 · 북측길</div>
+              <div class="stats">4.80 km · 33:41 · avg 7'01"</div>
+            </div>
+            <div class="ci-verdict">
+              <div class="v">Solved</div>
+              <div class="d">+520m</div>
+            </div>
+          </div>
+
+          <div class="case-item">
+            <div class="ci-badge">
+              <div class="en">Case</div>
+              <div class="no">025</div>
+            </div>
+            <div class="ci-body">
+              <div class="dt">April 13 · Sunday</div>
+              <div class="loc">여의도 · 한강공원</div>
+              <div class="stats">5.12 km · 36:20 · avg 7'05"</div>
+            </div>
+            <div class="ci-verdict">
+              <div class="v">Solved</div>
+              <div class="d">+204m</div>
+            </div>
+          </div>
+
+          <div class="case-item">
+            <div class="ci-badge fail">
+              <div class="en">Case</div>
+              <div class="no">024</div>
+            </div>
+            <div class="ci-body">
+              <div class="dt">April 11 · Friday</div>
+              <div class="loc">종로 · 청계천</div>
+              <div class="stats">1.84 km · 15:40 · avg 8'31"</div>
+            </div>
+            <div class="ci-verdict">
+              <div class="v cold">Cold</div>
+              <div class="d neg">−42m</div>
+            </div>
+          </div>
+
+          <div class="case-item">
+            <div class="ci-badge">
+              <div class="en">Case</div>
+              <div class="no">023</div>
+            </div>
+            <div class="ci-body">
+              <div class="dt">April 10 · Thursday</div>
+              <div class="loc">잠실 · 석촌호수</div>
+              <div class="stats">3.80 km · 27:12 · avg 7'09"</div>
+            </div>
+            <div class="ci-verdict">
+              <div class="v">Solved</div>
+              <div class="d">+186m</div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+    <div class="phone-label">05 · Archive</div>
+  </div>
+
+  <!-- ======================================================
+       6) SETTINGS / AGENT PROFILE
+       ====================================================== -->
+  <div class="phone-wrap">
+    <div class="phone">
+      <div class="notch"></div>
+      <div class="screen">
+        <div class="statusbar"><span>9:41</span><span>●●●● ●●</span></div>
+
+        <div class="topbar">
+          <div class="back">‹</div>
+          <div class="t">Agent · Credentials</div>
+          <div class="r">↗</div>
+        </div>
+
+        <div class="settings body-pad" style="padding-top: 4px;">
+
+          <div class="prof-head">
+            <div class="k">Personnel File</div>
+            <div class="title">Agent Profile</div>
+          </div>
+
+          <div class="agent-card">
+            <div class="row">
+              <div class="agent-avatar">D</div>
+              <div class="agent-info">
+                <div class="k">Codename · Badge</div>
+                <div class="name">Agent D.O.R.I</div>
+                <div class="pro">PRO · Member</div>
+              </div>
+            </div>
+            <div class="agent-stats">
+              <div class="as">
+                <div class="v">28</div>
+                <div class="k">Cases</div>
+              </div>
+              <div class="as">
+                <div class="v">79%</div>
+                <div class="k">Solved</div>
+              </div>
+              <div class="as">
+                <div class="v">14<span style="font-size:11px;">d</span></div>
+                <div class="k">Streak</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="settings-section">
+            <div class="sec-head">
+              <div class="n">01 · Appearance</div>
+              <div class="line"></div>
+              <div class="num">§01</div>
+            </div>
+            <div class="set-item">
+              <div>
+                <div class="lbl">Theme</div>
+                <div class="sublbl">Visual · Mood</div>
+              </div>
+              <div class="v">Film Noir</div>
+            </div>
+            <div class="set-item">
+              <div>
+                <div class="lbl">Case Number Style</div>
+                <div class="sublbl">Badge Format</div>
+              </div>
+              <div class="v">Italic · 028</div>
+            </div>
+          </div>
+
+          <div class="settings-section">
+            <div class="sec-head">
+              <div class="n">02 · Audio</div>
+              <div class="line"></div>
+              <div class="num">§02</div>
+            </div>
+            <div class="set-item">
+              <div>
+                <div class="lbl">Narrator Voice</div>
+                <div class="sublbl">Hard-boiled Detective</div>
+              </div>
+              <div class="v">Male · Low</div>
+            </div>
+            <div class="set-item">
+              <div>
+                <div class="lbl">Footstep FX</div>
+                <div class="sublbl">Suspect Audio Cues</div>
+              </div>
+              <div class="toggle on"></div>
+            </div>
+            <div class="set-item">
+              <div>
+                <div class="lbl">Radio Static</div>
+                <div class="sublbl">Ambient Noise</div>
+              </div>
+              <div class="toggle on"></div>
+            </div>
+          </div>
+
+          <div class="settings-section">
+            <div class="sec-head">
+              <div class="n">03 · Game</div>
+              <div class="line"></div>
+              <div class="num">§03</div>
+            </div>
+            <div class="set-item">
+              <div>
+                <div class="lbl">Default Suspect Speed</div>
+                <div class="sublbl">Pursuit Difficulty</div>
+              </div>
+              <div class="v">Medium</div>
+            </div>
+            <div class="set-item">
+              <div>
+                <div class="lbl">Jumpscare Intensity</div>
+                <div class="sublbl">On Close Call</div>
+              </div>
+              <div class="v">Subtle</div>
+            </div>
+            <div class="set-item">
+              <div>
+                <div class="lbl">Haptic Feedback</div>
+                <div class="sublbl">Watch Companion</div>
+              </div>
+              <div class="toggle on"></div>
+            </div>
+          </div>
+
+          <div class="settings-section">
+            <div class="sec-head">
+              <div class="n">04 · Support</div>
+              <div class="line"></div>
+              <div class="num">§04</div>
+            </div>
+            <div class="set-item">
+              <div>
+                <div class="lbl">Help · FAQ</div>
+                <div class="sublbl">Field Manual</div>
+              </div>
+              <div class="v">›</div>
+            </div>
+            <div class="set-item">
+              <div>
+                <div class="lbl">Privacy</div>
+                <div class="sublbl">Classified Files</div>
+              </div>
+              <div class="v">›</div>
+            </div>
+            <div class="set-item">
+              <div>
+                <div class="lbl">Version</div>
+                <div class="sublbl">Build · 1.0.0 +12</div>
+              </div>
+              <div class="v">Latest</div>
+            </div>
+          </div>
+
+          <div class="hidden-hint">
+            — tap <em>×7</em> to unlock the cold file —
+          </div>
+
+        </div>
+      </div>
+    </div>
+    <div class="phone-label">06 · Agent Profile</div>
+  </div>
+
+</div>
+
+</body>
+</html>

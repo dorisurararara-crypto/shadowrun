@@ -1,0 +1,1237 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Shadow Run — 5 Themes × 6 Screens</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,700;1,400;1,700&family=Gowun+Batang:wght@400;700&family=Nanum+Myeongjo:wght@400;700;800&family=Noto+Serif+KR:wght@200;400;500;700;900&family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=Space+Grotesk:wght@400;500;700;900&family=Inter:wght@100;200;300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;700&family=Oswald:wght@200;400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css" />
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: #050507;
+    color: #eaeaea;
+    font-family: 'Pretendard', sans-serif;
+    min-height: 100vh;
+    padding: 40px 20px 80px;
+  }
+  .master-header { max-width: 1400px; margin: 0 auto 48px; text-align: center; }
+  .master-header h1 {
+    font-family: 'Playfair Display', serif;
+    font-weight: 900;
+    font-size: 46px;
+    letter-spacing: -0.02em;
+  }
+  .master-header h1 em { font-style: italic; color: #ff6b7e; font-weight: 400; }
+  .master-header p { color: #888; font-size: 14px; line-height: 1.6; max-width: 760px; margin: 12px auto 0; }
+  .master-header nav {
+    display: flex; justify-content: center; gap: 8px; margin-top: 20px; flex-wrap: wrap;
+  }
+  .master-header nav a {
+    padding: 8px 14px;
+    border: 1px solid #2a2a2e;
+    border-radius: 999px;
+    color: #aaa;
+    font-size: 12px;
+    text-decoration: none;
+    letter-spacing: 0.05em;
+  }
+  .master-header nav a:hover { border-color: #ff6b7e; color: #ff6b7e; }
+
+  /* ============ 테마 섹션 ============ */
+  .theme-section {
+    max-width: 1400px;
+    margin: 0 auto 72px;
+    padding: 32px 24px 40px;
+    border-top: 1px solid #1a1a1d;
+  }
+  .theme-title {
+    display: flex;
+    align-items: baseline;
+    gap: 16px;
+    margin-bottom: 8px;
+    flex-wrap: wrap;
+  }
+  .theme-num {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-size: 14px;
+    color: #ff6b7e;
+    letter-spacing: 0.25em;
+  }
+  .theme-name {
+    font-family: 'Playfair Display', serif;
+    font-weight: 900;
+    font-size: 32px;
+    letter-spacing: -0.02em;
+    color: #fff;
+  }
+  .theme-price {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    padding: 3px 10px;
+    border-radius: 4px;
+    letter-spacing: 0.1em;
+  }
+  .price-free { background: rgba(107, 217, 199, 0.1); color: #6BD9C7; border: 1px solid rgba(107, 217, 199, 0.3); }
+  .price-paid { background: rgba(212, 175, 55, 0.1); color: #D4AF37; border: 1px solid rgba(212, 175, 55, 0.3); }
+  .theme-desc { color: #888; font-size: 13.5px; line-height: 1.55; max-width: 800px; margin-bottom: 28px; }
+
+  .screens-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 28px 16px;
+    justify-items: center;
+  }
+  @media (max-width: 1100px) { .screens-grid { grid-template-columns: repeat(2, 1fr); } }
+  @media (max-width: 700px)  { .screens-grid { grid-template-columns: 1fr; } }
+
+  .screen-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+  }
+  .screen-name {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-size: 13px;
+    color: #888;
+    letter-spacing: 0.15em;
+  }
+
+  /* ============ 폰 프레임 공용 ============ */
+  .phone {
+    width: 300px; height: 620px;
+    border-radius: 42px;
+    overflow: hidden;
+    position: relative;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.8), 0 0 0 7px #1a1a1a, 0 0 0 8px #2c2c30;
+  }
+  .notch {
+    position: absolute;
+    top: 11px; left: 50%; transform: translateX(-50%);
+    width: 104px; height: 26px;
+    background: #000;
+    border-radius: 20px;
+    z-index: 100;
+  }
+  .screen {
+    width: 100%; height: 100%;
+    position: relative;
+    overflow: hidden;
+    background: var(--bg);
+    color: var(--fg);
+    font-family: var(--bodyFont);
+  }
+  .statusbar {
+    position: absolute; top: 0; left: 0; right: 0;
+    padding: 13px 22px 0;
+    display: flex; justify-content: space-between;
+    font-family: 'Inter', sans-serif;
+    font-size: 11.5px;
+    font-weight: 600;
+    color: var(--fg);
+    z-index: 80;
+    letter-spacing: -0.02em;
+  }
+
+  /* ============ CSS 변수로 테마 토큰 정의 ============ */
+  /* T1: Pure Cinematic */
+  .t1 {
+    --bg: #000;
+    --surface: #0a0a0a;
+    --card: #0e0e0e;
+    --fg: #f5f5f5;
+    --fg-dim: #888;
+    --fg-fade: #555;
+    --accent: #8B0000;
+    --accent-soft: #c83030;
+    --accent-bg: rgba(139,0,0,0.1);
+    --border: #1a1a1a;
+    --border-strong: #2a0000;
+    --heroFont: 'Playfair Display', serif;
+    --bodyFont: 'Noto Serif KR', serif;
+    --numFont: 'Playfair Display', serif;
+    --labelFont: 'Playfair Display', serif;
+  }
+  /* T2: Film Noir */
+  .t2 {
+    --bg: #0D0907;
+    --surface: #110C08;
+    --card: #150E0A;
+    --fg: #E8DCC4;
+    --fg-dim: #8a7d5f;
+    --fg-fade: #5a4d35;
+    --accent: #8B2635;
+    --accent-soft: #B89660;
+    --accent-bg: rgba(184,150,96,0.08);
+    --border: #2a1d10;
+    --border-strong: #3a2718;
+    --heroFont: 'Cormorant Garamond', serif;
+    --bodyFont: 'Cormorant Garamond', serif;
+    --numFont: 'Cormorant Garamond', serif;
+    --labelFont: 'Oswald', sans-serif;
+  }
+  /* T3: Korean Mystic Horror */
+  .t3 {
+    --bg: #050302;
+    --surface: #0a0604;
+    --card: #0d0607;
+    --fg: #F0EBE3;
+    --fg-dim: #9a8a7a;
+    --fg-fade: #5a4840;
+    --accent: #7A0A0E;
+    --accent-soft: #c42029;
+    --accent-bg: rgba(122,10,14,0.12);
+    --border: #2a1518;
+    --border-strong: #4a2528;
+    --heroFont: 'Nanum Myeongjo', serif;
+    --bodyFont: 'Gowun Batang', serif;
+    --numFont: 'Nanum Myeongjo', serif;
+    --labelFont: 'Nanum Myeongjo', serif;
+  }
+  /* T4: Editorial Thriller */
+  .t4 {
+    --bg: #0a0a0a;
+    --surface: #111;
+    --card: #0e0e0e;
+    --fg: #fff;
+    --fg-dim: #888;
+    --fg-fade: #555;
+    --accent: #DC2626;
+    --accent-soft: #f87171;
+    --accent-bg: rgba(220,38,38,0.08);
+    --border: #222;
+    --border-strong: #fff;
+    --heroFont: 'Playfair Display', serif;
+    --bodyFont: 'Inter', sans-serif;
+    --numFont: 'Playfair Display', serif;
+    --labelFont: 'Inter', sans-serif;
+  }
+  /* T5: Neo-Noir Cyber */
+  .t5 {
+    --bg: #04040A;
+    --surface: #080812;
+    --card: #0a0a18;
+    --fg: #E8E8F0;
+    --fg-dim: #666;
+    --fg-fade: #3a3a4a;
+    --accent: #FF1744;
+    --accent-soft: #ff5a75;
+    --accent-bg: rgba(255,23,68,0.08);
+    --blue: #4DD0E1;
+    --blue-dim: rgba(77,208,225,0.15);
+    --border: rgba(77,208,225,0.12);
+    --border-strong: #FF1744;
+    --heroFont: 'Playfair Display', serif;
+    --bodyFont: 'Inter', sans-serif;
+    --numFont: 'JetBrains Mono', monospace;
+    --labelFont: 'JetBrains Mono', monospace;
+  }
+  /* 테마별 배경 질감 */
+  .t1 .screen {
+    background:
+      radial-gradient(ellipse 400px 300px at 50% 0%, rgba(139,0,0,0.1), transparent 60%),
+      #000;
+  }
+  .t2 .screen {
+    background:
+      radial-gradient(ellipse at 30% 20%, rgba(184,150,96,0.04), transparent 50%),
+      #0D0907;
+  }
+  .t2 .screen::before {
+    content: '';
+    position: absolute; inset: 0;
+    background: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/><feColorMatrix values='0 0 0 0 0.7 0 0 0 0 0.6 0 0 0 0 0.4 0 0 0 0.06 0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
+    pointer-events: none;
+    mix-blend-mode: overlay;
+    opacity: 0.5;
+    z-index: 1;
+  }
+  .t3 .screen { background: #050302; }
+  .t3 .screen::after {
+    content: '影';
+    position: absolute;
+    top: 18%; right: -30px;
+    font-family: 'Nanum Myeongjo', serif;
+    font-size: 240px;
+    color: rgba(122,10,14,0.12);
+    line-height: 1;
+    pointer-events: none;
+    z-index: 1;
+  }
+  .t5 .screen {
+    background:
+      radial-gradient(ellipse at 80% 0%, rgba(255,23,68,0.16), transparent 55%),
+      radial-gradient(ellipse at 0% 80%, rgba(77,208,225,0.06), transparent 55%),
+      #04040A;
+  }
+  .t5 .screen::before {
+    content: '';
+    position: absolute; inset: 0;
+    background: repeating-linear-gradient(0deg, transparent 0, transparent 3px, rgba(77,208,225,0.02) 3px, rgba(77,208,225,0.02) 4px);
+    pointer-events: none;
+    z-index: 1;
+  }
+
+  /* ============ 공용 레이아웃 ============ */
+  .body { padding: 44px 20px 14px; position: relative; z-index: 10; height: 100%; overflow-y: auto; }
+  .body::-webkit-scrollbar { display: none; }
+
+  /* 헤더 */
+  .h-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 12px;
+  }
+  .eyebrow {
+    font-family: var(--labelFont);
+    font-size: 10px;
+    color: var(--accent-soft);
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    font-style: italic;
+  }
+  .t2 .eyebrow, .t4 .eyebrow, .t5 .eyebrow { font-style: normal; }
+  .icons {
+    display: flex;
+    gap: 8px;
+  }
+  .ico {
+    width: 28px; height: 28px;
+    border-radius: 8px;
+    background: rgba(255,255,255,0.03);
+    border: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: center;
+    color: var(--fg-dim);
+    font-size: 14px;
+  }
+  .logo {
+    font-family: var(--heroFont);
+    font-weight: 900;
+    font-size: 30px;
+    letter-spacing: -0.03em;
+    line-height: 1;
+    color: var(--fg);
+    margin-bottom: 4px;
+  }
+  .t3 .logo { font-size: 26px; letter-spacing: 0.04em; }
+  .t5 .logo { font-style: italic; text-shadow: 0 0 16px rgba(255,23,68,0.4); }
+  .logo em { color: var(--accent); font-style: inherit; }
+  .sub {
+    font-family: var(--labelFont);
+    font-size: 10px;
+    color: var(--fg-fade);
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    margin-bottom: 14px;
+  }
+
+  /* 인용구 */
+  .quote {
+    font-family: var(--bodyFont);
+    font-size: 14px;
+    line-height: 1.6;
+    color: var(--fg);
+    margin: 6px 0 14px;
+    padding: 2px 0;
+  }
+  .t1 .quote, .t2 .quote, .t3 .quote { text-align: center; }
+  .t4 .quote { font-family: 'Playfair Display', serif; font-size: 17px; line-height: 1.3; }
+  .t5 .quote { padding-left: 12px; border-left: 2px solid var(--accent); }
+  .quote em, .quote strong {
+    font-family: var(--numFont);
+    font-style: italic;
+    color: var(--accent);
+    font-weight: 700;
+  }
+  .quote-by {
+    font-family: var(--labelFont);
+    font-size: 9.5px;
+    color: var(--fg-fade);
+    letter-spacing: 0.3em;
+    margin-top: 6px;
+    text-align: center;
+    text-transform: uppercase;
+  }
+  .t5 .quote-by { text-align: left; color: var(--blue, var(--accent-soft)); }
+
+  /* 스탯 */
+  .stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1px;
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+    padding: 10px 0;
+    margin-bottom: 14px;
+  }
+  .stat { text-align: center; padding: 2px 4px; border-right: 1px solid var(--border); }
+  .stat:last-child { border-right: none; }
+  .stat .v {
+    font-family: var(--numFont);
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--fg);
+    line-height: 1;
+    letter-spacing: -0.02em;
+  }
+  .t1 .stat .v, .t4 .stat .v { font-weight: 400; }
+  .t5 .stat .v { font-style: italic; }
+  .stat .v small {
+    font-size: 9px;
+    color: var(--fg-fade);
+    font-weight: 400;
+    margin-left: 1px;
+  }
+  .stat .k {
+    font-family: var(--labelFont);
+    font-size: 8px;
+    color: var(--fg-fade);
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    margin-top: 3px;
+  }
+
+  /* 시작 버튼 */
+  .start {
+    padding: 14px 14px 16px;
+    margin-bottom: 14px;
+    text-align: center;
+    background: var(--accent-bg);
+    border: 1px solid var(--accent);
+    border-radius: 0;
+    position: relative;
+  }
+  .t4 .start { background: var(--accent); border: none; color: #fff; text-align: left; padding: 16px; }
+  .t5 .start {
+    background: linear-gradient(135deg, var(--accent) 0%, #aa0028 100%);
+    border: 1px solid var(--accent);
+    box-shadow: 0 0 20px rgba(255,23,68,0.25);
+    color: #fff;
+  }
+  .t2 .start::before, .t2 .start::after {
+    content: ''; position: absolute; width: 14px; height: 14px;
+    border: 1px solid var(--accent-soft);
+  }
+  .t2 .start::before { top: -1px; left: -1px; border-right: none; border-bottom: none; }
+  .t2 .start::after { bottom: -1px; right: -1px; border-left: none; border-top: none; }
+  .start-tag {
+    font-family: var(--labelFont);
+    font-size: 9px;
+    color: var(--accent-soft);
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    margin-bottom: 3px;
+    font-style: italic;
+  }
+  .t4 .start-tag, .t5 .start-tag { color: rgba(255,255,255,0.7); font-style: normal; }
+  .start-ttl {
+    font-family: var(--heroFont);
+    font-weight: 700;
+    font-size: 18px;
+    color: var(--fg);
+    line-height: 1.15;
+    letter-spacing: -0.01em;
+  }
+  .t4 .start-ttl, .t5 .start-ttl { color: #fff; font-style: italic; font-weight: 900; }
+
+  /* 로그 / 리스트 */
+  .log-ttl {
+    font-family: var(--labelFont);
+    font-size: 9.5px;
+    color: var(--accent-soft);
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+    padding-bottom: 4px;
+    border-bottom: 1px solid var(--border);
+  }
+  .t4 .log-ttl { border-bottom: 2px solid var(--fg); color: var(--accent); }
+  .log {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    padding: 7px 0;
+    border-bottom: 1px dotted var(--border);
+    font-size: 11.5px;
+  }
+  .log-l {
+    color: var(--fg-dim);
+    font-family: var(--bodyFont);
+  }
+  .t2 .log-l { font-style: italic; }
+  .log-v {
+    font-family: var(--heroFont);
+    font-style: italic;
+    color: var(--fg);
+    font-size: 12px;
+  }
+  .log-v.ok { color: var(--accent-soft); }
+  .log-v.fail { color: var(--accent); }
+  .t5 .log-v { font-family: var(--numFont); font-style: normal; font-weight: 700; }
+
+  /* ============ 화면별 특수 스타일 ============ */
+
+  /* PREPARE */
+  .prep-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    padding: 12px;
+    margin-bottom: 10px;
+  }
+  .prep-card-k {
+    font-family: var(--labelFont);
+    font-size: 9px;
+    color: var(--fg-fade);
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+  }
+  .prep-card-v {
+    font-family: var(--heroFont);
+    font-size: 14px;
+    color: var(--fg);
+    font-weight: 700;
+  }
+  .prep-options {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 6px;
+    margin-top: 6px;
+  }
+  .prep-opt {
+    padding: 10px 4px;
+    border: 1px solid var(--border);
+    text-align: center;
+    font-family: var(--bodyFont);
+    font-size: 11px;
+    color: var(--fg-dim);
+  }
+  .prep-opt.sel {
+    border-color: var(--accent);
+    color: var(--accent);
+    background: var(--accent-bg);
+  }
+  .prep-opt small {
+    display: block;
+    font-family: var(--numFont);
+    font-size: 14px;
+    color: var(--fg);
+    font-style: italic;
+    margin-bottom: 3px;
+    font-weight: 700;
+  }
+  .prep-opt.sel small { color: var(--accent); }
+  .prep-go {
+    margin-top: 14px;
+    padding: 20px;
+    background: linear-gradient(135deg, var(--accent) 0%, #5b0000 100%);
+    text-align: center;
+    border: 1px solid var(--accent);
+    color: #fff;
+  }
+  .t5 .prep-go { box-shadow: 0 0 20px rgba(255,23,68,0.3); }
+  .prep-go-ttl {
+    font-family: var(--heroFont);
+    font-style: italic;
+    font-weight: 900;
+    font-size: 24px;
+    color: #fff;
+    letter-spacing: -0.01em;
+  }
+  .prep-go-sub {
+    font-family: var(--labelFont);
+    font-size: 10px;
+    color: rgba(255,255,255,0.8);
+    letter-spacing: 0.3em;
+    margin-top: 3px;
+  }
+
+  /* RUNNING */
+  .run-hero {
+    text-align: center;
+    margin: 20px 0 16px;
+  }
+  .run-hero-k {
+    font-family: var(--labelFont);
+    font-size: 10px;
+    color: var(--accent-soft);
+    letter-spacing: 0.35em;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+    animation: blinkSlow 2s infinite;
+  }
+  @keyframes blinkSlow { 0%, 60% { opacity: 1; } 61%, 100% { opacity: 0.5; } }
+  .run-hero-n {
+    font-family: var(--numFont);
+    font-size: 80px;
+    font-weight: 900;
+    color: var(--accent);
+    line-height: 0.9;
+    letter-spacing: -0.04em;
+    text-shadow: 0 0 30px var(--accent-bg);
+  }
+  .t1 .run-hero-n, .t2 .run-hero-n, .t4 .run-hero-n { font-weight: 700; }
+  .t3 .run-hero-n { font-weight: 800; color: var(--accent-soft); }
+  .t5 .run-hero-n { font-style: italic; }
+  .run-hero-u {
+    font-family: var(--labelFont);
+    font-size: 11px;
+    color: var(--fg-fade);
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    margin-top: 4px;
+  }
+  .run-map {
+    height: 110px;
+    border: 1px solid var(--border);
+    background:
+      radial-gradient(circle at 35% 55%, rgba(139,0,0,0.15), transparent 40%),
+      linear-gradient(135deg, rgba(255,255,255,0.02), transparent);
+    position: relative;
+    margin-bottom: 12px;
+    overflow: hidden;
+  }
+  .t5 .run-map {
+    background:
+      radial-gradient(circle at 35% 55%, rgba(255,23,68,0.2), transparent 40%),
+      radial-gradient(circle at 20% 70%, rgba(77,208,225,0.1), transparent 40%);
+  }
+  .run-map::before {
+    content: '';
+    position: absolute; inset: 0;
+    background:
+      linear-gradient(90deg, transparent 49%, rgba(255,255,255,0.03) 50%, transparent 51%),
+      linear-gradient(0deg, transparent 49%, rgba(255,255,255,0.03) 50%, transparent 51%);
+    background-size: 24px 24px;
+  }
+  .dot-me {
+    position: absolute;
+    left: 35%; top: 55%;
+    width: 10px; height: 10px;
+    background: #fff;
+    border-radius: 50%;
+    box-shadow: 0 0 0 3px rgba(255,255,255,0.3);
+  }
+  .dot-him {
+    position: absolute;
+    left: 20%; top: 70%;
+    width: 8px; height: 8px;
+    background: var(--accent);
+    border-radius: 50%;
+    box-shadow: 0 0 0 3px rgba(139,0,0,0.3), 0 0 18px var(--accent);
+    animation: pulseRed 0.9s infinite;
+  }
+  @keyframes pulseRed {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.25); }
+  }
+  .run-pause {
+    position: absolute;
+    left: 50%; bottom: 20px;
+    transform: translateX(-50%);
+    width: 54px; height: 54px;
+    border-radius: 50%;
+    background: var(--accent-bg);
+    border: 1px solid var(--accent);
+    display: flex; align-items: center; justify-content: center;
+    color: var(--accent);
+    font-size: 20px;
+    font-weight: 700;
+  }
+  .t4 .run-pause { background: var(--accent); color: #fff; border: none; }
+  .t5 .run-pause { box-shadow: 0 0 16px rgba(255,23,68,0.4); }
+
+  /* RESULT */
+  .res-verdict {
+    text-align: center;
+    padding: 16px 0 10px;
+  }
+  .res-v-tag {
+    font-family: var(--labelFont);
+    font-size: 10px;
+    color: var(--accent-soft);
+    letter-spacing: 0.35em;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+    font-style: italic;
+  }
+  .t2 .res-v-tag, .t4 .res-v-tag, .t5 .res-v-tag { font-style: normal; }
+  .res-v-ttl {
+    font-family: var(--heroFont);
+    font-size: 38px;
+    font-weight: 900;
+    color: var(--fg);
+    letter-spacing: -0.03em;
+    line-height: 1;
+  }
+  .t2 .res-v-ttl, .t5 .res-v-ttl { font-style: italic; }
+  .t3 .res-v-ttl { font-size: 30px; font-weight: 800; }
+  .res-v-sub {
+    font-family: var(--bodyFont);
+    font-size: 13px;
+    color: var(--fg-dim);
+    margin-top: 8px;
+    font-style: italic;
+    line-height: 1.5;
+  }
+  .t4 .res-v-sub { font-style: normal; }
+  .res-divider {
+    width: 30px; height: 1px;
+    background: var(--accent);
+    margin: 14px auto;
+  }
+  .res-chart {
+    height: 70px;
+    padding: 8px 0;
+    position: relative;
+    margin-bottom: 10px;
+  }
+  .res-chart svg { width: 100%; height: 100%; }
+  .res-chart-k {
+    font-family: var(--labelFont);
+    font-size: 9px;
+    color: var(--fg-fade);
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+  }
+
+  /* HISTORY */
+  .hist-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 10px;
+  }
+  .hist-title {
+    font-family: var(--heroFont);
+    font-weight: 900;
+    font-size: 22px;
+    color: var(--fg);
+    letter-spacing: -0.02em;
+  }
+  .t2 .hist-title, .t5 .hist-title { font-style: italic; }
+  .hist-month {
+    font-family: var(--labelFont);
+    font-size: 10px;
+    color: var(--fg-fade);
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+  }
+  .hist-total {
+    padding: 10px 12px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    margin-bottom: 10px;
+    display: flex;
+    justify-content: space-around;
+    text-align: center;
+  }
+  .hist-total-item .v {
+    font-family: var(--numFont);
+    font-size: 17px;
+    color: var(--fg);
+    font-weight: 700;
+  }
+  .t5 .hist-total-item .v { font-style: italic; }
+  .hist-total-item .k {
+    font-family: var(--labelFont);
+    font-size: 8px;
+    color: var(--fg-fade);
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    margin-top: 2px;
+  }
+  .hist-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 2px;
+    border-bottom: 1px dotted var(--border);
+  }
+  .hist-badge {
+    width: 34px; height: 34px;
+    border: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: center;
+    font-family: var(--heroFont);
+    font-style: italic;
+    font-size: 11px;
+    color: var(--fg-dim);
+    flex-shrink: 0;
+  }
+  .hist-badge.ok { border-color: var(--accent-soft); color: var(--accent-soft); }
+  .hist-badge.fail { background: var(--accent); color: #fff; border-color: var(--accent); }
+  .hist-info { flex: 1; min-width: 0; }
+  .hist-date { font-size: 11px; color: var(--fg); font-weight: 600; }
+  .hist-meta { font-size: 9.5px; color: var(--fg-fade); margin-top: 1px; font-family: var(--labelFont); letter-spacing: 0.05em; }
+  .hist-dist {
+    font-family: var(--numFont);
+    font-size: 12px;
+    font-weight: 700;
+    text-align: right;
+  }
+  .t1 .hist-dist, .t4 .hist-dist { font-style: italic; font-weight: 400; }
+  .hist-dist.pos { color: var(--accent-soft); }
+  .hist-dist.neg { color: var(--accent); }
+
+  /* SETTINGS */
+  .set-profile {
+    background: var(--card);
+    border: 1px solid var(--border);
+    padding: 12px;
+    margin-bottom: 14px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .set-avatar {
+    width: 42px; height: 42px;
+    border-radius: 50%;
+    background: var(--accent-bg);
+    border: 1px solid var(--accent);
+    display: flex; align-items: center; justify-content: center;
+    font-family: var(--heroFont);
+    font-style: italic;
+    font-size: 16px;
+    color: var(--accent);
+    font-weight: 700;
+  }
+  .set-name { font-size: 13px; color: var(--fg); font-weight: 600; font-family: var(--heroFont); }
+  .t1 .set-name, .t4 .set-name { font-style: italic; font-weight: 400; font-size: 15px; }
+  .set-pro {
+    font-family: var(--labelFont);
+    font-size: 9px;
+    color: #D4AF37;
+    letter-spacing: 0.25em;
+    margin-top: 2px;
+  }
+  .set-sec-ttl {
+    font-family: var(--labelFont);
+    font-size: 9px;
+    color: var(--accent-soft);
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    margin: 14px 0 4px;
+    font-style: italic;
+  }
+  .t4 .set-sec-ttl, .t5 .set-sec-ttl { font-style: normal; }
+  .set-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 9px 0;
+    border-bottom: 1px dotted var(--border);
+    font-size: 12px;
+  }
+  .set-row-l { color: var(--fg); font-family: var(--bodyFont); }
+  .set-row-v {
+    color: var(--fg-dim);
+    font-family: var(--labelFont);
+    font-size: 10px;
+    letter-spacing: 0.1em;
+  }
+  .set-row-v .dot {
+    display: inline-block;
+    width: 5px; height: 5px;
+    background: var(--accent);
+    border-radius: 50%;
+    margin-right: 4px;
+  }
+  .set-version {
+    text-align: center;
+    font-family: var(--labelFont);
+    font-size: 9px;
+    color: var(--fg-fade);
+    letter-spacing: 0.2em;
+    margin-top: 16px;
+    padding: 8px;
+    border: 1px dashed var(--border);
+  }
+
+  /* 테마별 시그니처 장식 */
+  .t2-stamp {
+    display: inline-block;
+    border: 1px solid var(--accent-soft);
+    padding: 2px 8px;
+    font-family: 'Oswald', sans-serif;
+    font-size: 9px;
+    color: var(--accent-soft);
+    letter-spacing: 0.3em;
+    margin-bottom: 8px;
+    text-transform: uppercase;
+  }
+  .t3-hanja {
+    font-family: 'Nanum Myeongjo', serif;
+    font-size: 13px;
+    color: var(--accent);
+    letter-spacing: 0.6em;
+    text-align: center;
+    margin-bottom: 6px;
+  }
+  .t4-no {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-size: 11px;
+    color: var(--accent);
+    letter-spacing: 0.2em;
+    margin-bottom: 2px;
+  }
+  .t4-divider { height: 2px; background: var(--fg); margin: 6px 0 8px; }
+  .t5-tag {
+    display: inline-block;
+    padding: 2px 7px;
+    border: 1px solid var(--accent);
+    color: var(--accent);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 8.5px;
+    letter-spacing: 0.2em;
+    margin-bottom: 10px;
+  }
+  .t5-tag::before { content: '● '; animation: blinkSlow 1s infinite; }
+
+</style>
+</head>
+<body>
+
+<div class="master-header">
+  <h1>SHADOW RUN · <em>All Themes × All Screens</em></h1>
+  <p>5개 테마 × 6개 핵심 화면 = 30개 목업.<br>
+     T1 Pure Cinematic은 무료 기본 / T2~T5는 인앱결제 프리미엄 테마팩.<br>
+     레이아웃은 같고 색·폰트·시그니처 장식만 테마별로 교체되도록 CSS 변수로 설계됨.</p>
+  <nav>
+    <a href="#t1">① Pure Cinematic · FREE</a>
+    <a href="#t2">② Film Noir · PAID</a>
+    <a href="#t3">③ Korean Mystic · PAID</a>
+    <a href="#t4">④ Editorial · PAID</a>
+    <a href="#t5">⑤ Neo-Noir Cyber · PAID</a>
+  </nav>
+</div>
+
+<!-- 화면 템플릿은 JS로 렌더링 (각 테마에 반복 삽입) -->
+<div id="root"></div>
+
+<script>
+const themes = [
+  { id:'t1', num:'Theme 01', name:'Pure Cinematic', price:'FREE · 기본', priceClass:'price-free',
+    desc:'순검정 + Noto Serif KR + Playfair Italic. 여백과 정적, 우아한 미니멀. 기본 탑재.' },
+  { id:'t2', num:'Theme 02', name:'Film Noir', price:'₩1,500',     priceClass:'price-paid',
+    desc:'1940년대 탐정 영화. 크림+골드+와인. Cormorant Italic + Oswald. 러닝 = 사건 파일 (CASE No.028).' },
+  { id:'t3', num:'Theme 03', name:'Korean Mystic', price:'₩1,500', priceClass:'price-paid',
+    desc:'곡성·파묘 감성. 나눔명조 + 한자 워터마크(影 · 追 · 始). "살았다/잡혔다" 한국적 호러 어휘.' },
+  { id:'t4', num:'Theme 04', name:'Editorial Thriller', price:'₩1,500', priceClass:'price-paid',
+    desc:'GQ/Vogue 매거진 에디토리얼. 거대 Playfair 로고, No.028 이슈 번호, "Cover Story" 프레임.' },
+  { id:'t5', num:'Theme 05', name:'Neo-Noir Cyber', price:'₩1,500',    priceClass:'price-paid',
+    desc:'블레이드러너·사이버펑크. 붉은 네온 + 차가운 시안. JetBrains Mono 시스템 로그 + Playfair Italic 제목.' },
+];
+
+// 테마별 시그니처 상단 장식
+function topDeco(tid, context) {
+  if (tid === 't2') return `<div class="t2-stamp">${context || 'Case No. 028'}</div>`;
+  if (tid === 't3') return `<div class="t3-hanja">${context || '影 追 夜'}</div>`;
+  if (tid === 't4') return `<div class="t4-no">No. ${context || '028'} · APR 17</div><div class="t4-divider"></div>`;
+  if (tid === 't5') return `<div class="t5-tag">${context || 'TRACKING · 028'}</div>`;
+  return '';
+}
+
+// 테마별 "탈출/잡힘" 단어
+const lex = {
+  t1: { ok:'escaped', fail:'caught',  run:'오늘의 도주', runSub:"tonight's run", success:'ESCAPED', failure:'CAUGHT' },
+  t2: { ok:'escaped', fail:'caught',  run:'오늘의 사건', runSub:'open the file',    success:'CASE · SOLVED', failure:'CASE · COLD' },
+  t3: { ok:'살았다',  fail:'잡혔다',   run:'오늘 밤',    runSub:'지 금 시 작',        success:'살 아 남 았 다', failure:'잡 혔 다' },
+  t4: { ok:'ESCAPED', fail:'CAUGHT',   run:'Chapter 29', runSub:'begin now',        success:'CHAPTER CLEARED', failure:'CHAPTER ENDED' },
+  t5: { ok:'ESCAPED', fail:'CAPTURED', run:'도주 시작',   runSub:'EXECUTE',           success:'SUBJECT · SAFE',  failure:'SUBJECT · LOST' },
+};
+
+function screenHome(t) {
+  const L = lex[t];
+  return `
+  <div class="screen">
+    <div class="statusbar"><span>9:41</span><span>●●●● ●●</span></div>
+    <div class="body">
+      <div class="h-top">
+        <div class="eyebrow">그림자는 쉬지 않는다</div>
+        <div class="icons"><div class="ico">≡</div><div class="ico">⚙</div></div>
+      </div>
+      ${topDeco(t)}
+      <div class="logo">SHADOW <em>RUN</em></div>
+      <div class="sub">Episode 028 · 4월 17일</div>
+      <div class="quote">어젯밤, 그는 당신보다<br><em>312미터</em> 더 가까이 다가왔다.</div>
+      <div class="quote-by">— previously on shadow run</div>
+      <div class="stats">
+        <div class="stat"><div class="v">12.4<small>km</small></div><div class="k">Week</div></div>
+        <div class="stat"><div class="v">28</div><div class="k">Runs</div></div>
+        <div class="stat"><div class="v">412<small>m</small></div><div class="k">Best</div></div>
+      </div>
+      <div class="start">
+        <div class="start-tag">${L.runSub}</div>
+        <div class="start-ttl">${L.run}</div>
+      </div>
+      <div class="log-ttl">Recent Chapters</div>
+      <div class="log"><span class="log-l">4월 16일 · 성동구</span><span class="log-v ok">${L.ok}</span></div>
+      <div class="log"><span class="log-l">4월 15일 · 한강</span><span class="log-v fail">${L.fail}</span></div>
+      <div class="log"><span class="log-l">4월 14일 · 남산</span><span class="log-v ok">${L.ok}</span></div>
+    </div>
+  </div>`;
+}
+
+function screenPrepare(t) {
+  return `
+  <div class="screen">
+    <div class="statusbar"><span>9:41</span><span>●●●● ●●</span></div>
+    <div class="body">
+      <div class="h-top">
+        <div class="eyebrow">← 뒤로</div>
+        <div class="icons"><div class="ico">⚙</div></div>
+      </div>
+      ${topDeco(t, t==='t2'?'Briefing · 029':t==='t3'?'오늘 밤의 준비':t==='t4'?'Issue 029':'PREP · 029')}
+      <div class="logo" style="font-size:22px;">오늘 밤의<br><em>준비</em></div>
+      <div class="sub">GPS · 정상 · 서울 성동구</div>
+
+      <div class="prep-card">
+        <div class="prep-card-k">도플갱어 속도</div>
+        <div class="prep-options">
+          <div class="prep-opt"><small>6:30</small>느림</div>
+          <div class="prep-opt sel"><small>5:30</small>보통</div>
+          <div class="prep-opt"><small>4:30</small>빠름</div>
+        </div>
+      </div>
+
+      <div class="prep-card">
+        <div class="prep-card-k">러닝화 선택</div>
+        <div class="prep-card-v">Nike Pegasus 40 <span style="font-family:var(--labelFont);font-size:9px;color:var(--fg-fade);letter-spacing:0.15em;margin-left:6px;">· 73KM</span></div>
+      </div>
+
+      <div class="prep-card">
+        <div class="prep-card-k">목표 거리</div>
+        <div class="prep-card-v">3.0 km · 자유</div>
+      </div>
+
+      <div class="prep-go">
+        <div class="prep-go-ttl">뛴다</div>
+        <div class="prep-go-sub">press to begin</div>
+      </div>
+    </div>
+  </div>`;
+}
+
+function screenRunning(t) {
+  const L = lex[t];
+  return `
+  <div class="screen">
+    <div class="statusbar"><span>9:41</span><span>●●●● ●●</span></div>
+    <div class="body">
+      <div class="h-top">
+        <div class="eyebrow" style="animation: blinkSlow 1s infinite;">● CHASING</div>
+        <div class="icons"><div class="ico">♫</div></div>
+      </div>
+      ${topDeco(t, t==='t2'?'Live Case':t==='t3'?'지 금':t==='t4'?'LIVE':'REC · LIVE')}
+      <div class="run-hero">
+        <div class="run-hero-k">도플갱어까지</div>
+        <div class="run-hero-n">152</div>
+        <div class="run-hero-u">METERS · BEHIND</div>
+      </div>
+      <div class="run-map">
+        <div class="dot-me"></div>
+        <div class="dot-him"></div>
+      </div>
+      <div class="stats">
+        <div class="stat"><div class="v">24:18</div><div class="k">Time</div></div>
+        <div class="stat"><div class="v">3.42<small>km</small></div><div class="k">Distance</div></div>
+        <div class="stat"><div class="v">5:41</div><div class="k">Pace</div></div>
+      </div>
+      <div class="run-pause">||</div>
+    </div>
+  </div>`;
+}
+
+function screenResult(t) {
+  const L = lex[t];
+  return `
+  <div class="screen">
+    <div class="statusbar"><span>9:41</span><span>●●●● ●●</span></div>
+    <div class="body">
+      <div class="h-top">
+        <div class="eyebrow">× 닫기</div>
+        <div class="icons"><div class="ico">↗</div></div>
+      </div>
+      ${topDeco(t, t==='t2'?'Case Closed · 028':t==='t3'?'오늘 밤의 결말':t==='t4'?'Issue 028':'MISSION · COMPLETE')}
+      <div class="res-verdict">
+        <div class="res-v-tag">Episode 028</div>
+        <div class="res-v-ttl">${L.success}</div>
+        <div class="res-v-sub">"그는 당신을 잡지 못했다.<br>오늘 밤, 어둠 속에서 당신이 이겼다."</div>
+      </div>
+      <div class="res-divider"></div>
+      <div class="stats">
+        <div class="stat"><div class="v">3.42<small>km</small></div><div class="k">Distance</div></div>
+        <div class="stat"><div class="v">24:18</div><div class="k">Time</div></div>
+        <div class="stat"><div class="v">+312<small>m</small></div><div class="k">Gap</div></div>
+      </div>
+
+      <div style="margin-top:10px;">
+        <div class="res-chart-k">추격자 거리 · Timeline</div>
+        <div class="res-chart">
+          <svg viewBox="0 0 300 70" preserveAspectRatio="none">
+            <path d="M 0 20 Q 40 35, 80 25 T 160 45 T 240 15 T 300 30"
+                  fill="none" stroke="var(--accent)" stroke-width="1.5" opacity="0.9"/>
+            <path d="M 0 20 Q 40 35, 80 25 T 160 45 T 240 15 T 300 30 L 300 70 L 0 70 Z"
+                  fill="var(--accent)" opacity="0.12"/>
+          </svg>
+        </div>
+      </div>
+
+      <div class="log-ttl" style="margin-top:8px;">통계 요약</div>
+      <div class="log"><span class="log-l">평균 페이스</span><span class="log-v">5'41''</span></div>
+      <div class="log"><span class="log-l">최고 페이스</span><span class="log-v">4'12''</span></div>
+      <div class="log"><span class="log-l">심박 · 평균</span><span class="log-v">158 bpm</span></div>
+      <div class="log"><span class="log-l">칼로리</span><span class="log-v">218 kcal</span></div>
+    </div>
+  </div>`;
+}
+
+function screenHistory(t) {
+  const L = lex[t];
+  return `
+  <div class="screen">
+    <div class="statusbar"><span>9:41</span><span>●●●● ●●</span></div>
+    <div class="body">
+      <div class="h-top">
+        <div class="eyebrow">← 홈</div>
+        <div class="icons"><div class="ico">▾</div></div>
+      </div>
+      ${topDeco(t, t==='t2'?'Archive · April':t==='t3'?'지 난 밤 들':t==='t4'?'April Issue':'LOGS · APR')}
+      <div class="hist-head">
+        <div class="hist-title">${t==='t3'?'지난 밤들':t==='t4'?'All Issues':'Chronicles'}</div>
+        <div class="hist-month">April 2026</div>
+      </div>
+      <div class="hist-total">
+        <div class="hist-total-item"><div class="v">28</div><div class="k">Runs</div></div>
+        <div class="hist-total-item"><div class="v">64.8<small>km</small></div><div class="k">Total</div></div>
+        <div class="hist-total-item"><div class="v">22 / 6</div><div class="k">W / L</div></div>
+      </div>
+
+      <div class="hist-row">
+        <div class="hist-badge ok">E28</div>
+        <div class="hist-info"><div class="hist-date">4월 16일 · 성동구</div><div class="hist-meta">3.42km · 24:18</div></div>
+        <div class="hist-dist pos">+312m</div>
+      </div>
+      <div class="hist-row">
+        <div class="hist-badge fail">E27</div>
+        <div class="hist-info"><div class="hist-date">4월 15일 · 한강</div><div class="hist-meta">2.18km · 18:02</div></div>
+        <div class="hist-dist neg">−18m</div>
+      </div>
+      <div class="hist-row">
+        <div class="hist-badge ok">E26</div>
+        <div class="hist-info"><div class="hist-date">4월 14일 · 남산</div><div class="hist-meta">4.80km · 33:41</div></div>
+        <div class="hist-dist pos">+520m</div>
+      </div>
+      <div class="hist-row">
+        <div class="hist-badge ok">E25</div>
+        <div class="hist-info"><div class="hist-date">4월 13일 · 올림픽공원</div><div class="hist-meta">5.20km · 37:12</div></div>
+        <div class="hist-dist pos">+680m</div>
+      </div>
+      <div class="hist-row">
+        <div class="hist-badge fail">E24</div>
+        <div class="hist-info"><div class="hist-date">4월 12일 · 망원</div><div class="hist-meta">2.80km · 22:00</div></div>
+        <div class="hist-dist neg">−42m</div>
+      </div>
+    </div>
+  </div>`;
+}
+
+function screenSettings(t) {
+  return `
+  <div class="screen">
+    <div class="statusbar"><span>9:41</span><span>●●●● ●●</span></div>
+    <div class="body">
+      <div class="h-top">
+        <div class="eyebrow">← 홈</div>
+        <div class="icons"></div>
+      </div>
+      ${topDeco(t, t==='t2'?'Profile · Agent':t==='t3'?'설 정':t==='t4'?'Account':'USER · SYS')}
+      <div class="logo" style="font-size:22px; margin-top:6px;">설정</div>
+
+      <div class="set-profile">
+        <div class="set-avatar">S</div>
+        <div style="flex:1;">
+          <div class="set-name">도리 · Shadow Runner</div>
+          <div class="set-pro">◆ PRO · 멤버</div>
+        </div>
+      </div>
+
+      <div class="set-sec-ttl">◆ Appearance</div>
+      <div class="set-row">
+        <span class="set-row-l">테마</span>
+        <span class="set-row-v"><span class="dot"></span>${t==='t1'?'Pure Cinematic':t==='t2'?'Film Noir':t==='t3'?'Korean Mystic':t==='t4'?'Editorial':'Neo-Noir Cyber'} ›</span>
+      </div>
+      <div class="set-row">
+        <span class="set-row-l">언어</span>
+        <span class="set-row-v">한국어 ›</span>
+      </div>
+
+      <div class="set-sec-ttl">◆ Audio</div>
+      <div class="set-row"><span class="set-row-l">음성 안내</span><span class="set-row-v">ON</span></div>
+      <div class="set-row"><span class="set-row-l">효과음 · 진동</span><span class="set-row-v">ON</span></div>
+      <div class="set-row"><span class="set-row-l">배경음</span><span class="set-row-v">70%</span></div>
+
+      <div class="set-sec-ttl">◆ Game</div>
+      <div class="set-row"><span class="set-row-l">기본 도플갱어 속도</span><span class="set-row-v">보통 ›</span></div>
+      <div class="set-row"><span class="set-row-l">목표 설정</span><span class="set-row-v">주 3회 ›</span></div>
+
+      <div class="set-sec-ttl">◆ Support</div>
+      <div class="set-row"><span class="set-row-l">리뷰 남기기</span><span class="set-row-v">›</span></div>
+      <div class="set-row"><span class="set-row-l">이용약관</span><span class="set-row-v">›</span></div>
+      <div class="set-row"><span class="set-row-l">개인정보처리방침</span><span class="set-row-v">›</span></div>
+
+      <div class="set-version">v 1.0.0 · build 12 · tap ×7 to unlock</div>
+    </div>
+  </div>`;
+}
+
+const screenList = [
+  { id:'home',     name:'Home',     fn: screenHome },
+  { id:'prepare',  name:'Prepare',  fn: screenPrepare },
+  { id:'running',  name:'Running',  fn: screenRunning },
+  { id:'result',   name:'Result',   fn: screenResult },
+  { id:'history',  name:'History',  fn: screenHistory },
+  { id:'settings', name:'Settings', fn: screenSettings },
+];
+
+const root = document.getElementById('root');
+themes.forEach(T => {
+  const sec = document.createElement('div');
+  sec.className = 'theme-section';
+  sec.id = T.id;
+  sec.innerHTML = `
+    <div class="theme-title">
+      <div class="theme-num">${T.num}</div>
+      <div class="theme-name">${T.name}</div>
+      <div class="theme-price ${T.priceClass}">${T.price}</div>
+    </div>
+    <div class="theme-desc">${T.desc}</div>
+    <div class="screens-grid"></div>
+  `;
+  const grid = sec.querySelector('.screens-grid');
+  screenList.forEach(sc => {
+    const card = document.createElement('div');
+    card.className = 'screen-card';
+    card.innerHTML = `
+      <div class="phone ${T.id}">
+        <div class="notch"></div>
+        ${sc.fn(T.id)}
+      </div>
+      <div class="screen-name">${sc.name}</div>
+    `;
+    grid.appendChild(card);
+  });
+  root.appendChild(sec);
+});
+</script>
+
+</body>
+</html>

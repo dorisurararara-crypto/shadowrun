@@ -8,6 +8,7 @@ import 'package:just_audio/just_audio.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:shadowrun/core/theme/app_theme.dart';
+import 'package:shadowrun/core/theme/theme_manager.dart';
 import 'package:shadowrun/core/database/database_helper.dart';
 import 'package:shadowrun/core/services/purchase_service.dart';
 import 'package:shadowrun/core/l10n/app_strings.dart';
@@ -177,6 +178,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
               children: [
                 _buildLanguageSettings(),
                 const SizedBox(height: 24),
+                _buildThemeEntry(),
+                const SizedBox(height: 24),
                 _buildProfileSettings(),
                 const SizedBox(height: 24),
                 _buildRunningSettings(),
@@ -238,6 +241,88 @@ class _SettingsScreenState extends State<SettingsScreen> {
           ),
         ),
       ],
+    );
+  }
+
+  // --- Theme Entry ---
+  Widget _buildThemeEntry() {
+    return ValueListenableBuilder(
+      valueListenable: ThemeManager.I.themeIdNotifier,
+      builder: (context, themeId, _) {
+        final theme = ThemeManager.getTheme(themeId);
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _sectionHeader(S.isKo ? '테마' : 'THEME'),
+            InkWell(
+              borderRadius: BorderRadius.circular(12),
+              onTap: () {
+                SfxService().tapCard();
+                context.push('/settings/theme');
+              },
+              child: Container(
+                padding: const EdgeInsets.all(20),
+                decoration: BoxDecoration(
+                  color: SRColors.card,
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: Colors.white.withValues(alpha: 0.05)),
+                ),
+                child: Row(
+                  children: [
+                    Container(
+                      width: 42,
+                      height: 42,
+                      decoration: BoxDecoration(
+                        color: theme.palette.background,
+                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(color: theme.palette.accent.withValues(alpha: 0.5), width: 1),
+                      ),
+                      alignment: Alignment.center,
+                      child: Text(
+                        theme.showHanjaWatermark && theme.hanjaSet.isNotEmpty
+                            ? theme.hanjaSet.first
+                            : 'Sr',
+                        style: TextStyle(
+                          fontFamily: theme.fonts.heroFamily,
+                          fontSize: theme.showHanjaWatermark ? 20 : 16,
+                          fontWeight: FontWeight.w900,
+                          fontStyle: theme.fonts.heroItalic ? FontStyle.italic : FontStyle.normal,
+                          color: theme.palette.accent,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 14),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            theme.id.displayNameKo,
+                            style: GoogleFonts.inter(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w700,
+                              color: SRColors.onSurface,
+                            ),
+                          ),
+                          const SizedBox(height: 2),
+                          Text(
+                            S.isKo ? '앱 무드 선택' : 'Choose app mood',
+                            style: GoogleFonts.inter(
+                              fontSize: 11,
+                              color: SRColors.onSurface.withValues(alpha: 0.5),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const Icon(Icons.chevron_right, color: SRColors.onSurface, size: 20),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        );
+      },
     );
   }
 
