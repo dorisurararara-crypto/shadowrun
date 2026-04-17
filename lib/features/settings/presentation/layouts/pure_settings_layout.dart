@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:shadowrun/core/l10n/app_strings.dart';
+import 'package:shadowrun/core/services/bgm_preferences.dart';
 import 'package:shadowrun/core/services/sfx_service.dart';
 
 /// T1 Pure Cinematic 테마 전용 설정 화면 레이아웃.
@@ -228,6 +229,33 @@ class PureSettingsLayout extends StatelessWidget {
                   sub: 'haptic',
                   value: hapticEnabled,
                   onChanged: onHapticToggle,
+                ),
+                ValueListenableBuilder<bool>(
+                  valueListenable: BgmPreferences.I.enabled,
+                  builder: (context, bgmOn, _) => _rowSwitch(
+                    label: S.isKo ? '배경음' : 'Background Music',
+                    sub: 'bgm',
+                    value: bgmOn,
+                    onChanged: (v) => BgmPreferences.I.setEnabled(v),
+                  ),
+                ),
+                ValueListenableBuilder<bool>(
+                  valueListenable: BgmPreferences.I.enabled,
+                  builder: (context, bgmOn, _) => ValueListenableBuilder<double>(
+                    valueListenable: BgmPreferences.I.volume,
+                    builder: (context, vol, _) => _bgmVolumeRow(enabled: bgmOn, volume: vol),
+                  ),
+                ),
+                ValueListenableBuilder<bool>(
+                  valueListenable: BgmPreferences.I.externalMusicMode,
+                  builder: (context, ext, _) => _rowSwitchDesc(
+                    label: S.isKo ? '내 음악 틀기' : 'Use My Music',
+                    desc: S.isKo
+                        ? '스포티파이·유튜브뮤직 등 기기 음악 우선 재생'
+                        : 'Lets Spotify/YouTube Music play over the app.',
+                    value: ext,
+                    onChanged: (v) => BgmPreferences.I.setExternalMusicMode(v),
+                  ),
                 ),
               ],
             ),
@@ -667,6 +695,125 @@ class PureSettingsLayout extends StatelessWidget {
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _rowSwitchDesc({
+    required String label,
+    required String desc,
+    required bool value,
+    required ValueChanged<bool> onChanged,
+  }) {
+    return Container(
+      padding: const EdgeInsets.symmetric(vertical: 10),
+      child: Row(
+        children: [
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  label,
+                  style: GoogleFonts.notoSerifKr(
+                    fontSize: 13,
+                    color: _ink,
+                    fontWeight: FontWeight.w400,
+                    letterSpacing: -0.13,
+                  ),
+                ),
+                const SizedBox(height: 3),
+                Text(
+                  desc,
+                  style: GoogleFonts.playfairDisplay(
+                    fontSize: 10.5,
+                    color: _inkFade,
+                    fontStyle: FontStyle.italic,
+                    fontWeight: FontWeight.w400,
+                    letterSpacing: 0.3,
+                    height: 1.35,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(width: 8),
+          Transform.scale(
+            scale: 0.85,
+            child: Switch(
+              value: value,
+              onChanged: (v) {
+                v ? SfxService().switchOn() : SfxService().switchOff();
+                onChanged(v);
+              },
+              activeThumbColor: _redSub,
+              activeTrackColor: _red.withValues(alpha: 0.4),
+              inactiveThumbColor: _inkFade,
+              inactiveTrackColor: _inkGhost,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _bgmVolumeRow({required bool enabled, required double volume}) {
+    final percent = (volume * 100).round();
+    return Opacity(
+      opacity: enabled ? 1.0 : 0.4,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 12),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Row(
+              children: [
+                Expanded(
+                  child: _labelSub(
+                    S.isKo ? '배경음 크기' : 'BGM Volume',
+                    'volume',
+                  ),
+                ),
+                Text(
+                  '$percent%',
+                  style: GoogleFonts.playfairDisplay(
+                    fontSize: 18,
+                    color: _redSub,
+                    fontStyle: FontStyle.italic,
+                    fontWeight: FontWeight.w900,
+                    height: 1.0,
+                    letterSpacing: -0.3,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 8),
+            SliderTheme(
+              data: SliderThemeData(
+                activeTrackColor: _red,
+                inactiveTrackColor: _inkGhost,
+                thumbColor: _redSub,
+                overlayColor: _red.withValues(alpha: 0.15),
+                trackHeight: 2,
+                thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 7),
+                trackShape: const RoundedRectSliderTrackShape(),
+              ),
+              child: Slider(
+                value: volume.clamp(0.0, 1.0),
+                min: 0.0,
+                max: 1.0,
+                divisions: 20,
+                onChanged: enabled
+                    ? (v) => BgmPreferences.I.volume.value = v
+                    : null,
+                onChangeEnd: enabled
+                    ? (v) => BgmPreferences.I.setVolume(v)
+                    : null,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

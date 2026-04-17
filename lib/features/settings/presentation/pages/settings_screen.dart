@@ -13,6 +13,7 @@ import 'package:shadowrun/core/theme/theme_id.dart';
 import 'package:shadowrun/core/database/database_helper.dart';
 import 'package:shadowrun/core/services/purchase_service.dart';
 import 'package:shadowrun/core/l10n/app_strings.dart';
+import 'package:shadowrun/core/services/bgm_preferences.dart';
 import 'package:shadowrun/core/services/sfx_service.dart';
 import 'package:shadowrun/core/docs/legal_texts.dart';
 import 'package:shadowrun/shared/models/run_model.dart';
@@ -2506,6 +2507,39 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   _save('vibration_enabled', '$v');
                 },
               ),
+              const SizedBox(height: 8),
+              // BGM ON/OFF
+              ValueListenableBuilder<bool>(
+                valueListenable: BgmPreferences.I.enabled,
+                builder: (context, bgmOn, _) => _SettingsToggle(
+                  label: S.isKo ? '배경음' : 'Background Music',
+                  subtitle: S.isKo ? '러닝 중 배경 음악 재생' : 'Play background music during runs',
+                  value: bgmOn,
+                  onChanged: (v) => BgmPreferences.I.setEnabled(v),
+                ),
+              ),
+              const SizedBox(height: 8),
+              // BGM Volume slider
+              ValueListenableBuilder<bool>(
+                valueListenable: BgmPreferences.I.enabled,
+                builder: (context, bgmOn, _) => ValueListenableBuilder<double>(
+                  valueListenable: BgmPreferences.I.volume,
+                  builder: (context, vol, _) => _buildBgmVolumeSlider(enabled: bgmOn, volume: vol),
+                ),
+              ),
+              const SizedBox(height: 8),
+              // External music mode
+              ValueListenableBuilder<bool>(
+                valueListenable: BgmPreferences.I.externalMusicMode,
+                builder: (context, ext, _) => _SettingsToggle(
+                  label: S.isKo ? '내 음악 틀기' : 'Use My Music',
+                  subtitle: S.isKo
+                      ? '스포티파이·유튜브뮤직 등 기기 음악 우선 재생'
+                      : 'Lets Spotify/YouTube Music play over the app.',
+                  value: ext,
+                  onChanged: (v) => BgmPreferences.I.setExternalMusicMode(v),
+                ),
+              ),
               // Voice selection (PRO only)
               if (_isPro) ...[
                 const SizedBox(height: 20),
@@ -2532,6 +2566,82 @@ class _SettingsScreenState extends State<SettingsScreen> {
           ),
         ),
       ],
+    );
+  }
+
+  Widget _buildBgmVolumeSlider({required bool enabled, required double volume}) {
+    final percent = (volume * 100).round();
+    return Opacity(
+      opacity: enabled ? 1.0 : 0.4,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 6),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        S.isKo ? '배경음 크기' : 'BGM Volume',
+                        style: GoogleFonts.inter(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
+                          color: SRColors.onSurface,
+                        ),
+                      ),
+                      const SizedBox(height: 2),
+                      Text(
+                        S.isKo ? '슬라이더로 볼륨 조절' : 'Drag to adjust volume',
+                        style: GoogleFonts.inter(
+                          fontSize: 12,
+                          color: SRColors.onSurface.withValues(alpha: 0.4),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                Text(
+                  '$percent%',
+                  style: GoogleFonts.spaceGrotesk(
+                    fontSize: 22,
+                    fontWeight: FontWeight.w900,
+                    color: const Color(0xFFFF0044),
+                    letterSpacing: -0.5,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 8),
+            SliderTheme(
+              data: SliderThemeData(
+                activeTrackColor: const Color(0xFFFF0044),
+                inactiveTrackColor: SRColors.background,
+                thumbColor: const Color(0xFFFF0044),
+                overlayColor: const Color(0xFFFF0044).withValues(alpha: 0.15),
+                trackHeight: 6,
+                thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 8),
+                trackShape: const RoundedRectSliderTrackShape(),
+              ),
+              child: Slider(
+                value: volume.clamp(0.0, 1.0),
+                min: 0.0,
+                max: 1.0,
+                divisions: 20,
+                onChanged: enabled
+                    ? (v) => BgmPreferences.I.volume.value = v
+                    : null,
+                onChangeEnd: enabled
+                    ? (v) => BgmPreferences.I.setVolume(v)
+                    : null,
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 

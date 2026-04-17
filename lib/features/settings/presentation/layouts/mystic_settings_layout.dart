@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:shadowrun/core/l10n/app_strings.dart';
+import 'package:shadowrun/core/services/bgm_preferences.dart';
 import 'package:shadowrun/core/services/sfx_service.dart';
 
 /// T3 Korean Mystic Horror 테마 전용 설정 화면 레이아웃.
@@ -240,6 +241,36 @@ class MysticSettingsLayout extends StatelessWidget {
                     subLabel: 'H A P T I C',
                     value: hapticEnabled,
                     onChanged: onHapticToggle,
+                  ),
+                  // BGM ON/OFF
+                  ValueListenableBuilder<bool>(
+                    valueListenable: BgmPreferences.I.enabled,
+                    builder: (context, bgmOn, _) => _switchRow(
+                      label: S.isKo ? '배경음' : 'Background Music',
+                      subLabel: 'B G M',
+                      value: bgmOn,
+                      onChanged: (v) => BgmPreferences.I.setEnabled(v),
+                    ),
+                  ),
+                  // BGM Volume
+                  ValueListenableBuilder<bool>(
+                    valueListenable: BgmPreferences.I.enabled,
+                    builder: (context, bgmOn, _) => ValueListenableBuilder<double>(
+                      valueListenable: BgmPreferences.I.volume,
+                      builder: (context, vol, _) => _bgmVolumeRow(enabled: bgmOn, volume: vol),
+                    ),
+                  ),
+                  // 외부 음악 허용
+                  ValueListenableBuilder<bool>(
+                    valueListenable: BgmPreferences.I.externalMusicMode,
+                    builder: (context, ext, _) => _switchRowDesc(
+                      label: S.isKo ? '내 음악 틀기' : 'Use My Music',
+                      desc: S.isKo
+                          ? '스포티파이·유튜브뮤직 등 기기 음악 우선 재생'
+                          : 'Lets Spotify/YouTube Music play over the app.',
+                      value: ext,
+                      onChanged: (v) => BgmPreferences.I.setExternalMusicMode(v),
+                    ),
                   ),
                   const SizedBox(height: 14),
 
@@ -655,6 +686,131 @@ class MysticSettingsLayout extends StatelessWidget {
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _switchRowDesc({
+    required String label,
+    required String desc,
+    required bool value,
+    required ValueChanged<bool> onChanged,
+  }) {
+    return Container(
+      padding: const EdgeInsets.symmetric(vertical: 10),
+      decoration: const BoxDecoration(
+        border: Border(
+          bottom: BorderSide(color: _borderInk, width: 0.5),
+        ),
+      ),
+      child: Row(
+        children: [
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  label,
+                  style: GoogleFonts.nanumMyeongjo(
+                    fontSize: 14,
+                    color: _rice,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  desc,
+                  style: GoogleFonts.gowunBatang(
+                    fontSize: 10.5,
+                    color: _fade,
+                    fontWeight: FontWeight.w400,
+                    height: 1.35,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(width: 8),
+          Transform.scale(
+            scale: 0.85,
+            child: Switch(
+              value: value,
+              onChanged: (v) {
+                v ? SfxService().switchOn() : SfxService().switchOff();
+                onChanged(v);
+              },
+              activeThumbColor: _bloodFresh,
+              activeTrackColor: _bloodDry.withValues(alpha: 0.55),
+              inactiveThumbColor: _outline,
+              inactiveTrackColor: _borderInk,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _bgmVolumeRow({required bool enabled, required double volume}) {
+    final percent = (volume * 100).round();
+    return Opacity(
+      opacity: enabled ? 1.0 : 0.4,
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 14),
+        decoration: const BoxDecoration(
+          border: Border(
+            bottom: BorderSide(color: _borderInk, width: 0.5),
+          ),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Row(
+              children: [
+                Expanded(
+                  child: _labelSub(
+                    S.isKo ? '배경음 크기' : 'BGM Volume',
+                    'V O L U M E',
+                  ),
+                ),
+                Text(
+                  '$percent%',
+                  style: GoogleFonts.nanumMyeongjo(
+                    fontSize: 18,
+                    color: _bloodFresh,
+                    fontWeight: FontWeight.w900,
+                    height: 1.0,
+                    letterSpacing: -0.5,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 8),
+            SliderTheme(
+              data: SliderThemeData(
+                activeTrackColor: _bloodDry,
+                inactiveTrackColor: _borderInk,
+                thumbColor: _bloodFresh,
+                overlayColor: _bloodDry.withValues(alpha: 0.2),
+                trackHeight: 2,
+                thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 7),
+                trackShape: const RoundedRectSliderTrackShape(),
+              ),
+              child: Slider(
+                value: volume.clamp(0.0, 1.0),
+                min: 0.0,
+                max: 1.0,
+                divisions: 20,
+                onChanged: enabled
+                    ? (v) => BgmPreferences.I.volume.value = v
+                    : null,
+                onChangeEnd: enabled
+                    ? (v) => BgmPreferences.I.setVolume(v)
+                    : null,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
