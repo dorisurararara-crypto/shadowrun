@@ -34,6 +34,12 @@ class PurePrepareLayout extends StatelessWidget {
   final bool isPro;
   final VoidCallback onLegendLocked;
 
+  // 페이스메이커 (freerun 모드일 때)
+  final bool pacemakerEnabled;
+  final ValueChanged<bool> onPacemakerToggled;
+  final int pacemakerSecPerKm;
+  final ValueChanged<int> onPacemakerPaceChanged;
+
   // 액션
   final VoidCallback onStart;
   final VoidCallback onBack;
@@ -61,6 +67,10 @@ class PurePrepareLayout extends StatelessWidget {
     required this.onLegendChanged,
     required this.isPro,
     required this.onLegendLocked,
+    required this.pacemakerEnabled,
+    required this.onPacemakerToggled,
+    required this.pacemakerSecPerKm,
+    required this.onPacemakerPaceChanged,
     required this.onStart,
     required this.onBack,
     required this.countdownActive,
@@ -180,6 +190,10 @@ class PurePrepareLayout extends StatelessWidget {
             const SizedBox(height: 22),
             if (selectedMode == 'marathon') ...[
               _legendSection(),
+              const SizedBox(height: 22),
+            ],
+            if (selectedMode == 'freerun') ...[
+              _pacemakerSection(),
               const SizedBox(height: 22),
             ],
           ],
@@ -769,6 +783,162 @@ class PurePrepareLayout extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  Widget _pacemakerSection() {
+    final isKo = S.isKo;
+    final title = isKo ? '페이스 메이커' : 'Pacemaker';
+    final desc = isKo
+        ? '유령이 이 페이스로 뛰어요. 앞서/뒤처지면 알려줘요.'
+        : 'A ghost paces with you and tells you when you drift.';
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Row(
+          crossAxisAlignment: CrossAxisAlignment.end,
+          children: [
+            Text(
+              title,
+              style: GoogleFonts.notoSerif(
+                fontStyle: FontStyle.italic,
+                fontSize: 11,
+                color: _inkFade,
+                letterSpacing: 2.5,
+                fontWeight: FontWeight.w300,
+              ),
+            ),
+            const Spacer(),
+            GestureDetector(
+              behavior: HitTestBehavior.opaque,
+              onTap: () {
+                SfxService().toggle();
+                onPacemakerToggled(!pacemakerEnabled);
+              },
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                decoration: BoxDecoration(
+                  border: Border.all(
+                    color: pacemakerEnabled ? _red : _inkGhost,
+                    width: 1,
+                  ),
+                ),
+                child: Text(
+                  pacemakerEnabled ? (isKo ? 'ON' : 'on') : (isKo ? 'OFF' : 'off'),
+                  style: GoogleFonts.playfairDisplay(
+                    fontStyle: FontStyle.italic,
+                    fontSize: 11,
+                    color: pacemakerEnabled ? _redSub : _inkFade,
+                    letterSpacing: 2,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 10),
+        Text(
+          desc,
+          style: GoogleFonts.notoSerif(
+            fontStyle: FontStyle.italic,
+            fontSize: 11,
+            color: _inkFade,
+            letterSpacing: 0.3,
+            fontWeight: FontWeight.w300,
+            height: 1.5,
+          ),
+        ),
+        const SizedBox(height: 14),
+        Opacity(
+          opacity: pacemakerEnabled ? 1.0 : 0.35,
+          child: IgnorePointer(
+            ignoring: !pacemakerEnabled,
+            child: Container(
+              padding: const EdgeInsets.fromLTRB(14, 12, 14, 10),
+              decoration: BoxDecoration(
+                color: pacemakerEnabled ? const Color(0xFF0A0304) : _bgPage,
+                border: Border.all(
+                  color: pacemakerEnabled ? _red : _inkGhost,
+                  width: pacemakerEnabled ? 1.2 : 1,
+                ),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      const Text('👻', style: TextStyle(fontSize: 20)),
+                      const SizedBox(width: 10),
+                      Text(
+                        _formatPace(pacemakerSecPerKm),
+                        style: GoogleFonts.playfairDisplay(
+                          fontStyle: FontStyle.italic,
+                          fontSize: 22,
+                          color: _ink,
+                          letterSpacing: 0.5,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                      const SizedBox(width: 6),
+                      Text(
+                        '/ km',
+                        style: GoogleFonts.notoSerif(
+                          fontSize: 10,
+                          color: _inkFade,
+                          letterSpacing: 1.2,
+                          fontWeight: FontWeight.w300,
+                        ),
+                      ),
+                    ],
+                  ),
+                  SliderTheme(
+                    data: const SliderThemeData(
+                      activeTrackColor: _red,
+                      inactiveTrackColor: _inkGhost,
+                      thumbColor: _redSub,
+                      overlayColor: Color(0x338B0000),
+                      trackHeight: 2,
+                    ),
+                    child: Slider(
+                      min: 270,
+                      max: 480,
+                      divisions: 14,
+                      value: pacemakerSecPerKm.toDouble(),
+                      onChanged: (v) => onPacemakerPaceChanged(v.round()),
+                    ),
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text("4'30\"",
+                          style: GoogleFonts.playfairDisplay(
+                            fontStyle: FontStyle.italic,
+                            fontSize: 10,
+                            color: _inkFade,
+                            letterSpacing: 1,
+                          )),
+                      Text("8'00\"",
+                          style: GoogleFonts.playfairDisplay(
+                            fontStyle: FontStyle.italic,
+                            fontSize: 10,
+                            color: _inkFade,
+                            letterSpacing: 1,
+                          )),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  static String _formatPace(int sec) {
+    final m = sec ~/ 60;
+    final s = sec % 60;
+    return "$m'${s.toString().padLeft(2, '0')}\"";
   }
 
   Widget _shoeCard() {

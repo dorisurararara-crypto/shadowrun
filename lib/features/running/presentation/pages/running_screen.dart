@@ -34,8 +34,9 @@ class RunningScreen extends StatefulWidget {
   final bool sameLocation; // 도플갱어: 같은 장소 vs 다른 장소
   final int? shoeId;
   final String? legendId; // marathon 모드일 때 선택한 전설 러너 id
+  final int? pacemakerPaceSec; // freerun + pacer 활성 시 목표 페이스(초/km)
 
-  const RunningScreen({super.key, this.shadowRunId, this.runMode = 'freerun', this.sameLocation = true, this.shoeId, this.legendId});
+  const RunningScreen({super.key, this.shadowRunId, this.runMode = 'freerun', this.sameLocation = true, this.shoeId, this.legendId, this.pacemakerPaceSec});
 
   @override
   State<RunningScreen> createState() => _RunningScreenState();
@@ -250,6 +251,28 @@ class _RunningScreenState extends State<RunningScreen>
         _soloTtsService = SoloTtsService();
         await _soloTtsService!.initialize(voice: voice);
         if (_aborted()) return;
+        // 페이스메이커 유령(선택) — MarathonService의 legend 트래커 재활용.
+        // legend만 주입하면 페이스 차이 TTS/햅틱이 자동 동작.
+        if (widget.pacemakerPaceSec != null) {
+          final paceSec = widget.pacemakerPaceSec!;
+          final pacer = LegendRunner(
+            id: 'pacemaker',
+            nameKo: '페이스메이커',
+            nameEn: 'Pacemaker',
+            flag: '👻',
+            marathonTime: Duration(seconds: (42.195 * paceSec).round()),
+            paceSecPerKm: paceSec.toDouble(),
+            bioKo: '당신의 목표 페이스',
+            bioEn: 'Your target pace',
+          );
+          _marathonService = MarathonService();
+          await _marathonService!.initialize(
+            voice: voice,
+            legend: pacer,
+            vibrationEnabled: vibEnabled,
+          );
+          if (_aborted()) return;
+        }
       }
 
       // 마라토너 모드에서는 flutter_tts km 스플릿 비활성화 (MarathonService가 처리)
@@ -329,6 +352,15 @@ class _RunningScreenState extends State<RunningScreen>
           if (widget.runMode == 'marathon' && _ttsOn) {
             _updateMarathonTime();
             // Legend(전설) 트래커 — legendId가 있을 때만 내부에서 동작.
+            // ignore: unawaited_futures
+            _marathonService?.updateProgress(
+              elapsedSeconds: _runService.durationS,
+              userDistanceKm: _runService.totalDistanceM / 1000.0,
+            );
+          } else if (widget.runMode == 'freerun' &&
+              widget.pacemakerPaceSec != null &&
+              _ttsOn) {
+            // 페이스메이커 유령 — legend 트래커가 페이스 차이 TTS/햅틱 담당.
             // ignore: unawaited_futures
             _marathonService?.updateProgress(
               elapsedSeconds: _runService.durationS,

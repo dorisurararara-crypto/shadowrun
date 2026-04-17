@@ -96,6 +96,9 @@ class _PrepareScreenState extends State<PrepareScreen>
   List<Map<String, dynamic>> _shoes = [];
   int? _selectedShoeId;
   String? _selectedLegendId; // null이면 자유 러닝, id면 해당 전설과 대결
+  // 자유 러닝(freerun) 페이스메이커 유령 — 선택적으로 목표 페이스 동반.
+  bool _pacemakerEnabled = false;
+  int _pacemakerSecPerKm = 360; // 6:00/km 기본
 
   bool get _isPro => PurchaseService().isPro;
   bool get _isChallenge => widget.shadowRunId != null;
@@ -282,6 +285,10 @@ class _PrepareScreenState extends State<PrepareScreen>
             'mode': _selectedMode,
             'shoeId': _selectedShoeId,
             'legendId': _selectedMode == 'marathon' ? _selectedLegendId : null,
+            'pacemakerPaceSec':
+                _selectedMode == 'freerun' && _pacemakerEnabled
+                    ? _pacemakerSecPerKm
+                    : null,
           });
         }
       }
@@ -347,6 +354,14 @@ class _PrepareScreenState extends State<PrepareScreen>
             onLegendChanged: (id) => setState(() => _selectedLegendId = id),
             isPro: _isPro,
             onLegendLocked: _showLegendLockedMessage,
+            pacemakerEnabled: _pacemakerEnabled,
+            onPacemakerToggled: (v) {
+              SfxService().toggle();
+              setState(() => _pacemakerEnabled = v);
+            },
+            pacemakerSecPerKm: _pacemakerSecPerKm,
+            onPacemakerPaceChanged: (v) =>
+                setState(() => _pacemakerSecPerKm = v),
             onStart: _startCountdown,
             onBack: () => context.pop(),
             countdownActive: _countdownActive,
@@ -386,6 +401,14 @@ class _PrepareScreenState extends State<PrepareScreen>
             onLegendChanged: (id) => setState(() => _selectedLegendId = id),
             isPro: _isPro,
             onLegendLocked: _showLegendLockedMessage,
+            pacemakerEnabled: _pacemakerEnabled,
+            onPacemakerToggled: (v) {
+              SfxService().toggle();
+              setState(() => _pacemakerEnabled = v);
+            },
+            pacemakerSecPerKm: _pacemakerSecPerKm,
+            onPacemakerPaceChanged: (v) =>
+                setState(() => _pacemakerSecPerKm = v),
             onStart: _startCountdown,
             onBack: () => context.pop(),
             countdownActive: _countdownActive,
@@ -433,6 +456,10 @@ class _PrepareScreenState extends State<PrepareScreen>
                                 if (_selectedMode == 'marathon') ...[
                                   const SizedBox(height: 20),
                                   _buildLegendSelector(),
+                                ],
+                                if (_selectedMode == 'freerun') ...[
+                                  const SizedBox(height: 20),
+                                  _buildPacemakerSection(),
                                 ],
                               ],
                               _buildShoeSelector(),
@@ -1185,6 +1212,114 @@ class _PrepareScreenState extends State<PrepareScreen>
           ],
         ),
       ),
+    );
+  }
+
+  static String _formatPaceSec(int sec) {
+    final m = sec ~/ 60;
+    final s = sec % 60;
+    return "$m'${s.toString().padLeft(2, '0')}\"/km";
+  }
+
+  Widget _buildPacemakerSection() {
+    final title = S.isKo ? '페이스 메이커' : 'Pacemaker';
+    final desc = S.isKo
+        ? '유령이 이 페이스로 뛰어요. 앞서/뒤처지면 알려줘요.'
+        : 'A ghost paces with you and tells you when you drift.';
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            Text(
+              title,
+              style: GoogleFonts.spaceGrotesk(
+                fontSize: 14,
+                fontWeight: FontWeight.w700,
+                color: SRColors.neutral500,
+                letterSpacing: 3,
+              ),
+            ),
+            const Spacer(),
+            Switch(
+              value: _pacemakerEnabled,
+              activeThumbColor: SRColors.primaryContainer,
+              onChanged: (v) {
+                SfxService().toggle();
+                setState(() => _pacemakerEnabled = v);
+              },
+            ),
+          ],
+        ),
+        const SizedBox(height: 6),
+        Text(
+          desc,
+          style: GoogleFonts.inter(
+            fontSize: 12,
+            color: SRColors.neutral500,
+          ),
+        ),
+        const SizedBox(height: 12),
+        Opacity(
+          opacity: _pacemakerEnabled ? 1.0 : 0.4,
+          child: IgnorePointer(
+            ignoring: !_pacemakerEnabled,
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              decoration: BoxDecoration(
+                color: const Color(0xFF161616),
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(
+                  color: _pacemakerEnabled
+                      ? SRColors.primaryContainer.withValues(alpha: 0.4)
+                      : Colors.white.withValues(alpha: 0.05),
+                ),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      const Text('👻', style: TextStyle(fontSize: 22)),
+                      const SizedBox(width: 10),
+                      Text(
+                        _formatPaceSec(_pacemakerSecPerKm),
+                        style: GoogleFonts.spaceGrotesk(
+                          fontSize: 22,
+                          fontWeight: FontWeight.w700,
+                          color: SRColors.onSurface,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 4),
+                  Slider(
+                    min: 270, // 4:30
+                    max: 480, // 8:00
+                    divisions: 14, // 30초 스텝
+                    value: _pacemakerSecPerKm.toDouble(),
+                    activeColor: SRColors.primaryContainer,
+                    onChanged: (v) {
+                      setState(() => _pacemakerSecPerKm = v.round());
+                    },
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text("4'30\"",
+                          style: GoogleFonts.inter(
+                              fontSize: 11, color: SRColors.neutral500)),
+                      Text("8'00\"",
+                          style: GoogleFonts.inter(
+                              fontSize: 11, color: SRColors.neutral500)),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ],
     );
   }
 

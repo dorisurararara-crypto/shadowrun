@@ -48,6 +48,7 @@ GoRouter createRouter(bool languageSelected) => GoRouter(
           sameLocation: map['sameLocation'] as bool? ?? true,
           shoeId: map['shoeId'] as int?,
           legendId: map['legendId'] as String?,
+          pacemakerPaceSec: map['pacemakerPaceSec'] as int?,
         );
       },
     ),

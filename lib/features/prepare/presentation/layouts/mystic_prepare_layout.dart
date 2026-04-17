@@ -34,6 +34,12 @@ class MysticPrepareLayout extends StatelessWidget {
   final bool isPro;
   final VoidCallback onLegendLocked;
 
+  // 페이스메이커 (freerun 모드일 때)
+  final bool pacemakerEnabled;
+  final ValueChanged<bool> onPacemakerToggled;
+  final int pacemakerSecPerKm;
+  final ValueChanged<int> onPacemakerPaceChanged;
+
   // 액션
   final VoidCallback onStart;
   final VoidCallback onBack;
@@ -61,6 +67,10 @@ class MysticPrepareLayout extends StatelessWidget {
     required this.onLegendChanged,
     required this.isPro,
     required this.onLegendLocked,
+    required this.pacemakerEnabled,
+    required this.onPacemakerToggled,
+    required this.pacemakerSecPerKm,
+    required this.onPacemakerPaceChanged,
     required this.onStart,
     required this.onBack,
     required this.countdownActive,
@@ -236,6 +246,10 @@ class MysticPrepareLayout extends StatelessWidget {
             const SizedBox(height: 18),
             if (selectedMode == 'marathon') ...[
               _legendSection(),
+              const SizedBox(height: 18),
+            ],
+            if (selectedMode == 'freerun') ...[
+              _pacemakerSection(),
               const SizedBox(height: 18),
             ],
           ],
@@ -786,6 +800,210 @@ class MysticPrepareLayout extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  Widget _pacemakerSection() {
+    final isKo = S.isKo;
+    return _sectionFrame(
+      title: isKo ? '페이스 메이커' : 'Pacemaker',
+      english: 'P A C E M A K E R   ·   助 伴',
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          InkWell(
+            onTap: () {
+              SfxService().toggle();
+              onPacemakerToggled(!pacemakerEnabled);
+            },
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
+              decoration: BoxDecoration(
+                color: pacemakerEnabled
+                    ? const Color(0x147A0A0E)
+                    : const Color(0x660A0606),
+                border: Border.all(
+                  color: pacemakerEnabled ? _bloodDry : _line,
+                  width: pacemakerEnabled ? 1.2 : 1,
+                ),
+              ),
+              child: Row(
+                children: [
+                  Container(
+                    width: 30,
+                    height: 30,
+                    alignment: Alignment.center,
+                    decoration: BoxDecoration(
+                      border: Border.all(
+                        color: pacemakerEnabled ? _bloodFresh : _riceFade,
+                        width: 1,
+                      ),
+                    ),
+                    child: Text(
+                      '助',
+                      style: GoogleFonts.nanumMyeongjo(
+                        fontSize: 14,
+                        color: pacemakerEnabled ? _bloodFresh : _riceDim,
+                        fontWeight: FontWeight.w800,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 14),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          isKo ? '유령 페이서 동반' : 'Ghost pacer',
+                          style: GoogleFonts.nanumMyeongjo(
+                            fontSize: 14,
+                            color: pacemakerEnabled ? _rice : _riceDim,
+                            fontWeight: FontWeight.w700,
+                            letterSpacing: 2,
+                          ),
+                        ),
+                        const SizedBox(height: 2),
+                        Text(
+                          isKo
+                              ? '유령이 이 페이스로 뛰어요. 앞서/뒤처지면 알려줘요.'
+                              : 'A ghost paces with you and tells you when you drift.',
+                          style: GoogleFonts.gowunBatang(
+                            fontSize: 11,
+                            color: _riceFade,
+                            fontWeight: FontWeight.w400,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(width: 10),
+                  Switch(
+                    value: pacemakerEnabled,
+                    activeThumbColor: _bloodFresh,
+                    activeTrackColor: _bloodDry,
+                    inactiveThumbColor: _riceGhost,
+                    inactiveTrackColor: _line,
+                    onChanged: (v) {
+                      SfxService().toggle();
+                      onPacemakerToggled(v);
+                    },
+                  ),
+                ],
+              ),
+            ),
+          ),
+          const SizedBox(height: 10),
+          Opacity(
+            opacity: pacemakerEnabled ? 1.0 : 0.35,
+            child: IgnorePointer(
+              ignoring: !pacemakerEnabled,
+              child: Container(
+                padding: const EdgeInsets.fromLTRB(14, 14, 14, 10),
+                decoration: BoxDecoration(
+                  color: pacemakerEnabled
+                      ? const Color(0xFF0F0505)
+                      : const Color(0x660A0606),
+                  border: Border.all(
+                    color: pacemakerEnabled ? _bloodDry : _line,
+                    width: pacemakerEnabled ? 1.2 : 1,
+                  ),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Text(
+                          '伴',
+                          style: GoogleFonts.nanumMyeongjo(
+                            fontSize: 22,
+                            color: pacemakerEnabled ? _bloodFresh : _riceGhost,
+                            fontWeight: FontWeight.w800,
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        Text(
+                          _formatPace(pacemakerSecPerKm),
+                          style: GoogleFonts.nanumMyeongjo(
+                            fontSize: 22,
+                            color: _rice,
+                            fontWeight: FontWeight.w800,
+                            letterSpacing: 1,
+                          ),
+                        ),
+                        const SizedBox(width: 6),
+                        Text(
+                          '/ km',
+                          style: GoogleFonts.gowunBatang(
+                            fontSize: 10,
+                            color: _riceFade,
+                            letterSpacing: 1.2,
+                            fontWeight: FontWeight.w400,
+                          ),
+                        ),
+                      ],
+                    ),
+                    SliderTheme(
+                      data: const SliderThemeData(
+                        activeTrackColor: _bloodFresh,
+                        inactiveTrackColor: _line,
+                        thumbColor: _bloodFresh,
+                        overlayColor: Color(0x557A0A0E),
+                        trackHeight: 2,
+                      ),
+                      child: Slider(
+                        min: 270,
+                        max: 480,
+                        divisions: 14,
+                        value: pacemakerSecPerKm.toDouble(),
+                        onChanged: (v) => onPacemakerPaceChanged(v.round()),
+                      ),
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          "4'30\"",
+                          style: GoogleFonts.nanumMyeongjo(
+                            fontSize: 10,
+                            color: _riceFade,
+                            letterSpacing: 1,
+                            fontWeight: FontWeight.w400,
+                          ),
+                        ),
+                        Text(
+                          '血',
+                          style: GoogleFonts.nanumMyeongjo(
+                            fontSize: 12,
+                            color: _bloodDry,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                        Text(
+                          "8'00\"",
+                          style: GoogleFonts.nanumMyeongjo(
+                            fontSize: 10,
+                            color: _riceFade,
+                            letterSpacing: 1,
+                            fontWeight: FontWeight.w400,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  static String _formatPace(int sec) {
+    final m = sec ~/ 60;
+    final s = sec % 60;
+    return "$m'${s.toString().padLeft(2, '0')}\"";
   }
 
   Widget _shoeSection() {
