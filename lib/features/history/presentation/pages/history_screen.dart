@@ -2,10 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:shadowrun/core/theme/app_theme.dart';
+import 'package:shadowrun/core/theme/theme_id.dart';
+import 'package:shadowrun/core/theme/theme_manager.dart';
 import 'package:shadowrun/core/database/database_helper.dart';
 import 'package:shadowrun/shared/models/run_model.dart';
 import 'package:shadowrun/core/l10n/app_strings.dart';
 import 'package:shadowrun/core/services/sfx_service.dart';
+import 'package:shadowrun/features/history/presentation/layouts/mystic_history_layout.dart';
 
 class HistoryScreen extends StatefulWidget {
   const HistoryScreen({super.key});
@@ -177,6 +180,34 @@ class _HistoryScreenState extends State<HistoryScreen>
 
   @override
   Widget build(BuildContext context) {
+    return ValueListenableBuilder<ThemeId>(
+      valueListenable: ThemeManager.I.themeIdNotifier,
+      builder: (context, themeId, _) {
+        if (themeId == ThemeId.koreanMystic) {
+          return FutureBuilder<List<RunModel>>(
+            future: _runsFuture,
+            builder: (context, snapshot) {
+              final runs = snapshot.data ?? const <RunModel>[];
+              return MysticHistoryLayout(
+                runs: runs,
+                onRunTap: (run) {
+                  SfxService().tapCard();
+                  context.push('/result', extra: {'runId': run.id});
+                },
+                onClose: () {
+                  SfxService().tapCard();
+                  context.go('/');
+                },
+              );
+            },
+          );
+        }
+        return _buildDefaultLayout(context);
+      },
+    );
+  }
+
+  Widget _buildDefaultLayout(BuildContext context) {
     return Scaffold(
       backgroundColor: SRColors.background,
       appBar: AppBar(

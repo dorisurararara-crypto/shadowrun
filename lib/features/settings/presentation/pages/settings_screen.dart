@@ -9,11 +9,13 @@ import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:shadowrun/core/theme/app_theme.dart';
 import 'package:shadowrun/core/theme/theme_manager.dart';
+import 'package:shadowrun/core/theme/theme_id.dart';
 import 'package:shadowrun/core/database/database_helper.dart';
 import 'package:shadowrun/core/services/purchase_service.dart';
 import 'package:shadowrun/core/l10n/app_strings.dart';
 import 'package:shadowrun/core/services/sfx_service.dart';
 import 'package:shadowrun/shared/models/run_model.dart';
+import 'package:shadowrun/features/settings/presentation/layouts/mystic_settings_layout.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
@@ -145,6 +147,82 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    return ValueListenableBuilder<ThemeId>(
+      valueListenable: ThemeManager.I.themeIdNotifier,
+      builder: (context, themeId, _) {
+        if (themeId == ThemeId.koreanMystic) {
+          if (_loading) {
+            return const Scaffold(
+              backgroundColor: Color(0xFF050302),
+              body: Center(
+                child: CircularProgressIndicator(
+                  color: Color(0xFFC42029),
+                  strokeWidth: 2,
+                ),
+              ),
+            );
+          }
+          return MysticSettingsLayout(
+            userName: _profileDisplayName(),
+            isPro: _isPro,
+            horrorLevel: _horrorLevel,
+            versionLabel: '1.0.0 · 012',
+            onHorrorHeaderTap: _onHorrorHeaderTap,
+            onThemeTap: () => context.push('/settings/theme'),
+            onLanguageToggle: () async {
+              final next = S.isKo ? 'en' : 'ko';
+              final prefs = await SharedPreferences.getInstance();
+              await prefs.setString('language', next);
+              await S.init(next);
+              if (mounted) setState(() {});
+            },
+            onVoiceTap: () {
+              _showMysticInfo(S.isKo ? '음성은 기본 설정에서 변경하세요.' : 'Change voice in default layout.');
+            },
+            onGoalTap: () {
+              _showMysticInfo(S.isKo ? '목표는 기본 설정에서 변경하세요.' : 'Set goal in default layout.');
+            },
+            onProTap: () {
+              if (_isPro) {
+                _showMysticInfo(S.isKo ? 'PRO 활성 상태입니다.' : 'PRO is active.');
+              } else {
+                _showMysticInfo(S.isKo ? 'PRO 업그레이드는 기본 설정에서 진행됩니다.' : 'Upgrade PRO in default layout.');
+              }
+            },
+            onPrivacyTap: () {
+              _showMysticInfo(S.isKo ? '개인정보 처리방침' : 'Privacy policy');
+            },
+            onReviewTap: () {
+              _showMysticInfo(S.isKo ? '리뷰 남기기' : 'Leave a review');
+            },
+            onTermsTap: () {
+              _showMysticInfo(S.isKo ? '이용약관' : 'Terms of service');
+            },
+            onBack: () => context.go('/'),
+          );
+        }
+        return _buildDefaultLayout(context);
+      },
+    );
+  }
+
+  String _profileDisplayName() {
+    // 기존 프로필 이름 필드가 없으므로 기본 라벨 사용.
+    return S.isKo ? '도리수라' : 'Shadow';
+  }
+
+  void _showMysticInfo(String msg) {
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(msg),
+        backgroundColor: const Color(0xFF0A0606),
+        duration: const Duration(seconds: 2),
+      ),
+    );
+  }
+
+  Widget _buildDefaultLayout(BuildContext context) {
     return Scaffold(
       backgroundColor: SRColors.background,
       appBar: AppBar(

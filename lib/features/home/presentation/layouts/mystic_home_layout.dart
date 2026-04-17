@@ -480,124 +480,120 @@ class MysticHomeLayout extends StatelessWidget {
 
   /// 도플갱어 추격 카드 — 챌린지 모드(/prepare extra: -1)
   Widget _doppelgangerCard(BuildContext context) {
-    return InkWell(
+    return _actionCard(
+      context: context,
+      minHeight: 120,
+      title: '오늘 밤,\n다시 뛰어라.',
+      subtitle: '도 플 갱 어   추 격',
+      cornerHanja: '追',
+      hanjaColor: _bloodDry,
+      subtitleColor: _bloodFresh,
+      decoration: BoxDecoration(
+        gradient: const RadialGradient(
+          center: Alignment.center,
+          radius: 1.2,
+          colors: [Color(0xFF3B0006), Color(0xFF0D0607)],
+        ),
+        border: Border.all(color: _bloodDry, width: 1),
+      ),
       onTap: () {
+        debugPrint('[MysticHome] 도플갱어 카드 TAP');
         SfxService().tapChallenge();
         context.push('/prepare', extra: -1);
       },
-      child: Container(
-        decoration: BoxDecoration(
-          gradient: const RadialGradient(
-            center: Alignment.center,
-            radius: 1.2,
-            colors: [Color(0xFF3B0006), Color(0xFF0D0607)],
-          ),
-          border: Border.all(color: _bloodDry, width: 1),
-        ),
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
-        child: Stack(
-          children: [
-            Positioned(
-              top: 6,
-              right: 10,
-              child: Text(
-                '追',
-                style: GoogleFonts.nanumMyeongjo(
-                  fontSize: 14,
-                  color: _bloodDry,
-                  letterSpacing: 2,
-                  fontWeight: FontWeight.w700,
-                ),
-              ),
-            ),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  '오늘 밤,\n다시 뛰어라.',
-                  style: GoogleFonts.nanumMyeongjo(
-                    fontSize: 22,
-                    color: _rice,
-                    height: 1.3,
-                    fontWeight: FontWeight.w800,
-                  ),
-                ),
-                const SizedBox(height: 6),
-                Text(
-                  '도 플 갱 어   추 격',
-                  style: GoogleFonts.gowunBatang(
-                    fontSize: 10,
-                    color: _bloodFresh,
-                    letterSpacing: 4,
-                    fontWeight: FontWeight.w700,
-                  ),
-                ),
-              ],
-            ),
-          ],
-        ),
-      ),
     );
   }
 
   /// 새 기록 카드 — 전설의 마라토너 or 자유 러닝 선택(/prepare)
   Widget _newRecordCard(BuildContext context) {
-    return InkWell(
+    return _actionCard(
+      context: context,
+      minHeight: 120,
+      title: '홀로,\n새 기록을 남겨라.',
+      subtitle: '전 설 의   마 라 토 너   ·   자 유',
+      cornerHanja: '記',
+      hanjaColor: _outline,
+      subtitleColor: _outline,
+      decoration: const BoxDecoration(
+        color: Color(0xFF0D0607),
+        border: Border(
+          top: BorderSide(color: _borderInk, width: 1),
+          bottom: BorderSide(color: _borderInk, width: 1),
+          left: BorderSide(color: _borderInk, width: 1),
+          right: BorderSide(color: _borderInk, width: 1),
+        ),
+      ),
       onTap: () {
+        debugPrint('[MysticHome] 새 기록 카드 TAP');
         SfxService().tapNewRun();
         context.push('/prepare');
       },
-      child: Container(
-        decoration: const BoxDecoration(
-          color: Color(0xFF0D0607),
-          border: Border(
-            top: BorderSide(color: _borderInk, width: 1),
-            bottom: BorderSide(color: _borderInk, width: 1),
-            left: BorderSide(color: _borderInk, width: 1),
-            right: BorderSide(color: _borderInk, width: 1),
-          ),
-        ),
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
-        child: Stack(
-          children: [
-            Positioned(
-              top: 6,
-              right: 10,
-              child: Text(
-                '記',
-                style: GoogleFonts.nanumMyeongjo(
-                  fontSize: 14,
-                  color: _outline,
-                  letterSpacing: 2,
-                  fontWeight: FontWeight.w700,
-                ),
-              ),
-            ),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  '홀로,\n새 기록을 남겨라.',
+    );
+  }
+
+  /// 공통 액션 카드 위젯 — 명시적 크기로 hit test 보장
+  Widget _actionCard({
+    required BuildContext context,
+    required double minHeight,
+    required String title,
+    required String subtitle,
+    required String cornerHanja,
+    required Color hanjaColor,
+    required Color subtitleColor,
+    required Decoration decoration,
+    required VoidCallback onTap,
+  }) {
+    return SizedBox(
+      width: double.infinity,
+      height: minHeight,
+      child: GestureDetector(
+        behavior: HitTestBehavior.opaque,
+        onTap: onTap,
+        child: Container(
+          decoration: decoration,
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+          child: Stack(
+            children: [
+              Positioned(
+                top: 0,
+                right: 0,
+                child: Text(
+                  cornerHanja,
                   style: GoogleFonts.nanumMyeongjo(
-                    fontSize: 22,
-                    color: _rice,
-                    height: 1.3,
-                    fontWeight: FontWeight.w800,
-                  ),
-                ),
-                const SizedBox(height: 6),
-                Text(
-                  '전 설 의   마 라 토 너   ·   자 유',
-                  style: GoogleFonts.gowunBatang(
-                    fontSize: 10,
-                    color: _outline,
-                    letterSpacing: 3,
+                    fontSize: 14,
+                    color: hanjaColor,
+                    letterSpacing: 2,
                     fontWeight: FontWeight.w700,
                   ),
                 ),
-              ],
-            ),
-          ],
+              ),
+              Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    style: GoogleFonts.nanumMyeongjo(
+                      fontSize: 22,
+                      color: _rice,
+                      height: 1.3,
+                      fontWeight: FontWeight.w800,
+                    ),
+                  ),
+                  const SizedBox(height: 6),
+                  Text(
+                    subtitle,
+                    style: GoogleFonts.gowunBatang(
+                      fontSize: 10,
+                      color: subtitleColor,
+                      letterSpacing: 3,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
         ),
       ),
     );

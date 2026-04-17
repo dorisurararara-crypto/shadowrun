@@ -13,6 +13,9 @@ import 'package:shadowrun/core/services/purchase_service.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:shadowrun/core/services/sfx_service.dart';
 import 'package:shadowrun/core/services/coaching_service.dart';
+import 'package:shadowrun/core/theme/theme_id.dart';
+import 'package:shadowrun/core/theme/theme_manager.dart';
+import 'package:shadowrun/features/result/presentation/layouts/mystic_result_layout.dart';
 import 'package:just_audio/just_audio.dart';
 import 'dart:math' as math2;
 
@@ -190,6 +193,38 @@ class _ResultScreenState extends State<ResultScreen>
       );
     }
 
+    return ValueListenableBuilder<ThemeId>(
+      valueListenable: ThemeManager.I.themeIdNotifier,
+      builder: (context, themeId, _) {
+        if (themeId == ThemeId.koreanMystic) {
+          return MysticResultLayout(
+            isWin: _isChallenge ? _isWin : null,
+            distanceM: run.distanceM,
+            durationS: run.durationS,
+            avgPaceText: run.formattedPace,
+            shadowGapM: _isChallenge ? _computeFinalShadowGapM() : null,
+            shadowDistanceSeries: _buildShadowDistanceSeries(),
+            maxPaceText: _computeMaxPaceText(),
+            avgHeartRate: _computeAvgHeartRate(),
+            calories: run.calories,
+            onClose: () {
+              SfxService().tapCard();
+              context.go('/');
+            },
+            onShare: _shareResult,
+            onRestart: () {
+              SfxService().tapChallenge();
+              // 챌린지였으면 챌린지 재시작, 아니면 일반 준비 화면
+              context.go(_isChallenge ? '/prepare' : '/prepare');
+            },
+          );
+        }
+        return _buildDefaultLayout(context, run);
+      },
+    );
+  }
+
+  Widget _buildDefaultLayout(BuildContext context, RunModel run) {
     return Scaffold(
       backgroundColor: SRColors.background,
       body: SafeArea(
@@ -226,6 +261,96 @@ class _ResultScreenState extends State<ResultScreen>
         ),
       ),
     );
+  }
+
+  /// 최종 시점에서 도플갱어와의 거리(m).
+  /// 양수 = 앞섬(탈출), 음수 = 뒤처짐(잡힘).
+  double _computeFinalShadowGapM() {
+    if (_points.isEmpty || _shadowPoints.isEmpty) return 0;
+    final runnerStartMs = _points.first.timestampMs;
+    final shadowStartMs = _shadowPoints.first.timestampMs;
+    double runnerDist = 0;
+    double shadowDist = 0;
+    int shadowIdx = 0;
+    for (int i = 1; i < _points.length; i++) {
+      runnerDist += _distanceBetween(
+        _points[i - 1].latitude, _points[i - 1].longitude,
+        _points[i].latitude, _points[i].longitude,
+      );
+      final elapsedMs = _points[i].timestampMs - runnerStartMs;
+      while (shadowIdx + 1 < _shadowPoints.length &&
+          (_shadowPoints[shadowIdx + 1].timestampMs - shadowStartMs) <= elapsedMs) {
+        shadowDist += _distanceBetween(
+          _shadowPoints[shadowIdx].latitude, _shadowPoints[shadowIdx].longitude,
+          _shadowPoints[shadowIdx + 1].latitude, _shadowPoints[shadowIdx + 1].longitude,
+        );
+        shadowIdx++;
+      }
+    }
+    return runnerDist - shadowDist;
+  }
+
+  /// 미스틱 차트용: 각 러너 타임라인에서 (runner누적 - shadow누적) 시리즈.
+  List<double> _buildShadowDistanceSeries() {
+    if (_points.length < 2 || _shadowPoints.isEmpty) return const [];
+    final runnerStartMs = _points.first.timestampMs;
+    final shadowStartMs = _shadowPoints.first.timestampMs;
+    double runnerDist = 0;
+    double shadowDist = 0;
+    int shadowIdx = 0;
+    final series = <double>[];
+    for (int i = 1; i < _points.length; i++) {
+      runnerDist += _distanceBetween(
+        _points[i - 1].latitude, _points[i - 1].longitude,
+        _points[i].latitude, _points[i].longitude,
+      );
+      final elapsedMs = _points[i].timestampMs - runnerStartMs;
+      while (shadowIdx + 1 < _shadowPoints.length &&
+          (_shadowPoints[shadowIdx + 1].timestampMs - shadowStartMs) <= elapsedMs) {
+        shadowDist += _distanceBetween(
+          _shadowPoints[shadowIdx].latitude, _shadowPoints[shadowIdx].longitude,
+          _shadowPoints[shadowIdx + 1].latitude, _shadowPoints[shadowIdx + 1].longitude,
+        );
+        shadowIdx++;
+      }
+      series.add(runnerDist - shadowDist);
+    }
+    // 너무 많으면 다운샘플 (최대 60 포인트)
+    if (series.length <= 60) return series;
+    final step = (series.length / 60).ceil();
+    final out = <double>[];
+    for (int i = 0; i < series.length; i += step) {
+      out.add(series[i]);
+    }
+    if (out.last != series.last) out.add(series.last);
+    return out;
+  }
+
+  /// 속도 최고점을 min/km 페이스로 환산 (speedMps 최대 → 가장 빠른 페이스).
+  String _computeMaxPaceText() {
+    if (_points.isEmpty) return "--'--\"";
+    double maxSpeed = 0;
+    for (final p in _points) {
+      if (p.speedMps > maxSpeed) maxSpeed = p.speedMps;
+    }
+    if (maxSpeed <= 0) return "--'--\"";
+    final paceMinPerKm = 1000 / maxSpeed / 60; // min/km
+    final min = paceMinPerKm.floor();
+    final sec = ((paceMinPerKm - min) * 60).round();
+    return "$min'${sec.toString().padLeft(2, '0')}\"";
+  }
+
+  int? _computeAvgHeartRate() {
+    if (_points.isEmpty) return null;
+    int sum = 0;
+    int count = 0;
+    for (final p in _points) {
+      if (p.heartRate != null && p.heartRate! > 0) {
+        sum += p.heartRate!;
+        count++;
+      }
+    }
+    return count == 0 ? null : (sum / count).round();
   }
 
   Widget _buildHeader() {

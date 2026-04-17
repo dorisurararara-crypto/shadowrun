@@ -22,6 +22,9 @@ import 'package:shadowrun/core/services/sfx_service.dart';
 import 'package:shadowrun/shared/widgets/stick_figure_marker.dart';
 import 'package:shadowrun/core/services/watch_connector_service.dart';
 import 'package:shadowrun/core/services/health_service.dart';
+import 'package:shadowrun/core/theme/theme_manager.dart';
+import 'package:shadowrun/core/theme/theme_id.dart';
+import 'package:shadowrun/features/running/presentation/layouts/mystic_running_layout.dart';
 
 class RunningScreen extends StatefulWidget {
   final int? shadowRunId;
@@ -903,6 +906,52 @@ class _RunningScreenState extends State<RunningScreen>
 
   @override
   Widget build(BuildContext context) {
+    return ValueListenableBuilder<ThemeId>(
+      valueListenable: ThemeManager.I.themeIdNotifier,
+      builder: (context, themeId, _) {
+        if (themeId == ThemeId.koreanMystic) {
+          return _buildMysticLayout();
+        }
+        return _buildDefaultLayout();
+      },
+    );
+  }
+
+  /// T3 Korean Mystic 레이아웃. 내부 데이터/콜백만 주입하고 실시간 로직은 기존 그대로.
+  Widget _buildMysticLayout() {
+    // 미니맵 — 기존 네이버맵 빌더 재사용.
+    final map = _buildNaverMap(onReady: (c) {
+      _mapController = c;
+      _lastAddedKmMarker = 0;
+      _activeOverlayIds.clear();
+    });
+    final content = MysticRunningLayout(
+      elapsedSeconds: _runService.durationS,
+      distanceM: _runService.totalDistanceM,
+      paceText: _runService.formattedPace,
+      shadowGapM: _runService.shadowDistanceM,
+      isPaused: _paused,
+      onPauseTap: _togglePause,
+      onStopTap: _confirmStop,
+      isChallenge: widget.shadowRunId != null,
+      mapChild: map,
+      ttsOn: _ttsOn,
+      sfxOn: _sfxOn,
+      onToggleTts: () {
+        setState(() => _ttsOn = !_ttsOn);
+        _horrorService.ttsEnabled = _ttsOn;
+      },
+      onToggleSfx: () {
+        setState(() => _sfxOn = !_sfxOn);
+        SfxService().enabled = _sfxOn;
+        _syncAudioState();
+      },
+    );
+    return _applyJumpscareOverlays(content);
+  }
+
+  /// 기본(T1 외 기존) 레이아웃.
+  Widget _buildDefaultLayout() {
     Widget content = Scaffold(
       backgroundColor: SRColors.background,
       body: _runMode == 'mapcenter'
@@ -911,6 +960,11 @@ class _RunningScreenState extends State<RunningScreen>
               ? _buildModeB()
               : _buildModeC(),
     );
+    return _applyJumpscareOverlays(content);
+  }
+
+  /// 점프스케어 떨림/플래시 오버레이 + PopScope — 테마 공통.
+  Widget _applyJumpscareOverlays(Widget content) {
 
     // 점프스케어 화면 떨림
     if (_jumpscareTriggered) {
