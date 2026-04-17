@@ -14,6 +14,7 @@ import 'package:shadowrun/shared/models/run_model.dart';
 import 'package:shadowrun/core/l10n/app_strings.dart';
 import 'package:shadowrun/core/services/sfx_service.dart';
 import 'package:shadowrun/features/prepare/presentation/layouts/mystic_prepare_layout.dart';
+import 'package:shadowrun/features/prepare/presentation/layouts/pure_prepare_layout.dart';
 
 class PrepareScreen extends StatefulWidget {
   final int? shadowRunId;
@@ -293,6 +294,41 @@ class _PrepareScreenState extends State<PrepareScreen>
             );
           }
           return MysticPrepareLayout(
+            isChallenge: _isChallenge,
+            gpsReady: _gpsReady,
+            tooFarFromStart: _tooFarFromStart,
+            canStart: _canStart,
+            selectedQuote: _selectedQuote,
+            selectedMode: _selectedMode,
+            onModeChanged: (m) {
+              SfxService().toggle();
+              setState(() => _selectedMode = m);
+            },
+            shadowRun: _shadowRun,
+            shadowLocationType: _shadowLocationType,
+            onShadowLocationChanged: (t) {
+              SfxService().toggle();
+              setState(() => _shadowLocationType = t);
+            },
+            shoes: _shoes,
+            selectedShoeId: _selectedShoeId,
+            onShoeChanged: (id) => setState(() => _selectedShoeId = id),
+            onStart: _startCountdown,
+            onBack: () => context.pop(),
+            countdownActive: _countdownActive,
+            countdownValue: _countdownValue,
+          );
+        }
+        if (themeId == ThemeId.pureCinematic) {
+          if (_loading) {
+            return const Scaffold(
+              backgroundColor: Color(0xFF000000),
+              body: Center(
+                child: CircularProgressIndicator(color: Color(0xFF8B0000)),
+              ),
+            );
+          }
+          return PurePrepareLayout(
             isChallenge: _isChallenge,
             gpsReady: _gpsReady,
             tooFarFromStart: _tooFarFromStart,

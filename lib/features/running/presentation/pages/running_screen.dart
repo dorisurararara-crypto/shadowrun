@@ -25,6 +25,7 @@ import 'package:shadowrun/core/services/health_service.dart';
 import 'package:shadowrun/core/theme/theme_manager.dart';
 import 'package:shadowrun/core/theme/theme_id.dart';
 import 'package:shadowrun/features/running/presentation/layouts/mystic_running_layout.dart';
+import 'package:shadowrun/features/running/presentation/layouts/pure_running_layout.dart';
 
 class RunningScreen extends StatefulWidget {
   final int? shadowRunId;
@@ -912,6 +913,9 @@ class _RunningScreenState extends State<RunningScreen>
         if (themeId == ThemeId.koreanMystic) {
           return _buildMysticLayout();
         }
+        if (themeId == ThemeId.pureCinematic) {
+          return _buildPureLayout();
+        }
         return _buildDefaultLayout();
       },
     );
@@ -926,6 +930,38 @@ class _RunningScreenState extends State<RunningScreen>
       _activeOverlayIds.clear();
     });
     final content = MysticRunningLayout(
+      elapsedSeconds: _runService.durationS,
+      distanceM: _runService.totalDistanceM,
+      paceText: _runService.formattedPace,
+      shadowGapM: _runService.shadowDistanceM,
+      isPaused: _paused,
+      onPauseTap: _togglePause,
+      onStopTap: _confirmStop,
+      isChallenge: widget.shadowRunId != null,
+      mapChild: map,
+      ttsOn: _ttsOn,
+      sfxOn: _sfxOn,
+      onToggleTts: () {
+        setState(() => _ttsOn = !_ttsOn);
+        _horrorService.ttsEnabled = _ttsOn;
+      },
+      onToggleSfx: () {
+        setState(() => _sfxOn = !_sfxOn);
+        SfxService().enabled = _sfxOn;
+        _syncAudioState();
+      },
+    );
+    return _applyJumpscareOverlays(content);
+  }
+
+  /// T1 Pure Cinematic 레이아웃. 내부 데이터/콜백만 주입.
+  Widget _buildPureLayout() {
+    final map = _buildNaverMap(onReady: (c) {
+      _mapController = c;
+      _lastAddedKmMarker = 0;
+      _activeOverlayIds.clear();
+    });
+    final content = PureRunningLayout(
       elapsedSeconds: _runService.durationS,
       distanceM: _runService.totalDistanceM,
       paceText: _runService.formattedPace,

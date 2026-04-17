@@ -16,6 +16,7 @@ import 'package:shadowrun/core/services/coaching_service.dart';
 import 'package:shadowrun/core/theme/theme_id.dart';
 import 'package:shadowrun/core/theme/theme_manager.dart';
 import 'package:shadowrun/features/result/presentation/layouts/mystic_result_layout.dart';
+import 'package:shadowrun/features/result/presentation/layouts/pure_result_layout.dart';
 import 'package:just_audio/just_audio.dart';
 import 'dart:math' as math2;
 
@@ -215,6 +216,29 @@ class _ResultScreenState extends State<ResultScreen>
             onRestart: () {
               SfxService().tapChallenge();
               // 챌린지였으면 챌린지 재시작, 아니면 일반 준비 화면
+              context.go(_isChallenge ? '/prepare' : '/prepare');
+            },
+          );
+        }
+        if (themeId == ThemeId.pureCinematic) {
+          return PureResultLayout(
+            isWin: _isChallenge ? _isWin : null,
+            distanceM: run.distanceM,
+            durationS: run.durationS,
+            avgPaceText: run.formattedPace,
+            shadowGapM: _isChallenge ? _computeFinalShadowGapM() : null,
+            shadowDistanceSeries: _buildShadowDistanceSeries(),
+            maxPaceText: _computeMaxPaceText(),
+            avgHeartRate: _computeAvgHeartRate(),
+            calories: run.calories,
+            episodeNumber: widget.runId,
+            onClose: () {
+              SfxService().tapCard();
+              context.go('/');
+            },
+            onShare: _shareResult,
+            onRestart: () {
+              SfxService().tapChallenge();
               context.go(_isChallenge ? '/prepare' : '/prepare');
             },
           );

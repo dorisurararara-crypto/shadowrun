@@ -11,6 +11,7 @@ import 'package:shadowrun/core/services/purchase_service.dart';
 import 'package:shadowrun/core/l10n/app_strings.dart';
 import 'package:shadowrun/core/services/sfx_service.dart';
 import 'package:shadowrun/features/home/presentation/layouts/mystic_home_layout.dart';
+import 'package:shadowrun/features/home/presentation/layouts/pure_home_layout.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -79,6 +80,13 @@ class _HomeScreenState extends State<HomeScreen> {
       builder: (context, themeId, _) {
         if (themeId == ThemeId.koreanMystic) {
           return MysticHomeLayout(
+            statsFuture: _statsFuture,
+            runsFuture: _runsFuture,
+            onRefresh: _refresh,
+          );
+        }
+        if (themeId == ThemeId.pureCinematic) {
+          return PureHomeLayout(
             statsFuture: _statsFuture,
             runsFuture: _runsFuture,
             onRefresh: _refresh,

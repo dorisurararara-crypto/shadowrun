@@ -16,6 +16,7 @@ import 'package:shadowrun/core/l10n/app_strings.dart';
 import 'package:shadowrun/core/services/sfx_service.dart';
 import 'package:shadowrun/shared/models/run_model.dart';
 import 'package:shadowrun/features/settings/presentation/layouts/mystic_settings_layout.dart';
+import 'package:shadowrun/features/settings/presentation/layouts/pure_settings_layout.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
@@ -198,6 +199,27 @@ class _SettingsScreenState extends State<SettingsScreen> {
             onTermsTap: () {
               _showMysticInfo(S.isKo ? '이용약관' : 'Terms of service');
             },
+            onBack: () => context.go('/'),
+          );
+        }
+        if (themeId == ThemeId.pureCinematic) {
+          if (_loading) {
+            return const Scaffold(
+              backgroundColor: Color(0xFF000000),
+              body: Center(
+                child: CircularProgressIndicator(
+                  color: Color(0xFFC83030),
+                  strokeWidth: 2,
+                ),
+              ),
+            );
+          }
+          return PureSettingsLayout(
+            userName: _profileDisplayName(),
+            isPro: _isPro,
+            horrorLevel: _horrorLevel,
+            onHorrorHeaderTap: _onHorrorHeaderTap,
+            onThemeTap: () => context.push('/settings/theme'),
             onBack: () => context.go('/'),
           );
         }

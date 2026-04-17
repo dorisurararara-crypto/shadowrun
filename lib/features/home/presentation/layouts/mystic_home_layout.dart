@@ -67,88 +67,93 @@ class MysticHomeLayout extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // codex 진단 반영: Stack 기본 fit:loose 때문에 non-positioned SingleChildScrollView의
+    // hit test가 깨져 자식 GestureDetector가 탭을 못 받음.
+    // 해결: SingleChildScrollView(+RefreshIndicator)를 Positioned.fill로 감싸 전체 크기 보장.
     return Scaffold(
       backgroundColor: _ink,
-      body: RefreshIndicator(
-        color: _bloodFresh,
-        backgroundColor: _ink,
-        onRefresh: () async => onRefresh(),
-        child: Stack(
-          children: [
-            // 배경 한자 워터마크 (오른쪽 상단)
-            const Positioned(
-              right: -60,
-              top: 60,
-              child: IgnorePointer(
-                child: Text(
-                  '影',
-                  style: TextStyle(
-                    fontFamily: 'Nanum Myeongjo',
-                    fontSize: 320,
-                    color: Color(0x26B00A12),
-                    height: 1,
-                    fontWeight: FontWeight.w800,
-                  ),
+      body: Stack(
+        children: [
+          // 배경 한자 워터마크 (오른쪽 상단)
+          const Positioned(
+            right: -60,
+            top: 60,
+            child: IgnorePointer(
+              child: Text(
+                '影',
+                style: TextStyle(
+                  fontFamily: 'Nanum Myeongjo',
+                  fontSize: 320,
+                  color: Color(0x26B00A12),
+                  height: 1,
+                  fontWeight: FontWeight.w800,
                 ),
               ),
             ),
-            // 배경 한자 워터마크 (왼쪽 하단)
-            const Positioned(
-              left: -40,
-              bottom: 180,
-              child: IgnorePointer(
-                child: Text(
-                  '追',
-                  style: TextStyle(
-                    fontFamily: 'Nanum Myeongjo',
-                    fontSize: 260,
-                    color: Color(0x1C7A0A0E),
-                    height: 1,
-                    fontWeight: FontWeight.w700,
-                  ),
+          ),
+          // 배경 한자 워터마크 (왼쪽 하단)
+          const Positioned(
+            left: -40,
+            bottom: 180,
+            child: IgnorePointer(
+              child: Text(
+                '追',
+                style: TextStyle(
+                  fontFamily: 'Nanum Myeongjo',
+                  fontSize: 260,
+                  color: Color(0x1C7A0A0E),
+                  height: 1,
+                  fontWeight: FontWeight.w700,
                 ),
               ),
             ),
+          ),
 
-            SingleChildScrollView(
-              physics: const AlwaysScrollableScrollPhysics(),
-              padding: EdgeInsets.only(
-                top: MediaQuery.of(context).padding.top + 24,
-                left: 22,
-                right: 22,
-                bottom: 32,
-              ),
-              child: FutureBuilder<Map<String, dynamic>>(
-                future: statsFuture,
-                builder: (context, statsSnap) {
-                  final stats = statsSnap.data ?? const {};
-                  final totalRuns = (stats['totalRuns'] ?? 0) as int;
-                  final totalDistanceM = ((stats['totalDistanceM'] ?? 0.0) as num).toDouble();
-                  final weeklyKm = (totalDistanceM / 1000);
-                  return FutureBuilder<List<RunModel>>(
-                    future: runsFuture,
-                    builder: (context, runsSnap) {
-                      final runs = runsSnap.data ?? const <RunModel>[];
-                      final lastRun = runs.isNotEmpty ? runs.first : null;
-                      final bestEscape = runs.isEmpty
-                          ? 0
-                          : runs.map((r) => r.distanceM.toInt()).reduce((a, b) => a > b ? a : b);
-                      final prevMeters = lastRun?.distanceM.toInt() ?? 0;
-                      return _buildContent(
-                        context,
-                        totalRuns: totalRuns,
-                        weeklyKm: weeklyKm,
-                        bestEscapeM: bestEscape,
-                        prevMeters: prevMeters,
-                        runs: runs.take(3).toList(),
-                      );
-                    },
-                  );
-                },
+          Positioned.fill(
+            child: RefreshIndicator(
+              color: _bloodFresh,
+              backgroundColor: _ink,
+              onRefresh: () async => onRefresh(),
+              child: SingleChildScrollView(
+                physics: const AlwaysScrollableScrollPhysics(),
+                padding: EdgeInsets.only(
+                  top: MediaQuery.of(context).padding.top + 24,
+                  left: 22,
+                  right: 22,
+                  bottom: 32,
+                ),
+                child: FutureBuilder<Map<String, dynamic>>(
+                  future: statsFuture,
+                  builder: (context, statsSnap) {
+                    final stats = statsSnap.data ?? const {};
+                    final totalRuns = (stats['totalRuns'] ?? 0) as int;
+                    final totalDistanceM = ((stats['totalDistanceM'] ?? 0.0) as num).toDouble();
+                    final weeklyKm = (totalDistanceM / 1000);
+                    return FutureBuilder<List<RunModel>>(
+                      future: runsFuture,
+                      builder: (context, runsSnap) {
+                        final runs = runsSnap.data ?? const <RunModel>[];
+                        final lastRun = runs.isNotEmpty ? runs.first : null;
+                        final bestEscape = runs.isEmpty
+                            ? 0
+                            : runs.map((r) => r.distanceM.toInt()).reduce((a, b) => a > b ? a : b);
+                        final prevMeters = lastRun?.distanceM.toInt() ?? 0;
+                        return _buildContent(
+                          context,
+                          totalRuns: totalRuns,
+                          weeklyKm: weeklyKm,
+                          bestEscapeM: bestEscape,
+                          prevMeters: prevMeters,
+                          runs: runs.take(3).toList(),
+                        );
+                      },
+                    );
+                  },
+                ),
               ),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
       bottomNavigationBar: _buildBottomNav(context),
     );
@@ -552,45 +557,44 @@ class MysticHomeLayout extends StatelessWidget {
         child: Container(
           decoration: decoration,
           padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
-          child: Stack(
+          // Stack 제거 → Column + Row로 한자 배치 (hit test 단순화)
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Positioned(
-                top: 0,
-                right: 0,
-                child: Text(
-                  cornerHanja,
-                  style: GoogleFonts.nanumMyeongjo(
-                    fontSize: 14,
-                    color: hanjaColor,
-                    letterSpacing: 2,
-                    fontWeight: FontWeight.w700,
-                  ),
-                ),
-              ),
-              Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.start,
+              Row(
                 children: [
-                  Text(
-                    title,
-                    style: GoogleFonts.nanumMyeongjo(
-                      fontSize: 22,
-                      color: _rice,
-                      height: 1.3,
-                      fontWeight: FontWeight.w800,
+                  Expanded(
+                    child: Text(
+                      title,
+                      style: GoogleFonts.nanumMyeongjo(
+                        fontSize: 22,
+                        color: _rice,
+                        height: 1.3,
+                        fontWeight: FontWeight.w800,
+                      ),
                     ),
                   ),
-                  const SizedBox(height: 6),
                   Text(
-                    subtitle,
-                    style: GoogleFonts.gowunBatang(
-                      fontSize: 10,
-                      color: subtitleColor,
-                      letterSpacing: 3,
+                    cornerHanja,
+                    style: GoogleFonts.nanumMyeongjo(
+                      fontSize: 14,
+                      color: hanjaColor,
+                      letterSpacing: 2,
                       fontWeight: FontWeight.w700,
                     ),
                   ),
                 ],
+              ),
+              const SizedBox(height: 6),
+              Text(
+                subtitle,
+                style: GoogleFonts.gowunBatang(
+                  fontSize: 10,
+                  color: subtitleColor,
+                  letterSpacing: 3,
+                  fontWeight: FontWeight.w700,
+                ),
               ),
             ],
           ),
