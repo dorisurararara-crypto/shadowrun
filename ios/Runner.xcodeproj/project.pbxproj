@@ -17,6 +17,7 @@
 		6C736AABC140791213B6FAC5 /* Pods_Runner.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CF13930EC9B30CD0ABBF1FAF /* Pods_Runner.framework */; };
 		74858FAF1ED2DC5600515810 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 74858FAE1ED2DC5600515810 /* AppDelegate.swift */; };
 		7884E8682EC3CC0700C636F2 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7884E8672EC3CC0400C636F2 /* SceneDelegate.swift */; };
+		9436AF859847B20415999DEC /* ShadowRunWatch Watch App.app in Embed Watch Content */ = {isa = PBXBuildFile; fileRef = 4FFEDAAF2F91310000C68C49 /* ShadowRunWatch Watch App.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		97C146FC1CF9000F007C117D /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 97C146FA1CF9000F007C117D /* Main.storyboard */; };
 		97C146FE1CF9000F007C117D /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 97C146FD1CF9000F007C117D /* Assets.xcassets */; };
 		97C147011CF9000F007C117D /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 97C146FF1CF9000F007C117D /* LaunchScreen.storyboard */; };
@@ -31,6 +32,13 @@
 			remoteInfo = Runner;
 		};
 		4FFEDAB12F91310000C68C49 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 97C146E61CF9000F007C117D /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 4FFEDAAE2F91310000C68C49;
+			remoteInfo = "ShadowRunWatch Watch App";
+		};
+		54A6346046BD8D97B06262C4 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 97C146E61CF9000F007C117D /* Project object */;
 			proxyType = 1;
@@ -59,6 +67,17 @@
 			files = (
 			);
 			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		E6BDB5839D957384C5982E18 /* Embed Watch Content */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "$(CONTENTS_FOLDER_PATH)/Watch";
+			dstSubfolderSpec = 16;
+			files = (
+				9436AF859847B20415999DEC /* ShadowRunWatch Watch App.app in Embed Watch Content */,
+			);
+			name = "Embed Watch Content";
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXCopyFilesBuildPhase section */
@@ -289,6 +308,7 @@
 				97C146EB1CF9000F007C117D /* Frameworks */,
 				97C146EC1CF9000F007C117D /* Resources */,
 				9705A1C41CF9048500538489 /* Embed Frameworks */,
+				E6BDB5839D957384C5982E18 /* Embed Watch Content */,
 				3B06AD1E1E4923F5004D2608 /* Thin Binary */,
 				49855616CB1ABAF87918F5AA /* [CP] Embed Pods Frameworks */,
 				EB55A471AC3DBF83E1AC8EA9 /* [CP] Copy Pods Resources */,
@@ -296,6 +316,7 @@
 			buildRules = (
 			);
 			dependencies = (
+				DCDB79E2D2384689722996CC /* PBXTargetDependency */,
 			);
 			name = Runner;
 			productName = Runner;
@@ -537,6 +558,12 @@
 			isa = PBXTargetDependency;
 			target = 4FFEDAAE2F91310000C68C49 /* ShadowRunWatch Watch App */;
 			targetProxy = 4FFEDAB12F91310000C68C49 /* PBXContainerItemProxy */;
+		};
+		DCDB79E2D2384689722996CC /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = "ShadowRunWatch Watch App";
+			target = 4FFEDAAE2F91310000C68C49 /* ShadowRunWatch Watch App */;
+			targetProxy = 54A6346046BD8D97B06262C4 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -792,7 +819,7 @@
 				INFOPLIST_KEY_NSHealthShareUsageDescription = "Read heart rate during runs.";
 				INFOPLIST_KEY_NSHealthUpdateUsageDescription = "Save workout data to Apple Health.";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
-				INFOPLIST_KEY_WKWatchOnly = YES;
+				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = com.ganziman.shadowrun;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -801,11 +828,12 @@
 				MARKETING_VERSION = 1.0;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
-				PRODUCT_BUNDLE_IDENTIFIER = com.ganziman.ShadowRunWatch.watchkitapp;
+				PRODUCT_BUNDLE_IDENTIFIER = com.ganziman.shadowrun.watchkitapp;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = watchos;
 				SKIP_INSTALL = YES;
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SUPPORTED_PLATFORMS = "watchos watchsimulator";
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
 				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
@@ -842,7 +870,7 @@
 				INFOPLIST_KEY_NSHealthShareUsageDescription = "Read heart rate during runs.";
 				INFOPLIST_KEY_NSHealthUpdateUsageDescription = "Save workout data to Apple Health.";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
-				INFOPLIST_KEY_WKWatchOnly = YES;
+				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = com.ganziman.shadowrun;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -850,11 +878,12 @@
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
 				MARKETING_VERSION = 1.0;
 				MTL_FAST_MATH = YES;
-				PRODUCT_BUNDLE_IDENTIFIER = com.ganziman.ShadowRunWatch.watchkitapp;
+				PRODUCT_BUNDLE_IDENTIFIER = com.ganziman.shadowrun.watchkitapp;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = watchos;
 				SKIP_INSTALL = YES;
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SUPPORTED_PLATFORMS = "watchos watchsimulator";
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
 				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -889,7 +918,7 @@
 				INFOPLIST_KEY_NSHealthShareUsageDescription = "Read heart rate during runs.";
 				INFOPLIST_KEY_NSHealthUpdateUsageDescription = "Save workout data to Apple Health.";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
-				INFOPLIST_KEY_WKWatchOnly = YES;
+				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = com.ganziman.shadowrun;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -897,11 +926,12 @@
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
 				MARKETING_VERSION = 1.0;
 				MTL_FAST_MATH = YES;
-				PRODUCT_BUNDLE_IDENTIFIER = com.ganziman.ShadowRunWatch.watchkitapp;
+				PRODUCT_BUNDLE_IDENTIFIER = com.ganziman.shadowrun.watchkitapp;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = watchos;
 				SKIP_INSTALL = YES;
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SUPPORTED_PLATFORMS = "watchos watchsimulator";
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
 				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
 				SWIFT_EMIT_LOC_STRINGS = YES;

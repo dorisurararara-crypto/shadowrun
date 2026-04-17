@@ -29,6 +29,51 @@
 
 ## 최신
 
+### 2026-04-18 11:10 (Mac → Windows) — Watch 자동 설치 wiring 완료
+
+**사용자 리포트:** iPhone 앱 설치해도 Apple Watch 에 앱이 자동 설치 안 됨.
+
+**원인 진단 (project.pbxproj):**
+1. Watch App 타겟에 `INFOPLIST_KEY_WKWatchOnly = YES` — **standalone Watch 앱**으로 마킹돼 있어 companion 이 아니었음
+2. `INFOPLIST_KEY_WKCompanionAppBundleIdentifier` 없음 — 짝 iPhone 앱 지정 안 돼 있음
+3. Watch bundle ID 가 `com.ganziman.**ShadowRunWatch**.watchkitapp` — iPhone 앱 `com.ganziman.shadowrun` 의 하위가 아닌 별도 계통
+4. Runner (Flutter) 타겟에 **Embed Watch Content 빌드 페이즈 없음** — Watch App 이 Runner.app 에 임베드되지 않음 (대신 `ShadowRunWatch` 스텁 iOS 타겟이 임베드)
+
+**수정 (Ruby xcodeproj gem 스크립트 3개, `tmp/*.rb` 에 기록):**
+1. `wire_watch_companion.rb`: Watch App 빌드 세팅 (Debug/Release/Profile 3개 전체)
+   - `INFOPLIST_KEY_WKWatchOnly` 제거
+   - `INFOPLIST_KEY_WKCompanionAppBundleIdentifier = com.ganziman.shadowrun` 추가
+   - `PRODUCT_BUNDLE_IDENTIFIER`: `com.ganziman.ShadowRunWatch.watchkitapp` → `com.ganziman.shadowrun.watchkitapp`
+   - Runner 타겟에 Embed Watch Content 빌드 페이즈 신규 + Watch App.app 파일 레퍼런스 + Runner→Watch 의존성
+2. `fix_watch_platforms.rb`: Watch 타겟에 `SUPPORTED_PLATFORMS = "watchos watchsimulator"` 명시 — xcodebuild 가 `-sdk iphoneos` 강제해도 Watch 는 watchos SDK 로 컴파일
+3. `move_embed_phase.rb`: Embed Watch Content 페이즈 위치를 마지막 → Embed Frameworks 바로 뒤로 이동 — [CP] Pods 스크립트 뒤에 있으면 Xcode dependency cycle 발생 ("Cycle inside Runner")
+
+**검증:**
+```
+flutter build ios --release --no-codesign → BUILD SUCCEEDED (40.3s, Runner.app 167.4MB, +1MB Watch 포함)
+
+확인한 Info.plist (Runner.app/Watch/ShadowRunWatch Watch App.app):
+  CFBundleIdentifier = com.ganziman.shadowrun.watchkitapp ✅
+  WKCompanionAppBundleIdentifier = com.ganziman.shadowrun ✅
+  WKWatchOnly = (제거됨) ✅
+```
+
+**⚠️ 사용자 수동 작업 필요 (Xcode + Apple Developer):**
+1. **Xcode 열기** (`open ios/Runner.xcworkspace`)
+2. Runner 타겟 → Signing & Capabilities 탭 → **Team = Q6H9HCTK6W 확인**, "Automatically manage signing" 체크
+3. **ShadowRunWatch Watch App** 타겟 → Signing & Capabilities → 동일하게 Team 확인 + Automatic signing
+4. 새 bundle ID `com.ganziman.shadowrun.watchkitapp` 은 Automatic signing 이 알아서 Apple Developer Portal 에 등록 — 만약 manual signing 쓰면 Portal 에서 직접 추가 + provisioning profile 생성
+5. **iPhone 앱 bundle ID (`com.ganziman.shadowrun`) 에 "Wireless Companion App" capability 필요** — Portal 에서 해당 App ID 편집해 체크 (Automatic signing 이면 보통 자동)
+6. Archive → Distribute → TestFlight 업로드 → TestFlight 에서 설치 → **iPhone 앱 설치 시 Watch 에 자동 설치되는지 확인**
+
+**기존 `com.ganziman.ShadowRunWatch.watchkitapp` bundle ID:**
+- App Store Connect 에 해당 bundle ID 로 별도 Watch 앱 항목이 자동 생성됐을 수 있음 (TestFlight 업로드 시)
+- 사용되지 않을 테니 ASC 에서 방치 또는 삭제 가능 (builds 있으면 바로 삭제 안 될 수 있음 — "앱 제거" 요청 필요할 수도)
+
+**Windows 할 일:** 없음. 사용자 TestFlight 테스트 후 실 설치 확인되면 close.
+
+---
+
 ### 2026-04-18 10:40 (Mac → Windows) — 백그라운드 오디오 코드측 보강 + iOS 빌드 OK
 
 **Windows 03:30 요청(백그라운드 audio 끊김) 중 코드로 고칠 수 있는 부분 반영.**
