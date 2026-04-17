@@ -10,6 +10,7 @@ import 'package:shadowrun/core/services/ad_service.dart';
 import 'package:shadowrun/core/services/purchase_service.dart';
 import 'package:shadowrun/core/l10n/app_strings.dart';
 import 'package:shadowrun/core/services/sfx_service.dart';
+import 'package:shadowrun/core/services/home_bgm_service.dart';
 import 'package:shadowrun/shared/widgets/challenge_run_picker.dart';
 import 'package:shadowrun/features/home/presentation/layouts/mystic_home_layout.dart';
 import 'package:shadowrun/features/home/presentation/layouts/pure_home_layout.dart';
@@ -33,11 +34,14 @@ class _HomeScreenState extends State<HomeScreen> {
     super.initState();
     _loadData();
     PurchaseService().proNotifier.addListener(_onProChanged);
+    // 테마별 홈 BGM 재생 시작 (사용자 BGM off 또는 외부음악 모드면 내부에서 no-op)
+    HomeBgmService.I.startForCurrentTheme();
   }
 
   @override
   void dispose() {
     PurchaseService().proNotifier.removeListener(_onProChanged);
+    HomeBgmService.I.stop();
     super.dispose();
   }
 

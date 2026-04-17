@@ -54,6 +54,10 @@ class AppThemeSet {
   final String tagline;
   final bool showHanjaWatermark;
   final List<String> hanjaSet;
+  // 테마별 BGM 풀 — 홈/러닝(비추격). 빈 리스트면 재생 안 함/기본 폴백.
+  // chase_* 는 여기 포함하지 않음 (HorrorService가 공통 관리).
+  final List<String> bgmHomePool;
+  final List<String> bgmRunningPool;
 
   const AppThemeSet({
     required this.id,
@@ -62,5 +66,7 @@ class AppThemeSet {
     required this.tagline,
     this.showHanjaWatermark = false,
     this.hanjaSet = const [],
+    this.bgmHomePool = const [],
+    this.bgmRunningPool = const [],
   });
 }

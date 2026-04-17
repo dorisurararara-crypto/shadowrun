@@ -6,6 +6,7 @@ import 'package:vibration/vibration.dart';
 import 'package:shadowrun/core/l10n/app_strings.dart';
 import 'package:shadowrun/core/services/bgm_preferences.dart';
 import 'package:shadowrun/core/services/watch_connector_service.dart';
+import 'package:shadowrun/core/theme/theme_manager.dart';
 import 'package:shadowrun/features/running/data/legend_runners.dart';
 
 class MarathonService {
@@ -104,7 +105,10 @@ class MarathonService {
       return;
     }
     try {
-      final bgm = _bgmOptions[_random.nextInt(_bgmOptions.length)];
+      // 테마별 BGM 풀 우선 사용, 없으면 기존 running_ambient 폴백
+      final themePool = ThemeManager.I.current.bgmRunningPool;
+      final pool = themePool.isNotEmpty ? themePool : _bgmOptions;
+      final bgm = pool[_random.nextInt(pool.length)];
       await _bgmPlayer.setAsset('assets/audio/$bgm');
       _bgmPlayer.setLoopMode(LoopMode.one);
       _bgmPlayer.setVolume(prefs.effectiveVolume(0.25));

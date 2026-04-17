@@ -26,6 +26,16 @@ const pureCinematicTheme = AppThemeSet(
     heroItalic: true,
   ),
   tagline: '그림자는 쉬지 않는다',
+  // ElevenLabs Music API로 생성한 테마 전용 BGM (2026-04-18)
+  // 프롬프트: cinematic noir minimal piano + dark strings ambient
+  bgmHomePool: [
+    'themes/t1_home_v1.mp3',
+    'themes/t1_home_v2.mp3',
+  ],
+  bgmRunningPool: [
+    'themes/t1_run_v1.mp3',
+    'themes/t1_run_v2.mp3',
+  ],
 );
 
 const koreanMysticTheme = AppThemeSet(
@@ -54,6 +64,16 @@ const koreanMysticTheme = AppThemeSet(
   tagline: '그 놈이 오늘 밤도 쫓아온다',
   showHanjaWatermark: true,
   hanjaSet: ['影', '追', '夜', '始', '終', '走', '設'],
+  // ElevenLabs Music API 생성 — Korean traditional horror ambient
+  // gayageum drone + cold wind + daegeum flute + pounding heartbeat
+  bgmHomePool: [
+    'themes/t3_home_v1.mp3',
+    'themes/t3_home_v2.mp3',
+  ],
+  bgmRunningPool: [
+    'themes/t3_run_v1.mp3',
+    'themes/t3_run_v2.mp3',
+  ],
 );
 
 const filmNoirTheme = AppThemeSet(
