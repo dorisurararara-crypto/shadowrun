@@ -4,6 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:shadowrun/shared/models/run_model.dart';
 import 'package:shadowrun/shared/widgets/challenge_run_picker.dart';
 import 'package:shadowrun/core/services/sfx_service.dart';
+import 'package:shadowrun/core/l10n/app_strings.dart';
 
 class MysticHomeLayout extends StatelessWidget {
   final Future<Map<String, dynamic>> statsFuture;
@@ -61,9 +62,16 @@ class MysticHomeLayout extends StatelessWidget {
   }
 
   String _buildPrevQuote(int shadowMeters) {
-    if (shadowMeters <= 0) return '그 놈은\n아직 당신을\n찾지 못했다.';
-    final words = _korWordsUnder1000(shadowMeters);
-    return '어젯밤, 그 놈이\n$words 걸음\n가까워졌다.';
+    if (shadowMeters <= 0) {
+      return S.isKo
+          ? '그 놈은\n아직 당신을\n찾지 못했다.'
+          : 'It has not\nfound you\nyet.';
+    }
+    if (S.isKo) {
+      final words = _korWordsUnder1000(shadowMeters);
+      return '어젯밤, 그 놈이\n$words 걸음\n가까워졌다.';
+    }
+    return 'Last night, it came\n$shadowMeters steps\ncloser.';
   }
 
   @override
@@ -171,8 +179,22 @@ class MysticHomeLayout extends StatelessWidget {
     final now = DateTime.now();
     // 曜日: 月 火 水 木 金 土 日 (전통 한자 요일)
     const weekDaysHanja = ['月', '火', '水', '木', '金', '土', '日'];
+    const weekDaysEn = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+    const monthsEn = [
+      'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+      'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec',
+    ];
     final weekdayHanja = weekDaysHanja[(now.weekday - 1).clamp(0, 6)];
     final dateHanja = '${_hanjaDigits(now.month)}月${_hanjaDigits(now.day)}日';
+    final weekdayEn = weekDaysEn[(now.weekday - 1).clamp(0, 6)];
+    final dateEn = '${monthsEn[(now.month - 1).clamp(0, 11)]} ${now.day}';
+    final dateLine = S.isKo
+        ? '$weekdayHanja曜日 · $dateHanja'
+        : '$weekdayEn · $dateEn';
+    final episodeNumber = (totalRuns + 1).toString().padLeft(3, '0');
+    final episodeLabel = S.isKo
+        ? '제 $episodeNumber 밤'
+        : 'Night No.$episodeNumber';
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -194,7 +216,7 @@ class MysticHomeLayout extends StatelessWidget {
         // 쉐도우런 큰 제목
         Center(
           child: Text(
-            '쉐도우런',
+            S.isKo ? '쉐도우런' : 'Shadow Run',
             style: GoogleFonts.nanumMyeongjo(
               fontSize: 46,
               color: _rice,
@@ -223,7 +245,9 @@ class MysticHomeLayout extends StatelessWidget {
         // 태그라인
         Center(
           child: Text(
-            '— 그림자는 쉬지 않는다 —',
+            S.isKo
+                ? '— 그림자는 쉬지 않는다 —'
+                : '— The shadow never rests —',
             style: GoogleFonts.gowunBatang(
               fontSize: 13,
               color: _bloodFresh,
@@ -236,7 +260,7 @@ class MysticHomeLayout extends StatelessWidget {
         // 에피소드 번호
         Center(
           child: Text(
-            '제 ${(totalRuns + 1).toString().padLeft(3, '0')} 밤',
+            episodeLabel,
             style: GoogleFonts.nanumMyeongjo(
               fontSize: 13,
               color: _rice.withValues(alpha: 0.8),
@@ -247,10 +271,10 @@ class MysticHomeLayout extends StatelessWidget {
         ),
         const SizedBox(height: 4),
 
-        // 한자 요일 · 한자 날짜 (예: 金曜日 · 四月十七日)
+        // 요일 · 날짜 (한국어: 金曜日 · 四月十七日 / 영문: Fri · Apr 17)
         Center(
           child: Text(
-            '$weekdayHanja曜日 · $dateHanja',
+            dateLine,
             style: GoogleFonts.nanumMyeongjo(
               fontSize: 11,
               color: _fade,
@@ -269,7 +293,9 @@ class MysticHomeLayout extends StatelessWidget {
         // 구분선: "─ 지난 밤의 기록 ─"
         Center(
           child: Text(
-            '─   지난 밤의 기록   ─',
+            S.isKo
+                ? '─   지난 밤의 기록   ─'
+                : '─   Chronicles of past nights   ─',
             style: GoogleFonts.nanumMyeongjo(
               fontSize: 11,
               color: _outline,
@@ -295,7 +321,9 @@ class MysticHomeLayout extends StatelessWidget {
         // 최근 러닝 제목
         if (runs.isNotEmpty) ...[
           Text(
-            '─   최근 세 밤   ─',
+            S.isKo
+                ? '─   최근 세 밤   ─'
+                : '─   Recent Three Nights   ─',
             textAlign: TextAlign.center,
             style: GoogleFonts.nanumMyeongjo(
               fontSize: 11,
@@ -404,28 +432,40 @@ class MysticHomeLayout extends StatelessWidget {
         children: [
           Expanded(
             child: _statCell(
-              label: '이번 주',
-              hanjaValue: _hanjaDigits(weeklyKm.round()),
+              label: S.isKo ? '이번 주' : 'This week',
+              hanjaValue: S.isKo
+                  ? _hanjaDigits(weeklyKm.round())
+                  : weeklyKm.round().toString(),
               unit: 'km',
-              korSub: '${_korWordsUnder1000(weeklyKm.round())} 킬로미터',
+              korSub: S.isKo
+                  ? '${_korWordsUnder1000(weeklyKm.round())} 킬로미터'
+                  : '${weeklyKm.round()} kilometers',
             ),
           ),
           Container(width: 1, height: 48, color: _borderInk),
           Expanded(
             child: _statCell(
-              label: '밤의 기록',
-              hanjaValue: _hanjaDigits(totalRuns),
+              label: S.isKo ? '밤의 기록' : 'Nights run',
+              hanjaValue: S.isKo
+                  ? _hanjaDigits(totalRuns)
+                  : totalRuns.toString(),
               unit: '',
-              korSub: '${_korWordsUnder1000(totalRuns)} 밤',
+              korSub: S.isKo
+                  ? '${_korWordsUnder1000(totalRuns)} 밤'
+                  : '$totalRuns nights',
             ),
           ),
           Container(width: 1, height: 48, color: _borderInk),
           Expanded(
             child: _statCell(
-              label: '최장 거리',
-              hanjaValue: _hanjaDigits(bestEscapeM),
+              label: S.isKo ? '최장 거리' : 'Best escape',
+              hanjaValue: S.isKo
+                  ? _hanjaDigits(bestEscapeM)
+                  : bestEscapeM.toString(),
               unit: 'm',
-              korSub: '${_korWordsUnder1000(bestEscapeM)} 걸음',
+              korSub: S.isKo
+                  ? '${_korWordsUnder1000(bestEscapeM)} 걸음'
+                  : '$bestEscapeM steps',
             ),
           ),
         ],
@@ -489,8 +529,12 @@ class MysticHomeLayout extends StatelessWidget {
     return _actionCard(
       context: context,
       minHeight: 120,
-      title: '오늘 밤,\n다시 뛰어라.',
-      subtitle: '도 플 갱 어   추 격',
+      title: S.isKo
+          ? '오늘 밤,\n다시 뛰어라.'
+          : 'Tonight,\nrun again.',
+      subtitle: S.isKo
+          ? '도 플 갱 어   추 격'
+          : 'D O P P E L · C H A S E',
       cornerHanja: '追',
       hanjaColor: _bloodDry,
       subtitleColor: _bloodFresh,
@@ -517,8 +561,12 @@ class MysticHomeLayout extends StatelessWidget {
     return _actionCard(
       context: context,
       minHeight: 120,
-      title: '홀로,\n새 기록을 남겨라.',
-      subtitle: '전 설 의   마 라 토 너   ·   자 유',
+      title: S.isKo
+          ? '홀로,\n새 기록을 남겨라.'
+          : 'Alone,\nset a new record.',
+      subtitle: S.isKo
+          ? '전 설 의   마 라 토 너   ·   자 유'
+          : 'L E G E N D · F R E E',
       cornerHanja: '記',
       hanjaColor: _outline,
       subtitleColor: _outline,
@@ -609,10 +657,16 @@ class MysticHomeLayout extends StatelessWidget {
   Widget _recentRow(RunModel r) {
     final isWin = r.challengeResult == 'win';
     final isLoss = r.challengeResult == 'lose';
-    final label = isWin ? '살았다' : isLoss ? '잡혔다' : '뛰었다';
+    final label = isWin
+        ? (S.isKo ? '살았다' : 'escaped')
+        : isLoss
+            ? (S.isKo ? '잡혔다' : 'caught')
+            : (S.isKo ? '뛰었다' : 'ran');
     final labelColor = isWin ? _rice : isLoss ? _bloodFresh : _outline;
     final date = r.date.length >= 10 ? r.date.substring(5, 10).replaceAll('-', '.') : r.date;
-    final location = (r.location ?? '').trim().isEmpty ? '이름 없는 길' : r.location!;
+    final location = (r.location ?? '').trim().isEmpty
+        ? (S.isKo ? '이름 없는 길' : 'Unnamed path')
+        : r.location!;
     final shortLoc = location.length > 12 ? '${location.substring(0, 12)}…' : location;
     final distKm = (r.distanceM / 1000).toStringAsFixed(2);
     return Container(
@@ -668,16 +722,16 @@ class MysticHomeLayout extends StatelessWidget {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
-            _navItem(context, '家', '오늘', active: true, onTap: () {}),
-            _navItem(context, '夜', '지난 밤', onTap: () {
+            _navItem(context, '家', S.isKo ? '오늘' : 'today', active: true, onTap: () {}),
+            _navItem(context, '夜', S.isKo ? '지난 밤' : 'past', onTap: () {
               SfxService().tapCard();
               context.push('/history');
             }),
-            _navItem(context, '分', '분 석', onTap: () {
+            _navItem(context, '分', S.isKo ? '분 석' : 'analysis', onTap: () {
               SfxService().tapCard();
               context.push('/analysis');
             }),
-            _navItem(context, '設', '설 정', onTap: () {
+            _navItem(context, '設', S.isKo ? '설 정' : 'settings', onTap: () {
               SfxService().tapCard();
               context.push('/settings');
             }),

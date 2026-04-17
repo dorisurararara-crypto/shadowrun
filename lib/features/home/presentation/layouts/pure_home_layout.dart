@@ -4,6 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:shadowrun/shared/models/run_model.dart';
 import 'package:shadowrun/shared/widgets/challenge_run_picker.dart';
 import 'package:shadowrun/core/services/sfx_service.dart';
+import 'package:shadowrun/core/l10n/app_strings.dart';
 
 /// T1 — Pure Cinematic 홈 레이아웃
 /// 순검정 배경 + 세리프 + 영화 자막체. 목업 full-t1-pure.html > Cell 1(Home) 충실 재현.
@@ -234,7 +235,9 @@ class PureHomeLayout extends StatelessWidget {
           child: Column(
             children: [
               Text(
-                '그는 아직 당신을\n찾지 못했다.',
+                S.isKo
+                    ? '그는 아직 당신을\n찾지 못했다.'
+                    : 'He has not\nfound you yet.',
                 textAlign: TextAlign.center,
                 style: GoogleFonts.notoSerifKr(
                   fontSize: 18,
@@ -256,7 +259,7 @@ class PureHomeLayout extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             Text(
-              '어젯밤, 그는 당신보다',
+              S.isKo ? '어젯밤, 그는 당신보다' : 'Last night, he came',
               textAlign: TextAlign.center,
               style: GoogleFonts.notoSerifKr(
                 fontSize: 17,
@@ -276,7 +279,7 @@ class PureHomeLayout extends StatelessWidget {
                 ),
                 children: [
                   TextSpan(
-                    text: '$prevMeters미터',
+                    text: S.isKo ? '$prevMeters미터' : '${prevMeters}m',
                     style: GoogleFonts.playfairDisplay(
                       fontSize: 24,
                       fontStyle: FontStyle.italic,
@@ -285,13 +288,13 @@ class PureHomeLayout extends StatelessWidget {
                       height: 1.5,
                     ),
                   ),
-                  const TextSpan(text: ' 더 가까이'),
+                  TextSpan(text: S.isKo ? ' 더 가까이' : ' closer'),
                 ],
               ),
             ),
             const SizedBox(height: 4),
             Text(
-              '다가왔다.',
+              S.isKo ? '다가왔다.' : 'than you.',
               textAlign: TextAlign.center,
               style: GoogleFonts.notoSerifKr(
                 fontSize: 17,
@@ -404,7 +407,7 @@ class PureHomeLayout extends StatelessWidget {
     return _actionCard(
       context: context,
       height: 118,
-      titleKo: '오늘의 도주',
+      titleKo: S.isKo ? '오늘의 도주' : "Tonight's Chase",
       subtitleEn: "begin tonight's run",
       borderColor: _bloodDeep,
       accentColor: _bloodSub,
@@ -423,7 +426,7 @@ class PureHomeLayout extends StatelessWidget {
     return _actionCard(
       context: context,
       height: 118,
-      titleKo: '홀로, 새 기록을',
+      titleKo: S.isKo ? '홀로, 새 기록을' : 'Alone, a new record.',
       subtitleEn: "tonight's legend",
       borderColor: _faint,
       accentColor: _muted,
