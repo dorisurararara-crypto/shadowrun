@@ -355,10 +355,19 @@ class _ResultScreenState extends State<ResultScreen>
     if (_points.isEmpty) return "--'--\"";
     double maxSpeed = 0;
     for (final p in _points) {
-      if (p.speedMps > maxSpeed) maxSpeed = p.speedMps;
+      // GPS drift/잠깐 정지 필터:
+      //  - 0.5 m/s 미만 = 걷는 것도 아님 (서있거나 신호 튐)
+      //  - 15 m/s 초과 = 54 km/h (사람 불가능, GPS 오류)
+      if (p.speedMps >= 0.5 && p.speedMps <= 15 && p.speedMps > maxSpeed) {
+        maxSpeed = p.speedMps;
+      }
     }
-    if (maxSpeed <= 0) return "--'--\"";
+    if (maxSpeed < 0.5) return "--'--\"";
     final paceMinPerKm = 1000 / maxSpeed / 60; // min/km
+    // 30분/km 초과는 표시 의미 없음 (매우 느린 GPS 샘플만 남은 경우)
+    if (paceMinPerKm > 30 || paceMinPerKm.isNaN || paceMinPerKm.isInfinite) {
+      return "--'--\"";
+    }
     final min = paceMinPerKm.floor();
     final sec = ((paceMinPerKm - min) * 60).round();
     return "$min'${sec.toString().padLeft(2, '0')}\"";
