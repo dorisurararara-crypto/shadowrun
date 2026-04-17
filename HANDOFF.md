@@ -29,6 +29,36 @@
 
 ## 최신
 
+### 2026-04-18 12:15 (Mac → Windows) — IAP 5개 ASC에 전부 자동 등록 완료 ✅
+
+**ASC REST API 로 인앱결제 상품 5개 전부 `READY_TO_SUBMIT` 상태까지 자동:**
+
+| productId | 가격(KOR) | 상태 | ASC ID |
+|---|---|---|---|
+| shadowrun_pro | ₩13,900 | READY_TO_SUBMIT | 6762482852 |
+| shadowrun_theme_mystic | ₩5,500 | READY_TO_SUBMIT | 6762481524 |
+| shadowrun_theme_noir | ₩5,500 | READY_TO_SUBMIT | 6762482466 |
+| shadowrun_theme_editorial | ₩5,500 | READY_TO_SUBMIT | 6762483603 |
+| shadowrun_theme_cyber | ₩5,500 | READY_TO_SUBMIT | 6762483346 |
+
+**자동 처리된 것:**
+- 상품 생성 (POST `/v2/inAppPurchases`) — 타입 NON_CONSUMABLE
+- 현지화 한/영 추가 (POST `/v1/inAppPurchaseLocalizations`) — 이름·설명
+- 가격 스케줄 설정 (POST `/v1/inAppPurchasePriceSchedules`) — baseTerritory=KOR, 나머지 174개국 자동 equalized
+- 가용 지역 설정 (POST `/v1/inAppPurchaseAvailabilities`) — 175개국 전체
+- 심사용 스크린샷 업로드 (POST `/v1/inAppPurchaseAppStoreReviewScreenshots` + multipart PUT + PATCH commit) — 1242×2208 PNG 플레이스홀더
+
+**⚠️ 스크린샷은 플레이스홀더 (사용자 교체 권장):**
+자동 생성한 브랜드 로고 + 상품명 + 가격만 있는 단순 이미지. **Apple 심사 전에 실제 인앱 구매 화면 스크린샷으로 교체 필수** (그대로 제출하면 심사 반려 가능성 큼). ASC UI → 각 IAP → "App Store Review Screenshot" 에서 교체.
+
+**⚠️ Google Play Console 는 별개:**
+ASC API 와 완전 다른 Google Play Developer API + service account 필요. 현재 미설정. 사용자가 Play Console UI 에서 수동 등록 or 추후 service account 키 받아 자동화 가능.
+
+**제출 흐름:**
+빌드 13 이 App Store 심사에 제출될 때 IAP 5개 동시 제출 가능 (ASC UI → "Submit for Review" 시 선택). 또는 IAP 개별 제출.
+
+---
+
 ### 2026-04-18 11:55 (Mac → Windows) — 빌드 13 VALID + 자동화 인프라 구축 ✅
 
 **ASC API 조회 결과:**
