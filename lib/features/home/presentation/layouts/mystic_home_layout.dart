@@ -163,8 +163,9 @@ class MysticHomeLayout extends StatelessWidget {
     required List<RunModel> runs,
   }) {
     final now = DateTime.now();
-    final weekDays = ['월', '화', '수', '목', '금', '토', '일'];
-    final weekdayKr = weekDays[(now.weekday - 1).clamp(0, 6)];
+    // 曜日: 月 火 水 木 金 土 日 (전통 한자 요일)
+    const weekDaysHanja = ['月', '火', '水', '木', '金', '土', '日'];
+    final weekdayHanja = weekDaysHanja[(now.weekday - 1).clamp(0, 6)];
     final dateHanja = '${_hanjaDigits(now.month)}月${_hanjaDigits(now.day)}日';
 
     return Column(
@@ -240,10 +241,10 @@ class MysticHomeLayout extends StatelessWidget {
         ),
         const SizedBox(height: 4),
 
-        // 요일 · 한자 날짜
+        // 한자 요일 · 한자 날짜 (예: 金曜日 · 四月十七日)
         Center(
           child: Text(
-            '$weekdayKr 曜日 · $dateHanja',
+            '$weekdayHanja曜日 · $dateHanja',
             style: GoogleFonts.nanumMyeongjo(
               fontSize: 11,
               color: _fade,
@@ -278,8 +279,10 @@ class MysticHomeLayout extends StatelessWidget {
 
         const SizedBox(height: 28),
 
-        // 시작 버튼
-        _startCard(context),
+        // 시작 카드 2종: 도플갱어 추격(=챌린지) + 새 기록(=자유/전설)
+        _doppelgangerCard(context),
+        const SizedBox(height: 12),
+        _newRecordCard(context),
 
         const SizedBox(height: 28),
 
@@ -305,60 +308,40 @@ class MysticHomeLayout extends StatelessWidget {
   Widget _quoteBlock({required int prevMeters}) {
     final quote = _buildPrevQuote(prevMeters);
     final parts = quote.split('\n');
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20),
-      child: Stack(
-        children: [
-          // 좌상 꺾쇠
-          Positioned(
-            left: 0,
-            top: 0,
-            child: CustomPaint(
-              size: const Size(18, 18),
-              painter: _CornerPainter(_bloodFresh, topLeft: true),
+    return SizedBox(
+      width: double.infinity,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 20),
+        child: Stack(
+          alignment: Alignment.center,
+          children: [
+            // 좌상 꺾쇠
+            Positioned(
+              left: 0,
+              top: 0,
+              child: CustomPaint(
+                size: const Size(18, 18),
+                painter: _CornerPainter(_bloodFresh, topLeft: true),
+              ),
             ),
-          ),
-          // 우하 꺾쇠
-          Positioned(
-            right: 0,
-            bottom: 0,
-            child: CustomPaint(
-              size: const Size(18, 18),
-              painter: _CornerPainter(_bloodFresh, topLeft: false),
+            // 우하 꺾쇠
+            Positioned(
+              right: 0,
+              bottom: 0,
+              child: CustomPaint(
+                size: const Size(18, 18),
+                painter: _CornerPainter(_bloodFresh, topLeft: false),
+              ),
             ),
-          ),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 22),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                Text(
-                  parts.isNotEmpty ? parts[0] : '',
-                  textAlign: TextAlign.center,
-                  style: GoogleFonts.nanumMyeongjo(
-                    fontSize: 16,
-                    color: _rice,
-                    height: 1.7,
-                    fontWeight: FontWeight.w400,
-                  ),
-                ),
-                if (parts.length > 1) ...[
-                  const SizedBox(height: 2),
+            // 본문 — 명시적 중앙 정렬 보장
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 22),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
                   Text(
-                    parts[1],
-                    textAlign: TextAlign.center,
-                    style: GoogleFonts.nanumMyeongjo(
-                      fontSize: 20,
-                      color: _bloodFresh,
-                      height: 1.5,
-                      fontWeight: FontWeight.w800,
-                    ),
-                  ),
-                ],
-                if (parts.length > 2) ...[
-                  const SizedBox(height: 2),
-                  Text(
-                    parts[2],
+                    parts.isNotEmpty ? parts[0] : '',
                     textAlign: TextAlign.center,
                     style: GoogleFonts.nanumMyeongjo(
                       fontSize: 16,
@@ -367,11 +350,37 @@ class MysticHomeLayout extends StatelessWidget {
                       fontWeight: FontWeight.w400,
                     ),
                   ),
+                  if (parts.length > 1) ...[
+                    const SizedBox(height: 2),
+                    Text(
+                      parts[1],
+                      textAlign: TextAlign.center,
+                      style: GoogleFonts.nanumMyeongjo(
+                        fontSize: 20,
+                        color: _bloodFresh,
+                        height: 1.5,
+                        fontWeight: FontWeight.w800,
+                      ),
+                    ),
+                  ],
+                  if (parts.length > 2) ...[
+                    const SizedBox(height: 2),
+                    Text(
+                      parts[2],
+                      textAlign: TextAlign.center,
+                      style: GoogleFonts.nanumMyeongjo(
+                        fontSize: 16,
+                        color: _rice,
+                        height: 1.7,
+                        fontWeight: FontWeight.w400,
+                      ),
+                    ),
+                  ],
                 ],
-              ],
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -469,11 +478,12 @@ class MysticHomeLayout extends StatelessWidget {
     );
   }
 
-  Widget _startCard(BuildContext context) {
+  /// 도플갱어 추격 카드 — 챌린지 모드(/prepare extra: -1)
+  Widget _doppelgangerCard(BuildContext context) {
     return InkWell(
       onTap: () {
-        SfxService().tapNewRun();
-        context.push('/prepare');
+        SfxService().tapChallenge();
+        context.push('/prepare', extra: -1);
       },
       child: Container(
         decoration: BoxDecoration(
@@ -491,7 +501,7 @@ class MysticHomeLayout extends StatelessWidget {
               top: 6,
               right: 10,
               child: Text(
-                '始',
+                '追',
                 style: GoogleFonts.nanumMyeongjo(
                   fontSize: 14,
                   color: _bloodDry,
@@ -512,13 +522,76 @@ class MysticHomeLayout extends StatelessWidget {
                     fontWeight: FontWeight.w800,
                   ),
                 ),
-                const SizedBox(height: 8),
+                const SizedBox(height: 6),
                 Text(
-                  '지 금   시 작',
+                  '도 플 갱 어   추 격',
                   style: GoogleFonts.gowunBatang(
                     fontSize: 10,
                     color: _bloodFresh,
                     letterSpacing: 4,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  /// 새 기록 카드 — 전설의 마라토너 or 자유 러닝 선택(/prepare)
+  Widget _newRecordCard(BuildContext context) {
+    return InkWell(
+      onTap: () {
+        SfxService().tapNewRun();
+        context.push('/prepare');
+      },
+      child: Container(
+        decoration: const BoxDecoration(
+          color: Color(0xFF0D0607),
+          border: Border(
+            top: BorderSide(color: _borderInk, width: 1),
+            bottom: BorderSide(color: _borderInk, width: 1),
+            left: BorderSide(color: _borderInk, width: 1),
+            right: BorderSide(color: _borderInk, width: 1),
+          ),
+        ),
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
+        child: Stack(
+          children: [
+            Positioned(
+              top: 6,
+              right: 10,
+              child: Text(
+                '記',
+                style: GoogleFonts.nanumMyeongjo(
+                  fontSize: 14,
+                  color: _outline,
+                  letterSpacing: 2,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+            ),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  '홀로,\n새 기록을 남겨라.',
+                  style: GoogleFonts.nanumMyeongjo(
+                    fontSize: 22,
+                    color: _rice,
+                    height: 1.3,
+                    fontWeight: FontWeight.w800,
+                  ),
+                ),
+                const SizedBox(height: 6),
+                Text(
+                  '전 설 의   마 라 토 너   ·   자 유',
+                  style: GoogleFonts.gowunBatang(
+                    fontSize: 10,
+                    color: _outline,
+                    letterSpacing: 3,
                     fontWeight: FontWeight.w700,
                   ),
                 ),
