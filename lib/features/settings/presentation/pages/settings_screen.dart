@@ -14,6 +14,7 @@ import 'package:shadowrun/core/database/database_helper.dart';
 import 'package:shadowrun/core/services/purchase_service.dart';
 import 'package:shadowrun/core/l10n/app_strings.dart';
 import 'package:shadowrun/core/services/sfx_service.dart';
+import 'package:shadowrun/core/docs/legal_texts.dart';
 import 'package:shadowrun/shared/models/run_model.dart';
 import 'package:shadowrun/features/settings/presentation/layouts/mystic_settings_layout.dart';
 import 'package:shadowrun/features/settings/presentation/layouts/pure_settings_layout.dart';
@@ -659,20 +660,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     SfxService().tapCard();
     _openPureDocSheet(
       title: S.isKo ? '개인정보 처리방침' : 'Privacy Policy',
-      body: S.isKo
-          ? 'Shadow Run은 러닝 기록과 위치 데이터를 기기 내에만 저장합니다.\n\n'
-              '• 위치: 러닝 중 경로 추적에만 사용되며 외부로 전송되지 않습니다.\n'
-              '• 카메라: 프로필 사진 촬영 시에만 사용됩니다.\n'
-              '• 오디오: 공포 효과음 재생에만 사용됩니다.\n'
-              '• 구매: Apple/Google 결제 시스템을 통해 처리되며, '
-              '앱은 결제 상태만 확인합니다.\n\n'
-              '데이터를 서버에 업로드하지 않으며, 사용자를 추적하지 않습니다.'
-          : 'Shadow Run stores running records and location data only on your device.\n\n'
-              '• Location: used only for path tracking during runs. Never transmitted.\n'
-              '• Camera: only when taking a profile photo.\n'
-              '• Audio: only for horror sound effects.\n'
-              '• Purchases: handled by Apple/Google; we only read entitlement state.\n\n'
-              'We do not upload data or track users.',
+      body: S.isKo ? LegalTexts.privacyPolicyKo : LegalTexts.privacyPolicyEn,
     );
   }
 
@@ -680,19 +668,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     SfxService().tapCard();
     _openPureDocSheet(
       title: S.isKo ? '이용 약관' : 'Terms of Service',
-      body: S.isKo
-          ? 'Shadow Run을 사용함으로써 다음에 동의합니다.\n\n'
-              '• 러닝 중에는 주변 교통 및 장애물을 항상 주의하세요.\n'
-              '• 이 앱은 엔터테인먼트 목적이며 의료/운동 조언을 대체하지 않습니다.\n'
-              '• PRO 구독은 Apple/Google 계정에서 언제든 해지할 수 있습니다.\n'
-              '• 무료체험 7일 종료 후에는 자동으로 일반 계정으로 전환됩니다.\n'
-              '• 공포 레벨 3~5는 심박·불안을 유도할 수 있으니 본인 판단하에 사용하세요.'
-          : 'By using Shadow Run you agree to the following.\n\n'
-              '• Always watch for traffic and obstacles while running.\n'
-              '• This app is for entertainment and is not medical advice.\n'
-              '• PRO subscription can be canceled anytime from Apple/Google.\n'
-              '• After the 7-day trial ends, you are switched to the free tier.\n'
-              '• Anxiety levels 3-5 may trigger stress responses — use at your own discretion.',
+      body: S.isKo ? LegalTexts.termsOfServiceKo : LegalTexts.termsOfServiceEn,
     );
   }
 
@@ -1028,20 +1004,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
       hanja: '助',
       title: S.isKo ? '개인정보 처리방침' : 'Privacy Policy',
       en: 'P R I V A C Y',
-      body: S.isKo
-          ? 'Shadow Run은 러닝 기록과 위치 데이터를 기기 내에만 저장합니다.\n\n'
-              '• 위치: 러닝 중 경로 추적에만 사용되며 외부로 전송되지 않습니다.\n'
-              '• 카메라: 프로필 사진 촬영 시에만 사용됩니다.\n'
-              '• 오디오: 공포 효과음 재생에만 사용됩니다.\n'
-              '• 구매: Apple/Google 결제 시스템을 통해 처리되며, '
-              '앱은 결제 상태만 확인합니다.\n\n'
-              '데이터를 서버에 업로드하지 않으며, 사용자를 추적하지 않습니다.'
-          : 'Shadow Run stores running records and location data only on your device.\n\n'
-              '• Location: used only for path tracking during runs. Never transmitted.\n'
-              '• Camera: only when taking a profile photo.\n'
-              '• Audio: only for horror sound effects.\n'
-              '• Purchases: handled by Apple/Google; we only read entitlement state.\n\n'
-              'We do not upload data or track users.',
+      body: S.isKo ? LegalTexts.privacyPolicyKo : LegalTexts.privacyPolicyEn,
     );
   }
 
@@ -1051,19 +1014,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
       hanja: '助',
       title: S.isKo ? '이용 약관' : 'Terms of Service',
       en: 'T E R M S',
-      body: S.isKo
-          ? 'Shadow Run을 사용함으로써 다음에 동의합니다.\n\n'
-              '• 러닝 중에는 주변 교통 및 장애물을 항상 주의하세요.\n'
-              '• 이 앱은 엔터테인먼트 목적이며 의료/운동 조언을 대체하지 않습니다.\n'
-              '• PRO 구독은 Apple/Google 계정에서 언제든 해지할 수 있습니다.\n'
-              '• 무료체험 7일 종료 후에는 자동으로 일반 계정으로 전환됩니다.\n'
-              '• 공포 레벨 3~5는 심박·불안을 유도할 수 있으니 본인 판단하에 사용하세요.'
-          : 'By using Shadow Run you agree to the following.\n\n'
-              '• Always watch for traffic and obstacles while running.\n'
-              '• This app is for entertainment and is not medical advice.\n'
-              '• PRO subscription can be canceled anytime from Apple/Google.\n'
-              '• After the 7-day trial ends, you are switched to the free tier.\n'
-              '• Anxiety levels 3-5 may trigger stress responses — use at your own discretion.',
+      body: S.isKo ? LegalTexts.termsOfServiceKo : LegalTexts.termsOfServiceEn,
     );
   }
 
