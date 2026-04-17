@@ -10,6 +10,7 @@ import 'package:shadowrun/core/services/ad_service.dart';
 import 'package:shadowrun/core/services/purchase_service.dart';
 import 'package:shadowrun/core/l10n/app_strings.dart';
 import 'package:shadowrun/core/services/sfx_service.dart';
+import 'package:shadowrun/features/home/presentation/layouts/mystic_home_layout.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -73,6 +74,22 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    return ValueListenableBuilder(
+      valueListenable: ThemeManager.I.themeIdNotifier,
+      builder: (context, themeId, _) {
+        if (themeId == ThemeId.koreanMystic) {
+          return MysticHomeLayout(
+            statsFuture: _statsFuture,
+            runsFuture: _runsFuture,
+            onRefresh: _refresh,
+          );
+        }
+        return _buildDefaultLayout(context);
+      },
+    );
+  }
+
+  Widget _buildDefaultLayout(BuildContext context) {
     return Scaffold(
       backgroundColor: SRColors.background,
       body: Column(
@@ -86,24 +103,10 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
             child: Row(
               children: [
-                ValueListenableBuilder(
-                  valueListenable: ThemeManager.I.themeIdNotifier,
-                  builder: (context, themeId, _) {
-                    final theme = ThemeManager.getTheme(themeId);
-                    final isMystic = themeId == ThemeId.koreanMystic;
-                    return Text(
-                      isMystic ? '쉐도우런' : 'SHADOW RUN',
-                      style: TextStyle(
-                        fontFamily: theme.fonts.heroFamily,
-                        fontSize: isMystic ? 22 : 24,
-                        fontWeight: FontWeight.w900,
-                        fontStyle: theme.fonts.heroItalic ? FontStyle.italic : FontStyle.normal,
-                        color: theme.palette.accentSoft,
-                        letterSpacing: isMystic ? 1 : -0.5,
-                      ),
-                    );
-                  },
-                ),
+                Text('SHADOW RUN', style: GoogleFonts.spaceGrotesk(
+                  fontSize: 24, fontWeight: FontWeight.w900,
+                  color: SRColors.primary, letterSpacing: -0.5,
+                )),
                 const Spacer(),
                 IconButton(
                   icon: const Icon(Icons.calendar_month_outlined, color: SRColors.neutral500, size: 24),
@@ -131,32 +134,7 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
           // Body (Stitch: px-6 py-8 space-y-8)
           Expanded(
-            child: Stack(
-              children: [
-                ValueListenableBuilder(
-                  valueListenable: ThemeManager.I.themeIdNotifier,
-                  builder: (context, themeId, _) {
-                    if (themeId != ThemeId.koreanMystic) return const SizedBox.shrink();
-                    final theme = ThemeManager.getTheme(themeId);
-                    final hanja = theme.hanjaSet.isNotEmpty ? theme.hanjaSet.first : '影';
-                    return Positioned(
-                      right: -40,
-                      top: 20,
-                      child: IgnorePointer(
-                        child: Text(
-                          hanja,
-                          style: TextStyle(
-                            fontFamily: 'Nanum Myeongjo',
-                            fontSize: 280,
-                            color: theme.palette.accent.withValues(alpha: 0.08),
-                            height: 1,
-                          ),
-                        ),
-                      ),
-                    );
-                  },
-                ),
-                RefreshIndicator(
+            child: RefreshIndicator(
               color: SRColors.primaryContainer,
               backgroundColor: SRColors.surface,
               onRefresh: () async => _refresh(),
@@ -177,12 +155,9 @@ class _HomeScreenState extends State<HomeScreen> {
                     if (!PurchaseService().isPro) _buildDailyChallengeCard(),
                     if (!PurchaseService().isPro) const SizedBox(height: 32),
                     _buildRecentRunsSection(),
-                    const SizedBox(height: 32),
                   ],
                 ),
               ),
-            ),
-              ],
             ),
           ),
         ],

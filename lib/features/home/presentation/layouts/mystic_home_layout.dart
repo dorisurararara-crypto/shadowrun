@@ -1,0 +1,672 @@
+import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:shadowrun/shared/models/run_model.dart';
+import 'package:shadowrun/core/services/sfx_service.dart';
+
+class MysticHomeLayout extends StatelessWidget {
+  final Future<Map<String, dynamic>> statsFuture;
+  final Future<List<RunModel>> runsFuture;
+  final VoidCallback onRefresh;
+
+  const MysticHomeLayout({
+    super.key,
+    required this.statsFuture,
+    required this.runsFuture,
+    required this.onRefresh,
+  });
+
+  static const _ink = Color(0xFF050302);
+  static const _rice = Color(0xFFF0EBE3);
+  static const _bloodDry = Color(0xFF7A0A0E);
+  static const _bloodFresh = Color(0xFFC42029);
+  static const _outline = Color(0xFF7A6858);
+  static const _fade = Color(0xFF5A4840);
+  static const _borderInk = Color(0xFF2A1518);
+
+  static String _hanjaDigits(int n) {
+    const d = ['零', '一', '二', '三', '四', '五', '六', '七', '八', '九'];
+    if (n < 0) return '$n';
+    if (n < 10) return d[n];
+    if (n < 20) return '十${n > 10 ? d[n - 10] : ''}';
+    if (n < 30) return '廿${n > 20 ? d[n - 20] : ''}';
+    if (n < 40) return '卅${n > 30 ? d[n - 30] : ''}';
+    if (n < 100) return '${d[n ~/ 10]}十${n % 10 > 0 ? d[n % 10] : ''}';
+    return n.toString().split('').map((c) => d[int.parse(c)]).join();
+  }
+
+  static String _korWordsUnder1000(int n) {
+    const units = ['', '일', '이', '삼', '사', '오', '육', '칠', '팔', '구'];
+    const tens = ['', '열', '스물', '서른', '마흔', '쉰', '예순', '일흔', '여든', '아흔'];
+    const teens = ['열', '열한', '열두', '열세', '열네', '열다섯', '열여섯', '열일곱', '열여덟', '열아홉'];
+    const tens2 = ['', '', '스물', '서른', '마흔', '쉰', '예순', '일흔', '여든', '아흔'];
+    const ones2 = ['', '한', '두', '세', '네', '다섯', '여섯', '일곱', '여덟', '아홉'];
+    String sub2(int x) {
+      if (x == 0) return '';
+      if (x < 10) return ones2[x];
+      if (x < 20) return teens[x - 10];
+      return '${tens2[x ~/ 10]}${x % 10 > 0 ? ones2[x % 10] : ''}';
+    }
+    if (n < 100) {
+      if (n == 0) return '영';
+      if (n < 10) return ones2[n];
+      if (n < 20) return teens[n - 10];
+      return '${tens[n ~/ 10]}${n % 10 > 0 ? ones2[n % 10] : ''}';
+    }
+    final h = n ~/ 100;
+    final rest = n % 100;
+    final hundred = '${h == 1 ? '' : units[h]}백';
+    return rest > 0 ? '$hundred ${sub2(rest)}' : hundred;
+  }
+
+  String _buildPrevQuote(int shadowMeters) {
+    if (shadowMeters <= 0) return '그 놈은\n아직 당신을\n찾지 못했다.';
+    final words = _korWordsUnder1000(shadowMeters);
+    return '어젯밤, 그 놈이\n$words 걸음\n가까워졌다.';
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: _ink,
+      body: RefreshIndicator(
+        color: _bloodFresh,
+        backgroundColor: _ink,
+        onRefresh: () async => onRefresh(),
+        child: Stack(
+          children: [
+            // 배경 한자 워터마크 (오른쪽 상단)
+            const Positioned(
+              right: -60,
+              top: 60,
+              child: IgnorePointer(
+                child: Text(
+                  '影',
+                  style: TextStyle(
+                    fontFamily: 'Nanum Myeongjo',
+                    fontSize: 320,
+                    color: Color(0x26B00A12),
+                    height: 1,
+                    fontWeight: FontWeight.w800,
+                  ),
+                ),
+              ),
+            ),
+            // 배경 한자 워터마크 (왼쪽 하단)
+            const Positioned(
+              left: -40,
+              bottom: 180,
+              child: IgnorePointer(
+                child: Text(
+                  '追',
+                  style: TextStyle(
+                    fontFamily: 'Nanum Myeongjo',
+                    fontSize: 260,
+                    color: Color(0x1C7A0A0E),
+                    height: 1,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+              ),
+            ),
+
+            SingleChildScrollView(
+              physics: const AlwaysScrollableScrollPhysics(),
+              padding: EdgeInsets.only(
+                top: MediaQuery.of(context).padding.top + 24,
+                left: 22,
+                right: 22,
+                bottom: 32,
+              ),
+              child: FutureBuilder<Map<String, dynamic>>(
+                future: statsFuture,
+                builder: (context, statsSnap) {
+                  final stats = statsSnap.data ?? const {};
+                  final totalRuns = (stats['totalRuns'] ?? 0) as int;
+                  final totalDistanceM = ((stats['totalDistanceM'] ?? 0.0) as num).toDouble();
+                  final weeklyKm = (totalDistanceM / 1000);
+                  return FutureBuilder<List<RunModel>>(
+                    future: runsFuture,
+                    builder: (context, runsSnap) {
+                      final runs = runsSnap.data ?? const <RunModel>[];
+                      final lastRun = runs.isNotEmpty ? runs.first : null;
+                      final bestEscape = runs.isEmpty
+                          ? 0
+                          : runs.map((r) => r.distanceM.toInt()).reduce((a, b) => a > b ? a : b);
+                      final prevMeters = lastRun?.distanceM.toInt() ?? 0;
+                      return _buildContent(
+                        context,
+                        totalRuns: totalRuns,
+                        weeklyKm: weeklyKm,
+                        bestEscapeM: bestEscape,
+                        prevMeters: prevMeters,
+                        runs: runs.take(3).toList(),
+                      );
+                    },
+                  );
+                },
+              ),
+            ),
+          ],
+        ),
+      ),
+      bottomNavigationBar: _buildBottomNav(context),
+    );
+  }
+
+  Widget _buildContent(
+    BuildContext context, {
+    required int totalRuns,
+    required double weeklyKm,
+    required int bestEscapeM,
+    required int prevMeters,
+    required List<RunModel> runs,
+  }) {
+    final now = DateTime.now();
+    final weekDays = ['월', '화', '수', '목', '금', '토', '일'];
+    final weekdayKr = weekDays[(now.weekday - 1).clamp(0, 6)];
+    final dateHanja = '${_hanjaDigits(now.month)}月${_hanjaDigits(now.day)}日';
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        // 상단 한자 헤더
+        Center(
+          child: Text(
+            '影      追      夜',
+            style: GoogleFonts.nanumMyeongjo(
+              fontSize: 15,
+              color: _bloodDry,
+              letterSpacing: 8,
+              fontWeight: FontWeight.w400,
+            ),
+          ),
+        ),
+        const SizedBox(height: 22),
+
+        // 쉐도우런 큰 제목
+        Center(
+          child: Text(
+            '쉐도우런',
+            style: GoogleFonts.nanumMyeongjo(
+              fontSize: 46,
+              color: _rice,
+              height: 1.0,
+              fontWeight: FontWeight.w800,
+              letterSpacing: 2,
+            ),
+          ),
+        ),
+        const SizedBox(height: 4),
+
+        // SHADOW RUN 영문 서브
+        Center(
+          child: Text(
+            'S H A D O W   R U N',
+            style: GoogleFonts.nanumMyeongjo(
+              fontSize: 11,
+              color: _outline,
+              letterSpacing: 4,
+              fontWeight: FontWeight.w400,
+            ),
+          ),
+        ),
+        const SizedBox(height: 16),
+
+        // 태그라인
+        Center(
+          child: Text(
+            '— 그림자는 쉬지 않는다 —',
+            style: GoogleFonts.gowunBatang(
+              fontSize: 13,
+              color: _bloodFresh,
+              fontWeight: FontWeight.w400,
+            ),
+          ),
+        ),
+        const SizedBox(height: 10),
+
+        // 에피소드 번호
+        Center(
+          child: Text(
+            '제 ${(totalRuns + 1).toString().padLeft(3, '0')} 밤',
+            style: GoogleFonts.nanumMyeongjo(
+              fontSize: 13,
+              color: _rice.withValues(alpha: 0.8),
+              letterSpacing: 4,
+              fontWeight: FontWeight.w400,
+            ),
+          ),
+        ),
+        const SizedBox(height: 4),
+
+        // 요일 · 한자 날짜
+        Center(
+          child: Text(
+            '$weekdayKr 曜日 · $dateHanja',
+            style: GoogleFonts.nanumMyeongjo(
+              fontSize: 11,
+              color: _fade,
+              letterSpacing: 4,
+              fontWeight: FontWeight.w400,
+            ),
+          ),
+        ),
+        const SizedBox(height: 30),
+
+        // 코너 꺾쇠 장식 박스 (인용구)
+        _quoteBlock(prevMeters: prevMeters),
+
+        const SizedBox(height: 28),
+
+        // 구분선: "─ 지난 밤의 기록 ─"
+        Center(
+          child: Text(
+            '─   지난 밤의 기록   ─',
+            style: GoogleFonts.nanumMyeongjo(
+              fontSize: 11,
+              color: _outline,
+              letterSpacing: 3,
+              fontWeight: FontWeight.w400,
+            ),
+          ),
+        ),
+        const SizedBox(height: 18),
+
+        // 통계 3칸
+        _statsRow(weeklyKm: weeklyKm, totalRuns: totalRuns, bestEscapeM: bestEscapeM),
+
+        const SizedBox(height: 28),
+
+        // 시작 버튼
+        _startCard(context),
+
+        const SizedBox(height: 28),
+
+        // 최근 러닝 제목
+        if (runs.isNotEmpty) ...[
+          Text(
+            '─   최근 세 밤   ─',
+            textAlign: TextAlign.center,
+            style: GoogleFonts.nanumMyeongjo(
+              fontSize: 11,
+              color: _outline,
+              letterSpacing: 3,
+              fontWeight: FontWeight.w400,
+            ),
+          ),
+          const SizedBox(height: 14),
+          for (final r in runs) _recentRow(r),
+        ],
+      ],
+    );
+  }
+
+  Widget _quoteBlock({required int prevMeters}) {
+    final quote = _buildPrevQuote(prevMeters);
+    final parts = quote.split('\n');
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 20),
+      child: Stack(
+        children: [
+          // 좌상 꺾쇠
+          Positioned(
+            left: 0,
+            top: 0,
+            child: CustomPaint(
+              size: const Size(18, 18),
+              painter: _CornerPainter(_bloodFresh, topLeft: true),
+            ),
+          ),
+          // 우하 꺾쇠
+          Positioned(
+            right: 0,
+            bottom: 0,
+            child: CustomPaint(
+              size: const Size(18, 18),
+              painter: _CornerPainter(_bloodFresh, topLeft: false),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 22),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Text(
+                  parts.isNotEmpty ? parts[0] : '',
+                  textAlign: TextAlign.center,
+                  style: GoogleFonts.nanumMyeongjo(
+                    fontSize: 16,
+                    color: _rice,
+                    height: 1.7,
+                    fontWeight: FontWeight.w400,
+                  ),
+                ),
+                if (parts.length > 1) ...[
+                  const SizedBox(height: 2),
+                  Text(
+                    parts[1],
+                    textAlign: TextAlign.center,
+                    style: GoogleFonts.nanumMyeongjo(
+                      fontSize: 20,
+                      color: _bloodFresh,
+                      height: 1.5,
+                      fontWeight: FontWeight.w800,
+                    ),
+                  ),
+                ],
+                if (parts.length > 2) ...[
+                  const SizedBox(height: 2),
+                  Text(
+                    parts[2],
+                    textAlign: TextAlign.center,
+                    style: GoogleFonts.nanumMyeongjo(
+                      fontSize: 16,
+                      color: _rice,
+                      height: 1.7,
+                      fontWeight: FontWeight.w400,
+                    ),
+                  ),
+                ],
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _statsRow({required double weeklyKm, required int totalRuns, required int bestEscapeM}) {
+    return Container(
+      decoration: const BoxDecoration(
+        border: Border(
+          top: BorderSide(color: _borderInk, width: 1),
+          bottom: BorderSide(color: _borderInk, width: 1),
+        ),
+      ),
+      padding: const EdgeInsets.symmetric(vertical: 14),
+      child: Row(
+        children: [
+          Expanded(
+            child: _statCell(
+              label: '이번 주',
+              hanjaValue: _hanjaDigits(weeklyKm.round()),
+              unit: 'km',
+              korSub: '${_korWordsUnder1000(weeklyKm.round())} 킬로미터',
+            ),
+          ),
+          Container(width: 1, height: 48, color: _borderInk),
+          Expanded(
+            child: _statCell(
+              label: '밤의 기록',
+              hanjaValue: _hanjaDigits(totalRuns),
+              unit: '',
+              korSub: '${_korWordsUnder1000(totalRuns)} 밤',
+            ),
+          ),
+          Container(width: 1, height: 48, color: _borderInk),
+          Expanded(
+            child: _statCell(
+              label: '최장 거리',
+              hanjaValue: _hanjaDigits(bestEscapeM),
+              unit: 'm',
+              korSub: '${_korWordsUnder1000(bestEscapeM)} 걸음',
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _statCell({required String label, required String hanjaValue, required String unit, required String korSub}) {
+    return Column(
+      children: [
+        Text(
+          label,
+          style: GoogleFonts.nanumMyeongjo(
+            fontSize: 10,
+            color: _fade,
+            letterSpacing: 2,
+            fontWeight: FontWeight.w400,
+          ),
+        ),
+        const SizedBox(height: 8),
+        RichText(
+          textAlign: TextAlign.center,
+          text: TextSpan(
+            children: [
+              TextSpan(
+                text: hanjaValue,
+                style: GoogleFonts.nanumMyeongjo(
+                  fontSize: 22,
+                  color: _rice,
+                  height: 1,
+                  fontWeight: FontWeight.w800,
+                ),
+              ),
+              if (unit.isNotEmpty)
+                TextSpan(
+                  text: unit,
+                  style: GoogleFonts.nanumMyeongjo(
+                    fontSize: 10,
+                    color: _outline,
+                    fontWeight: FontWeight.w400,
+                  ),
+                ),
+            ],
+          ),
+        ),
+        const SizedBox(height: 4),
+        Text(
+          korSub,
+          style: GoogleFonts.gowunBatang(
+            fontSize: 10,
+            color: _outline,
+            fontWeight: FontWeight.w400,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _startCard(BuildContext context) {
+    return InkWell(
+      onTap: () {
+        SfxService().tapNewRun();
+        context.push('/prepare');
+      },
+      child: Container(
+        decoration: BoxDecoration(
+          gradient: const RadialGradient(
+            center: Alignment.center,
+            radius: 1.2,
+            colors: [Color(0xFF3B0006), Color(0xFF0D0607)],
+          ),
+          border: Border.all(color: _bloodDry, width: 1),
+        ),
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
+        child: Stack(
+          children: [
+            Positioned(
+              top: 6,
+              right: 10,
+              child: Text(
+                '始',
+                style: GoogleFonts.nanumMyeongjo(
+                  fontSize: 14,
+                  color: _bloodDry,
+                  letterSpacing: 2,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+            ),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  '오늘 밤,\n다시 뛰어라.',
+                  style: GoogleFonts.nanumMyeongjo(
+                    fontSize: 22,
+                    color: _rice,
+                    height: 1.3,
+                    fontWeight: FontWeight.w800,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  '지 금   시 작',
+                  style: GoogleFonts.gowunBatang(
+                    fontSize: 10,
+                    color: _bloodFresh,
+                    letterSpacing: 4,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _recentRow(RunModel r) {
+    final isWin = r.challengeResult == 'win';
+    final isLoss = r.challengeResult == 'lose';
+    final label = isWin ? '살았다' : isLoss ? '잡혔다' : '뛰었다';
+    final labelColor = isWin ? _rice : isLoss ? _bloodFresh : _outline;
+    final date = r.date.length >= 10 ? r.date.substring(5, 10).replaceAll('-', '.') : r.date;
+    final location = (r.location ?? '').trim().isEmpty ? '이름 없는 길' : r.location!;
+    final shortLoc = location.length > 12 ? '${location.substring(0, 12)}…' : location;
+    final distKm = (r.distanceM / 1000).toStringAsFixed(2);
+    return Container(
+      padding: const EdgeInsets.symmetric(vertical: 10),
+      decoration: const BoxDecoration(
+        border: Border(
+          bottom: BorderSide(color: _borderInk, style: BorderStyle.solid, width: 0.5),
+        ),
+      ),
+      child: Row(
+        children: [
+          Expanded(
+            child: Text(
+              '$date · $shortLoc',
+              style: GoogleFonts.gowunBatang(
+                fontSize: 12,
+                color: _outline,
+                fontWeight: FontWeight.w400,
+              ),
+            ),
+          ),
+          Text(
+            '${distKm}km',
+            style: GoogleFonts.nanumMyeongjo(
+              fontSize: 12,
+              color: _rice.withValues(alpha: 0.75),
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+          const SizedBox(width: 10),
+          Text(
+            label,
+            style: GoogleFonts.nanumMyeongjo(
+              fontSize: 12,
+              color: labelColor,
+              fontWeight: FontWeight.w800,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildBottomNav(BuildContext context) {
+    return Container(
+      decoration: const BoxDecoration(
+        color: _ink,
+        border: Border(top: BorderSide(color: _borderInk, width: 1)),
+      ),
+      padding: const EdgeInsets.symmetric(vertical: 10),
+      child: SafeArea(
+        top: false,
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: [
+            _navItem(context, '家', '오늘', active: true, onTap: () {}),
+            _navItem(context, '夜', '지난 밤', onTap: () {
+              SfxService().tapCard();
+              context.push('/history');
+            }),
+            _navItem(context, '分', '분 석', onTap: () {
+              SfxService().tapCard();
+              context.push('/analysis');
+            }),
+            _navItem(context, '設', '설 정', onTap: () {
+              SfxService().tapCard();
+              context.push('/settings');
+            }),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _navItem(BuildContext context, String hanja, String label, {bool active = false, required VoidCallback onTap}) {
+    final c = active ? _bloodFresh : _outline;
+    return Expanded(
+      child: InkWell(
+        onTap: onTap,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 6),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                hanja,
+                style: GoogleFonts.nanumMyeongjo(
+                  fontSize: 20,
+                  color: c,
+                  fontWeight: FontWeight.w800,
+                ),
+              ),
+              const SizedBox(height: 2),
+              Text(
+                label,
+                style: GoogleFonts.gowunBatang(
+                  fontSize: 9,
+                  color: c.withValues(alpha: 0.8),
+                  letterSpacing: 1.5,
+                  fontWeight: FontWeight.w400,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _CornerPainter extends CustomPainter {
+  final Color color;
+  final bool topLeft;
+  _CornerPainter(this.color, {required this.topLeft});
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = color
+      ..strokeWidth = 1.5
+      ..style = PaintingStyle.stroke;
+    if (topLeft) {
+      canvas.drawLine(Offset(0, size.height), const Offset(0, 0), paint);
+      canvas.drawLine(const Offset(0, 0), Offset(size.width, 0), paint);
+    } else {
+      canvas.drawLine(Offset(0, size.height), Offset(size.width, size.height), paint);
+      canvas.drawLine(Offset(size.width, size.height), Offset(size.width, 0), paint);
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+}
