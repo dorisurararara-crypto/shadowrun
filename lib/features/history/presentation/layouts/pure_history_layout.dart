@@ -129,7 +129,7 @@ class PureHistoryLayout extends StatelessWidget {
                       ),
                     ),
                     Text(
-                      'home',
+                      S.isKo ? '홈' : 'home',
                       style: GoogleFonts.playfairDisplay(
                         fontSize: 12,
                         fontStyle: FontStyle.italic,
@@ -157,15 +157,22 @@ class PureHistoryLayout extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         Text(
-          'Chronicles',
+          S.isKo ? '연대기' : 'Chronicles',
           textAlign: TextAlign.center,
-          style: GoogleFonts.playfairDisplay(
-            fontSize: 38,
-            fontStyle: FontStyle.italic,
-            color: _ink,
-            height: 1,
-            fontWeight: FontWeight.w400,
-          ),
+          style: S.isKo
+              ? GoogleFonts.notoSerifKr(
+                  fontSize: 34,
+                  color: _ink,
+                  height: 1,
+                  fontWeight: FontWeight.w500,
+                )
+              : GoogleFonts.playfairDisplay(
+                  fontSize: 38,
+                  fontStyle: FontStyle.italic,
+                  color: _ink,
+                  height: 1,
+                  fontWeight: FontWeight.w400,
+                ),
         ),
         const SizedBox(height: 10),
         Text(
@@ -218,7 +225,7 @@ class PureHistoryLayout extends StatelessWidget {
                     letterSpacing: -0.2,
                   ),
                 ),
-                label: 'RUNS',
+                label: S.isKo ? '러닝' : 'RUNS',
               ),
             ),
             Container(width: 1, color: _vDivider),
@@ -250,7 +257,7 @@ class PureHistoryLayout extends StatelessWidget {
                     ],
                   ),
                 ),
-                label: 'DISTANCE',
+                label: S.isKo ? '거리' : 'DISTANCE',
               ),
             ),
             Container(width: 1, color: _vDivider),
@@ -291,7 +298,7 @@ class PureHistoryLayout extends StatelessWidget {
                     ],
                   ),
                 ),
-                label: 'WON · LOST',
+                label: S.isKo ? '탈출 · 잡힘' : 'WON · LOST',
               ),
             ),
           ],
@@ -311,14 +318,21 @@ class PureHistoryLayout extends StatelessWidget {
         ),
       ),
       child: Text(
-        'CHAPTERS THIS MONTH',
-        style: GoogleFonts.playfairDisplay(
-          fontSize: 10,
-          fontStyle: FontStyle.italic,
-          color: _inkFade,
-          fontWeight: FontWeight.w400,
-          letterSpacing: 3.5,
-        ),
+        S.isKo ? '이번 달 기록' : 'CHAPTERS THIS MONTH',
+        style: S.isKo
+            ? GoogleFonts.notoSerifKr(
+                fontSize: 10,
+                color: _inkFade,
+                fontWeight: FontWeight.w400,
+                letterSpacing: 3.5,
+              )
+            : GoogleFonts.playfairDisplay(
+                fontSize: 10,
+                fontStyle: FontStyle.italic,
+                color: _inkFade,
+                fontWeight: FontWeight.w400,
+                letterSpacing: 3.5,
+              ),
       ),
     );
   }
@@ -330,14 +344,21 @@ class PureHistoryLayout extends StatelessWidget {
       child: Column(
         children: [
           Text(
-            'no chapters yet',
-            style: GoogleFonts.playfairDisplay(
-              fontSize: 18,
-              fontStyle: FontStyle.italic,
-              color: _inkDim,
-              fontWeight: FontWeight.w400,
-              letterSpacing: 1,
-            ),
+            S.isKo ? '아직 기록 없음' : 'no chapters yet',
+            style: S.isKo
+                ? GoogleFonts.notoSerifKr(
+                    fontSize: 18,
+                    color: _inkDim,
+                    fontWeight: FontWeight.w400,
+                    letterSpacing: 1,
+                  )
+                : GoogleFonts.playfairDisplay(
+                    fontSize: 18,
+                    fontStyle: FontStyle.italic,
+                    color: _inkDim,
+                    fontWeight: FontWeight.w400,
+                    letterSpacing: 1,
+                  ),
           ),
           const SizedBox(height: 10),
           Text(
@@ -373,7 +394,12 @@ class PureHistoryLayout extends StatelessWidget {
 
     final isWin = run.challengeResult == 'win';
     final isLoss = run.challengeResult == 'lose';
-    final resultLabel = isWin ? 'escaped' : isLoss ? 'caught' : 'chased';
+    final isKo = S.isKo;
+    final resultLabel = isWin
+        ? (isKo ? '탈출' : 'escaped')
+        : isLoss
+            ? (isKo ? '잡힘' : 'caught')
+            : (isKo ? '완주' : 'chased');
     final resultColor = isLoss ? _redSub : _inkFade;
 
     final location = (run.location ?? '').trim().isEmpty
@@ -463,13 +489,20 @@ class PureHistoryLayout extends StatelessWidget {
               // 우측: 결과
               Text(
                 resultLabel,
-                style: GoogleFonts.playfairDisplay(
-                  fontSize: 10,
-                  fontStyle: FontStyle.italic,
-                  color: resultColor,
-                  fontWeight: FontWeight.w400,
-                  letterSpacing: 2.5,
-                ),
+                style: isKo
+                    ? GoogleFonts.notoSerifKr(
+                        fontSize: 11,
+                        color: resultColor,
+                        fontWeight: FontWeight.w500,
+                        letterSpacing: 2.5,
+                      )
+                    : GoogleFonts.playfairDisplay(
+                        fontSize: 10,
+                        fontStyle: FontStyle.italic,
+                        color: resultColor,
+                        fontWeight: FontWeight.w400,
+                        letterSpacing: 2.5,
+                      ),
               ),
               // 우측 끝: ⋯ 액션 버튼
               if (onRunEdit != null || onRunDelete != null || onRunChallenge != null)
@@ -522,14 +555,21 @@ class PureHistoryLayout extends StatelessWidget {
                   color: _hair,
                 ),
                 Text(
-                  'ACTIONS',
-                  style: GoogleFonts.playfairDisplay(
-                    fontSize: 10,
-                    fontStyle: FontStyle.italic,
-                    color: _inkFade,
-                    fontWeight: FontWeight.w400,
-                    letterSpacing: 3.5,
-                  ),
+                  isKo ? '액션' : 'ACTIONS',
+                  style: isKo
+                      ? GoogleFonts.notoSerifKr(
+                          fontSize: 10,
+                          color: _inkFade,
+                          fontWeight: FontWeight.w500,
+                          letterSpacing: 3.5,
+                        )
+                      : GoogleFonts.playfairDisplay(
+                          fontSize: 10,
+                          fontStyle: FontStyle.italic,
+                          color: _inkFade,
+                          fontWeight: FontWeight.w400,
+                          letterSpacing: 3.5,
+                        ),
                 ),
                 const SizedBox(height: 14),
                 if (onRunChallenge != null)

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:shadowrun/shared/models/run_model.dart';
+import 'package:shadowrun/shared/widgets/bgm_toggle_button.dart';
 import 'package:shadowrun/shared/widgets/challenge_run_picker.dart';
 import 'package:shadowrun/core/services/sfx_service.dart';
 import 'package:shadowrun/core/l10n/app_strings.dart';
@@ -38,6 +39,8 @@ class MysticHomeLayout extends StatelessWidget {
   }
 
   static String _korWordsUnder1000(int n) {
+    // 1000+ 또는 음수는 숫자 그대로 (함수명 그대로 1000 미만만 한글 표기)
+    if (n < 0 || n >= 1000) return '$n';
     const units = ['', '일', '이', '삼', '사', '오', '육', '칠', '팔', '구'];
     const tens = ['', '열', '스물', '서른', '마흔', '쉰', '예순', '일흔', '여든', '아흔'];
     const teens = ['열', '열한', '열두', '열세', '열네', '열다섯', '열여섯', '열일곱', '열여덟', '열아홉'];
@@ -61,17 +64,47 @@ class MysticHomeLayout extends StatelessWidget {
     return rest > 0 ? '$hundred ${sub2(rest)}' : hundred;
   }
 
-  String _buildPrevQuote(int shadowMeters) {
-    if (shadowMeters <= 0) {
-      return S.isKo
-          ? '그 놈은\n아직 당신을\n찾지 못했다.'
-          : 'It has not\nfound you\nyet.';
+  /// 어제 러닝 결과 → 3줄 시적 카피 (Mystic 톤: 한국 민속 호러).
+  /// [line1, highlight, line3] 반환. 승/패·모드별 분기.
+  List<String> _narrativeLines(RunModel? last) {
+    final ko = S.isKo;
+    if (last == null) {
+      return ko
+          ? ['그 놈은', '당신을', '기다린다.']
+          : ['The shadow', 'waits', 'for you.'];
     }
-    if (S.isKo) {
-      final words = _korWordsUnder1000(shadowMeters);
-      return '어젯밤, 그 놈이\n$words 걸음\n가까워졌다.';
+    if (last.isChallenge) {
+      final r = last.challengeResult;
+      // 최종 간격(finalShadowGapM) 우선.
+      final gap = (last.finalShadowGapM ?? 0).abs().toInt();
+      if (r == 'lose') {
+        return ko
+            ? ['어젯밤, 그 놈이', '너의 숨을', '먹었다.']
+            : ['Last night, he', 'took', 'your breath.'];
+      }
+      if (r == 'win') {
+        if (gap >= 500) {
+          final words = ko ? _korWordsUnder1000(gap.clamp(0, 999)) : '$gap';
+          return ko
+              ? ['어젯밤, 그 놈을', '$words 걸음', '밖에 두었다.']
+              : ['Last night,', '${gap}m', 'left behind.'];
+        }
+        if (gap >= 100) {
+          final words = ko ? _korWordsUnder1000(gap.clamp(0, 999)) : '$gap';
+          return ko
+              ? ['어젯밤, 그 놈을', '$words 걸음', '앞서 벗어났다.']
+              : ['Last night,', '${gap}m', 'escaped.'];
+        }
+        return ko
+            ? ['어젯밤,', '간신히', '빠져나왔다.']
+            : ['Last night,', 'just barely,', 'you slipped free.'];
+      }
     }
-    return 'Last night, it came\n$shadowMeters steps\ncloser.';
+    // 자유 · 마라톤
+    final km = (last.distanceM / 1000).toStringAsFixed(1);
+    return ko
+        ? ['어제의', '${km}km', '발걸음.']
+        : ['Yesterday', '${km}km', 'of footfalls.'];
   }
 
   @override
@@ -146,13 +179,12 @@ class MysticHomeLayout extends StatelessWidget {
                         final bestEscape = runs.isEmpty
                             ? 0
                             : runs.map((r) => r.distanceM.toInt()).reduce((a, b) => a > b ? a : b);
-                        final prevMeters = lastRun?.distanceM.toInt() ?? 0;
                         return _buildContent(
                           context,
                           totalRuns: totalRuns,
                           weeklyKm: weeklyKm,
                           bestEscapeM: bestEscape,
-                          prevMeters: prevMeters,
+                          lastRun: lastRun,
                           runs: runs.take(3).toList(),
                         );
                       },
@@ -173,7 +205,7 @@ class MysticHomeLayout extends StatelessWidget {
     required int totalRuns,
     required double weeklyKm,
     required int bestEscapeM,
-    required int prevMeters,
+    required RunModel? lastRun,
     required List<RunModel> runs,
   }) {
     final now = DateTime.now();
@@ -201,17 +233,25 @@ class MysticHomeLayout extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        // 상단 한자 헤더
-        Center(
-          child: Text(
-            '影      追      夜',
-            style: GoogleFonts.nanumMyeongjo(
-              fontSize: 15,
-              color: _bloodDry,
-              letterSpacing: 8,
-              fontWeight: FontWeight.w400,
+        // 상단 한자 헤더 + 우측 BGM 토글
+        Row(
+          children: [
+            const SizedBox(width: 44), // 좌우 대칭용 여백
+            Expanded(
+              child: Center(
+                child: Text(
+                  '影      追      夜',
+                  style: GoogleFonts.nanumMyeongjo(
+                    fontSize: 15,
+                    color: _bloodDry,
+                    letterSpacing: 8,
+                    fontWeight: FontWeight.w400,
+                  ),
+                ),
+              ),
             ),
-          ),
+            BgmToggleButton(color: _bloodDry),
+          ],
         ),
         const SizedBox(height: 22),
 
@@ -288,7 +328,7 @@ class MysticHomeLayout extends StatelessWidget {
         const SizedBox(height: 30),
 
         // 코너 꺾쇠 장식 박스 (인용구)
-        _quoteBlock(prevMeters: prevMeters),
+        _quoteBlock(lastRun: lastRun),
 
         const SizedBox(height: 28),
 
@@ -341,9 +381,8 @@ class MysticHomeLayout extends StatelessWidget {
     );
   }
 
-  Widget _quoteBlock({required int prevMeters}) {
-    final quote = _buildPrevQuote(prevMeters);
-    final parts = quote.split('\n');
+  Widget _quoteBlock({required RunModel? lastRun}) {
+    final parts = _narrativeLines(lastRun);
     return SizedBox(
       width: double.infinity,
       child: Padding(

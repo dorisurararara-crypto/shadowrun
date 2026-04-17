@@ -144,7 +144,7 @@ class PureSettingsLayout extends StatelessWidget {
 
             // APPEARANCE
             _section(
-              title: 'Appearance',
+              title: S.isKo ? '외관' : 'Appearance',
               children: [
                 _row(
                   label: S.isKo ? '테마' : 'Theme',
@@ -183,7 +183,7 @@ class PureSettingsLayout extends StatelessWidget {
 
             // RUN
             _section(
-              title: 'Run',
+              title: S.isKo ? '러닝' : 'Run',
               children: [
                 _row(
                   label: S.isKo ? '러닝화' : 'Shoes',
@@ -196,7 +196,7 @@ class PureSettingsLayout extends StatelessWidget {
 
             // GOAL
             _section(
-              title: 'Goal',
+              title: S.isKo ? '목표' : 'Goal',
               children: [
                 _row(
                   label: S.isKo ? '활성 목표' : 'Active goal',
@@ -210,7 +210,7 @@ class PureSettingsLayout extends StatelessWidget {
 
             // AUDIO
             _section(
-              title: 'Audio',
+              title: S.isKo ? '오디오' : 'Audio',
               children: [
                 _row(
                   label: S.isKo ? '나레이터 목소리' : 'Voice of Shadow',
@@ -268,7 +268,7 @@ class PureSettingsLayout extends StatelessWidget {
 
             // SUPPORT
             _section(
-              title: 'Support',
+              title: S.isKo ? '지원' : 'Support',
               children: [
                 _row(
                   label: S.isKo ? '개인정보 처리방침' : 'Privacy Policy',
@@ -512,7 +512,7 @@ class PureSettingsLayout extends StatelessWidget {
             onTap: onHorrorHeaderTap,
             child: SizedBox(
               width: double.infinity,
-              child: _sectionHeader('Fear'),
+              child: _sectionHeader(S.isKo ? '공포' : 'Fear'),
             ),
           ),
           ..._renderChildren([
@@ -573,7 +573,7 @@ class PureSettingsLayout extends StatelessWidget {
         onTap: () { SfxService().tapCard(); onRestorePurchases(); },
       ));
     }
-    return _section(title: 'Pro', children: children);
+    return _section(title: S.isKo ? '프로' : 'Pro', children: children);
   }
 
   Widget _sectionHeader(String label) {
@@ -587,13 +587,20 @@ class PureSettingsLayout extends StatelessWidget {
       ),
       child: Text(
         label,
-        style: GoogleFonts.playfairDisplay(
-          fontSize: 10,
-          color: _redSub,
-          letterSpacing: 4.0,
-          fontStyle: FontStyle.italic,
-          fontWeight: FontWeight.w400,
-        ),
+        style: S.isKo
+            ? GoogleFonts.notoSerifKr(
+                fontSize: 10,
+                color: _redSub,
+                letterSpacing: 4.0,
+                fontWeight: FontWeight.w500,
+              )
+            : GoogleFonts.playfairDisplay(
+                fontSize: 10,
+                color: _redSub,
+                letterSpacing: 4.0,
+                fontStyle: FontStyle.italic,
+                fontWeight: FontWeight.w400,
+              ),
       ),
     );
   }

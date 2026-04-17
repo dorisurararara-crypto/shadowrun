@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:shadowrun/shared/models/run_model.dart';
+import 'package:shadowrun/shared/widgets/bgm_toggle_button.dart';
 import 'package:shadowrun/shared/widgets/challenge_run_picker.dart';
 import 'package:shadowrun/core/services/sfx_service.dart';
 import 'package:shadowrun/core/l10n/app_strings.dart';
@@ -68,13 +69,12 @@ class PureHomeLayout extends StatelessWidget {
                             : runs
                                 .map((r) => r.distanceM.toInt())
                                 .reduce((a, b) => a > b ? a : b);
-                        final prevMeters = lastRun?.distanceM.toInt() ?? 0;
                         return _buildContent(
                           context,
                           totalRuns: totalRuns,
                           weeklyKm: weeklyKm,
                           bestEscapeM: bestEscape,
-                          prevMeters: prevMeters,
+                          lastRun: lastRun,
                           runs: runs.take(3).toList(),
                         );
                       },
@@ -95,7 +95,7 @@ class PureHomeLayout extends StatelessWidget {
     required int totalRuns,
     required double weeklyKm,
     required int bestEscapeM,
-    required int prevMeters,
+    required RunModel? lastRun,
     required List<RunModel> runs,
   }) {
     // "Episode 005" 가 무슨 뜻인지 사용자가 혼란 → padding 제거 + "N번째 달리기"로 명확화.
@@ -106,18 +106,26 @@ class PureHomeLayout extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        // ── Eyebrow: a shadow never rests ──
-        Center(
-          child: Text(
-            '— a shadow never rests —',
-            style: GoogleFonts.playfairDisplay(
-              fontSize: 12,
-              fontStyle: FontStyle.italic,
-              color: _bloodSub,
-              letterSpacing: 2.5,
-              fontWeight: FontWeight.w400,
+        // ── Eyebrow: a shadow never rests + 우측 BGM 토글 ──
+        Row(
+          children: [
+            const SizedBox(width: 44),
+            Expanded(
+              child: Center(
+                child: Text(
+                  S.isKo ? '— 그림자는 쉬지 않는다 —' : '— a shadow never rests —',
+                  style: GoogleFonts.playfairDisplay(
+                    fontSize: 12,
+                    fontStyle: FontStyle.italic,
+                    color: _bloodSub,
+                    letterSpacing: 2.5,
+                    fontWeight: FontWeight.w400,
+                  ),
+                ),
+              ),
             ),
-          ),
+            BgmToggleButton(color: _bloodSub),
+          ],
         ),
         const SizedBox(height: 20),
 
@@ -170,14 +178,14 @@ class PureHomeLayout extends StatelessWidget {
         const SizedBox(height: 30),
 
         // ── Cinematic subtitle quote ──
-        _quoteBlock(prevMeters),
+        _quoteBlock(lastRun),
 
         const SizedBox(height: 10),
 
         // ── previously on shadow run ──
         Center(
           child: Text(
-            '— previously on shadow run —',
+            S.isKo ? '— 지난 달리기 —' : '— previously on shadow run —',
             style: GoogleFonts.playfairDisplay(
               fontSize: 11,
               fontStyle: FontStyle.italic,
@@ -209,7 +217,7 @@ class PureHomeLayout extends StatelessWidget {
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 14),
                 child: Text(
-                  'recent chapters',
+                  S.isKo ? '최근 기록' : 'recent chapters',
                   style: GoogleFonts.playfairDisplay(
                     fontSize: 11,
                     fontStyle: FontStyle.italic,
@@ -230,31 +238,9 @@ class PureHomeLayout extends StatelessWidget {
   }
 
   // ─── Quote block ───────────────────────────────────────────
-  Widget _quoteBlock(int prevMeters) {
-    if (prevMeters <= 0) {
-      return SizedBox(
-        width: double.infinity,
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 12),
-          child: Column(
-            children: [
-              Text(
-                S.isKo
-                    ? '그는 아직 당신을\n찾지 못했다.'
-                    : 'He has not\nfound you yet.',
-                textAlign: TextAlign.center,
-                style: GoogleFonts.notoSerifKr(
-                  fontSize: 18,
-                  color: _offWhite,
-                  height: 1.7,
-                  fontWeight: FontWeight.w400,
-                ),
-              ),
-            ],
-          ),
-        ),
-      );
-    }
+  /// 어제 러닝 결과에 따른 시적 카피. 도플갱어 승/패, 자유, 마라톤 분기.
+  Widget _quoteBlock(RunModel? lastRun) {
+    final parts = _narrativeParts(lastRun);
     return SizedBox(
       width: double.infinity,
       child: Padding(
@@ -263,7 +249,7 @@ class PureHomeLayout extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             Text(
-              S.isKo ? '어젯밤, 그는 당신보다' : 'Last night, he came',
+              parts.line1,
               textAlign: TextAlign.center,
               style: GoogleFonts.notoSerifKr(
                 fontSize: 17,
@@ -273,32 +259,20 @@ class PureHomeLayout extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 4),
-            RichText(
+            Text(
+              parts.highlight,
               textAlign: TextAlign.center,
-              text: TextSpan(
-                style: GoogleFonts.notoSerifKr(
-                  fontSize: 17,
-                  color: _offWhite,
-                  height: 1.7,
-                ),
-                children: [
-                  TextSpan(
-                    text: S.isKo ? '$prevMeters미터' : '${prevMeters}m',
-                    style: GoogleFonts.playfairDisplay(
-                      fontSize: 24,
-                      fontStyle: FontStyle.italic,
-                      color: _bloodSub,
-                      fontWeight: FontWeight.w800,
-                      height: 1.5,
-                    ),
-                  ),
-                  TextSpan(text: S.isKo ? ' 더 가까이' : ' closer'),
-                ],
+              style: GoogleFonts.playfairDisplay(
+                fontSize: 24,
+                fontStyle: FontStyle.italic,
+                color: parts.highlightColor,
+                fontWeight: FontWeight.w800,
+                height: 1.5,
               ),
             ),
             const SizedBox(height: 4),
             Text(
-              S.isKo ? '다가왔다.' : 'than you.',
+              parts.line3,
               textAlign: TextAlign.center,
               style: GoogleFonts.notoSerifKr(
                 fontSize: 17,
@@ -310,6 +284,71 @@ class PureHomeLayout extends StatelessWidget {
           ],
         ),
       ),
+    );
+  }
+
+  _NarrativeParts _narrativeParts(RunModel? last) {
+    final ko = S.isKo;
+    if (last == null) {
+      return _NarrativeParts(
+        line1: ko ? '그림자는' : 'The shadow',
+        highlight: ko ? '당신을 기다린다' : 'waits for you',
+        highlightColor: _offWhite,
+        line3: ko ? '' : '',
+      );
+    }
+    if (last.isChallenge) {
+      final r = last.challengeResult;
+      // 도플갱어 모드 표시용 거리는 **최종 간격(finalShadowGapM)** 을 우선 사용.
+      // 구버전 레코드(null)나 fallback 시 distanceM 사용.
+      final gap = (last.finalShadowGapM ?? 0).abs().toInt();
+      if (r == 'lose') {
+        return _NarrativeParts(
+          line1: ko ? '어젯밤, 그는' : 'Last night, he',
+          highlight: ko ? '당신을 덮쳤다' : 'caught you',
+          highlightColor: _bloodSub,
+          line3: ko ? '.' : '.',
+        );
+      }
+      if (r == 'win') {
+        if (gap >= 500) {
+          return _NarrativeParts(
+            line1: ko ? '어젯밤, 그를' : 'Last night,',
+            highlight: ko ? '$gap미터' : '${gap}m',
+            highlightColor: _bloodSub,
+            line3: ko ? '차이로 떨궈놓고 왔다.' : 'far behind you.',
+          );
+        }
+        if (gap >= 100) {
+          return _NarrativeParts(
+            line1: ko ? '어젯밤, 그를' : 'Last night, by',
+            highlight: ko ? '$gap미터' : '${gap}m',
+            highlightColor: _bloodSub,
+            line3: ko ? '앞서 벗어났다.' : 'you escaped him.',
+          );
+        }
+        return _NarrativeParts(
+          line1: ko ? '어젯밤,' : 'Last night,',
+          highlight: ko ? '아슬아슬하게' : 'just barely',
+          highlightColor: _bloodSub,
+          line3: ko ? '벗어났다.' : 'you got away.',
+        );
+      }
+      // isChallenge 인데 result null (취소·오류) — 중립
+      return _NarrativeParts(
+        line1: ko ? '어제의' : 'Yesterday\'s',
+        highlight: ko ? '달리기' : 'run',
+        highlightColor: _offWhite,
+        line3: ko ? '가 기록되었다.' : 'is recorded.',
+      );
+    }
+    // 자유 · 마라톤 (isChallenge=false)
+    final km = (last.distanceM / 1000).toStringAsFixed(1);
+    return _NarrativeParts(
+      line1: ko ? '어제 당신은' : 'Yesterday, you ran',
+      highlight: ko ? '${km}km' : '${km}km',
+      highlightColor: _offWhite,
+      line3: ko ? '를 달렸다.' : '.',
     );
   }
 
@@ -333,7 +372,7 @@ class PureHomeLayout extends StatelessWidget {
             child: _statCell(
               value: weeklyKm.toStringAsFixed(1),
               unit: 'km',
-              label: 'this week',
+              label: S.isKo ? '이번 주' : 'this week',
             ),
           ),
           Container(width: 1, height: 50, color: _divider),
@@ -341,7 +380,7 @@ class PureHomeLayout extends StatelessWidget {
             child: _statCell(
               value: '$chapters',
               unit: '',
-              label: 'chapters',
+              label: S.isKo ? '기록' : 'chapters',
             ),
           ),
           Container(width: 1, height: 50, color: _divider),
@@ -349,7 +388,7 @@ class PureHomeLayout extends StatelessWidget {
             child: _statCell(
               value: '$bestEscapeM',
               unit: 'm',
-              label: 'best escape',
+              label: S.isKo ? '최장 탈출' : 'best escape',
             ),
           ),
         ],
@@ -412,7 +451,7 @@ class PureHomeLayout extends StatelessWidget {
       context: context,
       height: 118,
       titleKo: S.isKo ? '오늘의 도주' : "Tonight's Chase",
-      subtitleEn: "begin tonight's run",
+      subtitleEn: S.isKo ? '오늘 밤의 추격' : "begin tonight's run",
       borderColor: _bloodDeep,
       accentColor: _bloodSub,
       onTap: () async {
@@ -431,7 +470,7 @@ class PureHomeLayout extends StatelessWidget {
       context: context,
       height: 118,
       titleKo: S.isKo ? '홀로, 새 기록을' : 'Alone, a new record.',
-      subtitleEn: "tonight's legend",
+      subtitleEn: S.isKo ? '오늘의 전설' : "tonight's legend",
       borderColor: _faint,
       accentColor: _muted,
       onTap: () {
@@ -494,7 +533,7 @@ class PureHomeLayout extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    '—   cue the chase',
+                    S.isKo ? '—   추격 시작' : '—   cue the chase',
                     style: GoogleFonts.playfairDisplay(
                       fontSize: 10,
                       fontStyle: FontStyle.italic,
@@ -526,13 +565,16 @@ class PureHomeLayout extends StatelessWidget {
     final isWin = r.challengeResult == 'win';
     final isLoss = r.challengeResult == 'lose';
     // 챌린지가 아닌 경우에도 무난한 라벨
-    final resultLabel =
-        isWin ? 'escaped' : isLoss ? 'caught' : 'chapter closed';
+    final resultLabel = S.isKo
+        ? (isWin ? '탈출' : isLoss ? '잡힘' : '완주')
+        : (isWin ? 'escaped' : isLoss ? 'caught' : 'chapter closed');
     final resultColor =
         isWin ? _offWhite : isLoss ? _bloodSub : _muted;
 
     final date = _dateShort(r.date);
-    final location = (r.location ?? '').trim().isEmpty ? 'unmarked path' : r.location!;
+    final location = (r.location ?? '').trim().isEmpty
+        ? (S.isKo ? '이름 없는 길' : 'unmarked path')
+        : r.location!;
     final shortLoc = location.length > 12 ? '${location.substring(0, 12)}…' : location;
     final distKm = (r.distanceM / 1000).toStringAsFixed(2);
 
@@ -675,4 +717,17 @@ class PureHomeLayout extends StatelessWidget {
     ];
     return '${months[dt.month - 1]} ${dt.day.toString().padLeft(2, '0')}';
   }
+}
+
+class _NarrativeParts {
+  final String line1;
+  final String highlight;
+  final Color highlightColor;
+  final String line3;
+  _NarrativeParts({
+    required this.line1,
+    required this.highlight,
+    required this.highlightColor,
+    required this.line3,
+  });
 }

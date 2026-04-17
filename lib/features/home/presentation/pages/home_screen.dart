@@ -41,7 +41,7 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void dispose() {
     PurchaseService().proNotifier.removeListener(_onProChanged);
-    HomeBgmService.I.stop();
+    // BGM은 러닝 시작 시에만 멈춤 — HomeScreen이 dispose돼도 계속 재생되도록 둔다.
     super.dispose();
   }
 

@@ -45,31 +45,41 @@ class HomeBgmService {
 
   Future<void> _playRandomFromPool() async {
     final prefs = BgmPreferences.I;
+    debugPrint('[HomeBgm] 재생 시도 — enabled=${prefs.enabled.value} externalMusic=${prefs.externalMusicMode.value} volume=${prefs.volume.value}');
     if (!prefs.enabled.value || prefs.externalMusicMode.value) {
+      debugPrint('[HomeBgm] → skip (사용자 설정)');
       try { await _player.stop(); } catch (_) {}
       return;
     }
     final theme = ThemeManager.I.current;
     final pool = theme.bgmHomePool;
+    debugPrint('[HomeBgm] theme=${theme.id.key} pool.length=${pool.length}');
     if (pool.isEmpty) {
+      debugPrint('[HomeBgm] → skip (pool empty)');
       try { await _player.stop(); } catch (_) {}
       return;
     }
     final asset = pool[_rng.nextInt(pool.length)];
-    if (_currentAsset == asset) return; // 동일 트랙이면 재시작 안 함
+    if (_currentAsset == asset) {
+      debugPrint('[HomeBgm] → same asset, skip restart');
+      return;
+    }
     _currentAsset = asset;
     try {
+      debugPrint('[HomeBgm] setAsset(assets/audio/$asset)');
       await _player.setAsset('assets/audio/$asset');
       await _player.setLoopMode(LoopMode.one);
-      await _player.setVolume(prefs.effectiveVolume(0.3));
+      final vol = prefs.effectiveVolume(0.75);
+      await _player.setVolume(vol);
+      debugPrint('[HomeBgm] play — volume=$vol');
       _player.play().catchError((_) {});
     } catch (e) {
-      debugPrint('HomeBgm 에러 ($asset): $e');
+      debugPrint('[HomeBgm] 에러 ($asset): $e');
     }
   }
 
   void _onVolumeChanged() {
-    _player.setVolume(BgmPreferences.I.effectiveVolume(0.3));
+    _player.setVolume(BgmPreferences.I.effectiveVolume(0.75));
   }
 
   void _onEnabledChanged() {
