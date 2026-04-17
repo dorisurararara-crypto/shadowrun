@@ -29,6 +29,39 @@
 
 ## 최신
 
+### 2026-04-18 11:40 (Mac → Windows) — 빌드 13 TestFlight 업로드 완료 ✅
+
+**한 방에 끝난 것:**
+- pubspec `1.0.0+12 → 1.0.0+13` bump
+- Runner 타겟 서명 누락(`DEVELOPMENT_TEAM=nil`) → Q6H9HCTK6W/Automatic 설정 (`tmp/set_runner_signing.rb`)
+- Archive 1차 실패: iOS 26.4 platform support 미설치 → `xcodebuild -downloadPlatform iOS` (8.45GB) 자동 다운로드
+- Archive 2차 실패: Watch App `CFBundleIconName` 누락 + 아이콘 파일 없음 → iOS `Icon-App-1024x1024@1x.png` 복사해 Watch 아이콘으로 사용 + `INFOPLIST_KEY_CFBundleIconName=AppIcon` 추가
+- Archive 3차: `flutter build ipa --release` 성공 (151.6MB)
+- `xcrun altool --validate-app` → VERIFY SUCCEEDED
+- `xcrun altool --upload-app` → **UPLOAD SUCCEEDED** (Delivery UUID `f8dd50ca-cad3-4701-b07f-338bd796aaad`, 148MB, 10.5초)
+
+**ASC API 자동화 셋업 완료 (앞으로 업로드 원샷):**
+- `~/.appstoreconnect/private_keys/AuthKey_KQ46867WUN.p8` (권한 600, git 제외)
+- Key ID / Issuer ID 는 Mac Claude memory 에 저장 — 다음 세션부터 "TestFlight 올려줘" 한마디로 version bump → build → validate → upload 자동
+
+**⚠️ 사용자 실기 테스트 (지금 유일한 막힌 지점):**
+Apple 서버에서 빌드 13 처리 5~20분 후 TestFlight 에 나타남. 그 뒤 실기 확인:
+- 🎯 **iPhone 설치 시 Apple Watch 에 SHADOW RUN 자동 설치되는지** (이번 리팩토링 핵심 검증)
+- 🎯 화면 끄고 5~10분 러닝 → BGM 지속
+- 🎯 전화 받고 끊은 뒤 → BGM 자동 복원
+- 🎯 뺑뺑 돌기 (30m 이내 원) → 거리 누적
+- 🎯 백그라운드 GPS 지속 — 상단 파란 바 유지
+- 🎯 03:10 리팩토링 regression 5항목 (GPS→지도, pause BGM, vehicle auto-pause, 점프스케어 크래시, 워치 명령)
+
+**🚫 여전히 사용자 수동 작업 남은 것:**
+- Play Console / ASC 상품 가격 변경: `shadowrun_pro` ₩13,900
+- ASC 신규 4개 테마 상품 등록: `shadowrun_theme_{mystic,noir,editorial,cyber}` · ₩5,500
+- ASC 기존 `com.ganziman.ShadowRunWatch.watchkitapp` bundle ID 로 만들어진 orphan Watch 앱 항목 정리 (있다면)
+
+**Windows 할 일:** 없음. 사용자 실기 리포트 오면 그때 대응.
+
+---
+
 ### 2026-04-18 11:10 (Mac → Windows) — Watch 자동 설치 wiring 완료
 
 **사용자 리포트:** iPhone 앱 설치해도 Apple Watch 에 앱이 자동 설치 안 됨.
