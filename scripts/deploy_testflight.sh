@@ -31,6 +31,23 @@ xcrun altool --upload-app --type ios -f "$IPA_PATH" \
   --apiKey "$KEY_ID" --apiIssuer "$ISSUER_ID"
 
 echo ""
-echo "✓ 업로드 완료. Apple 처리 5~20분 후 TestFlight 반영."
-echo "  빌드 상태 확인:        scripts/asc/check_build_status.rb ${new_build}"
-echo "  외부 테스트 제출:      scripts/asc/submit_external_beta.rb ${new_build}"
+echo "✓ 업로드 완료. Apple 처리 대기 중… (최대 20분)"
+
+# 사용자는 항상 외부 테스터로 배포 — VALID 될 때까지 poll 한 뒤 외부 그룹에 자동 제출
+SCRIPT_DIR="$(dirname "$0")"
+for attempt in $(seq 1 40); do
+  sleep 30
+  state=$("${SCRIPT_DIR}/asc/check_build_status.rb" "${new_build}" 2>/dev/null | awk -v b="${new_build}" '$1==b {print $2; exit}')
+  if [ "$state" = "VALID" ]; then
+    echo "✓ 빌드 ${new_build} VALID — 외부 그룹 자동 제출"
+    "${SCRIPT_DIR}/asc/submit_external_beta.rb" "${new_build}"
+    echo ""
+    echo "✓ 외부 테스터 배포 완료 (Beta Review 통과된 그룹이라 대부분 즉시 반영)"
+    exit 0
+  fi
+  echo "  [${attempt}/40] state=${state:-unknown}, 30s 뒤 재확인"
+done
+
+echo "⚠️ 20분 지나도 VALID 안 됨. 나중에 수동으로:"
+echo "  ${SCRIPT_DIR}/asc/submit_external_beta.rb ${new_build}"
+exit 1

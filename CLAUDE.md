@@ -32,6 +32,13 @@
 
 사용자가 귀찮아하는 배포·ASC 메타데이터 작업은 거의 전부 자동화돼있음. 다음 목록의 작업이 요청되면 **확인 없이 바로 실행**해도 됨 (이미 인프라 셋업 끝났고 사용자가 승인한 영역).
 
+### 🚨 사용자 선호: TestFlight 는 **항상 외부 테스트로**
+
+사용자는 **외부 그룹 `ganzitester` 로만** TestFlight 테스트합니다. **내부 테스트 전용으로 올리지 말 것.**
+- "TestFlight 에 올려줘" = 업로드 + 외부 그룹 할당 + Beta Review 제출까지 **하나의 작업**
+- 외부 그룹은 이미 Apple Beta Review 통과 — 이후 빌드는 대부분 자동 승인
+- `deploy_testflight.sh` 가 빌드 업로드 + VALID 대기 + 외부 제출을 자동 이어서 수행
+
 ### 1. TestFlight 새 빌드 배포 (한 줄)
 
 ```bash
@@ -143,7 +150,8 @@ flutter analyze
 ## 사용자가 "TestFlight 에 올려줘" 했을 때 기본 동작
 
 별 말 없으면:
-1. `./scripts/deploy_testflight.sh` (버전 +1)
-2. VALID 될 때까지 `check_build_status.rb` 로 기다림 (또는 몇 분 후 재시도)
-3. `./scripts/asc/submit_external_beta.rb` 로 외부 배포까지
-4. HANDOFF.md "## 최신" 에 결과 기록 + commit + push
+1. `./scripts/deploy_testflight.sh` (버전 +1) — 업로드까지
+2. 스크립트가 **VALID 까지 자동 poll** (5~20분) + 외부 그룹 할당 + Beta Review 제출 **까지 이어서 수행**
+3. HANDOFF.md "## 최신" 에 결과 기록 + commit + push
+
+**절대 내부 테스트에만 올리지 말 것.** 사용자는 항상 외부 테스터로 받음.
