@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:shadowrun/core/l10n/app_strings.dart';
 import 'package:shadowrun/shared/models/run_model.dart';
 
 /// T1 Pure Cinematic 테마용 History(Chronicles) 화면.
@@ -13,12 +14,18 @@ class PureHistoryLayout extends StatelessWidget {
   final List<RunModel> runs;
   final void Function(RunModel run) onRunTap;
   final VoidCallback onClose;
+  final void Function(RunModel run)? onRunChallenge;
+  final void Function(RunModel run)? onRunEdit;
+  final void Function(RunModel run)? onRunDelete;
 
   const PureHistoryLayout({
     super.key,
     required this.runs,
     required this.onRunTap,
     required this.onClose,
+    this.onRunChallenge,
+    this.onRunEdit,
+    this.onRunDelete,
   });
 
   // Pure Cinematic 팔레트 (full-t1-pure.html :root 변수)
@@ -349,6 +356,12 @@ class PureHistoryLayout extends StatelessWidget {
 
   // ---------- 에피소드 row ----------
   Widget _buildEpisodeRow(RunModel run) {
+    return Builder(
+      builder: (ctx) => _buildEpisodeRowContent(ctx, run),
+    );
+  }
+
+  Widget _buildEpisodeRowContent(BuildContext context, RunModel run) {
     final dt = DateTime.tryParse(run.date);
     final episodeNo = run.id ?? 0;
 
@@ -458,15 +471,149 @@ class PureHistoryLayout extends StatelessWidget {
                   letterSpacing: 2.5,
                 ),
               ),
+              // 우측 끝: ⋯ 액션 버튼
+              if (onRunEdit != null || onRunDelete != null || onRunChallenge != null)
+                GestureDetector(
+                  behavior: HitTestBehavior.opaque,
+                  onTap: () => _showActionSheet(context, run),
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                    margin: const EdgeInsets.only(left: 6),
+                    child: Text(
+                      '⋯',
+                      style: GoogleFonts.playfairDisplay(
+                        fontSize: 18,
+                        fontStyle: FontStyle.italic,
+                        color: _inkFade,
+                        fontWeight: FontWeight.w400,
+                        height: 1,
+                      ),
+                    ),
+                  ),
+                ),
             ],
           ),
         ),
       ),
     );
   }
+
+  // ---------- 액션 바텀시트 (수정/삭제/도전) ----------
+  void _showActionSheet(BuildContext context, RunModel run) {
+    final isKo = S.isKo;
+    showModalBottomSheet<void>(
+      context: context,
+      backgroundColor: Colors.black,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(4)),
+      ),
+      builder: (sheetCtx) {
+        return SafeArea(
+          top: false,
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(20, 10, 20, 14),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  width: 36,
+                  height: 1,
+                  margin: const EdgeInsets.only(top: 4, bottom: 16),
+                  color: _hair,
+                ),
+                Text(
+                  'ACTIONS',
+                  style: GoogleFonts.playfairDisplay(
+                    fontSize: 10,
+                    fontStyle: FontStyle.italic,
+                    color: _inkFade,
+                    fontWeight: FontWeight.w400,
+                    letterSpacing: 3.5,
+                  ),
+                ),
+                const SizedBox(height: 14),
+                if (onRunChallenge != null)
+                  _PureSheetItem(
+                    label: isKo ? '도플갱어로 도전' : 'Challenge as doppelganger',
+                    onTap: () {
+                      Navigator.pop(sheetCtx);
+                      onRunChallenge!(run);
+                    },
+                  ),
+                if (onRunEdit != null)
+                  _PureSheetItem(
+                    label: isKo ? '이름 변경' : 'Rename',
+                    onTap: () {
+                      Navigator.pop(sheetCtx);
+                      onRunEdit!(run);
+                    },
+                  ),
+                if (onRunDelete != null)
+                  _PureSheetItem(
+                    label: isKo ? '삭제' : 'Delete',
+                    danger: true,
+                    onTap: () {
+                      Navigator.pop(sheetCtx);
+                      onRunDelete!(run);
+                    },
+                  ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
 }
 
 // ===================== 내부 위젯 =====================
+
+/// Pure 바텀시트 액션 아이템. danger: true면 _red 외곽선.
+class _PureSheetItem extends StatelessWidget {
+  final String label;
+  final bool danger;
+  final VoidCallback onTap;
+
+  const _PureSheetItem({
+    required this.label,
+    required this.onTap,
+    this.danger = false,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      behavior: HitTestBehavior.opaque,
+      onTap: onTap,
+      child: Container(
+        width: double.infinity,
+        margin: const EdgeInsets.symmetric(vertical: 4),
+        padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
+        decoration: BoxDecoration(
+          border: Border.all(
+            color: danger
+                ? PureHistoryLayout._redSub
+                : PureHistoryLayout._hair,
+            width: danger ? 1 : 0.8,
+          ),
+        ),
+        child: Text(
+          label,
+          textAlign: TextAlign.center,
+          style: GoogleFonts.playfairDisplay(
+            fontSize: 14,
+            fontStyle: FontStyle.italic,
+            color: danger
+                ? PureHistoryLayout._redSub
+                : PureHistoryLayout._ink,
+            fontWeight: FontWeight.w400,
+            letterSpacing: 2,
+          ),
+        ),
+      ),
+    );
+  }
+}
 
 class _SummaryCell extends StatelessWidget {
   final Widget valueWidget;

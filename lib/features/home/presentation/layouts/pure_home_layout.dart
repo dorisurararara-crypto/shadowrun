@@ -98,7 +98,11 @@ class PureHomeLayout extends StatelessWidget {
     required int prevMeters,
     required List<RunModel> runs,
   }) {
-    final episode = (totalRuns + 1).toString().padLeft(3, '0');
+    // "Episode 005" 가 무슨 뜻인지 사용자가 혼란 → padding 제거 + "N번째 달리기"로 명확화.
+    final runCount = totalRuns + 1;
+    final episodeLabel = S.isKo
+        ? '$runCount번째 달리기'
+        : 'Your run #$runCount';
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
@@ -154,7 +158,7 @@ class PureHomeLayout extends StatelessWidget {
         // ── Episode 028 · Date ──
         Center(
           child: Text(
-            'Episode $episode   ·   ${_todayEn()}',
+            '$episodeLabel   ·   ${_todayEn()}',
             style: GoogleFonts.notoSerifKr(
               fontSize: 11,
               color: _muted,

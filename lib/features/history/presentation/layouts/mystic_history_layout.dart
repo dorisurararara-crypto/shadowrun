@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:shadowrun/core/l10n/app_strings.dart';
 import 'package:shadowrun/shared/models/run_model.dart';
 
 /// T3 Korean Mystic 테마용 History(지난 밤들) 화면.
@@ -14,12 +15,18 @@ class MysticHistoryLayout extends StatelessWidget {
   final List<RunModel> runs;
   final void Function(RunModel run) onRunTap;
   final VoidCallback onClose;
+  final void Function(RunModel run)? onRunChallenge;
+  final void Function(RunModel run)? onRunEdit;
+  final void Function(RunModel run)? onRunDelete;
 
   const MysticHistoryLayout({
     super.key,
     required this.runs,
     required this.onRunTap,
     required this.onClose,
+    this.onRunChallenge,
+    this.onRunEdit,
+    this.onRunDelete,
   });
 
   // 먹빛 호러 팔레트 (mystic_home_layout 과 동일)
@@ -415,6 +422,12 @@ class MysticHistoryLayout extends StatelessWidget {
 
   // ---------- 에피소드 row ----------
   Widget _buildEpisodeRow(RunModel run) {
+    return Builder(
+      builder: (ctx) => _buildEpisodeRowContent(ctx, run),
+    );
+  }
+
+  Widget _buildEpisodeRowContent(BuildContext context, RunModel run) {
     final dt = DateTime.tryParse(run.date);
     final episodeNo = run.id ?? 0;
     final dateKo = dt != null ? '${dt.month}월 ${dt.day}일' : run.date;
@@ -492,9 +505,103 @@ class MysticHistoryLayout extends StatelessWidget {
                 letterSpacing: 1,
               ),
             ),
+            // 우측 끝: ⋯ 액션 버튼 (수정/삭제)
+            if (onRunEdit != null || onRunDelete != null || onRunChallenge != null)
+              GestureDetector(
+                behavior: HitTestBehavior.opaque,
+                onTap: () => _showActionSheet(context, run),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                  margin: const EdgeInsets.only(left: 6),
+                  child: Text(
+                    '⋯',
+                    style: GoogleFonts.nanumMyeongjo(
+                      fontSize: 20,
+                      color: _outline,
+                      fontWeight: FontWeight.w800,
+                      height: 1,
+                    ),
+                  ),
+                ),
+              ),
           ],
         ),
       ),
+    );
+  }
+
+  // ---------- 액션 바텀시트 (수정/삭제/도전) ----------
+  void _showActionSheet(BuildContext context, RunModel run) {
+    final isKo = S.isKo;
+    showModalBottomSheet<void>(
+      context: context,
+      backgroundColor: const Color(0xFF0D0607),
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(8)),
+      ),
+      builder: (sheetCtx) {
+        return SafeArea(
+          top: false,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 10),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                // 핸들
+                Container(
+                  width: 36,
+                  height: 2,
+                  margin: const EdgeInsets.only(top: 4, bottom: 14),
+                  color: _borderInk,
+                ),
+                // 상단 작은 한자 라벨
+                Text(
+                  '選 · 択',
+                  style: GoogleFonts.nanumMyeongjo(
+                    fontSize: 10,
+                    color: _outline,
+                    letterSpacing: 5,
+                    fontWeight: FontWeight.w400,
+                  ),
+                ),
+                const SizedBox(height: 10),
+                if (onRunChallenge != null)
+                  _MysticSheetItem(
+                    label: isKo ? '도플갱어로 도전' : 'Challenge as doppelganger',
+                    hanja: '追',
+                    color: _rice,
+                    onTap: () {
+                      Navigator.pop(sheetCtx);
+                      onRunChallenge!(run);
+                    },
+                  ),
+                if (onRunEdit != null)
+                  _MysticSheetItem(
+                    label: isKo ? '이름 변경' : 'Rename',
+                    hanja: '改',
+                    color: _rice,
+                    onTap: () {
+                      Navigator.pop(sheetCtx);
+                      onRunEdit!(run);
+                    },
+                  ),
+                if (onRunDelete != null)
+                  _MysticSheetItem(
+                    label: isKo ? '삭제' : 'Delete',
+                    hanja: '消',
+                    color: _rice,
+                    dangerBg: _bloodFresh,
+                    onTap: () {
+                      Navigator.pop(sheetCtx);
+                      onRunDelete!(run);
+                    },
+                  ),
+                const SizedBox(height: 6),
+              ],
+            ),
+          ),
+        );
+      },
     );
   }
 }
@@ -527,6 +634,77 @@ class _DoubleRulingBox extends StatelessWidget {
         const SizedBox(height: 3),
         Container(height: 1, color: color),
       ],
+    );
+  }
+}
+
+/// Mystic 바텀시트 액션 아이템. dangerBg를 주면 血 배경 + 쌀빛 텍스트.
+class _MysticSheetItem extends StatelessWidget {
+  final String label;
+  final String hanja;
+  final Color color;
+  final Color? dangerBg;
+  final VoidCallback onTap;
+
+  const _MysticSheetItem({
+    required this.label,
+    required this.hanja,
+    required this.color,
+    required this.onTap,
+    this.dangerBg,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final isDanger = dangerBg != null;
+    return InkWell(
+      onTap: onTap,
+      child: Container(
+        width: double.infinity,
+        margin: const EdgeInsets.fromLTRB(18, 4, 18, 4),
+        padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
+        decoration: BoxDecoration(
+          color: isDanger ? dangerBg : Colors.transparent,
+          border: Border.all(
+            color: isDanger
+                ? dangerBg!
+                : MysticHistoryLayout._borderInk,
+            width: 0.8,
+          ),
+        ),
+        child: Row(
+          children: [
+            SizedBox(
+              width: 26,
+              child: Text(
+                hanja,
+                style: GoogleFonts.nanumMyeongjo(
+                  fontSize: 18,
+                  color: isDanger
+                      ? MysticHistoryLayout._rice
+                      : MysticHistoryLayout._bloodDry,
+                  fontWeight: FontWeight.w800,
+                  height: 1,
+                ),
+              ),
+            ),
+            const SizedBox(width: 14),
+            Expanded(
+              child: Text(
+                label,
+                style: GoogleFonts.nanumMyeongjo(
+                  fontSize: 14,
+                  color: isDanger
+                      ? MysticHistoryLayout._rice
+                      : color,
+                  fontWeight: FontWeight.w700,
+                  letterSpacing: 1.2,
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

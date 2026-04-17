@@ -23,6 +23,10 @@ class PurePrepareLayout extends StatelessWidget {
   final String shadowLocationType; // 'same' | 'different'
   final ValueChanged<String> onShadowLocationChanged;
 
+  // 챌린지 — 도플갱어 속도 3단 ('slow' | 'mid' | 'fast')
+  final String shadowSpeedLevel;
+  final ValueChanged<String> onShadowSpeedChanged;
+
   // 러닝화
   final List<Map<String, dynamic>> shoes;
   final int? selectedShoeId;
@@ -60,6 +64,8 @@ class PurePrepareLayout extends StatelessWidget {
     required this.shadowRun,
     required this.shadowLocationType,
     required this.onShadowLocationChanged,
+    required this.shadowSpeedLevel,
+    required this.onShadowSpeedChanged,
     required this.shoes,
     required this.selectedShoeId,
     required this.onShoeChanged,
@@ -518,23 +524,16 @@ class PurePrepareLayout extends StatelessWidget {
   }
 
   /// 챌린지 — 그림자의 속도 (slow 6:30 / mid 5:30 / fast 4:30)
+  /// shadowSpeedLevel props로 제어 — 사용자가 탭해서 변경.
   Widget _shadowSpeedSection() {
-    final paceMin = shadowRun?.avgPace ?? 5.5;
-    String current;
-    if (paceMin >= 6.0) {
-      current = 'slow';
-    } else if (paceMin <= 5.0) {
-      current = 'fast';
-    } else {
-      current = 'mid';
-    }
+    final current = shadowSpeedLevel;
     final isKo = S.isKo;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         _sectionHeader(
           isKo ? '도플갱어 속도' : 'Doppelgänger Pace',
-          isKo ? '자동' : 'auto',
+          isKo ? '탭으로 변경' : 'tap to change',
         ),
         const SizedBox(height: 12),
         Row(
@@ -564,7 +563,7 @@ class PurePrepareLayout extends StatelessWidget {
     return GestureDetector(
       behavior: HitTestBehavior.opaque,
       onTap: () {
-        SfxService().toggle();
+        onShadowSpeedChanged(key);
       },
       child: SizedBox(
         height: 96,

@@ -23,6 +23,10 @@ class MysticPrepareLayout extends StatelessWidget {
   final String shadowLocationType; // 'same' | 'different'
   final ValueChanged<String> onShadowLocationChanged;
 
+  // 챌린지 — 도플갱어 속도 3단 ('slow' | 'mid' | 'fast')
+  final String shadowSpeedLevel;
+  final ValueChanged<String> onShadowSpeedChanged;
+
   // 러닝화
   final List<Map<String, dynamic>> shoes;
   final int? selectedShoeId;
@@ -60,6 +64,8 @@ class MysticPrepareLayout extends StatelessWidget {
     required this.shadowRun,
     required this.shadowLocationType,
     required this.onShadowLocationChanged,
+    required this.shadowSpeedLevel,
+    required this.onShadowSpeedChanged,
     required this.shoes,
     required this.selectedShoeId,
     required this.onShoeChanged,
@@ -388,18 +394,9 @@ class MysticPrepareLayout extends StatelessWidget {
     );
   }
 
-  /// 챌린지 — 그림자의 속도 3단 (읽기 전용: shadowRun.avgPace 기준 자동 매칭)
+  /// 챌린지 — 그림자의 속도 3단. shadowSpeedLevel props로 제어.
   Widget _shadowSpeedSection() {
-    // avgPace는 min/km 단위. 기본 '보통' 매칭.
-    final paceMin = shadowRun?.avgPace ?? 5.5;
-    String current;
-    if (paceMin >= 6.0) {
-      current = 'slow';
-    } else if (paceMin <= 5.0) {
-      current = 'fast';
-    } else {
-      current = 'mid';
-    }
+    final current = shadowSpeedLevel;
     return _sectionFrame(
       title: '그림자의 속도',
       english: 'S H A D O W   S P E E D',
@@ -417,55 +414,59 @@ class MysticPrepareLayout extends StatelessWidget {
 
   Widget _speedOption(String key, String hanja, String label, String sub, String current) {
     final on = key == current;
-    return Container(
-      padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 4),
-      decoration: BoxDecoration(
-        color: on ? const Color(0xFF0F0505) : const Color(0x990A0606),
-        border: Border.all(
-          color: on ? _bloodDry : _line,
-          width: on ? 1.2 : 1,
+    return GestureDetector(
+      behavior: HitTestBehavior.opaque,
+      onTap: () => onShadowSpeedChanged(key),
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 4),
+        decoration: BoxDecoration(
+          color: on ? const Color(0xFF0F0505) : const Color(0x990A0606),
+          border: Border.all(
+            color: on ? _bloodDry : _line,
+            width: on ? 1.2 : 1,
+          ),
+          boxShadow: on
+              ? const [
+                  BoxShadow(
+                    color: Color(0x407A0A0E),
+                    blurRadius: 18,
+                    spreadRadius: -8,
+                  ),
+                ]
+              : null,
         ),
-        boxShadow: on
-            ? const [
-                BoxShadow(
-                  color: Color(0x407A0A0E),
-                  blurRadius: 18,
-                  spreadRadius: -8,
-                ),
-              ]
-            : null,
-      ),
-      child: Column(
-        children: [
-          Text(
-            hanja,
-            style: GoogleFonts.nanumMyeongjo(
-              fontSize: 20,
-              color: on ? _bloodFresh : _riceGhost,
-              fontWeight: FontWeight.w800,
+        child: Column(
+          children: [
+            Text(
+              hanja,
+              style: GoogleFonts.nanumMyeongjo(
+                fontSize: 20,
+                color: on ? _bloodFresh : _riceGhost,
+                fontWeight: FontWeight.w800,
+              ),
             ),
-          ),
-          const SizedBox(height: 4),
-          Text(
-            label,
-            textAlign: TextAlign.center,
-            style: GoogleFonts.gowunBatang(
-              fontSize: 11,
-              color: on ? _rice : _riceDim,
-              fontWeight: FontWeight.w400,
+            const SizedBox(height: 4),
+            Text(
+              label,
+              textAlign: TextAlign.center,
+              style: GoogleFonts.gowunBatang(
+                fontSize: 11,
+                color: on ? _rice : _riceDim,
+                fontWeight: FontWeight.w400,
+              ),
             ),
-          ),
-          const SizedBox(height: 2),
-          Text(
-            sub,
-            style: GoogleFonts.gowunBatang(
-              fontSize: 9,
-              color: _riceFade,
-              letterSpacing: 1.2,
-              fontWeight: FontWeight.w400,
+            const SizedBox(height: 2),
+            Text(
+              sub,
+              style: GoogleFonts.gowunBatang(
+                fontSize: 9,
+                color: _riceFade,
+                letterSpacing: 1.2,
+                fontWeight: FontWeight.w400,
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

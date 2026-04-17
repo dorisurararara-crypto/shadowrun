@@ -199,6 +199,12 @@ class _HistoryScreenState extends State<HistoryScreen>
                   SfxService().tapCard();
                   context.go('/');
                 },
+                onRunChallenge: (run) {
+                  SfxService().tapCard();
+                  context.push('/prepare', extra: run.id);
+                },
+                onRunEdit: _editRunName,
+                onRunDelete: _deleteRun,
               );
             },
           );
@@ -218,6 +224,12 @@ class _HistoryScreenState extends State<HistoryScreen>
                   SfxService().tapCard();
                   context.go('/');
                 },
+                onRunChallenge: (run) {
+                  SfxService().tapCard();
+                  context.push('/prepare', extra: run.id);
+                },
+                onRunEdit: _editRunName,
+                onRunDelete: _deleteRun,
               );
             },
           );

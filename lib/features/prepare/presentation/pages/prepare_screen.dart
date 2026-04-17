@@ -99,6 +99,9 @@ class _PrepareScreenState extends State<PrepareScreen>
   // 자유 러닝(freerun) 페이스메이커 유령 — 선택적으로 목표 페이스 동반.
   bool _pacemakerEnabled = false;
   int _pacemakerSecPerKm = 360; // 6:00/km 기본
+  // 챌린지 모드 — 도플갱어 속도 선택 ('slow' | 'mid' | 'fast')
+  // DB 'shadow_speed' 배수값(0.8/1.0/1.2)과 매핑된다.
+  String _shadowSpeedLevel = 'mid';
 
   bool get _isPro => PurchaseService().isPro;
   bool get _isChallenge => widget.shadowRunId != null;
@@ -131,6 +134,17 @@ class _PrepareScreenState extends State<PrepareScreen>
     if (_isChallenge) {
       _shadowRun = await DatabaseHelper.getRun(widget.shadowRunId!);
       _shadowPoints = await DatabaseHelper.getRunPoints(widget.shadowRunId!);
+      // 저장된 도플갱어 속도 배수값 로드 → 3단계로 변환.
+      final savedSpeed = double.tryParse(
+              await DatabaseHelper.getSetting('shadow_speed') ?? '1.0') ??
+          1.0;
+      if (savedSpeed <= 0.9) {
+        _shadowSpeedLevel = 'slow';
+      } else if (savedSpeed >= 1.1) {
+        _shadowSpeedLevel = 'fast';
+      } else {
+        _shadowSpeedLevel = 'mid';
+      }
     }
     _shoes = await DatabaseHelper.getActiveShoes();
     // 첫 진입 시 첫 번째 전설(킵초게)을 기본 선택. PRO-only면 무료 전설 중 첫 번째.
@@ -162,6 +176,18 @@ class _PrepareScreenState extends State<PrepareScreen>
     }
     await prefs.setInt(prefKey, index);
     _selectedQuote = S.isKo ? quotesKo[index] : quotesEn[index];
+  }
+
+  Future<void> _onShadowSpeedChanged(String level) async {
+    final multiplier = level == 'slow'
+        ? 0.8
+        : level == 'fast'
+            ? 1.2
+            : 1.0;
+    await DatabaseHelper.setSetting('shadow_speed', multiplier.toString());
+    if (!mounted) return;
+    setState(() => _shadowSpeedLevel = level);
+    SfxService().toggle();
   }
 
   void _startGpsCheck() {
@@ -347,6 +373,8 @@ class _PrepareScreenState extends State<PrepareScreen>
               SfxService().toggle();
               setState(() => _shadowLocationType = t);
             },
+            shadowSpeedLevel: _shadowSpeedLevel,
+            onShadowSpeedChanged: _onShadowSpeedChanged,
             shoes: _shoes,
             selectedShoeId: _selectedShoeId,
             onShoeChanged: (id) => setState(() => _selectedShoeId = id),
@@ -394,6 +422,8 @@ class _PrepareScreenState extends State<PrepareScreen>
               SfxService().toggle();
               setState(() => _shadowLocationType = t);
             },
+            shadowSpeedLevel: _shadowSpeedLevel,
+            onShadowSpeedChanged: _onShadowSpeedChanged,
             shoes: _shoes,
             selectedShoeId: _selectedShoeId,
             onShoeChanged: (id) => setState(() => _selectedShoeId = id),
@@ -443,6 +473,8 @@ class _PrepareScreenState extends State<PrepareScreen>
                               if (_isChallenge && _shadowRun != null) ...[
                                 const SizedBox(height: 16),
                                 _buildShadowStats(),
+                                const SizedBox(height: 16),
+                                _buildShadowSpeedSelector(),
                                 const SizedBox(height: 16),
                                 _buildLocationSelector(),
                                 if (_shadowLocationType == 'same') ...[
@@ -890,6 +922,90 @@ class _PrepareScreenState extends State<PrepareScreen>
               ),
             ),
           ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildShadowSpeedSelector() {
+    final isKo = S.isKo;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          isKo ? '도플갱어 속도' : 'DOPPELGANGER PACE',
+          style: GoogleFonts.spaceGrotesk(
+            fontSize: 14,
+            fontWeight: FontWeight.w700,
+            color: SRColors.neutral500,
+            letterSpacing: 3,
+          ),
+        ),
+        const SizedBox(height: 12),
+        Row(
+          children: [
+            Expanded(
+              child: _shadowSpeedOption(
+                  'slow', isKo ? '느림' : 'slow', '6:30'),
+            ),
+            const SizedBox(width: 8),
+            Expanded(
+              child: _shadowSpeedOption(
+                  'mid', isKo ? '보통' : 'medium', '5:30'),
+            ),
+            const SizedBox(width: 8),
+            Expanded(
+              child: _shadowSpeedOption(
+                  'fast', isKo ? '빠름' : 'fast', '4:30'),
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+
+  Widget _shadowSpeedOption(String key, String label, String pace) {
+    final selected = _shadowSpeedLevel == key;
+    return GestureDetector(
+      onTap: () => _onShadowSpeedChanged(key),
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 14),
+        decoration: BoxDecoration(
+          color: selected
+              ? SRColors.primaryContainer.withValues(alpha: 0.1)
+              : const Color(0xFF161616),
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(
+            color: selected
+                ? SRColors.primaryContainer.withValues(alpha: 0.5)
+                : Colors.white.withValues(alpha: 0.05),
+            width: selected ? 1.5 : 1,
+          ),
+        ),
+        child: Column(
+          children: [
+            Text(
+              label,
+              style: GoogleFonts.spaceGrotesk(
+                fontSize: 13,
+                fontWeight: FontWeight.w700,
+                color: selected
+                    ? SRColors.primaryContainer
+                    : SRColors.onSurface.withValues(alpha: 0.6),
+                letterSpacing: 1,
+              ),
+            ),
+            const SizedBox(height: 4),
+            Text(
+              '$pace/km',
+              style: GoogleFonts.inter(
+                fontSize: 11,
+                color: selected
+                    ? SRColors.onSurface
+                    : SRColors.neutral500,
+              ),
+            ),
+          ],
         ),
       ),
     );

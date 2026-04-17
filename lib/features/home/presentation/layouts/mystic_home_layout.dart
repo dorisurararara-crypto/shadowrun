@@ -191,10 +191,12 @@ class MysticHomeLayout extends StatelessWidget {
     final dateLine = S.isKo
         ? '$weekdayHanja曜日 · $dateHanja'
         : '$weekdayEn · $dateEn';
-    final episodeNumber = (totalRuns + 1).toString().padLeft(3, '0');
+    // "제 005 밤" 이 무슨 뜻인지 불명확하다는 사용자 피드백 반영:
+    // padding 제거 + "N번째 달리기"로 의미 명확화.
+    final runCount = totalRuns + 1;
     final episodeLabel = S.isKo
-        ? '제 $episodeNumber 밤'
-        : 'Night No.$episodeNumber';
+        ? '$runCount번째 달리기'
+        : 'Your run #$runCount';
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
