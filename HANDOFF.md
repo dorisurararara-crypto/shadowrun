@@ -67,22 +67,47 @@ flutter build ios --release --no-codesign → BUILD SUCCEEDED (59.4s, Runner.app
 - 신규 4개 상품 (`shadowrun_theme_mystic/noir/editorial/cyber` · ₩5,500) 등록
 - Mac Claude 는 스토어 콘솔 접근 불가 → 사용자가 UI에서 직접 처리
 
-**Windows 할 일:** 당장 없음. 실기 테스트 리포트 후 추가 대응 (만약 여전히 BGM 끊기면 `just_audio_background` 패키지 도입 검토).
+### 🚫 Mac 이 **안/못 한 것** (Windows 가 알아야 할 갭)
+
+**Windows 가 명시적으로 제안했지만 Mac 이 의도적으로 스킵한 코드 작업:**
+1. `just_audio_background` 패키지 **도입 안 함** — 모든 `setAsset` 호출을 `setAudioSource(AudioSource.uri(..., tag: MediaItem(...)))` 로 리팩토링해야 하는데 Horror/Marathon 서비스에 15곳 이상 변경점. 실기 테스트 못 하는 상태에서 큰 refactor 는 risky 하다 판단해 보류. **이번 AudioSession 수정으로 부족하면 그때 본격 도입.**
+2. `HorrorService`/`MarathonService` 에 `interruptionEventStream` 서비스 레벨 구독 **추가 안 함** — just_audio 기본 `handleInterruptions=true` 가 자체 pause/resume, main.dart 전역 훅이 세션 setActive 보강 → 서비스 레벨은 중복이라 판단.
+
+**Mac Claude 가 물리적으로 못 하는 작업 (사용자만 가능):**
+- 03:30 #1 백그라운드 GPS 실기 검증 (화면 꺼진 5~10분 러닝, 파란 바 유지)
+- 03:30 #3 뺑뺑 돌기 실기 검증 (30m 이내 원)
+- 03:30 #2 백그라운드 audio 실기 검증 (장시간 러닝 BGM 지속, 전화 후 복원)
+- 03:10 리팩토링 실기 regression 5항목:
+  - 러닝 시작 → GPS 잡힌 후 지도 정상 표시
+  - 일시정지/재개 → BGM 상태 자연스러운지
+  - 차량 감지 중 수동 pause
+  - 점프스케어 발생 → 크래시 없이 결과 화면 전환
+  - 워치 pause/resume/stop 명령 동작
+- 19:20 스토어 상품 등록 (Play Console + ASC UI)
+- 19:20 TestFlight 업로드 (사용자 결정 필요)
+
+**Windows 할 일:** 당장 없음. 사용자 실기 테스트 리포트 후:
+- BGM 여전히 끊김 → `just_audio_background` 본격 도입 설계
+- regression 발견 → 해당 서비스 패치
+- 전부 OK → 19:20 스토어 가격 정책 반영 후 버전 bump + TestFlight 준비
 
 ## 이력
 
 ### 2026-04-18 03:30 (Windows → Mac) — iOS 백그라운드 audio·GPS 요청 → 코드측 처리됨
-- 뺑뺑 돌기 (GPS 거리 기반 필터): Windows가 d1fa360 에서 처리
-- 백그라운드 audio: Mac이 10:40 AudioSession 동적 분기 + setActive 훅으로 처리
-- 백그라운드 GPS 지속·실기 검증: 사용자 테스트 대기
+- 뺑뺑 돌기 (GPS 거리 기반 필터): Windows 가 d1fa360 에서 처리
+- 백그라운드 audio: Mac 이 10:40 AudioSession 동적 분기 + setActive 훅으로 코드측 처리 (just_audio_background 도입은 **보류**)
+- 백그라운드 GPS 지속·전화 인터럽션·뺑뺑 돌기 실기 검증: **사용자 테스트 대기**
 
 ### 2026-04-17 19:20 (Windows → Mac) — 테마 시스템 도입 · 스토어 상품 등록 요청
 - 테마 인프라(T1 Pure + T3 Mystic 1차) 구현 완료 — Windows 커밋
 - iOS 빌드: Mac 이 release 빌드 성공 확인 (2026-04-18 10:40)
 - 스토어 상품 등록 (Play Console / ASC): **사용자 수동 작업 남음** — `shadowrun_pro` ₩13,900 + 4개 테마 상품 ₩5,500
+- TestFlight 업로드: **사용자 결정 대기**
 
 ### 2026-04-17 03:10 (Windows → Mac) — 라이프사이클 대대적 리팩토링 (bbe3487)
-running_screen + services 버그픽스 11건 (GPS silent data loss, NaverMap stale cache, pause BGM 상태머신, vehicle auto-pause, watch/health race, AnimationController dispose race, jumpscare timer, watch terminal state, HR dropout, use-after-dispose, marathon TTS 중복). Codex 12회차 CLEAN, flutter analyze 깨끗. Mac 빌드 검증 완료 (01:15 블록 + 10:40 재확인).
+running_screen + services 버그픽스 11건 (GPS silent data loss, NaverMap stale cache, pause BGM 상태머신, vehicle auto-pause, watch/health race, AnimationController dispose race, jumpscare timer, watch terminal state, HR dropout, use-after-dispose, marathon TTS 중복). Codex 12회차 CLEAN, flutter analyze 깨끗.
+- Mac 빌드 검증: 완료 (01:15 블록 + 10:40 재확인)
+- **실기 regression 테스트 5항목(러닝 GPS→지도, pause BGM, vehicle auto-pause, 점프스케어 크래시, 워치 명령): 사용자 테스트 대기**
 
 ### 2026-04-17 01:15 (Mac → Windows) — Runner + ShadowRunWatch 빌드 성공
 CocoaPods xcodeproj 패치(objectVersion 70), project.pbxproj 수정(파일 등록·entitlements·Watch INFOPLIST 키), Runner/Watch entitlements 신규, SceneDelegate iOS 13 호환, Combine import. 커밋 f649c12.
