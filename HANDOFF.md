@@ -29,6 +29,34 @@
 
 ## 최신
 
+### 2026-04-18 자정 (Windows → Mac) — 🔧 TTS 전면 재작성 진행 중 · 완료 후 빌드 14 요청
+
+**배경:**
+- 기존 assets/audio/tts_*.mp3 약 1705개에서 영/한 혼용 발음 버그("피프틴미터" = 15 meters 영어 발음이 한국어 문장 섞임) 등 품질 문제
+- ElevenLabs Pro 토큰 여유 있어서 이 밤 사이 **전면 재작성**
+- 관련 커밋: `e0b9b9a` (코드 + 대본 + generate 스크립트)
+
+**현재 상태 (commit `e0b9b9a` 기준):**
+- ✅ 9개 모드 대본 JSON 작성 (도플 공용 600 + 마라톤 350 + 프리런 240 + Pure 354 + Mystic 324 대사)
+- ✅ `tmp/voice_scripts_v2/generate_v3.py` — eleven_v3 + audio tags + language_code + apply_text_normalization=off
+- ✅ 기존 mp3 백업 완료 (tmp/tts_backup/, .gitignore 로 repo 제외)
+- ✅ `tts_line_bank.dart`: koreanMystic 기본 보이스 → `halmeoni` (신 voice ID `UOxKeHS7lixzgw35mtAR`, 할머니·낮은 속삭임)
+- ✅ `horror_service.dart`: TtsLineBank 우선 재생 + 구 시스템 fallback, 테마 전용 20% 혼합
+- ⏳ **TTS mp3 생성 중** (백그라운드, concurrent 2, 4248회 / 약 15만 자, eleven_v3)
+- ⏳ 완료 후 Windows 가 mp3 커밋 + 이 HANDOFF 재갱신 예정
+
+**🚨 Mac 에게 요청:**
+1. **지금은 대기** — TTS mp3 생성이 완료돼야 신 시스템이 실제 앱에서 작동 (현재 fallback 로 구 mp3 사용 중)
+2. 다음 Windows 업데이트 ("TTS 완료, 빌드 14 올려줘") 오면:
+   - `./scripts/deploy_testflight.sh` (pubspec bump, 빌드, validate, upload)
+   - `./scripts/asc/submit_external_beta.rb` (외부 그룹 `ganzitester` 배포)
+   - 결과 HANDOFF 에 기록
+3. 참고: **지금 커밋 `e0b9b9a` 만으로도 빌드는 안 깨짐** (fallback 덕). 긴급하면 바로 배포 가능하지만 새 보이스 시스템 반영 안 됨.
+
+**진행률 (작업 시작 기준):** 약 14% (598/4248). 약 1.5시간 후 완료 예상.
+
+---
+
 ### 2026-04-18 12:30 (Mac → Windows) — 빌드 13 외부 TestFlight 제출 ✅
 
 사용자가 주로 외부 테스트 사용해서 자동 처리:
