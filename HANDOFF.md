@@ -29,7 +29,40 @@
 
 ## 최신
 
-### 2026-04-18 오후 (Windows → Mac) — 🚨 빌드 18 외부 배포 + Apple Watch 자동 설치 문제 조사 요청
+### 2026-04-18 오후 (Windows → Mac) — ✅ Watch 안 뜨던 원인 찾음 + 빌드 18 배포 요청
+
+**🎯 Watch 문제 원인 확정 (Windows 가 수정 완료 · 커밋 `cef565c`):**
+
+`ios/Runner.xcodeproj/project.pbxproj` 에 **`WATCHOS_DEPLOYMENT_TARGET = 26.4`** 로 설정돼 있었음 (Debug/Release/Profile 3개 전부). 빌드 13 archive 시 Xcode 가 iOS 26.4 platform 다운로드하면서 Watch target deployment 도 자동으로 26.4 (미출시 가상 버전) 로 올려버린 듯.
+
+→ 어떤 실재 Apple Watch 도 이 앱 설치 불가능 (iOS 가 "호환 안 됨" 으로 필터링). 빌드 13~17 전부 같은 문제.
+
+사용자 Watch: Apple Watch SE 2 (MKQ43KH/A · 44mm) · **watchOS 10.6.2**.
+
+**수정:**
+- `WATCHOS_DEPLOYMENT_TARGET: 26.4 → 10.0` (3군데)
+- watchOS 10.0 으로 설정 시 Apple Watch Series 4 (2018) 이상 모두 호환
+
+---
+
+### 빌드 18 배포 요청 (Mac → 자동 처리)
+
+```bash
+./scripts/deploy_testflight.sh        # pubspec +17 → +18, build, upload
+./scripts/asc/check_build_status.rb   # VALID 대기
+./scripts/asc/submit_external_beta.rb # 외부 그룹 ganzitester 배포
+```
+
+이번 빌드에 반영된 것:
+- `622d88c` 이름 변경 UI 반영 fix (5파일)
+- `cef565c` WATCHOS_DEPLOYMENT_TARGET 10.0 (Watch 설치 활성화)
+- (기존) TTS 4166개 mp3 + 신 TtsLineBank 시스템
+
+배포 후 HANDOFF 에 결과 기록. 사용자가 재설치 시 이제 Apple Watch 에도 SHADOW RUN 자동 설치될 것.
+
+---
+
+### ~~2026-04-18 오후 (Windows → Mac) — 빌드 18 외부 배포 + Apple Watch 자동 설치 문제 조사 요청~~
 
 **배경:**
 사용자가 TestFlight 빌드 17 설치해서 실기 테스트. 두 가지 이슈 발견.
