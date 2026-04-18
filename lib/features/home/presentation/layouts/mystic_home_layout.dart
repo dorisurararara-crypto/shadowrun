@@ -705,9 +705,11 @@ class MysticHomeLayout extends StatelessWidget {
             : (S.isKo ? '뛰었다' : 'ran');
     final labelColor = isWin ? _rice : isLoss ? _bloodFresh : _outline;
     final date = r.date.length >= 10 ? r.date.substring(5, 10).replaceAll('-', '.') : r.date;
-    final location = (r.location ?? '').trim().isEmpty
-        ? (S.isKo ? '이름 없는 길' : 'Unnamed path')
-        : r.location!;
+    final userName = r.name?.trim() ?? '';
+    final autoLoc = r.location?.trim() ?? '';
+    final location = userName.isNotEmpty
+        ? userName
+        : (autoLoc.isNotEmpty ? autoLoc : (S.isKo ? '이름 없는 길' : 'Unnamed path'));
     final shortLoc = location.length > 12 ? '${location.substring(0, 12)}…' : location;
     final distKm = (r.distanceM / 1000).toStringAsFixed(2);
     return Container(

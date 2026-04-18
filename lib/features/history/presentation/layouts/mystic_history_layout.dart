@@ -444,9 +444,12 @@ class MysticHistoryLayout extends StatelessWidget {
     final resultLabel = isWin ? '살았다' : isLoss ? '잡혔다' : '뛰 었 다';
     final resultColor = isWin ? _rice : isLoss ? _bloodFresh : _outline;
 
-    final location = (run.location ?? '').trim().isEmpty
-        ? '이름 없는 길'
-        : run.location!.trim();
+    // 사용자 지정 이름(run.name) 우선, 없으면 자동 장소(run.location)
+    final userName = run.name?.trim() ?? '';
+    final autoLoc = run.location?.trim() ?? '';
+    final location = userName.isNotEmpty
+        ? userName
+        : (autoLoc.isNotEmpty ? autoLoc : '이름 없는 길');
 
     return InkWell(
       onTap: () => onRunTap(run),

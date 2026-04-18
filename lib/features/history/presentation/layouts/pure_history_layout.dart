@@ -402,9 +402,12 @@ class PureHistoryLayout extends StatelessWidget {
             : (isKo ? '완주' : 'chased');
     final resultColor = isLoss ? _redSub : _inkFade;
 
-    final location = (run.location ?? '').trim().isEmpty
-        ? '이름 없는 길'
-        : run.location!.trim();
+    // 사용자 지정 이름(run.name) 우선, 없으면 자동 장소(run.location), 둘 다 없으면 플레이스홀더
+    final userName = run.name?.trim() ?? '';
+    final autoLoc = run.location?.trim() ?? '';
+    final location = userName.isNotEmpty
+        ? userName
+        : (autoLoc.isNotEmpty ? autoLoc : '이름 없는 길');
 
     return GestureDetector(
       behavior: HitTestBehavior.opaque,

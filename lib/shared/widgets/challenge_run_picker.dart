@@ -221,7 +221,9 @@ class _ChallengePickerSheet extends StatelessWidget {
     required bool pure,
   }) {
     final dateLabel = _formatDate(run.date);
-    final location = (run.location ?? '').trim();
+    final userName = run.name?.trim() ?? '';
+    final autoLoc = run.location?.trim() ?? '';
+    final location = userName.isNotEmpty ? userName : autoLoc;
     final locationLabel = location.isEmpty
         ? (S.isKo ? '이름 없는 길' : 'Unnamed route')
         : (location.length > 22 ? '${location.substring(0, 22)}…' : location);

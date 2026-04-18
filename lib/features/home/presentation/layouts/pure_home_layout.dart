@@ -572,9 +572,11 @@ class PureHomeLayout extends StatelessWidget {
         isWin ? _offWhite : isLoss ? _bloodSub : _muted;
 
     final date = _dateShort(r.date);
-    final location = (r.location ?? '').trim().isEmpty
-        ? (S.isKo ? '이름 없는 길' : 'unmarked path')
-        : r.location!;
+    final userName = r.name?.trim() ?? '';
+    final autoLoc = r.location?.trim() ?? '';
+    final location = userName.isNotEmpty
+        ? userName
+        : (autoLoc.isNotEmpty ? autoLoc : (S.isKo ? '이름 없는 길' : 'unmarked path'));
     final shortLoc = location.length > 12 ? '${location.substring(0, 12)}…' : location;
     final distKm = (r.distanceM / 1000).toStringAsFixed(2);
 
