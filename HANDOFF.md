@@ -29,6 +29,54 @@
 
 ## 최신
 
+### 2026-04-18 오후 (Windows → Mac) — 🚨 빌드 18 외부 배포 + Apple Watch 자동 설치 문제 조사 요청
+
+**배경:**
+사용자가 TestFlight 빌드 17 설치해서 실기 테스트. 두 가지 이슈 발견.
+
+**이슈 1 — 이름 변경 반영 안 됨 (Windows 가 수정 완료):**
+- 기록에서 러닝 이름 바꿔도 UI 에 반영 안 됐음
+- 원인: 이름 변경 다이얼로그가 DB `name` 컬럼 업데이트 → 테마 레이아웃이 `location` 컬럼만 표시
+- 수정 커밋: `622d88c` fix(history): run.name 우선 표시 + 폴백 체인
+- 영향 파일: pure/mystic history · home · challenge_run_picker
+
+**이슈 2 — 🚨 Apple Watch 에 앱 여전히 안 나타남:**
+- 사용자: 빌드 17 (iPhone 설치 완료) 인데 Apple Watch 에 SHADOW RUN 앱 안 뜸
+- 11:10 에 Mac 이 Watch companion wiring 끝냈는데도 여전히 문제
+- 이미 된 것: `WKWatchOnly` 제거, `WKCompanionAppBundleIdentifier=com.ganziman.shadowrun`, bundle ID `com.ganziman.shadowrun.watchkitapp`, Runner 에 Embed Watch Content 페이즈 추가
+
+**🚨 Mac 에게 요청:**
+
+1. **빌드 18 업로드** (현재 pubspec `1.0.0+17`, deploy 스크립트가 +18 로 bump):
+   ```bash
+   ./scripts/deploy_testflight.sh
+   ./scripts/asc/check_build_status.rb   # VALID 대기
+   ./scripts/asc/submit_external_beta.rb # 외부 그룹 ganzitester 배포
+   ```
+
+2. **Watch 자동 설치 실패 원인 조사** (빌드 18 업로드 전후 둘 다 OK):
+
+   ### 확인 체크리스트
+   - (a) **IPA 내부 실제 embed 검증**: `unzip -l build/ios/ipa/shadowrun.ipa | grep -i watch` 로 Watch.app 이 실제 IPA 에 들어있는지
+   - (b) **Runner.app/Watch/ShadowRunWatch\ Watch\ App.app/Info.plist** 의 `WKCompanionAppBundleIdentifier` 값이 실제 `com.ganziman.shadowrun` 인지
+   - (c) **ASC 빌드 17 세부**: API `GET /v1/builds/5486fff8.../app` + related resource 로 **companion Watch bundle 이 ASC 에 인식돼 있는지** (인식 됐다면 ASC 빌드 페이지에 "Watch 앱" 항목 노출)
+   - (d) **App ID (com.ganziman.shadowrun) 에 WirelessCompanionApp capability** 가 Apple Developer Portal 에 실제 활성화돼 있는지 — Automatic signing 이라도 이건 수동 활성 필요한 경우 있음
+   - (e) **Watch App 타겟의 min watchOS 버전** 이 사용자 Apple Watch OS 버전보다 낮은지 (사용자 Watch OS 버전 확인 필요)
+   - (f) **사용자 iPhone 의 Watch 앱 → SHADOW RUN → "내 시계에 앱 표시" 토글** 상태 — 수동 설치 경로라도 먼저 확인
+
+   ### 원인 후보 순위
+   1. App ID 에 Wireless Companion App capability 누락 (가장 흔함) → Portal 가서 체크박스 체크
+   2. IPA embed 페이즈가 archive 시점에 빠짐 (Debug 세팅만 있고 Release 빠진 경우)
+   3. Watch App min watchOS 너무 높음 (기본값 10.0+ 인데 사용자 시계가 9.x 이하)
+
+3. **빌드 18 업로드 전에 이 조사 결과 HANDOFF 에 기록** — 원인 알면 수정한 뒤 업로드. 원인 불명이면 현 상태 그대로 +18 올리고 ASC/Portal 관찰.
+
+**참고 — 빌드 17 상태:**
+- 외부 그룹 할당 완료. QC 풀렸는지 확인 부탁 (`tmp/beta_retry_14.log` 상태).
+- 빌드 17 / 18 동시 배포되면 테스터가 둘 중 최신 설치.
+
+---
+
 ### 2026-04-18 11:55 (Mac → Windows) — 빌드 14 외부 TestFlight 업로드 + 그룹 할당 ✅
 
 **사용자 요청으로 Transporter 수동 업로드 경로로 전환** (altool 업로드 대신):
