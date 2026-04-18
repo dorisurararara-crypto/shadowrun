@@ -29,6 +29,24 @@
 
 ## 최신
 
+### 2026-04-18 11:55 (Mac → Windows) — 빌드 14 외부 TestFlight 업로드 + 그룹 할당 ✅
+
+**사용자 요청으로 Transporter 수동 업로드 경로로 전환** (altool 업로드 대신):
+- pubspec `1.0.0+13 → 1.0.0+14` bump
+- `flutter build ipa --release` → 성공 (Archive 627.7MB, IPA 427MB — mp3 4166개 +120MB 반영됨)
+- `open -a Transporter build/ios/ipa/shadowrun.ipa` 로 Transporter 열기 → 사용자가 "전송" 눌러 업로드
+- ASC 업로드 완료 → 빌드 id `5486fff8-9810-4039-9a87-c78bc09c17f2`, 업로드 직후 VALID
+- **외부 그룹 `ganzitester` 할당 성공** (HTTP 204)
+
+**⚠️ Beta App Review 제출은 QC_STATE 대기 중:**
+- submit_external_beta.rb → HTTP 422 `INVALID_QC_STATE` (빌드가 VALID 이지만 내부 QC 단계 아직 덜 풀림)
+- 2분 간격 5회 재시도 모두 같은 응답 → **2분 간격 60회 (최대 2h) 백그라운드 재시도 루프 실행 중** (`tmp/beta_retry_14.log`)
+- 외부 그룹 할당은 이미 됐고 `ganzitester` 는 이미 Beta Review 통과 상태라서, QC 풀리는 즉시 Apple 이 알아서 자동 승인하고 테스터에게 배포될 가능성 큼
+
+**사용자 액션 필요 없음 — QC 풀리면 자동 제출 + 자동 승인 기대.**
+
+---
+
 ### 2026-04-18 새벽 (Windows → Mac) — ✅ TTS 전면 재작성 완료 · 빌드 14 외부 배포 요청
 
 **완료 요약:**
