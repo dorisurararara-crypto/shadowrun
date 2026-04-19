@@ -29,6 +29,39 @@
 
 ## 최신
 
+### 2026-04-19 15:48 (Mac → Windows) — 빌드 20 외부 TestFlight 제출 ✅ (지도 마커 축소)
+
+**수정 내용 (커밋 `6df8c78`):**
+
+러닝 지도에서 나/도플갱어/그림자/전설 마커가 너무 커서 지도를 가린다는 피드백 반영. StickFigureMarker 지도 표준 위치점 스타일로 축소.
+
+- **프로필 사진 없을 때** (가장 큰 변화): 64/56px solid 원 + 큰 글로우 + 흰 아이콘 → **26/24px 채워진 원 + 2px 흰 테두리 + 약한 글로우** (구글맵 위치점 스타일)
+- **프로필 사진 있을 때**: 64/56px + 3px 컬러 테두리 + 큰 글로우 → **36/32px + 2px 컬러 테두리 + 약한 글로우**
+- 색상 유지: 러너 녹색 #00FF88, 도플갱어/그림자/전설 빨간 #FF2020
+
+시뮬레이터 프리뷰로 A/B/C 세 사이즈 비교하고 **사진 없으면 C (26/24), 사진 있으면 B (36/32)** 조합으로 확정.
+
+**빌드 과정:**
+- flutter clean + pod deintegrate + pod install 재수행 (시뮬레이터 슬라이스 섞여 있던 것 제거)
+  - 1차 업로드 실패 원인: `Runner.app/Frameworks/objective_c.framework` 에 arm64 simulator slice 포함 → ASC 거부. 프리뷰 실행(`flutter run -d "iPhone 17"`)으로 시뮬레이터용 재링크 됐던 것이 archive 에 섞였음.
+- `xcodebuild -exportArchive` + ASC API key (서명 에러 폴백)
+- `altool --upload-app` — **48초에 427MB** (Delivery UUID `2beb0bf2-e771-4227-bcf9-5a9f8c153d07`)
+- ASC 처리 6분 → VALID ✅
+- 외부 그룹 `ganzitester` 할당 HTTP 204 ✅
+- Beta App Review 제출 HTTP 201 ✅ (WAITING_FOR_REVIEW)
+- caffeinate PID 바인딩으로 업로드 중 Mac 잠자기 방지 (규칙화됨)
+
+**🚨 실기 검증:**
+- 러닝 시작 → 지도 위 마커가 훨씬 깔끔해짐
+- 사진 업로드 안 돼도 채워진 동그라미로 위치 명확 (흰 아이콘 X)
+- 빌드 19 이전 기능 (TTS/BGM/Watch/런타임 fix) 전부 유지
+
+**빌드 번호:**
+- 20: Watch fix + TTS + 런타임 버그 6건 + 마커 축소 (현재 최신)
+- pubspec `1.0.0+17` — 다음은 auto-bump 로 +21 예정
+
+---
+
 ### 2026-04-19 14:49 (Mac → Windows) — 빌드 19 외부 TestFlight 제출 ✅ (런타임 버그 6건 fix)
 
 **코드 리뷰 3차 반복 결과 — 런타임 버그 총 6건 수정 후 빌드 19 배포:**
