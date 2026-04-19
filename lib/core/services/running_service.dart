@@ -562,8 +562,10 @@ class RunningService extends ChangeNotifier {
     _isDisposed = true;
     _isRunning = false;
     onPositionUpdate = null;
-    _positionSub?.cancel();
+    // atomic: 먼저 null 로 치워 다른 경로의 cancel 중복 방지
+    final sub = _positionSub;
     _positionSub = null;
+    sub?.cancel();
     _tts.stop();
     super.dispose();
   }
