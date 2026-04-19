@@ -522,6 +522,7 @@ class RunningService extends ChangeNotifier {
       challengeResult: run.challengeResult,
       shadowRunId: run.shadowRunId,
       location: run.location,
+      finalShadowGapM: run.finalShadowGapM,
     );
   }
 

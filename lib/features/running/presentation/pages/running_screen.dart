@@ -860,6 +860,9 @@ class _RunningScreenState extends State<RunningScreen>
     _stopping = true;
     _ticker?.cancel();
 
+    // Watch 명령 즉시 차단 — stop 처리 중 toggleTts/pause 등 들어와 dispose된 서비스 접근 방지
+    _watchConnector.onWatchCommand = null;
+
     // GPS 콜백 즉시 해제 (dispose된 서비스 접근 방지)
     _runService.onPositionUpdate = null;
 

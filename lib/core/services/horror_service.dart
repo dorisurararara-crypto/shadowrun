@@ -343,6 +343,7 @@ class HorrorService {
         filename = '${langBase}_$_voiceId.mp3';
       }
 
+      await _ttsPlayer.stop();
       await _ttsPlayer.setAsset('assets/audio/$filename');
       _ttsPlayer.setVolume(1.0);
       _ttsPlayer.play().catchError((_) {});

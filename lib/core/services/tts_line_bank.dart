@@ -21,6 +21,9 @@ class TtsLineBank {
   bool enabled = true;
   double volume = 0.9;
 
+  bool _playing = false;
+  bool _disposed = false;
+
   List<String>? _manifest;
 
   Future<void> _loadManifest() async {
@@ -50,37 +53,53 @@ class TtsLineBank {
     String? voice,
     String? lang,
   }) async {
-    if (!enabled) return false;
-    await _loadManifest();
-    final v = voice ?? _voiceForTheme();
-    final l = lang ?? (S.isKo ? 'ko' : 'en');
-    final prefix = 'assets/audio/voice/${v}_${mode}_${category}_${l}_v';
-    final candidates = _manifest!.where((p) => p.startsWith(prefix)).toList();
-    if (candidates.isEmpty) return false;
-
-    final key = prefix;
-    final recent = _recent[key] ?? [];
-    var pool = candidates.where((c) => !recent.contains(c)).toList();
-    if (pool.isEmpty) pool = candidates;
-    final pick = pool[_rng.nextInt(pool.length)];
-    (_recent[key] ??= []).add(pick);
-    while (_recent[key]!.length > 3) {
-      _recent[key]!.removeAt(0);
-    }
+    if (!enabled || _disposed) return false;
+    // 동시 호출 직렬화 — setAsset race 방지 (마일스톤+페이스 콜백 중첩 등)
+    if (_playing) return false;
+    _playing = true;
     try {
-      await _player.setAsset(pick);
-      await _player.setVolume(volume);
-      _player.play();
-      return true;
-    } catch (e) {
-      debugPrint('TtsLineBank play error ($pick): $e');
-      return false;
+      await _loadManifest();
+      final v = voice ?? _voiceForTheme();
+      final l = lang ?? (S.isKo ? 'ko' : 'en');
+      final prefix = 'assets/audio/voice/${v}_${mode}_${category}_${l}_v';
+      final candidates = _manifest!.where((p) => p.startsWith(prefix)).toList();
+      if (candidates.isEmpty) return false;
+
+      final key = prefix;
+      final recent = _recent[key] ?? [];
+      var pool = candidates.where((c) => !recent.contains(c)).toList();
+      if (pool.isEmpty) pool = candidates;
+      final pick = pool[_rng.nextInt(pool.length)];
+      (_recent[key] ??= []).add(pick);
+      while (_recent[key]!.length > 3) {
+        _recent[key]!.removeAt(0);
+      }
+      try {
+        await _player.stop();
+        await _player.setAsset(pick);
+        await _player.setVolume(volume);
+        _player.play();
+        return true;
+      } catch (e) {
+        debugPrint('TtsLineBank play error ($pick): $e');
+        return false;
+      }
+    } finally {
+      _playing = false;
     }
   }
 
   Future<void> stop() async {
     try {
       await _player.stop();
+    } catch (_) {}
+  }
+
+  Future<void> dispose() async {
+    if (_disposed) return;
+    _disposed = true;
+    try {
+      await _player.dispose();
     } catch (_) {}
   }
 }
