@@ -23,6 +23,10 @@ class HealthKitHandler: NSObject {
     }
 
     private func requestAuth(result: @escaping FlutterResult) {
+        #if targetEnvironment(simulator)
+        result(false)
+        return
+        #endif
         guard HKHealthStore.isHealthDataAvailable() else {
             result(false)
             return

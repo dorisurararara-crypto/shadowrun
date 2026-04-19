@@ -64,8 +64,8 @@ class MysticHomeLayout extends StatelessWidget {
     return rest > 0 ? '$hundred ${sub2(rest)}' : hundred;
   }
 
-  /// 어제 러닝 결과 → 3줄 시적 카피 (Mystic 톤: 한국 민속 호러).
-  /// [line1, highlight, line3] 반환. 승/패·모드별 분기.
+  /// 최근 러닝 결과 → 3줄 시적 카피 (Mystic 톤: 한국 민속 호러).
+  /// [line1, highlight, line3] 반환. 승/패·모드별 분기. 오늘/어젯밤 분기.
   List<String> _narrativeLines(RunModel? last) {
     final ko = S.isKo;
     if (last == null) {
@@ -73,38 +73,49 @@ class MysticHomeLayout extends StatelessWidget {
           ? ['그 놈은', '당신을', '기다린다.']
           : ['The shadow', 'waits', 'for you.'];
     }
+    final lastDate = DateTime.tryParse(last.date);
+    final now = DateTime.now();
+    final isToday = lastDate != null &&
+        lastDate.year == now.year &&
+        lastDate.month == now.month &&
+        lastDate.day == now.day;
+    final nightPrefix = isToday
+        ? (ko ? '오늘 밤' : 'Tonight')
+        : (ko ? '어젯밤' : 'Last night');
+    final dayPrefix = isToday
+        ? (ko ? '오늘의' : 'Today')
+        : (ko ? '어제의' : 'Yesterday');
     if (last.isChallenge) {
       final r = last.challengeResult;
       // 최종 간격(finalShadowGapM) 우선.
       final gap = (last.finalShadowGapM ?? 0).abs().toInt();
       if (r == 'lose') {
         return ko
-            ? ['어젯밤, 그 놈이', '너의 숨을', '먹었다.']
-            : ['Last night, he', 'took', 'your breath.'];
+            ? ['$nightPrefix, 그 놈이', '너의 숨을', '먹었다.']
+            : ['$nightPrefix, he', 'took', 'your breath.'];
       }
       if (r == 'win') {
         if (gap >= 500) {
           final words = ko ? _korWordsUnder1000(gap.clamp(0, 999)) : '$gap';
           return ko
-              ? ['어젯밤, 그 놈을', '$words 걸음', '밖에 두었다.']
-              : ['Last night,', '${gap}m', 'left behind.'];
+              ? ['$nightPrefix, 그 놈을', '$words 걸음', '밖에 두었다.']
+              : ['$nightPrefix,', '${gap}m', 'left behind.'];
         }
         if (gap >= 100) {
           final words = ko ? _korWordsUnder1000(gap.clamp(0, 999)) : '$gap';
           return ko
-              ? ['어젯밤, 그 놈을', '$words 걸음', '앞서 벗어났다.']
-              : ['Last night,', '${gap}m', 'escaped.'];
+              ? ['$nightPrefix, 그 놈을', '$words 걸음', '앞서 벗어났다.']
+              : ['$nightPrefix,', '${gap}m', 'escaped.'];
         }
         return ko
-            ? ['어젯밤,', '간신히', '빠져나왔다.']
-            : ['Last night,', 'just barely,', 'you slipped free.'];
+            ? ['$nightPrefix,', '간신히', '빠져나왔다.']
+            : ['$nightPrefix,', 'just barely,', 'you slipped free.'];
       }
     }
     // 자유 · 마라톤
-    final km = (last.distanceM / 1000).toStringAsFixed(1);
     return ko
-        ? ['어제의', '${km}km', '발걸음.']
-        : ['Yesterday', '${km}km', 'of footfalls.'];
+        ? [dayPrefix, last.formattedDistance, '발걸음.']
+        : [dayPrefix, last.formattedDistance, 'of footfalls.'];
   }
 
   @override
@@ -475,12 +486,12 @@ class MysticHomeLayout extends StatelessWidget {
             child: _statCell(
               label: S.isKo ? '이번 주' : 'This week',
               hanjaValue: S.isKo
-                  ? _hanjaDigits(weeklyKm.round())
-                  : weeklyKm.round().toString(),
-              unit: 'km',
+                  ? _hanjaDigits((RunModel.useMiles ? (weeklyKm / 1.609344) : weeklyKm).round())
+                  : (RunModel.useMiles ? (weeklyKm / 1.609344) : weeklyKm).round().toString(),
+              unit: RunModel.useMiles ? 'mi' : 'km',
               korSub: S.isKo
-                  ? '${_korWordsUnder1000(weeklyKm.round())} 킬로미터'
-                  : '${weeklyKm.round()} kilometers',
+                  ? '${_korWordsUnder1000((RunModel.useMiles ? (weeklyKm / 1.609344) : weeklyKm).round())} ${RunModel.useMiles ? "마일" : "킬로미터"}'
+                  : '${(RunModel.useMiles ? (weeklyKm / 1.609344) : weeklyKm).round()} ${RunModel.useMiles ? "miles" : "kilometers"}',
             ),
           ),
           Container(width: 1, height: 48, color: _borderInk),
@@ -653,6 +664,7 @@ class MysticHomeLayout extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisAlignment: MainAxisAlignment.center,
+            mainAxisSize: MainAxisSize.min,
             children: [
               Row(
                 children: [
@@ -662,7 +674,7 @@ class MysticHomeLayout extends StatelessWidget {
                       style: GoogleFonts.nanumMyeongjo(
                         fontSize: 22,
                         color: _rice,
-                        height: 1.3,
+                        height: 1.2,
                         fontWeight: FontWeight.w800,
                       ),
                     ),
@@ -711,7 +723,6 @@ class MysticHomeLayout extends StatelessWidget {
         ? userName
         : (autoLoc.isNotEmpty ? autoLoc : (S.isKo ? '이름 없는 길' : 'Unnamed path'));
     final shortLoc = location.length > 12 ? '${location.substring(0, 12)}…' : location;
-    final distKm = (r.distanceM / 1000).toStringAsFixed(2);
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 10),
       decoration: const BoxDecoration(
@@ -732,7 +743,7 @@ class MysticHomeLayout extends StatelessWidget {
             ),
           ),
           Text(
-            '${distKm}km',
+            r.formattedDistance,
             style: GoogleFonts.nanumMyeongjo(
               fontSize: 12,
               color: _rice.withValues(alpha: 0.75),

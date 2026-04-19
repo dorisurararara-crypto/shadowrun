@@ -651,7 +651,9 @@ class _RunningScreenState extends State<RunningScreen>
 
   void _safeAddOverlay<T extends NAddableOverlay>(NaverMapController controller, T overlay) {
     _activeOverlayIds.add('${overlay.info.type.name}:${overlay.info.id}');
-    controller.addOverlay(overlay);
+    // 플러그인 채널 오류(MissingPluginException 등) 를 삼킨다 — 러닝 흐름 유지.
+    // ignore: unawaited_futures
+    Future.sync(() => controller.addOverlay(overlay)).catchError((_) => overlay);
   }
 
   void _updateMapOverlays(NaverMapController controller, NLatLng target) {
@@ -1057,6 +1059,7 @@ class _RunningScreenState extends State<RunningScreen>
       onPauseTap: _togglePause,
       onStopTap: _confirmStop,
       isChallenge: widget.shadowRunId != null,
+      runMode: widget.runMode,
       mapChild: map,
       ttsOn: _ttsOn,
       sfxOn: _sfxOn,
@@ -1213,9 +1216,7 @@ class _RunningScreenState extends State<RunningScreen>
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceAround,
                       children: [
-                        _modeAStat(S.dist, _runService.totalDistanceM >= 1000
-                            ? '${(_runService.totalDistanceM / 1000).toStringAsFixed(2)}km'
-                            : '${_runService.totalDistanceM.toInt()}m'),
+                        _modeAStat(S.dist, RunModel.formatDistanceStatic(_runService.totalDistanceM)),
                         _modeAStat(S.pace, _runService.formattedPace),
                         _modeAStat(S.duration, _runService.formattedDuration),
                       ],
@@ -1300,9 +1301,7 @@ class _RunningScreenState extends State<RunningScreen>
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceAround,
                     children: [
-                      _modeAStat(S.dist, _runService.totalDistanceM >= 1000
-                          ? '${(_runService.totalDistanceM / 1000).toStringAsFixed(2)}km'
-                          : '${_runService.totalDistanceM.toInt()}m'),
+                      _modeAStat(S.dist, RunModel.formatDistanceStatic(_runService.totalDistanceM)),
                       _modeAStat(S.duration, _runService.formattedDuration),
                       _modeAStat(S.calories, '${_runService.calories}'),
                     ],
@@ -1451,9 +1450,7 @@ class _RunningScreenState extends State<RunningScreen>
               ),
               _hudStat(
                 S.dist,
-                _runService.totalDistanceM >= 1000
-                    ? '${(_runService.totalDistanceM / 1000).toStringAsFixed(2)}km'
-                    : '${_runService.totalDistanceM.toInt()}m',
+                RunModel.formatDistanceStatic(_runService.totalDistanceM),
               ),
             ],
           ),

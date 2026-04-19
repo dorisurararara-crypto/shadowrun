@@ -297,6 +297,22 @@ class PureHomeLayout extends StatelessWidget {
         line3: ko ? '' : '',
       );
     }
+    // 같은 날(오늘) 달린 기록이면 "오늘 / Today", 그 외엔 "어젯밤 / Last night".
+    final lastDate = DateTime.tryParse(last.date);
+    final now = DateTime.now();
+    final isToday = lastDate != null &&
+        lastDate.year == now.year &&
+        lastDate.month == now.month &&
+        lastDate.day == now.day;
+    final whenPrefix = isToday
+        ? (ko ? '오늘' : 'Tonight')
+        : (ko ? '어젯밤' : 'Last night');
+    final youPrefix = isToday
+        ? (ko ? '오늘 당신은' : 'Tonight, you ran')
+        : (ko ? '어제 당신은' : 'Yesterday, you ran');
+    final yesterdayRun = isToday
+        ? (ko ? '오늘의' : 'Today\'s')
+        : (ko ? '어제의' : 'Yesterday\'s');
     if (last.isChallenge) {
       final r = last.challengeResult;
       // 도플갱어 모드 표시용 거리는 **최종 간격(finalShadowGapM)** 을 우선 사용.
@@ -304,7 +320,7 @@ class PureHomeLayout extends StatelessWidget {
       final gap = (last.finalShadowGapM ?? 0).abs().toInt();
       if (r == 'lose') {
         return _NarrativeParts(
-          line1: ko ? '어젯밤, 그는' : 'Last night, he',
+          line1: ko ? '$whenPrefix, 그는' : '$whenPrefix, he',
           highlight: ko ? '당신을 덮쳤다' : 'caught you',
           highlightColor: _bloodSub,
           line3: ko ? '.' : '.',
@@ -313,7 +329,7 @@ class PureHomeLayout extends StatelessWidget {
       if (r == 'win') {
         if (gap >= 500) {
           return _NarrativeParts(
-            line1: ko ? '어젯밤, 그를' : 'Last night,',
+            line1: ko ? '$whenPrefix, 그를' : '$whenPrefix,',
             highlight: ko ? '$gap미터' : '${gap}m',
             highlightColor: _bloodSub,
             line3: ko ? '차이로 떨궈놓고 왔다.' : 'far behind you.',
@@ -321,14 +337,14 @@ class PureHomeLayout extends StatelessWidget {
         }
         if (gap >= 100) {
           return _NarrativeParts(
-            line1: ko ? '어젯밤, 그를' : 'Last night, by',
+            line1: ko ? '$whenPrefix, 그를' : '$whenPrefix, by',
             highlight: ko ? '$gap미터' : '${gap}m',
             highlightColor: _bloodSub,
             line3: ko ? '앞서 벗어났다.' : 'you escaped him.',
           );
         }
         return _NarrativeParts(
-          line1: ko ? '어젯밤,' : 'Last night,',
+          line1: ko ? '$whenPrefix,' : '$whenPrefix,',
           highlight: ko ? '아슬아슬하게' : 'just barely',
           highlightColor: _bloodSub,
           line3: ko ? '벗어났다.' : 'you got away.',
@@ -336,17 +352,16 @@ class PureHomeLayout extends StatelessWidget {
       }
       // isChallenge 인데 result null (취소·오류) — 중립
       return _NarrativeParts(
-        line1: ko ? '어제의' : 'Yesterday\'s',
+        line1: yesterdayRun,
         highlight: ko ? '달리기' : 'run',
         highlightColor: _offWhite,
         line3: ko ? '가 기록되었다.' : 'is recorded.',
       );
     }
     // 자유 · 마라톤 (isChallenge=false)
-    final km = (last.distanceM / 1000).toStringAsFixed(1);
     return _NarrativeParts(
-      line1: ko ? '어제 당신은' : 'Yesterday, you ran',
-      highlight: ko ? '${km}km' : '${km}km',
+      line1: youPrefix,
+      highlight: last.formattedDistance,
       highlightColor: _offWhite,
       line3: ko ? '를 달렸다.' : '.',
     );
@@ -370,8 +385,10 @@ class PureHomeLayout extends StatelessWidget {
         children: [
           Expanded(
             child: _statCell(
-              value: weeklyKm.toStringAsFixed(1),
-              unit: 'km',
+              value: RunModel.useMiles
+                  ? (weeklyKm / 1.609344).toStringAsFixed(1)
+                  : weeklyKm.toStringAsFixed(1),
+              unit: RunModel.useMiles ? 'mi' : 'km',
               label: S.isKo ? '이번 주' : 'this week',
             ),
           ),
@@ -578,7 +595,6 @@ class PureHomeLayout extends StatelessWidget {
         ? userName
         : (autoLoc.isNotEmpty ? autoLoc : (S.isKo ? '이름 없는 길' : 'unmarked path'));
     final shortLoc = location.length > 12 ? '${location.substring(0, 12)}…' : location;
-    final distKm = (r.distanceM / 1000).toStringAsFixed(2);
 
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 12),
@@ -603,7 +619,7 @@ class PureHomeLayout extends StatelessWidget {
                 ),
                 const SizedBox(height: 2),
                 Text(
-                  '${distKm}km  ·  ${r.formattedDuration}',
+                  '${r.formattedDistance}  ·  ${r.formattedDuration}',
                   style: GoogleFonts.playfairDisplay(
                     fontSize: 11,
                     fontStyle: FontStyle.italic,

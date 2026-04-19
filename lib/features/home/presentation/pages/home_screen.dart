@@ -359,7 +359,11 @@ class _HomeScreenState extends State<HomeScreen> {
           child: Column(
             children: [
               Row(children: [
-                Expanded(child: _statCell(S.totalDistance, distanceKm.toStringAsFixed(1), unit: 'km')),
+                Expanded(child: _statCell(
+                  S.totalDistance,
+                  (RunModel.useMiles ? (distanceKm / 1.609344) : distanceKm).toStringAsFixed(1),
+                  unit: RunModel.useMiles ? 'mi' : 'km',
+                )),
                 const SizedBox(width: 16),
                 Expanded(child: _statCell(S.totalRuns, '$totalRuns')),
               ]),

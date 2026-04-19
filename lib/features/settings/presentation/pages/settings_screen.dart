@@ -1939,8 +1939,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   brand.isEmpty ? null : brand,
                   maxKm * 1000,
                 );
-                if (ctx.mounted) Navigator.pop(ctx);
-                _loadShoes();
+                if (ctx.mounted) Navigator.pop(ctx, true);
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: SRColors.primaryContainer,
@@ -1957,9 +1956,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
           ],
         ),
       ),
-    ).then((_) {
-      nameController.dispose();
-      brandController.dispose();
+    ).then((added) {
+      // 다이얼로그 종료 애니메이션이 완료된 뒤 dispose 해야 in-flight TextField 위젯이
+      // 이미 dispose된 컨트롤러를 다시 참조하는 framework assertion 을 피함.
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        nameController.dispose();
+        brandController.dispose();
+      });
+      if (added == true && mounted) _loadShoes();
     });
   }
 
@@ -2270,8 +2274,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 } else {
                   await DatabaseHelper.insertGoal(selectedType, selectedPeriod, value);
                 }
-                if (ctx.mounted) Navigator.pop(ctx);
-                _loadGoal();
+                if (ctx.mounted) Navigator.pop(ctx, true);
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: SRColors.primaryContainer,
@@ -2288,8 +2291,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
           ],
         ),
       ),
-    ).then((_) {
-      targetController.dispose();
+    ).then((saved) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        targetController.dispose();
+      });
+      if (saved == true && mounted) _loadGoal();
     });
   }
 
@@ -3275,6 +3281,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
     ).then((_) {
       _adminTapCount = 0;
       _adminFirstTap = null;
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        controller.dispose();
+      });
     });
   }
 

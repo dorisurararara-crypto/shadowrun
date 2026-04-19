@@ -66,7 +66,21 @@ class RunModel {
     finalShadowGapM: (map['final_shadow_gap_m'] as num?)?.toDouble(),
   );
 
-  String get formattedDistance => formattedDistanceUnit(_useMiles ? 'mi' : 'km');
+  String get formattedDistance => formatDistanceStatic(distanceM);
+
+  /// 러닝 모델 인스턴스 없이 거리 (meters) 문자열 포맷 — 단위 토글 반영.
+  static String formatDistanceStatic(double distanceM) {
+    if (_useMiles) {
+      final miles = distanceM / 1609.344;
+      if (miles >= 0.1) return '${miles.toStringAsFixed(2)}mi';
+      final yards = (distanceM * 1.09361).toInt();
+      return '${yards}yd';
+    }
+    if (distanceM >= 1000) {
+      return '${(distanceM / 1000).toStringAsFixed(2)}km';
+    }
+    return '${distanceM.toInt()}m';
+  }
 
   String formattedDistanceUnit(String unit) {
     if (unit == 'mi') {

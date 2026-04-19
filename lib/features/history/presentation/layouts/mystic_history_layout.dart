@@ -325,7 +325,10 @@ class MysticHistoryLayout extends StatelessWidget {
                   ),
                 ),
                 TextSpan(
-                  text: _hanjaDecimal(totalKm, frac: 1),
+                  text: _hanjaDecimal(
+                    RunModel.useMiles ? (totalKm / 1.609344) : totalKm,
+                    frac: 1,
+                  ),
                   style: GoogleFonts.nanumMyeongjo(
                     fontSize: 22,
                     color: _rice,
@@ -334,7 +337,7 @@ class MysticHistoryLayout extends StatelessWidget {
                   ),
                 ),
                 TextSpan(
-                  text: ' km',
+                  text: RunModel.useMiles ? ' mi' : ' km',
                   style: GoogleFonts.nanumMyeongjo(
                     fontSize: 11,
                     color: _outline,
@@ -435,8 +438,10 @@ class MysticHistoryLayout extends StatelessWidget {
         ? '${_hanjaDigits(dt.month)}月 ${_hanjaDay(dt.day)}日'
         : '';
 
-    final distKm = run.distanceM / 1000;
-    final distHanja = _hanjaDecimal(distKm, frac: 2);
+    final useMi = RunModel.useMiles;
+    final distPrimary = useMi ? run.distanceM / 1609.344 : run.distanceM / 1000;
+    final distHanja = _hanjaDecimal(distPrimary, frac: 2);
+    final distUnit = useMi ? 'mi' : 'km';
     final durHanja = _hanjaDuration(run.durationS);
 
     final isWin = run.challengeResult == 'win';
@@ -484,7 +489,7 @@ class MysticHistoryLayout extends StatelessWidget {
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    '$dateHanja  ·  $distHanja km  ·  $durHanja',
+                    '$dateHanja  ·  $distHanja $distUnit  ·  $durHanja',
                     style: GoogleFonts.nanumMyeongjo(
                       fontSize: 10.5,
                       color: _outline,

@@ -658,7 +658,7 @@ class PurePrepareLayout extends StatelessWidget {
         onShadowLocationChanged(key);
       },
       child: SizedBox(
-        height: 66,
+        height: 74,
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
           decoration: BoxDecoration(
@@ -763,7 +763,7 @@ class PurePrepareLayout extends StatelessWidget {
         onModeChanged(key);
       },
       child: SizedBox(
-        height: 66,
+        height: 74,
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
           decoration: BoxDecoration(

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:shadowrun/shared/models/run_model.dart';
 
 /// T3 Korean Mystic 테마의 러닝 중 화면.
 ///
@@ -59,9 +60,16 @@ class MysticRunningLayout extends StatelessWidget {
     return '${m.toString().padLeft(2, '0')}:${ss.toString().padLeft(2, '0')}';
   }
 
-  String _fmtDistanceKm(double m) {
-    if (m >= 1000) return (m / 1000).toStringAsFixed(2);
-    return (m / 1000).toStringAsFixed(2);
+  ({String value, String unit}) _fmtDistance(double m) {
+    if (RunModel.useMiles) {
+      final miles = m / 1609.344;
+      if (miles >= 0.1) return (value: miles.toStringAsFixed(2), unit: 'mi');
+      return (value: (m * 1.09361).toInt().toString(), unit: 'yd');
+    }
+    if (m >= 1000) {
+      return (value: (m / 1000).toStringAsFixed(2), unit: 'km');
+    }
+    return (value: m.toInt().toString(), unit: 'm');
   }
 
   /// 도플갱어까지의 거리. 양수 = 뒤, 음수 = 앞(잡힘 직전).
@@ -322,7 +330,7 @@ class MysticRunningLayout extends StatelessWidget {
   }
 
   Widget _buildStatsRow() {
-    final distKm = _fmtDistanceKm(distanceM);
+    final dist = _fmtDistance(distanceM);
     final timeStr = _fmtDuration(elapsedSeconds);
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 24),
@@ -334,7 +342,7 @@ class MysticRunningLayout extends StatelessWidget {
       ),
       child: Row(
         children: [
-          Expanded(child: _statCell(label: '거 리', value: distKm, unit: 'km')),
+          Expanded(child: _statCell(label: '거 리', value: dist.value, unit: dist.unit)),
           Container(width: 1, height: 44, color: _line),
           Expanded(child: _statCell(label: '시 간', value: timeStr, unit: '')),
           Container(width: 1, height: 44, color: _line),

@@ -3,6 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:shadowrun/core/services/sfx_service.dart';
 import 'package:shadowrun/features/history/presentation/widgets/analytics_overview.dart';
 import 'package:shadowrun/features/result/presentation/widgets/result_detail_section.dart';
+import 'package:shadowrun/shared/models/run_model.dart';
 
 /// 한국 민속 호러(T3) 테마의 러닝 결과 화면.
 ///
@@ -96,11 +97,22 @@ class MysticResultLayout extends StatelessWidget {
   }
 
   String get _formattedDistance {
+    if (RunModel.useMiles) {
+      final miles = distanceM / 1609.344;
+      if (miles >= 0.1) return miles.toStringAsFixed(2);
+      return (distanceM * 1.09361).toInt().toString();
+    }
     if (distanceM >= 1000) return (distanceM / 1000).toStringAsFixed(2);
     return distanceM.toInt().toString();
   }
 
-  String get _distanceUnit => distanceM >= 1000 ? 'km' : 'm';
+  String get _distanceUnit {
+    if (RunModel.useMiles) {
+      final miles = distanceM / 1609.344;
+      return miles >= 0.1 ? 'mi' : 'yd';
+    }
+    return distanceM >= 1000 ? 'km' : 'm';
+  }
 
   String get _formattedDuration {
     final h = durationS ~/ 3600;

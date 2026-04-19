@@ -3,6 +3,7 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:shadowrun/core/database/database_helper.dart';
 import 'package:shadowrun/core/l10n/app_strings.dart';
+import 'package:shadowrun/shared/models/run_model.dart';
 
 /// 테마 독립적인 분석 Overview.
 /// 러닝 목표 링, streak, 주간 거리 막대, 히트맵 달력, PR 카드, 도플갱어 전적 카드를 한 컬럼에 표시.
@@ -414,7 +415,7 @@ class _AnalyticsOverviewState extends State<AnalyticsOverview> {
             children: [
               Expanded(child: _prCell(
                 S.isKo ? '최장 거리' : 'longest run',
-                bestDist > 0 ? '${(bestDist / 1000).toStringAsFixed(2)} km' : '—',
+                bestDist > 0 ? RunModel.formatDistanceStatic(bestDist) : '—',
               )),
               Expanded(child: _prCell(
                 S.isKo ? '최장 탈출' : 'longest escape',

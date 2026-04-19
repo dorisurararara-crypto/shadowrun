@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:shadowrun/core/l10n/app_strings.dart';
+import 'package:shadowrun/shared/models/run_model.dart';
 
 /// T1 Pure Cinematic 테마의 러닝 중 화면.
 ///
@@ -20,6 +21,7 @@ class PureRunningLayout extends StatelessWidget {
   final VoidCallback onPauseTap;
   final VoidCallback onStopTap;
   final bool isChallenge;
+  final String runMode;
   final Widget mapChild;
   final bool ttsOn;
   final bool sfxOn;
@@ -36,6 +38,7 @@ class PureRunningLayout extends StatelessWidget {
     required this.onPauseTap,
     required this.onStopTap,
     required this.isChallenge,
+    this.runMode = 'freerun',
     required this.mapChild,
     required this.ttsOn,
     required this.sfxOn,
@@ -64,8 +67,13 @@ class PureRunningLayout extends StatelessWidget {
     return '${m.toString().padLeft(2, '0')}:${ss.toString().padLeft(2, '0')}';
   }
 
-  /// 거리(m) → "3.42" (km, 정수/km 이상은 소수 2자리) 또는 "152" (m)
+  /// 거리(m) → "3.42" (km/mi) / "152" (m/yd). 단위 토글 반영.
   ({String value, String unit}) _fmtDistance(double m) {
+    if (RunModel.useMiles) {
+      final miles = m / 1609.344;
+      if (miles >= 0.1) return (value: miles.toStringAsFixed(2), unit: 'mi');
+      return (value: (m * 1.09361).toInt().toString(), unit: 'yd');
+    }
     if (m >= 1000) {
       return (value: (m / 1000).toStringAsFixed(2), unit: 'km');
     }
@@ -77,10 +85,17 @@ class PureRunningLayout extends StatelessWidget {
   ({String num, String unit, String narr, bool danger}) _shadowDisplay() {
     final isKo = S.isKo;
     if (!isChallenge || shadowGapM.isInfinite || shadowGapM.isNaN) {
+      final isMarathon = runMode == 'marathon';
+      final useMi = RunModel.useMiles;
+      final primary = useMi ? distanceM / 1609.344 : distanceM / 1000.0;
+      final unitKo = useMi ? '마일' : '킬로미터';
+      final unitEn = useMi ? 'miles' : 'kilometers';
       return (
-        num: '--',
-        unit: isKo ? '미터 · 혼자 달리기' : 'meters · solo run',
-        narr: '오늘은 혼자 달린다.',
+        num: primary >= 10 ? primary.toStringAsFixed(1) : primary.toStringAsFixed(2),
+        unit: isMarathon
+            ? (isKo ? '$unitKo · 전설과 함께' : '$unitEn · chasing legends')
+            : (isKo ? '$unitKo · 혼자 달리기' : '$unitEn · solo run'),
+        narr: isMarathon ? '전설의 페이스가 곁을 달린다.' : '오늘은 혼자 달린다.',
         danger: false,
       );
     }
@@ -204,13 +219,16 @@ class PureRunningLayout extends StatelessWidget {
 
   // === 중앙 큰 숫자 ===
   Widget _buildCenter(({String num, String unit, String narr, bool danger}) shadow) {
+    final isSolo = !isChallenge || shadowGapM.isInfinite || shadowGapM.isNaN;
     return Padding(
       padding: const EdgeInsets.fromLTRB(20, 24, 20, 8),
       child: Column(
         children: [
           // Episode tag
           Text(
-            S.isKo ? '도플갱어와의 거리' : 'Distance from the Doppelgänger',
+            isSolo
+                ? (S.isKo ? '오늘의 거리' : 'tonight\'s distance')
+                : (S.isKo ? '도플갱어와의 거리' : 'Distance from the Doppelgänger'),
             style: S.isKo
                 ? GoogleFonts.notoSerifKr(
                     fontSize: 11,

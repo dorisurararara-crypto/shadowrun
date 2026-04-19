@@ -236,7 +236,9 @@ class PureHistoryLayout extends StatelessWidget {
                   text: TextSpan(
                     children: [
                       TextSpan(
-                        text: totalKm.toStringAsFixed(1),
+                        text: RunModel.useMiles
+                            ? (totalKm / 1.609344).toStringAsFixed(1)
+                            : totalKm.toStringAsFixed(1),
                         style: GoogleFonts.playfairDisplay(
                           fontSize: 22,
                           fontStyle: FontStyle.italic,
@@ -247,7 +249,7 @@ class PureHistoryLayout extends StatelessWidget {
                         ),
                       ),
                       TextSpan(
-                        text: 'km',
+                        text: RunModel.useMiles ? 'mi' : 'km',
                         style: GoogleFonts.playfairDisplay(
                           fontSize: 10,
                           color: _inkFade,
@@ -389,7 +391,7 @@ class PureHistoryLayout extends StatelessWidget {
     final dateKo = dt != null ? '${dt.month}월 ${dt.day}일' : run.date;
     final weekEn = dt != null ? _weekdaysEn[dt.weekday - 1] : '';
 
-    final distKm = (run.distanceM / 1000).toStringAsFixed(2);
+    final distance = run.formattedDistance;
     final duration = run.formattedDuration;
 
     final isWin = run.challengeResult == 'win';
@@ -476,7 +478,7 @@ class PureHistoryLayout extends StatelessWidget {
                     ),
                     const SizedBox(height: 3),
                     Text(
-                      '$location · $distKm km · $duration',
+                      '$location · $distance · $duration',
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: GoogleFonts.notoSerif(
@@ -671,9 +673,10 @@ class _SummaryCell extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
+      mainAxisSize: MainAxisSize.min,
       children: [
         valueWidget,
-        const SizedBox(height: 6),
+        const SizedBox(height: 3),
         Text(
           label,
           style: GoogleFonts.playfairDisplay(

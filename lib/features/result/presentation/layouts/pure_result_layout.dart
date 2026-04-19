@@ -4,6 +4,7 @@ import 'package:shadowrun/core/l10n/app_strings.dart';
 import 'package:shadowrun/core/services/sfx_service.dart';
 import 'package:shadowrun/features/history/presentation/widgets/analytics_overview.dart';
 import 'package:shadowrun/features/result/presentation/widgets/result_detail_section.dart';
+import 'package:shadowrun/shared/models/run_model.dart';
 
 /// 순정 시네마(T1) 테마의 러닝 결과 화면.
 ///
@@ -101,11 +102,22 @@ class PureResultLayout extends StatelessWidget {
   }
 
   String get _formattedDistance {
+    if (RunModel.useMiles) {
+      final miles = distanceM / 1609.344;
+      if (miles >= 0.1) return miles.toStringAsFixed(2);
+      return (distanceM * 1.09361).toInt().toString();
+    }
     if (distanceM >= 1000) return (distanceM / 1000).toStringAsFixed(2);
     return distanceM.toInt().toString();
   }
 
-  String get _distanceUnit => distanceM >= 1000 ? 'km' : 'm';
+  String get _distanceUnit {
+    if (RunModel.useMiles) {
+      final miles = distanceM / 1609.344;
+      return miles >= 0.1 ? 'mi' : 'yd';
+    }
+    return distanceM >= 1000 ? 'km' : 'm';
+  }
 
   String get _formattedDuration {
     final h = durationS ~/ 3600;
@@ -295,21 +307,26 @@ class PureResultLayout extends StatelessWidget {
   Widget _buildVerdict() {
     return Column(
       children: [
-        // ESCAPED / CAUGHT — Playfair Italic 900 대형 + red glow
-        Text(
-          _verdictText,
-          textAlign: TextAlign.center,
-          style: GoogleFonts.playfairDisplay(
-            fontSize: 56,
-            fontStyle: FontStyle.italic,
-            fontWeight: FontWeight.w900,
-            color: _ink,
-            letterSpacing: 2,
-            height: 1,
-            shadows: const [
-              Shadow(color: Color(0x59C83030), blurRadius: 40),
-              Shadow(color: Color(0x338B0000), blurRadius: 80),
-            ],
+        // ESCAPED / CAUGHT / RECORDED — Playfair Italic 900 대형 + red glow
+        FittedBox(
+          fit: BoxFit.scaleDown,
+          child: Text(
+            _verdictText,
+            maxLines: 1,
+            softWrap: false,
+            textAlign: TextAlign.center,
+            style: GoogleFonts.playfairDisplay(
+              fontSize: 56,
+              fontStyle: FontStyle.italic,
+              fontWeight: FontWeight.w900,
+              color: _ink,
+              letterSpacing: 2,
+              height: 1,
+              shadows: const [
+                Shadow(color: Color(0x59C83030), blurRadius: 40),
+                Shadow(color: Color(0x338B0000), blurRadius: 80),
+              ],
+            ),
           ),
         ),
         const SizedBox(height: 10),

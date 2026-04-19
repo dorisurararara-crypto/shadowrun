@@ -227,7 +227,7 @@ class _ChallengePickerSheet extends StatelessWidget {
     final locationLabel = location.isEmpty
         ? (S.isKo ? '이름 없는 길' : 'Unnamed route')
         : (location.length > 22 ? '${location.substring(0, 22)}…' : location);
-    final distKm = (run.distanceM / 1000).toStringAsFixed(2);
+    final distance = run.formattedDistance;
     final durationLabel = _formatDuration(run.durationS);
 
     String resultLabel;
@@ -293,7 +293,7 @@ class _ChallengePickerSheet extends StatelessWidget {
                     ),
                     const SizedBox(height: 3),
                     Text(
-                      '$distKm km · $durationLabel',
+                      '$distance · $durationLabel',
                       style: GoogleFonts.inter(
                         fontSize: 11,
                         color: fgDim,
