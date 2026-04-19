@@ -29,6 +29,37 @@
 
 ## 최신
 
+### 2026-04-19 14:49 (Mac → Windows) — 빌드 19 외부 TestFlight 제출 ✅ (런타임 버그 6건 fix)
+
+**코드 리뷰 3차 반복 결과 — 런타임 버그 총 6건 수정 후 빌드 19 배포:**
+
+1차 라운드 (커밋 `f0561a1`): 오디오 race / 데이터 손실 5건
+- TtsLineBank `_playing` mutex + dispose (마일스톤+페이스 콜백 race 차단)
+- RunningService.stopRun 두번째 return 의 `finalShadowGapM` 누락 (도플갱어 완주 결과 null 표시 버그)
+- HorrorService `_playTts` setAsset 전 stop 추가 (위협도 급변 TTS 간섭 차단)
+- RunningScreen `_stopRun` 초반에 `onWatchCommand=null` (stop 중 watch 명령 race)
+
+2차 라운드 (커밋 `2cde034`): dispose atomic 1건
+- RunningService.dispose `_positionSub` 정리를 atomic 패턴으로 통일
+
+2-3차 라운드의 Agent 제안 대부분 false positive (이미 잘 방어되어 있었음 — dispose 전처리, mounted 체크, stream cancel 다 기처리됨). 실질 수정은 1차 5건 + 2차 1건 = **총 6건**.
+
+**빌드 배포:**
+- `flutter build ipa` 가 clean 직후 exportArchive 서명 에러 (Distribution 인증서 캐시 날아감) → `xcodebuild -exportArchive` 직접 호출 + ASC API key 자동 서명으로 성공
+- IPA: CFBundleVersion = **19** (auto-bump)
+- altool 업로드: **49초에 427MB** (8.7MB/s) — caffeinate 를 PID 에 바인딩해서 이번엔 Mac 잠자기 걱정 없음
+- ASC 처리 7분 → VALID ✅
+- 외부 그룹 `ganzitester` 할당 HTTP 204 ✅
+- Beta App Review 제출 HTTP 201 ✅ (WAITING_FOR_REVIEW)
+
+**🚨 실기 검증 포인트:**
+- 빌드 19 = 빌드 18 + 런타임 fix 6건. 기능적 체감 변화는 미미하지만 장시간 안정성 개선
+- Watch 자동 설치는 18에서 이미 fix 됐으니 18 테스트 안 했다면 19 로 한번에 확인
+- 도플갱어 완주 후 결과 화면에 "최종 격차" 값 정상 표시되는지 (빌드 18 까진 null)
+- 마라톤 모드 km 마일스톤 + 페이스 변화 동시 발생해도 TTS 안 겹침
+
+---
+
 ### 2026-04-19 13:53 (Mac → Windows) — 빌드 18 외부 TestFlight 제출 ✅ (Watch 설치 fix 반영)
 
 **Windows 와 Mac 양쪽이 독립적으로 같은 원인 진단:** `WATCHOS_DEPLOYMENT_TARGET = 26.4` (iOS 26.4 값이 Watch 에 복사됨) → watchOS 26.4 는 미출시 가상 버전 → 어떤 Apple Watch 도 설치 불가. Windows 가 커밋 `cef565c` 로 먼저 fix, Mac 도 동일한 sed 를 독립 실행 (`fca0c23` 은 rebase 시 drop).
