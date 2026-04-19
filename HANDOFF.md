@@ -29,6 +29,28 @@
 
 ## 최신
 
+### 2026-04-19 16:18 (Mac → Windows) — 빌드 21 외부 TestFlight 제출 ✅ (도플갱어 BGM 시작 버그 fix)
+
+**수정 내용 (커밋 `21f8617`):**
+
+사용자 리포트: "도플갱어 모드에선 BGM 이 안 나오는 것 같다" — 실제 확인 결과 HorrorService._onLevelChanged 가 위협도 "변경" 트리거에만 BGM 재생 → 초기 aheadFar 상태에선 BGM 시작 코드 호출 안 됨. 마라톤/자유달리기는 각자 서비스가 initialize 에서 BGM 재생 중이라 문제 없었음.
+
+- `HorrorService.initialize()` 마지막에 현재 레벨 BGM 즉시 재생 추가 (9줄)
+- 시작 시 `bgm_peaceful` 계열 (0.3 볼륨) 이 자연스럽게 깔림, 위협도 변화 시 자동 전환
+
+**빌드 배포:**
+- `flutter build ipa` → archive 성공, export 서명 에러 (계속 반복되는 패턴)
+- `xcodebuild -exportArchive` 폴백 → 성공, CFBundleVersion=21
+- `altool --upload-app` 48초 / 427MB (Delivery UUID `4995e084-3b12-4f6d-9522-e6f812c1d4d5`)
+- caffeinate PID 바인딩
+- ASC 처리 6분 → VALID → 외부 그룹 할당 → Beta Review 제출 완료 (WAITING_FOR_REVIEW)
+
+**🚨 실기 검증 포인트:**
+- 도플갱어 모드 시작 직후 BGM 들리는지 (이게 핵심)
+- 위협도가 aheadFar → aheadMid → ... → dangerClose → critical 로 변할 때 BGM 자연스럽게 전환되는지
+
+---
+
 ### 2026-04-19 15:48 (Mac → Windows) — 빌드 20 외부 TestFlight 제출 ✅ (지도 마커 축소)
 
 **수정 내용 (커밋 `6df8c78`):**
