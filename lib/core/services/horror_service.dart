@@ -51,6 +51,15 @@ class HorrorService {
     _vibrationEnabled = vibrationEnabled;
     _voiceId = voice;
     _hasVibrator = (await Vibration.hasVibrator()) == true;
+
+    // 초기 BGM 시작 — _onLevelChanged 는 "변경" 트리거라 초기 safe 상태에선 호출되지 않음.
+    // 도플갱어 모드에서 시작 직후 무음 구간이 생기는 걸 방지.
+    final bgmList = _bgmVariants[_currentLevel];
+    if (bgmList != null && bgmList.isNotEmpty) {
+      final bgm = bgmList[_rng.nextInt(bgmList.length)];
+      final vol = _bgmVolume[_currentLevel] ?? 0.5;
+      await _playBgm(bgm, volume: vol);
+    }
   }
 
   // 구간별 TTS 변형 (10개씩)
