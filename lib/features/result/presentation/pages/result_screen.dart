@@ -84,6 +84,17 @@ class _ResultScreenState extends State<ResultScreen>
     SfxService().reportOpen();
     _loadData();
     _loadBannerAd();
+    _maybeShowInterstitial();
+  }
+
+  /// Pro 유저가 아니면 Result 진입 매 N회마다 전면 광고 노출 (AdService 내부 cap).
+  /// 화면 로드·애니메이션과 충돌 피하기 위해 1.2초 딜레이 후 트리거.
+  void _maybeShowInterstitial() {
+    if (PurchaseService().isPro) return;
+    Future.delayed(const Duration(milliseconds: 1200), () {
+      if (!mounted) return;
+      AdService().maybeShowResultInterstitial();
+    });
   }
 
   void _loadBannerAd() {

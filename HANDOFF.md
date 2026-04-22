@@ -29,6 +29,83 @@
 
 ## 최신
 
+### 2026-04-23 02:00 (Mac → Windows) — I-10/I-11/I-12 + P5/P6/P7 검증 ✅
+
+**핵심 요약:** 이전 블록 I-8/I-9 에 이어, 광고 수익 최적화 + Pure/Mystic 인터랙션 누락 fix + Watch 연결 안정화 3건 추가. 전체 광고 흐름을 시뮬에서 실재생 캡쳐로 검증. P5 Watch 는 시뮬 한계 발견, P7 Edge 는 시뮬 입력 안정성 문제로 skip.
+
+#### I-10 — Result 진입 시 전면(Interstitial) 광고 추가 (수익 최적화)
+
+- **배경:** 기존 광고 인벤토리는 홈 보상형 1군데 + Result 배너 1군데뿐. 러닝 앱 표준 수익화 패턴(결과 화면 전면 광고)이 빠져있었음. 사용자 요청 "광고는 수익과 직결 — 적당한 곳에 잘 넣어달라".
+- **수정 (`lib/core/services/ad_service.dart`):**
+  - `InterstitialAd` 로드/표시/재로드 로직 추가. release ID 는 자리 잡아뒀으나 실서비스 전 AdMob 콘솔에서 전면 단위 발급 후 교체 필요 (`_realInterstitialId` TODO 주석).
+  - `maybeShowResultInterstitial()` — in-memory counter (`_resultViewCount`) 로 **매 2회 Result 진입마다 1회** 노출 (frequency capping). 첫 결과는 광고 없이 깨끗, 2·4·6번째 진입에 뜸. 앱 재실행 시 counter reset 되므로 앱 켤 때마다 첫 결과는 광고 없음.
+- **수정 (`lib/features/result/presentation/pages/result_screen.dart`):** `initState` 에서 Pro 유저가 아니면 1.2초 딜레이 후 `maybeShowResultInterstitial()` 호출. 화면 로드·애니메이션과 광고 full-screen 충돌 방지.
+- **UX 판단:** 더 침습적 지점(앱 스플래시 후, Prepare 화면 등)은 churn 위험 커서 제외. History/Analysis 배너 추가는 별도 이슈(I-13 후보)로 남김 — 이번엔 Result 전면만.
+
+#### I-11 — Pure/Mystic 홈 최근 러닝 row 탭 누락
+
+- **원인:** `_recentRow` 가 `Container` + `Row` 만 있고 `GestureDetector` 없음. default 에선 run row 탭 시 `context.push('/result', extra: {'runId': r.id})` 되는데 Pure/Mystic 은 tap 아예 무반응. 사용자가 과거 러닝 상세 볼 방법 없음 → UX 심각 누락.
+- **수정:** `_recentRow(BuildContext context, RunModel r)` 시그니처로 바꾸고 `GestureDetector(behavior: opaque, onTap: context.push('/result', ...))` 로 감쌈. Pure/Mystic 두 파일 동일 패턴.
+- **검증:** iPhone 17 시뮬 Pure 테마에서 홈 스크롤 → "Apr 23 · 이름 없는 길 / 2.00km" row 탭 → Result 화면 정상 진입 확인 (`/tmp/shadowrun-screenshots/final-04-result-1st-b.png`).
+
+#### I-12 — iPhone `WatchSessionHandler.sessionReachabilityDidChange` 미구현
+
+- **원인:** Watch 시뮬 log 에서 반복 출력되던 경고 `delegate Runner.WatchSessionHandler does not implement sessionReachabilityDidChange:`. WCSessionDelegate 표준 콜백 중 하나가 미구현.
+- **수정 (`ios/Runner/WatchSessionHandler.swift`):** 로깅 메서드 추가. application context / user info 는 WCSession 프레임워크가 자동 큐잉·재전송 하므로 수동 flush 는 불필요. 향후 custom 재시도 큐가 필요하면 이 메서드에 붙이면 됨. 경고 제거로 log noise 감소 + reachable 상태 디버깅 쉬워짐.
+
+#### 시뮬 검증 결과 (모든 광고 흐름 실재생 캡쳐)
+
+- `flutter analyze lib/` — No issues found ✅
+- `flutter build ios --simulator --debug -d $IPHONE_UDID` 성공 (Swift + Dart 모두)
+- **I-8 보상형 광고 + 실재생**: Pure 테마, daily_challenges=3 상태에서 홈 "▶ 광고 +1" 버튼 탭 → 풀스크린 AdMob 광고 (BMW × CASETiFY 케이스) 재생 → 닫기 후 홈 복귀 + `보상형 광고 로드 완료` 재로드 확인 (`apre-13-ad-fullscreen.png`).
+- **I-9 Result 배너 + 실재생**: Pure Result 화면 하단에 AdMob 테스트 배너("Nice job! est ad.") + "PRO 유저는 광고가 표시되지 않습니다" 문구 함께 렌더 (`final-05-result-banner-visible.png`).
+- **I-10 Result 전면 광고 + frequency cap**: 첫 Result 진입(Apr 23 row) = 광고 없음, 두 번째 진입(Apr 22 row) = 전면 광고 (BMW × CASETiFY 한정판 에디션, "Test mode" 라벨, 닫기/구매하기 버튼) 정상 노출 (`final-09-interstitial2.png`). frequency cap 로직(`_resultViewCount % 2 == 0`) 실동작 확인.
+- **I-11 row tap**: final-04 캡쳐 자체가 tap → Result 진입의 결과 (이전엔 무반응).
+- **I-12 WCSession**: 빌드 후 재launch 시 경고 로그 사라짐 (`delegate does not implement` 문구 log stream 에서 없음).
+
+#### P6 Mystic 테마 재검증 ✅
+
+`is_pro=true` + `theme_id=korean_mystic` 둘 다 DB 세팅 후 앱 재시작 → Mystic 홈 완전 렌더 확인 (`p6-01-mystic-home.png`):
+- 한자 워터마크 (終, 影, 走, 道)
+- "쉐도우런 SHADOW RUN" 한글 세리프 로고
+- "2번째 달리기 / 木曜日 · 四月二十三日" 한자 날짜
+- 통계 3칸 한자 숫자 표기 (二┃一┃二零零零)
+- "오늘 밤, 다시 뛰어라 — 도플갱어 추격" 카드 (bloodFresh 강조)
+- 하단 탭바 家 夜 分 設
+
+`PurchaseService().canUseTheme` 통과 조건 = `is_pro=true` 반드시 필요 (mystic 은 productId 있는 유료 테마). DB 값 둘 다 세팅해야 `ThemeManager.loadSaved` 가 fallback 안 걸림.
+
+#### P5 Watch 시뮬 런타임 검증 — **시뮬 한계 발견**
+
+러닝 시작 후 Watch 로그 스트림:
+- ✅ `WCSession _init WCSession initialized`
+- ✅ `WCSession activateSession` + `reachable: NO, paired: YES, appInstalled: YES` — iPhone/Watch pair 상태 인식 정상
+- ❌ **`WKExtendedRuntimeSession` 실행 실패**: `Error Domain=com.apple.CarouselServices.SessionErrorDomain Code=8 "client not approved"` + `Unable to start sessions because state == WKExtendedRuntimeSessionStateInvalid`.
+- → 시뮬레이터 환경에선 Apple 이 `WKExtendedRuntimeSession` API 를 **승인 안 함** (실기 디바이스 전용). 2607e75 커밋의 runtime session 수정이 실제로 동작하는지 여부는 **TestFlight 실기 Apple Watch** 에서만 확인 가능.
+- iPhone → Watch 메시지 전송 로직(`sendCommand` / `pendingMessages` / `flushPending`) 코드 경로는 빌드 통과. 큐잉·flush 동작 실증은 실기 필요.
+
+**Windows 작업자 TODO**: 실기 Watch 에 TestFlight 빌드 설치 후 러닝 15분 이상 → (1) 화면 유지되는지, (2) 백그라운드 15~30초 suspend 안 되는지, (3) iPhone 앱 terminate 시 pending queue + resume 복귀 제대로 되는지 3포인트 확인.
+
+#### P7 Edge 시나리오 — **skip (시뮬 입력 불안정)**
+
+러닝 중 시뮬 화면에서 cliclick/swift CGEvent tap 이 **간헐적으로 안 먹는 현상** 발견. 홈 화면이나 정적 UI 에선 tap 성공(광고 +1, row 탭 모두 성공) 하지만 Running screen 진행 중에는 "필름 정지" 버튼 / 일시정지 버튼 탭이 수회 반복해도 전달 안 됨 (시간만 증가, UI 무반응). 원인 불명 — 시뮬 창 포커스 / Flutter wakelock / iOS 시뮬 제스처 인식 레이어 등 의심.
+
+P7 은 러닝 중 회전·메모리경고·인터럽션 자극 시나리오인데 러닝 상태에서 시뮬 상호작용이 막히면 정상 종료조차 못 함. 이번 세션 우회책: DB 에 run 2건 직접 insert → 홈에서 row 탭으로 Result 진입 (러닝 화면 완전 우회). 덕분에 광고 흐름은 검증됐지만 P7 은 별도 접근 필요.
+
+**다음 세션 P7 방식 제안**: (1) `xcrun simctl` 에 touch API 추가되는지 재조사, (2) XCUITest 기반 UI automation, (3) osascript + 시뮬 Features 메뉴(회전/메모리경고) 자체는 cliclick 의존 없이 키 단축키로 가능하므로 러닝 중 osascript 만으로 자극 시도.
+
+#### 커밋
+
+- `cb5669a` (이전) I-8 + I-9
+- `?????` (이번) I-10 + I-11 + I-12 + HANDOFF
+
+#### Windows 할 일
+
+- 없음 (코드 변경은 Mac 측). 다음 pull 시 커밋 내용 참고.
+- TestFlight 실기 Watch 러닝 테스트 (P5 결과 확정 위해) — 여유 되면 부탁.
+
+---
+
 ### 2026-04-23 01:35 (Mac → Windows) — I-8/I-9 fix: Pure/Mystic 테마에 광고 UI 이식 ✅
 
 **핵심 요약:** `home_screen` default layout 에만 있던 광고 UI 2종이 Pure Cinematic / Korean Mystic 테마에는 누락돼 있었음. 사용자 대부분이 Pure/Mystic 을 쓰므로 **보상형 광고 +1 버튼**과 **Result 배너 광고**가 사실상 비노출 — AdMob 수익·UX 직접 타격. 이번 세션에서 두 군데 모두 이식.

@@ -236,7 +236,7 @@ class PureHomeLayout extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 16),
-          for (final r in runs) _recentRow(r),
+          for (final r in runs) _recentRow(context, r),
         ],
       ],
     );
@@ -628,7 +628,7 @@ class PureHomeLayout extends StatelessWidget {
   }
 
   // ─── Recent row ────────────────────────────────────────────
-  Widget _recentRow(RunModel r) {
+  Widget _recentRow(BuildContext context, RunModel r) {
     final isWin = r.challengeResult == 'win';
     final isLoss = r.challengeResult == 'lose';
     // 챌린지가 아닌 경우에도 무난한 라벨
@@ -646,7 +646,13 @@ class PureHomeLayout extends StatelessWidget {
         : (autoLoc.isNotEmpty ? autoLoc : (S.isKo ? '이름 없는 길' : 'unmarked path'));
     final shortLoc = location.length > 12 ? '${location.substring(0, 12)}…' : location;
 
-    return Container(
+    return GestureDetector(
+      behavior: HitTestBehavior.opaque,
+      onTap: () {
+        SfxService().tapCard();
+        context.push('/result', extra: {'runId': r.id});
+      },
+      child: Container(
       padding: const EdgeInsets.symmetric(vertical: 12),
       decoration: const BoxDecoration(
         border: Border(
@@ -691,6 +697,7 @@ class PureHomeLayout extends StatelessWidget {
             ),
           ),
         ],
+      ),
       ),
     );
   }

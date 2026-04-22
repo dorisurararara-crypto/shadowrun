@@ -391,7 +391,7 @@ class MysticHomeLayout extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 14),
-          for (final r in runs) _recentRow(r),
+          for (final r in runs) _recentRow(context, r),
         ],
       ],
     );
@@ -756,7 +756,7 @@ class MysticHomeLayout extends StatelessWidget {
     );
   }
 
-  Widget _recentRow(RunModel r) {
+  Widget _recentRow(BuildContext context, RunModel r) {
     final isWin = r.challengeResult == 'win';
     final isLoss = r.challengeResult == 'lose';
     final label = isWin
@@ -772,7 +772,13 @@ class MysticHomeLayout extends StatelessWidget {
         ? userName
         : (autoLoc.isNotEmpty ? autoLoc : (S.isKo ? '이름 없는 길' : 'Unnamed path'));
     final shortLoc = location.length > 12 ? '${location.substring(0, 12)}…' : location;
-    return Container(
+    return GestureDetector(
+      behavior: HitTestBehavior.opaque,
+      onTap: () {
+        SfxService().tapCard();
+        context.push('/result', extra: {'runId': r.id});
+      },
+      child: Container(
       padding: const EdgeInsets.symmetric(vertical: 10),
       decoration: const BoxDecoration(
         border: Border(
@@ -809,6 +815,7 @@ class MysticHomeLayout extends StatelessWidget {
             ),
           ),
         ],
+      ),
       ),
     );
   }

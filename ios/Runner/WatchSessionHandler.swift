@@ -51,4 +51,12 @@ class WatchSessionHandler: NSObject, WCSessionDelegate {
             self.flutterCallback?(message)
         }
     }
+
+    // Watch 쪽 reachable 상태 변화 콜백. 미구현 상태에선 WCSession 프레임워크가
+    // "delegate does not implement" 경고를 찍는다. 로깅만으로도 경고 제거됨.
+    // WCSession 은 application context / user info 를 자동 큐잉·재전송 하므로
+    // 여기서 수동 재전송은 불필요. 향후 custom 큐가 생기면 여기서 flush.
+    func sessionReachabilityDidChange(_ session: WCSession) {
+        print("WatchSession reachability changed: isReachable=\(session.isReachable)")
+    }
 }
