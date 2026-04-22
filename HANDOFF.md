@@ -29,6 +29,79 @@
 
 ## 최신
 
+### 2026-04-23 02:20 (Mac → Windows) — P7 Edge 완료 + I-5 BGM DSP 완화 ✅
+
+**핵심 요약:** 이전 블록에서 다음 세션으로 미뤘던 P7(회전/백그라운드/메모리경고) 을 `xcrun simctl` 없이 **osascript 로 Simulator 메뉴 클릭** 방식으로 우회 처리. 사용자 피드백 "BGM 트랙 자체가 귀 아픔" 에 대한 I-5 를 **ffmpeg DSP (highpass + treble -3dB + EBU R128 loudnorm)** 로 완화. Mystic 홈 BGM 은 원본 -14 LUFS 로 표준 대비 9 LUFS 과다, 이게 주원인이었을 가능성 높음.
+
+#### P7 Edge 시나리오 — 시뮬에서 가능한 범위 전부 통과 ✅
+
+`xcrun simctl` 에 `memorywarning`·`rotate` subcommand 는 없음. 대신 **Simulator.app 메뉴를 osascript 로 클릭** 하는 방식으로 우회.
+
+| 자극 | 경로 | 로그 반응 | 결과 |
+|---|---|---|---|
+| Rotate Right (landscape) | `Device > Rotate Right` | `Scene will change interface orientation: landscapeLeft (4)` | ✅ crash 없음 |
+| Rotate Left (portrait 복귀) | `Device > Rotate Left` | `Scene will change interface orientation: portrait (1)` | ✅ 복원 정상 |
+| Home 버튼 (백그라운드) | `Device > Home` | `[Lifecycle] state = inactive → hidden → paused` + `[HomeBgm] pauseForBackground → _player.pause()` | ✅ 2607e75 의 pauseForBackground 정상 발사 |
+| 앱 재실행 (foreground) | `simctl launch` | `[Lifecycle] state = hidden → inactive → resumed` + `[HomeBgm] resumeFromBackground → skip` (BGM off 상태) | ✅ 복귀 정상 |
+| Simulate Memory Warning | `Debug > Simulate Memory Warning` | 크래시 없음, 앱 계속 반응 | ✅ |
+
+**결론:** iOS lifecycle 이벤트 처리 전부 정상. 러닝 중 자극은 시뮬 tap 불안정 이슈로 여전히 실기 권장이지만, 앱의 핵심 lifecycle/orientation/memory 핸들링은 시뮬 수준에서 검증 완료.
+
+**스크린샷**: `/tmp/shadowrun-screenshots/p7-02-rotated.png` (landscape), `p7-03-background.png` (home screen), `p7-04-after-memory-warning.png`.
+
+#### I-5 BGM 트랙 DSP 완화 — 귀 통증 피드백 대응 ✅
+
+원인 분석 (ffmpeg loudnorm 측정):
+- **t1_home_v1 (Pure)**: 원본 **-21.1 LUFS**, LRA 5.4 LU — 표준 대비 약간 큼
+- **t3_home_v1 (Mystic)**: 원본 **-14.0 LUFS**, LRA **20.4 LU** — **모바일 BGM 표준(-23 LUFS) 대비 9 LUFS 과다**, dynamic range 도 매우 큼 (피크 순간 귀 튐)
+- Mystic 쪽이 "귀 아프다" 피드백의 **주원인**일 가능성 매우 높음.
+
+처리 filter chain (`ffmpeg -af "highpass=f=80,highshelf=f=8000:g=-3,loudnorm=I=-23:TP=-2:LRA=11"`):
+- `highpass=80Hz` — 저주파 진동(이어폰 pop/럼블) 제거
+- `highshelf -3dB @ 8kHz` — 고주파 쏘임(tinnitus 유발) 부드럽게
+- `loudnorm EBU R128 -23 LUFS` — 모바일 표준 볼륨으로 정규화, dynamic range 압축
+
+처리 후 loudness:
+- **t1_home_v1**: -21.1 → **-23.6 LUFS** (2.5 LUFS 완화)
+- **t3_home_v1**: -14.0 → **-21.6 LUFS** (**7.6 LUFS 완화**), LRA 20.4 → 11.1 LU (**절반으로 압축**)
+
+적용 대상: `assets/audio/themes/` 의 **홈 BGM 4개만** (`t1_home_v1/v2`, `t3_home_v1/v2`). Running/Result/Prepare BGM 은 그대로 둠 (컨텍스트상 약간의 긴장감이 의도).
+
+**백업**: 원본 4개 파일은 `assets/audio/themes/.original/` 에 보존 (gitignore). 결과 맘에 안 들면 원복 가능. git history (직전 커밋) 에서도 복원 가능.
+
+**시뮬 청감 검증 불가 (소리 실제 재생 못 들음)**. 다음 TestFlight 배포 시 실기에서 사용자 확인 필요. 귀 통증 개선 안 됐다면 완전 신규 트랙 (ElevenLabs Music API 재호출) 로 전환 필요.
+
+#### P5 Watch 실기 검증 — **여전히 실기 필요, 이번 세션 범위 외**
+
+지난 블록에 기록한 대로 시뮬 `WKExtendedRuntimeSession` 은 Apple 정책상 `client not approved` 로 막혀 있음. iPhone-Watch WCSession pair/activate + sessionReachabilityDidChange 콜백(I-12) 까지는 시뮬에서 검증됐고 코드 경로 전부 빌드 통과. 남은 건 실기에서 15분 이상 러닝했을 때 화면 유지·백그라운드 방어·큐 flush 여부. **TestFlight 배포 → Windows 측 사용자 확인** 필요.
+
+#### 이번 세션(전체) 완료 이슈 요약
+
+- I-1 BGM 토글 라벨 영문화 (`467736b`)
+- I-2 연대기 3px overflow (`467736b`)
+- I-3 TtsLineBank AssetManifest (`f6d1fcf`)
+- **I-5 BGM DSP 완화** (`?????` 이번) — ffmpeg 처리, 특히 Mystic 7.6 LUFS 완화
+- I-8 홈 광고+1 Pure/Mystic 이식 (`cb5669a`)
+- I-9 Result 배너 Pure/Mystic 이식 (`cb5669a`)
+- I-10 Result 전면 광고 추가 (`554c81c`)
+- I-11 Pure/Mystic 최근 러닝 row 탭 누락 (`554c81c`)
+- I-12 iPhone WCSession reachability 콜백 (`554c81c`)
+- P6 Mystic 재검증 완료
+- P7 Edge 시나리오 완료
+
+#### 커밋
+
+- `cb5669a` I-8 + I-9 + HANDOFF
+- `554c81c` I-10 + I-11 + I-12 + HANDOFF
+- `?????` (이번) **I-5 BGM DSP + P7 결과 + HANDOFF**
+
+#### Windows 할 일
+
+- 없음 (Mac 측 작업 완료). 다음 pull 시 변경 내용 참고.
+- **TestFlight 실기 테스트 요청** (여유 있을 때): (1) Mystic 홈 BGM 이 귀 통증 개선됐는지, (2) Watch 러닝 15분+ 유지·백그라운드 방어.
+
+---
+
 ### 2026-04-23 02:00 (Mac → Windows) — I-10/I-11/I-12 + P5/P6/P7 검증 ✅
 
 **핵심 요약:** 이전 블록 I-8/I-9 에 이어, 광고 수익 최적화 + Pure/Mystic 인터랙션 누락 fix + Watch 연결 안정화 3건 추가. 전체 광고 흐름을 시뮬에서 실재생 캡쳐로 검증. P5 Watch 는 시뮬 한계 발견, P7 Edge 는 시뮬 입력 안정성 문제로 skip.
