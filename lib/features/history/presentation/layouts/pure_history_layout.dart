@@ -285,6 +285,7 @@ class PureHistoryLayout extends StatelessWidget {
                           fontSize: 20,
                           color: _redEmber,
                           fontWeight: FontWeight.w400,
+                          height: 1,
                         ),
                       ),
                       TextSpan(

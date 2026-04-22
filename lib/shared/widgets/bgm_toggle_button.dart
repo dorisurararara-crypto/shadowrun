@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:shadowrun/core/l10n/app_strings.dart';
 import 'package:shadowrun/core/services/bgm_preferences.dart';
 
 /// 홈 상단에 배치하는 BGM on/off 미니 토글.
@@ -17,7 +18,9 @@ class BgmToggleButton extends StatelessWidget {
         final muted = !prefs.enabled.value || prefs.externalMusicMode.value;
         return IconButton(
           splashRadius: 22,
-          tooltip: muted ? 'BGM 켜기' : 'BGM 끄기',
+          tooltip: S.isKo
+              ? (muted ? 'BGM 켜기' : 'BGM 끄기')
+              : (muted ? 'Turn BGM on' : 'Turn BGM off'),
           icon: Icon(
             muted ? Icons.volume_off_outlined : Icons.volume_up_outlined,
             color: color,
