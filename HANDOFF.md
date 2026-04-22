@@ -29,6 +29,68 @@
 
 ## 최신
 
+### 2026-04-23 03:25 (Mac → Windows) — I-13/interstitial ID/deploy 안전장치 코드 push (v26 배포는 다음 세션)
+
+**배포 실패 요약**: v22 이후 3가지 추가 변경을 v25 로 재배포 시도했으나 **Xcode Automatic Signing 의 Distribution cert 사라짐** → `exportArchive: No signing certificate "iOS Distribution" found` → ipa export 실패로 이전 v23 ipa 가 그대로 업로드되어 Apple ASC 에서 `ENTITY_ERROR.ATTRIBUTE.INVALID.DUPLICATE (previousBundleVersion: 23)` reject.
+
+진단:
+- `security find-identity -v -p codesigning` 결과 `Apple Development` 만 있고 `Apple Distribution` 없음
+- v22 는 어제 성공했는데 지금은 없음 → Xcode Automatic Signing 이 임시 cert 발급 후 정리한 듯. 재발급에 Xcode GUI 필요.
+- 스크립트가 `--build-number 25` 명시했음에도 ipa 가 여전히 v23 인 건 export 실패로 old ipa 재사용되는 Flutter 동작 (Flutter 가 export 실패 시 fallback 으로 기존 build/ipa 에 있는 ipa 를 validate 로 보냄).
+
+**이번 push 된 코드** (`e51f896`):
+- I-13: `lib/shared/widgets/banner_ad_tile.dart` 신설 + History/Analysis 6개 Scaffold 의 bottomNavigationBar 에 배치
+- `ad_service.dart _realInterstitialId` 테스트 ID(4411468910) → release ID (ca-app-pub-8170207135799034/2917990766) 교체. AdMob 콘솔에서 사용자가 직접 발급.
+- `deploy_testflight.sh`:
+  - ASC 최대 빌드 번호 조회해서 `max(pubspec+1, asc_max+1)` 로 bump (중복 방지)
+  - `flutter build ipa --release --build-number $new_build --build-name $ver` 로 CFBundleVersion 강제 지정 (Flutter 캐시 대비)
+  - poll 시 `uploadedDate` 가 upload 시각보다 10분 이상 이전이면 abort ("기존 빌드 오인" 방어)
+
+**다음 세션 복구 절차** (v26 배포 스크립트):
+
+```bash
+# 1. Xcode 에서 Distribution cert 재발급 (GUI 필수, 사용자 개입)
+open -a Xcode
+# Xcode > Settings > Accounts > 선택한 Apple ID > Manage Certificates
+# > "+" > "Apple Distribution" 클릭 → 자동 발급
+
+# 2. 발급 확인
+security find-identity -v -p codesigning
+# → "Apple Distribution: seunghyun jo (929W83M38K)" 가 떠야 함
+
+# 3. 재배포 (pubspec v25 로 bump 되어있음, 스크립트가 ASC 기준 v26 으로 bump)
+cd ~/shadow/shadowrun
+./scripts/deploy_testflight.sh
+# 또는 명시: ./scripts/deploy_testflight.sh 26
+
+# 4. v26 이 올라가면 ganzitester 자동 제출 → 사용자 실기 확인
+```
+
+**또는 완전 수동**: `open ~/shadow/shadowrun/build/ios/archive/Runner.xcarchive` → Xcode Organizer > "Distribute App" > "App Store Connect" 클릭. Xcode 가 필요한 cert 자동 발급 + upload 까지 단일 GUI 액션.
+
+**v22 에 이미 담긴 것** (사용자 실기 확인 가능):
+- I-5 BGM DSP 완화 (Mystic -7.6 LUFS)
+- I-8~I-12 (Pure/Mystic 광고 UI + row tap + WCSession reachability)
+- 앱 아이콘 21개
+- P6/P7 시뮬 검증 완료
+
+**v26 에 추가될 것** (다음 세션 배포):
+- I-13 배너 (History/Analysis)
+- Interstitial release ID 교체
+- deploy 스크립트 안전장치
+
+#### 커밋
+
+- `cb5669a` I-8 + I-9
+- `554c81c` I-10 + I-11 + I-12
+- `cfcaab3` I-5 BGM DSP + P7 Edge
+- `545c9b2` 앱 아이콘 + CFBundleIconName
+- `97a7a3a` v22 재배포
+- `e51f896` I-13 + Interstitial release ID + deploy 안전장치 (push 완료, TestFlight 미반영)
+- (다음) v26 배포 + HANDOFF 업데이트
+
+---
+
 ### 2026-04-23 02:55 (Mac → Windows) — TestFlight 빌드 1.0.0+22 외부 배포 + Beta Review 승인 ✅
 
 **v19 업로드 실패 → v22 재배포 성공.** v19 는 Apple ASC 에 이미 4일 전 (Apr 19 PDT) 업로드된 빌드가 있어서 내 업로드가 **중복 버전으로 거부** 됨 (`Beta App Review 제출 HTTP 422 INVALID_QC_STATE`). 스크립트의 VALID poll 이 Apple 측의 기존 v19 를 보고 통과해버려서 겉으로는 "외부 배포 완료" 로 찍혔지만 실제로는 이번 세션 변경사항이 TestFlight 에 안 올라갔다. 사용자가 "테스트플라이트에 안 뜨지" 지적 덕분에 즉시 발견.
