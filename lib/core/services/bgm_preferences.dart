@@ -15,7 +15,8 @@ class BgmPreferences {
   final ValueNotifier<bool> enabled = ValueNotifier(true);
 
   /// 사용자 볼륨 (0.0 ~ 1.0). 서비스 기본 볼륨에 곱해짐.
-  final ValueNotifier<double> volume = ValueNotifier(0.6);
+  /// 초기 체감을 너무 크게 두면 TestFlight 피드백처럼 "귀 아프다" 반응이 나옴 → 보수적으로 낮게 시작.
+  final ValueNotifier<double> volume = ValueNotifier(0.3);
 
   /// 외부 음악(Spotify/YouTube Music) 허용 모드.
   /// true면 내장 BGM 자동 off + AudioSession을 mix로 설정.

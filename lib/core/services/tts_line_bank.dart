@@ -1,4 +1,3 @@
-import 'dart:convert';
 import 'dart:math';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
@@ -29,9 +28,9 @@ class TtsLineBank {
   Future<void> _loadManifest() async {
     if (_manifest != null) return;
     try {
-      final s = await rootBundle.loadString('AssetManifest.json');
-      final m = jsonDecode(s) as Map<String, dynamic>;
-      _manifest = m.keys
+      final am = await AssetManifest.loadFromAssetBundle(rootBundle);
+      _manifest = am
+          .listAssets()
           .where((k) => k.startsWith('assets/audio/voice/') && k.endsWith('.mp3'))
           .toList();
     } catch (e) {
