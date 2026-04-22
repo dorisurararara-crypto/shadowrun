@@ -126,8 +126,8 @@ flutter analyze
 
 | 항목 | 값 |
 |---|---|
-| ASC API Key 파일 | `~/.appstoreconnect/private_keys/AuthKey_KQ46867WUN.p8` (chmod 600, git 제외) |
-| Key ID | `KQ46867WUN` |
+| ASC API Key 파일 | `~/.appstoreconnect/private_keys/AuthKey_JSGU6J4JN4.p8` (chmod 600, git 제외) |
+| Key ID | `JSGU6J4JN4` |
 | Issuer ID | `5269abe3-03f1-46a9-a37c-35d950758714` |
 | Team ID | `Q6H9HCTK6W` |
 | App ID (ASC) | `6762060466` |

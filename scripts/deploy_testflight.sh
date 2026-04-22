@@ -7,7 +7,7 @@
 set -euo pipefail
 cd "$(dirname "$0")/.."
 
-KEY_ID='KQ46867WUN'
+KEY_ID='JSGU6J4JN4'
 ISSUER_ID='5269abe3-03f1-46a9-a37c-35d950758714'
 IPA_PATH='build/ios/ipa/shadowrun.ipa'
 

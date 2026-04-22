@@ -3,7 +3,7 @@ GEMS='/opt/homebrew/Cellar/cocoapods/1.16.2_2/libexec/gems'
 Dir["#{GEMS}/*/lib"].each { |p| $LOAD_PATH.unshift(p) }
 require 'openssl'; require 'base64'; require 'json'; require 'net/http'; require 'uri'
 
-KEY_ID='KQ46867WUN'; ISSUER_ID='5269abe3-03f1-46a9-a37c-35d950758714'
+KEY_ID='JSGU6J4JN4'; ISSUER_ID='5269abe3-03f1-46a9-a37c-35d950758714'
 KEY_PATH = File.expand_path("~/.appstoreconnect/private_keys/AuthKey_#{KEY_ID}.p8")
 APP_ID='6762060466'
 PK = OpenSSL::PKey::EC.new(File.read(KEY_PATH))

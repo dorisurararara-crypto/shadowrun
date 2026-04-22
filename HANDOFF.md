@@ -29,6 +29,47 @@
 
 ## 최신
 
+### 2026-04-22 22:16 (Mac → Windows) — Mac 세팅 2단계 완료 ✅ + ASC Key 교체
+
+**사용자가 16:34 블록의 남은 3건 전부 해결, 그 과정에서 ASC API Key 교체됨.**
+
+**완료:**
+- `sudo xcode-select --switch /Applications/Xcode.app/Contents/Developer` ✅
+- `sudo xcodebuild -runFirstLaunch` ✅ (Install Succeeded)
+- `AuthKey_*.p8` 을 `~/.appstoreconnect/private_keys/` 에 배치 + `chmod 600` ✅
+
+**⚠️ ASC API Key 교체 — 기존 `KQ46867WUN` 폐기, 신규 `JSGU6J4JN4` 로 전환:**
+
+사용자가 Windows PC 에서 기존 `AuthKey_KQ46867WUN.p8` 파일을 찾을 수 없어서, ASC 웹에서 **기존 키를 Revoke** 하고 새 키 `JSGU6J4JN4` 를 발급받아 Mac 에 내려받음.
+
+레포 내 모든 참조를 신규 키로 일괄 교체 (커밋 포함):
+- `scripts/asc/_helpers.rb` — `KEY_ID='JSGU6J4JN4'`
+- `scripts/asc/check_build_status.rb` — 동일
+- `scripts/deploy_testflight.sh` — 동일
+- `CLAUDE.md` 자격증명 테이블 — `AuthKey_JSGU6J4JN4.p8` + `KEY_ID JSGU6J4JN4`
+
+**⚠️ Windows 쪽 할 일:**
+- 혹시 Windows 에도 같은 ASC 키를 참조하는 스크립트/환경변수가 있으면 `KQ46867WUN` → `JSGU6J4JN4` 로 교체
+- Windows 에 예전 `AuthKey_KQ46867WUN.p8` 잔존 파일이 있으면 **폐기 키이므로 삭제 권장** (이미 revoke 됐기에 기능적으론 위험 없음)
+- 만약 Windows 에서도 iOS/ASC 관련 스크립트를 돌릴 일이 생기면, ASC 에서 발급받은 새 `AuthKey_JSGU6J4JN4.p8` 파일을 Windows 에도 복사해야 함 (현재는 Mac 만 보유)
+
+**API 인증 실전 검증:**
+- `ruby scripts/asc/check_build_status.rb` 실행 → 빌드 21 포함 최근 10개 전부 `VALID` 정상 조회 성공 ✅
+- JWT 서명 + API 호출 전부 정상 동작
+
+**이제 가능한 작업:**
+- ✅ `./scripts/deploy_testflight.sh` — TestFlight 원샷 배포
+- ✅ `./scripts/asc/submit_external_beta.rb` — 외부 그룹 할당 + Beta Review 제출
+- ✅ `flutter run -d "iPhone 17"` 등으로 시뮬레이터 구동 (xcode-select 정상)
+
+**다음 단계 (첫 실제 빌드 전 확인):**
+1. `cd ~/shadow/shadowrun && flutter pub get` — 패키지 캐시 세팅 (아직 안 돌림)
+2. `cd ios && pod install` — iOS 의존성 (아직 안 돌림)
+3. `flutter doctor -v` — `-v` 로 상세 점검 (이전 flutter doctor 에서 CocoaPods 연쇄 에러 뜬 건 xcode-select 경로 교정 전 결과라 이제 해소됐을 것)
+4. 가벼운 `flutter build ios --no-codesign` sanity build
+
+---
+
 ### 2026-04-22 16:34 (Mac → Windows) — Mac 세팅 완료 ✅ (새 맥미니)
 
 사용자가 새 맥미니 도입, 이제 Windows 주 개발 · Mac iOS/watchOS 담당 구도로 병행. 새 맥 기준 0에서 iOS 빌드 환경 구축.
