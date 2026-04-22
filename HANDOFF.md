@@ -29,6 +29,56 @@
 
 ## 최신
 
+### 2026-04-23 02:50 (Mac → Windows) — TestFlight 빌드 1.0.0+19 외부 배포 완료 ✅
+
+이번 마라톤 세션 전체 (I-5 + I-8~I-12 + P6/P7 + 광고 3종 검증 + BGM DSP) 를 담은 **빌드 19**를 ganzitester 외부 그룹에 제출 완료. 진행 중 2가지 Mac 세팅 누락 발견 + 즉시 해결:
+
+**세팅 1 — Xcode Apple Developer 계정 로그인 (code signing 용):**
+- 증상: `flutter build ipa --release` 중 `No Accounts: Add a new account in Accounts settings.` + `No profiles for 'com.ganziman.shadowrun'` 에러.
+- 원인: 지난 "Mac 세팅 2단계" 는 ASC API Key (altool 업로드용) 배치까지였고 **Xcode Account (Xcode 내부 code signing 용) 로그인은 빠져있었음**. 둘이 별개 시스템.
+- 해결: Xcode > Settings > Accounts 에서 Apple ID 로그인 (사용자 수동 GUI 조작). 로그인 후 Automatic Signing 이 provisioning profile + signing certificate 자동 발급.
+
+**세팅 2 — iOS AppIcon 자산 + Info.plist `CFBundleIconName`:**
+- 증상: altool validate-app 에서 `ERROR ITMS-90713: Missing Info.plist value CFBundleIconName`.
+- 원인: `ios/Runner/Assets.xcassets/AppIcon.appiconset/` 에 **Contents.json 만 있고 실제 PNG 파일은 하나도 없었음**. `.gitignore` 의 `*.png` 전역 패턴 때문에 이전부터 tracking 안 됐을 가능성. + Info.plist 에 `CFBundleIconName` 키 자체가 누락.
+- 해결:
+  - `assets/icon/app_icon.png` (원본 1024×1024) 를 `sips` 로 Contents.json 이 요구하는 21개 사이즈로 resize. (20@1/2/3x, 29@1/2/3x, 40@1/2/3x, 50@1/2x, 57@1/2x, 60@2/3x, 72@1/2x, 76@1/2x, 83.5@2x, 1024@1x)
+  - Info.plist 에 `<key>CFBundleIconName</key><string>AppIcon</string>` 추가.
+  - `.gitignore` 에 AppIcon.appiconset 의 `*.png` negation 추가 + force add. Watch 쪽 `icon-1024.png` 도 tracking 재확인.
+
+**빌드 & 배포 결과:**
+- `1.0.0+17` → `1.0.0+19` (18 은 signing 실패 시도로 소실 후 자동 +1 재시도)
+- `flutter build ipa --release` 통과
+- `xcrun altool --validate-app` 통과
+- `xcrun altool --upload-app` 통과 → ASC 빌드 처리 대기
+- ASC `state=VALID` 자동 poll (30초 간격)
+- `scripts/asc/submit_external_beta.rb 19` 외부 그룹 ganzitester 제출 완료
+
+사용자 TestFlight 앱에 곧 반영. 실기 실시 확인 포인트:
+- **I-5 BGM 청감** — 특히 Mystic 홈 (t3_home) 이 7.6 LUFS 완화돼서 이전 "귀 아프다" 이슈 해소 여부.
+- **P5 Watch 런타임 실기** — 러닝 15분+ 화면 유지 / WKExtendedRuntimeSession 실기 동작 / pendingMessages flush.
+- **광고 3종 노출 빈도** — 첫 Result 진입 깨끗, 두 번째부터 전면 광고. 사용자 정서 기준 적절한지.
+- **아이콘 표시** — `assets/icon/app_icon.png` 원본 그대로 사용. 디자인 바꾸려면 이 파일 교체 후 `sips` resize 재실행 (또는 `flutter_launcher_icons` 패키지 도입).
+
+**다음 세션 Mac 세팅 체크리스트** (로그인 소실 대비):
+- `~/.appstoreconnect/private_keys/AuthKey_JSGU6J4JN4.p8` 존재 확인
+- `xcrun altool --list-providers --apiKey JSGU6J4JN4 --apiIssuer ...` 로 ASC 인증 상태 확인
+- Xcode > Settings > Accounts 에 Apple ID 로그인 유지 상태 확인 (Apple 정기 재인증 요구)
+- iOS 앱 아이콘 경로: `ios/Runner/Assets.xcassets/AppIcon.appiconset/` — 21개 PNG 존재
+
+#### 커밋
+
+- `cb5669a` I-8 + I-9
+- `554c81c` I-10 + I-11 + I-12
+- `cfcaab3` I-5 BGM DSP + P7 Edge
+- `?????` (이번) **빌드 19 앱 아이콘 + CFBundleIconName + 버전 bump**
+
+#### Windows 할 일
+
+- TestFlight 에서 빌드 19 다운로드 → 실기 확인 (위 체크리스트).
+
+---
+
 ### 2026-04-23 02:20 (Mac → Windows) — P7 Edge 완료 + I-5 BGM DSP 완화 ✅
 
 **핵심 요약:** 이전 블록에서 다음 세션으로 미뤘던 P7(회전/백그라운드/메모리경고) 을 `xcrun simctl` 없이 **osascript 로 Simulator 메뉴 클릭** 방식으로 우회 처리. 사용자 피드백 "BGM 트랙 자체가 귀 아픔" 에 대한 I-5 를 **ffmpeg DSP (highpass + treble -3dB + EBU R128 loudnorm)** 로 완화. Mystic 홈 BGM 은 원본 -14 LUFS 로 표준 대비 9 LUFS 과다, 이게 주원인이었을 가능성 높음.
