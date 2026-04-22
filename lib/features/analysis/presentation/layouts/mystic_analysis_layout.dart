@@ -3,6 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:shadowrun/core/l10n/app_strings.dart';
 import 'package:shadowrun/features/analysis/presentation/widgets/analysis_dashboard.dart';
 import 'package:shadowrun/features/history/presentation/widgets/analytics_overview.dart';
+import 'package:shadowrun/shared/widgets/banner_ad_tile.dart';
 
 /// T3 Korean Mystic 분석 탭.
 /// - 상단 "← 홈" + "曜" 한자 헤더
@@ -43,6 +44,7 @@ class MysticAnalysisLayout extends StatelessWidget {
 
     return Scaffold(
       backgroundColor: _ink,
+      bottomNavigationBar: const BannerAdTile(),
       body: Stack(
         children: [
           const Positioned(

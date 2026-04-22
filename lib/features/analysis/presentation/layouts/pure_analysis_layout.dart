@@ -3,6 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:shadowrun/core/l10n/app_strings.dart';
 import 'package:shadowrun/features/analysis/presentation/widgets/analysis_dashboard.dart';
 import 'package:shadowrun/features/history/presentation/widgets/analytics_overview.dart';
+import 'package:shadowrun/shared/widgets/banner_ad_tile.dart';
 
 /// T1 Pure Cinematic 분석 탭.
 /// - 상단 "← home" + eyebrow
@@ -41,6 +42,7 @@ class PureAnalysisLayout extends StatelessWidget {
 
     return Scaffold(
       backgroundColor: _bgPage,
+      bottomNavigationBar: const BannerAdTile(),
       body: Stack(
         children: [
           SafeArea(

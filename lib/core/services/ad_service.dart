@@ -11,9 +11,7 @@ class AdService {
 
   static const _realBannerId = 'ca-app-pub-8170207135799034/9789728281';
   static const _realRewardedId = 'ca-app-pub-8170207135799034/7163564942';
-  // TODO: 실서비스 전 AdMob 콘솔에서 Interstitial 단위 ID 발급 후 교체.
-  // 현재는 release 빌드에서도 테스트 ID 사용 (수익 0, AdMob 정책 위반 아님).
-  static const _realInterstitialId = 'ca-app-pub-3940256099942544/4411468910';
+  static const _realInterstitialId = 'ca-app-pub-8170207135799034/2917990766';
 
   static const _testBannerId = 'ca-app-pub-3940256099942544/6300978111';
   static const _testRewardedId = 'ca-app-pub-3940256099942544/5224354917';

@@ -10,6 +10,7 @@ import 'package:shadowrun/core/l10n/app_strings.dart';
 import 'package:shadowrun/core/services/sfx_service.dart';
 import 'package:shadowrun/features/history/presentation/layouts/mystic_history_layout.dart';
 import 'package:shadowrun/features/history/presentation/layouts/pure_history_layout.dart';
+import 'package:shadowrun/shared/widgets/banner_ad_tile.dart';
 
 class HistoryScreen extends StatefulWidget {
   const HistoryScreen({super.key});
@@ -242,6 +243,7 @@ class _HistoryScreenState extends State<HistoryScreen>
   Widget _buildDefaultLayout(BuildContext context) {
     return Scaffold(
       backgroundColor: SRColors.background,
+      bottomNavigationBar: const BannerAdTile(),
       appBar: AppBar(
         backgroundColor: SRColors.surface,
         elevation: 0,

@@ -10,6 +10,7 @@ import 'package:shadowrun/core/services/sfx_service.dart';
 import 'package:shadowrun/features/analysis/presentation/layouts/mystic_analysis_layout.dart';
 import 'package:shadowrun/features/analysis/presentation/layouts/pure_analysis_layout.dart';
 import 'package:shadowrun/features/analysis/presentation/widgets/analysis_dashboard.dart';
+import 'package:shadowrun/shared/widgets/banner_ad_tile.dart';
 import 'package:shadowrun/features/history/presentation/widgets/analytics_overview.dart';
 
 /// 분석 탭 — 테마별 레이아웃 분기.
@@ -113,7 +114,13 @@ class _AnalysisScreenState extends State<AnalysisScreen> {
           if (!isPro) _buildProOverlay(),
         ],
       ),
-      bottomNavigationBar: _buildBottomNav(),
+      bottomNavigationBar: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          const BannerAdTile(showProHint: false),
+          _buildBottomNav(),
+        ],
+      ),
     );
   }
 

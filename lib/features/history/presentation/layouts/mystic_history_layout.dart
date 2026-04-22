@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:shadowrun/core/l10n/app_strings.dart';
 import 'package:shadowrun/shared/models/run_model.dart';
+import 'package:shadowrun/shared/widgets/banner_ad_tile.dart';
 
 /// T3 Korean Mystic 테마용 History(지난 밤들) 화면.
 ///
@@ -102,6 +103,7 @@ class MysticHistoryLayout extends StatelessWidget {
 
     return Scaffold(
       backgroundColor: _ink,
+      bottomNavigationBar: const BannerAdTile(),
       body: Stack(
         children: [
           // 배경 한자 워터마크 (오른쪽 상단)
