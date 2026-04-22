@@ -29,7 +29,58 @@
 
 ## 최신
 
-### 2026-04-23 02:50 (Mac → Windows) — TestFlight 빌드 1.0.0+19 외부 배포 완료 ✅
+### 2026-04-23 02:55 (Mac → Windows) — TestFlight 빌드 1.0.0+22 외부 배포 + Beta Review 승인 ✅
+
+**v19 업로드 실패 → v22 재배포 성공.** v19 는 Apple ASC 에 이미 4일 전 (Apr 19 PDT) 업로드된 빌드가 있어서 내 업로드가 **중복 버전으로 거부** 됨 (`Beta App Review 제출 HTTP 422 INVALID_QC_STATE`). 스크립트의 VALID poll 이 Apple 측의 기존 v19 를 보고 통과해버려서 겉으로는 "외부 배포 완료" 로 찍혔지만 실제로는 이번 세션 변경사항이 TestFlight 에 안 올라갔다. 사용자가 "테스트플라이트에 안 뜨지" 지적 덕분에 즉시 발견.
+
+**v22 재배포:**
+- `deploy_testflight.sh 22` 로 번호 명시 (v20, v21 도 이미 존재했으므로 v22 로 스킵)
+- `flutter build ipa --release` 통과 (Xcode archive 43.7s, IPA 61.8s)
+- `xcrun altool --upload-app` 통과 (Delivery UUID `adf0b6b5-...`, 427MB 54.8s)
+- ASC `processingState: VALID` 자동 poll 통과
+- `submit_external_beta.rb 22` — **외부 그룹 할당 HTTP 204 + Beta App Review 제출 HTTP 201 ("제출 성공")**
+- 현재 상태: `betaReviewState: APPROVED`, `externalBuildState: IN_BETA_TESTING` — **즉시 승인 + 외부 테스터 배포 중** (v21 승인 이력 덕에 재심사 없이 자동 통과)
+
+**빌드 v22 ID:** `adf0b6b5-0237-40c0-abeb-942582ae4c18`, uploadedDate `2026-04-22T10:41:45-07:00` (KST 2026-04-23 02:41).
+
+#### 포함된 변경 (세션 전체)
+
+- I-5 홈 BGM DSP 완화 (Mystic -7.6 LUFS)
+- I-8 홈 광고+1 Pure/Mystic 이식
+- I-9 Result 배너 Pure/Mystic 이식
+- I-10 Result 전면 광고 신규 (매 2회 cap)
+- I-11 Pure/Mystic 최근 러닝 row 탭 누락
+- I-12 iPhone WCSession reachability 콜백
+- P6 Mystic 재검증 + P7 Edge 시나리오
+- 앱 아이콘 21개 sips resize + Info.plist CFBundleIconName
+
+#### 배포 파이프라인 2가지 함정 (차후 예방)
+
+**함정 1 — Xcode Apple ID 로그인 누락** (이전 블록 언급):
+- ASC API Key 는 altool 업로드 인증, Xcode Account 는 코드 서명 인증서 발급. **별개 시스템, 둘 다 필요**.
+- 해결: Xcode > Settings > Accounts 에 Apple ID 로그인 (사용자 GUI 필수).
+
+**함정 2 — 기존 빌드 버전과 충돌**:
+- `deploy_testflight.sh` 의 VALID poll 로직이 "Apple 에 이미 있는 같은 버전" 을 보고 통과해버릴 수 있음.
+- 방어책: pubspec 의 build number 를 **ASC 에 있는 최대 번호 + 1** 로 명시 지정. 배포 전 `scripts/asc/check_build_status.rb` 로 최근 빌드 확인 습관.
+- 구조 개선 여지: `deploy_testflight.sh` 가 poll 직전에 "이 빌드의 uploadedDate 가 방금 upload 시각 근처인지" 를 검증하도록 개선 가능 (다음 세션 I-13 후보).
+
+**함정 3 — AppIcon asset 공백** (이번 세션에서 해결):
+- `Assets.xcassets/AppIcon.appiconset/` 에 Contents.json 만 있고 PNG 전무. `.gitignore` 의 `*.png` 전역 패턴이 원인으로 추정.
+- 해결: `assets/icon/app_icon.png` (1024x1024) 를 sips 로 21 size resize + Info.plist `CFBundleIconName=AppIcon` 추가 + `.gitignore` negation + force add.
+
+#### 사용자 실기 확인 포인트
+
+TestFlight 앱 pull-to-refresh 후 **v22 1.0.0(22)** 가 떠야 함. 확인:
+- **I-5 BGM 청감** — Mystic 홈 귀 통증 해소 여부 (가장 큰 개선 포인트)
+- **P5 Watch 실기** — 러닝 15분+ 화면 유지, ExtendedRuntime 실제 동작, pendingMessages flush
+- **광고 3종** — 보상형/배너/전면. Result 진입 매 2회째 전면 광고 뜨는지
+- **Pure/Mystic 최근 러닝 row 탭** (I-11) — 이전엔 무반응이었던 게 Result 로 진입되는지
+- **앱 아이콘** — 홈 스크린에 `assets/icon/app_icon.png` 그대로 표시
+
+---
+
+### 2026-04-23 02:50 (Mac → Windows) — TestFlight 빌드 1.0.0+19 외부 배포 완료 ✅ (결과적 실패, v22 로 재배포)
 
 이번 마라톤 세션 전체 (I-5 + I-8~I-12 + P6/P7 + 광고 3종 검증 + BGM DSP) 를 담은 **빌드 19**를 ganzitester 외부 그룹에 제출 완료. 진행 중 2가지 Mac 세팅 누락 발견 + 즉시 해결:
 
