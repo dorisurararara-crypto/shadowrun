@@ -9,6 +9,7 @@ import 'core/router/app_router.dart';
 import 'core/services/ad_service.dart';
 import 'core/services/purchase_service.dart';
 import 'core/services/bgm_preferences.dart';
+import 'core/services/home_bgm_service.dart';
 import 'core/l10n/app_strings.dart';
 import 'core/database/database_helper.dart';
 import 'shared/models/run_model.dart';
@@ -125,9 +126,41 @@ void main() async {
   runApp(ShadowRunApp(languageSelected: langSelected));
 }
 
-class ShadowRunApp extends StatelessWidget {
+class ShadowRunApp extends StatefulWidget {
   final bool languageSelected;
   const ShadowRunApp({super.key, required this.languageSelected});
+
+  @override
+  State<ShadowRunApp> createState() => _ShadowRunAppState();
+}
+
+class _ShadowRunAppState extends State<ShadowRunApp> with WidgetsBindingObserver {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  // 러닝 중에는 RunningScreen.initState 가 HomeBgmService.stop() 을 호출해 _active=false 로
+  // 내려놓기 때문에, 아래 pauseForBackground 는 러닝 상태에선 no-op. 러닝 아닌 상태
+  // (홈 화면 등) 에선 BGM 이 _active=true 라 실제 일시 정지됨.
+  // 러닝 중에 흐르는 Horror/Marathon BGM 은 각자 서비스가 담당하며 백그라운드에서도
+  // iOS UIBackgroundModes: audio 로 계속 재생 (의도된 동작).
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    debugPrint('[Lifecycle] state = $state');
+    if (state == AppLifecycleState.paused) {
+      HomeBgmService.I.pauseForBackground();
+    } else if (state == AppLifecycleState.resumed) {
+      HomeBgmService.I.resumeFromBackground();
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -141,7 +174,7 @@ class ShadowRunApp extends StatelessWidget {
           title: 'SHADOW RUN',
           debugShowCheckedModeBanner: false,
           theme: SRTheme.dark,
-          routerConfig: createRouter(languageSelected),
+          routerConfig: createRouter(widget.languageSelected),
         );
       },
     );

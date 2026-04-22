@@ -19,6 +19,7 @@ class HomeBgmService {
   final AudioPlayer _player = AudioPlayer();
   final Random _rng = Random();
   bool _active = false;
+  bool _pausedByBackground = false;
   String? _currentAsset;
 
   Future<void> startForCurrentTheme() async {
@@ -35,12 +36,41 @@ class HomeBgmService {
 
   Future<void> stop() async {
     _active = false;
+    _pausedByBackground = false;
     BgmPreferences.I.volume.removeListener(_onVolumeChanged);
     BgmPreferences.I.enabled.removeListener(_onEnabledChanged);
     BgmPreferences.I.externalMusicMode.removeListener(_onEnabledChanged);
     ThemeManager.I.themeIdNotifier.removeListener(_onThemeChanged);
     try { await _player.stop(); } catch (_) {}
     _currentAsset = null;
+  }
+
+  /// 앱이 백그라운드로 전환될 때 호출. 러닝 중이 아닐 때 BGM 을 일시 정지.
+  /// listener/상태(_active, _currentAsset) 는 그대로 유지 → 복귀 시 바로 이어 재생.
+  Future<void> pauseForBackground() async {
+    if (!_active) {
+      debugPrint('[HomeBgm] pauseForBackground → skip (not active — 러닝 중이거나 홈 이탈)');
+      return;
+    }
+    _pausedByBackground = true;
+    debugPrint('[HomeBgm] pauseForBackground → _player.pause() (백그라운드 진입)');
+    try { await _player.pause(); } catch (_) {}
+  }
+
+  /// 앱이 foreground 복귀 시 호출. pauseForBackground 로 멈춘 경우에만 재개.
+  Future<void> resumeFromBackground() async {
+    if (!_active || !_pausedByBackground) {
+      debugPrint('[HomeBgm] resumeFromBackground → skip (active=$_active pausedByBg=$_pausedByBackground)');
+      return;
+    }
+    _pausedByBackground = false;
+    final prefs = BgmPreferences.I;
+    if (!prefs.enabled.value || prefs.externalMusicMode.value) {
+      debugPrint('[HomeBgm] resumeFromBackground → skip (BGM 꺼짐 or 외부음악 모드)');
+      return;
+    }
+    debugPrint('[HomeBgm] resumeFromBackground → _player.play() (포그라운드 복귀)');
+    try { _player.play().catchError((_) {}); } catch (_) {}
   }
 
   Future<void> _playRandomFromPool() async {

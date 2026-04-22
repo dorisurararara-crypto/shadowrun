@@ -29,6 +29,77 @@
 
 ## 최신
 
+### 2026-04-22 23:14 (Mac → Windows) — 버그 fix 2건 (BGM + Watch) + 시뮬레이터에서 버그 A 동작 검증 ✅
+
+사용자 TestFlight 리포트 2건 수정. 버그 A (iPhone BGM) 는 iPhone 17 시뮬레이터에서 **로그로 2회 재현성 확인**, 버그 B (Watch) 는 코드 수정 + 빌드 통과까지 (실기 검증은 TestFlight 필요).
+
+#### 버그 A — 홈 BGM 이 달리기 중 아닐 때 백그라운드에서도 계속 재생
+
+- **원인:** 앱 어디에도 `WidgetsBindingObserver` 가 없어서 `AppLifecycleState.paused` 이벤트 무시. `UIBackgroundModes: audio` + AudioSession `playback` 때문에 iOS 가 알아서 BGM 계속 재생. HomeScreen.dispose 도 의도적으로 BGM 안 멈추는 구조.
+- **수정:**
+  - `lib/core/services/home_bgm_service.dart`: `pauseForBackground()` / `resumeFromBackground()` 추가 + `_pausedByBackground` 플래그. 러닝 진입 시 기존 `stop()` 이 `_active=false` 만들어 pause 호출이 자동 no-op → 러닝 중 BGM 유지 (의도된 동작) 에 영향 없음.
+  - `lib/main.dart`: `ShadowRunApp` 을 StatefulWidget 으로 전환 + `WidgetsBindingObserver` mixin. `didChangeAppLifecycleState` 에서 paused 시 `pauseForBackground()`, resumed 시 `resumeFromBackground()` 호출.
+  - 각 분기에 `debugPrint` 남겨 향후 디버그·검증 용이 (기존 서비스들도 동일 패턴).
+- **시뮬레이터 검증 (iPhone 17, 2회 사이클):**
+  - `[Lifecycle] state = AppLifecycleState.inactive → hidden → paused` 체인 확인
+  - `[HomeBgm] pauseForBackground → _player.pause() (백그라운드 진입)` 로그 실제 발사 ✅
+  - 복귀 시 `inactive → resumed` + `[HomeBgm] resumeFromBackground → skip (BGM 꺼짐 or 외부음악 모드)` — 검증 중 사용자가 소리 커서 설정에서 BGM off 했기 때문에 skip 분기 진입 (정상). 일반 사용 케이스 (BGM on) 에선 `_player.play()` 분기로 실제 재개.
+- **재현성:** 2회 반복 모두 동일 체인. 코드 수정 실패·race 없음.
+
+#### 버그 B — Apple Watch: 화면 금방 꺼짐, 연결 불안정, 상태 드리프트
+
+- **원인:**
+  - `WKExtendedRuntimeSession` 도 `HKWorkoutSession` 도 미구현 → Watch 앱이 러닝 시작 후 15~30초만에 백그라운드 suspend. 화면 꺼짐 + 상태 멈춤의 근본 원인.
+  - `sendCommand` 에 재시도 큐 없어서 `isReachable=false` 구간 전송된 중요 명령 (`pause`/`resume`/`stop`/`toggleTts`/`toggleSfx`/`dismiss`) 이 silent drop.
+- **수정 (`ios/ShadowRunWatch Watch App/Services/WatchSessionManager.swift`):**
+  - `WKExtendedRuntimeSessionDelegate` 준수 추가 + `import WatchKit`.
+  - `extendedSession: WKExtendedRuntimeSession?` — `processMessage` 에서 `runState = running` 진입 시 `startExtendedRuntime()`, `idle`/`result` 진입 시 `stopExtendedRuntime()`. `paused` 는 세션 유지 (곧 resume 가능).
+  - `pendingMessages: [[String: Any]]` 큐 + `sendCommand(command:data:isImportant:)` 시그니처 변경. `isImportant: true` 기본 — isReachable=false 면 큐잉. heartRate 만 `isImportant: false` 로 호출 (놓치면 다음 5초 틱에 복구되는 스냅샷).
+  - `flushPending()` — `activationDidComplete` / `sessionReachabilityDidChange` 에서 reachable 복구 시 자동 flush. 전송 실패는 다시 큐잉.
+- **HKWorkoutSession 도입은 이번 커밋에서 skip** — HealthKit 권한 UX 까지 건드리는 큰 변경이라 일단 WKExtendedRuntimeSession 으로 1차 해결 시도. 실기 테스트에서 여전히 장시간 유지 안 되면 후속 커밋에서 workout session 으로 업그레이드.
+- **빌드 검증:**
+  - `flutter build ios --no-codesign --debug` (디바이스) 통과 — Swift 컴파일 OK
+  - `flutter build ios --simulator --debug -d <iPhone-17-UUID>` 통과 — Watch companion 포함
+- **실기 검증 필요 (시뮬레이터 한계):**
+  - 시뮬레이터는 Watch 의 AOD·배터리 정책을 재현 안 함 → "화면이 실제로 안 꺼지는지" 는 실기 Apple Watch 에서만 확인 가능.
+  - 사용자가 TestFlight 빌드 받아서 Watch 에서 러닝 15분 이상 → 화면 유지 / 명령 안 놓침 / iPhone 이랑 상태 일치 확인 필요.
+
+#### 시뮬레이터 인프라 부가 완료
+
+- iOS 26.4 + watchOS 26.4 SDK/런타임 다운로드 (`xcodebuild -downloadPlatform iOS` / `watchOS`)
+- iPhone 17 시뮬레이터 (UDID `633A1F93-627C-4AC5-B382-3DA6BD50CB2F`) booted + Runner.app 설치
+- `flutter doctor` iOS 섹션 전부 ✓
+
+#### 🐛 스캔 중 추가 발견 (fix 대상)
+
+- **[UI render overflow] 기록/차트 화면 (`/history`, `/analysis`) 에서 `BOTTOM OVERFLOWED BY 3.0 PIXELS` 빨간 경고 노출.** Flutter debug overlay 가 직접 그려짐 → 실제 사용자에게도 보일 수 있고, overflow 된 영역은 hit test 무시되어 하단 UI 탭이 가끔 먹히지 않을 여지. 아마 `pure_history_layout.dart` 또는 내부 body column 에 SafeArea bottom 누락 / 3px 패딩 부족. 다음 라운드에서 fix.
+
+#### UI 스캔 진행 상황 (중단 지점)
+
+이번 세션에서 확인한 것:
+- 홈 → 기록 탭 (`/history`) 이동 정상, "연대기 April 2026" 화면 (빈 상태) 렌더
+- 홈 → 차트 탭 (`/analysis`) 이동 정상 — 다만 history 화면과 비주얼 거의 동일 (이게 의도인지 확인 필요)
+- 설정 탭 이동 실패 — cliclick 좌표 4회 시도 후 실패. history 화면에 이미 push 되어 있어서 탭바가 화면 최하단에 없거나, overflow 로 hit test 영역 밖. **iOS back swipe** 로 홈 복귀 후 재시도는 다음 세션에서.
+
+아직 못 돌린 테스트 (다음 세션 TODO):
+- Settings 진입 + 언어 변경 (한↔영) + 테마 변경 (pure/mystic/noir/editorial/cyber)
+- 각 테마에서 홈 BGM 변화 / UI 변화 점검
+- 홈 카드 → 각 러닝 모드 시작 (도플갱어/마라톤/자유달리기)
+- `xcrun simctl location set <lat>,<lng>` + interval 갱신으로 2km 달리기 시뮬레이션 → pause/resume/stop 전체 흐름 + Result 화면
+- Edge: 백그라운드→포그라운드 러닝 중 상태 보존, 인터럽션 (전화/알람) 대응
+
+#### ⚠️ 사용자 할 일
+
+- **TestFlight 배포 여부 결정** — 말씀 주시면 Mac 세션이 `./scripts/deploy_testflight.sh` → ASC VALID poll → `submit_external_beta.rb` 외부 제출까지 원샷 진행.
+- (배포 후) 실기 Watch 에서 버그 B 잔존 여부 확인.
+- history 화면 overflow 재현 여부 확인해주시면 좋음 (실기에서 빨간 경고 안 뜰 수도 — release 빌드는 Flutter debug overlay 안 그림. 그래도 overflow 자체는 수정 권장).
+
+#### Windows 할 일
+
+- 없음. 다음 pull 시 코드 변경 내용 참고만.
+
+---
+
 ### 2026-04-22 22:16 (Mac → Windows) — Mac 세팅 2단계 완료 ✅ + ASC Key 교체
 
 **사용자가 16:34 블록의 남은 3건 전부 해결, 그 과정에서 ASC API Key 교체됨.**

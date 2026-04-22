@@ -1,8 +1,9 @@
 import Foundation
 import WatchConnectivity
+import WatchKit
 import Combine
 
-class WatchSessionManager: NSObject, ObservableObject, WCSessionDelegate {
+class WatchSessionManager: NSObject, ObservableObject, WCSessionDelegate, WKExtendedRuntimeSessionDelegate {
     static let shared = WatchSessionManager()
 
     @Published var isPhoneReachable = false
@@ -14,6 +15,12 @@ class WatchSessionManager: NSObject, ObservableObject, WCSessionDelegate {
     }
 
     private var heartRateTimer: Timer?
+    // reachable=false 구간에 발생한 "중요 명령" (pause/resume/stop 등) 을 저장했다가
+    // 연결 복구 시 일괄 전송. heartRate 같은 실시간 스냅샷은 큐잉하지 않음 (드롭).
+    private var pendingMessages: [[String: Any]] = []
+    // 러닝 중 Watch 앱이 백그라운드 suspend 되지 않도록 유지하는 세션.
+    // start 후 보통 최소 15~30분 동안 화면·앱 활성 유지 (WKExtendedRuntimeSession).
+    private var extendedSession: WKExtendedRuntimeSession?
 
     override init() {
         super.init()
@@ -23,20 +30,73 @@ class WatchSessionManager: NSObject, ObservableObject, WCSessionDelegate {
         }
     }
 
-    func sendCommand(_ command: String, data: [String: Any] = [:]) {
+    /// Watch → iPhone 명령 전송.
+    /// - isImportant=true (기본): reachable=false 면 큐잉, 복구 시 자동 flush.
+    /// - isImportant=false: 실시간 스냅샷(heartRate 등), 놓쳐도 다음 틱에 복구되는 데이터는 큐잉하지 않음.
+    func sendCommand(_ command: String, data: [String: Any] = [:], isImportant: Bool = true) {
         var message = data
         message["command"] = command
-        guard WCSession.default.isReachable else { return }
-        WCSession.default.sendMessage(message, replyHandler: nil) { error in
-            print("Watch send error: \(error.localizedDescription)")
+        if WCSession.default.isReachable {
+            WCSession.default.sendMessage(message, replyHandler: nil) { [weak self] error in
+                print("Watch send error: \(error.localizedDescription) cmd=\(command)")
+                if isImportant {
+                    DispatchQueue.main.async { self?.pendingMessages.append(message) }
+                }
+            }
+        } else if isImportant {
+            print("[WatchSession] not reachable — queuing cmd=\(command)")
+            pendingMessages.append(message)
         }
+    }
+
+    private func flushPending() {
+        guard WCSession.default.isReachable, !pendingMessages.isEmpty else { return }
+        let snapshot = pendingMessages
+        pendingMessages.removeAll()
+        print("[WatchSession] flushing \(snapshot.count) pending messages")
+        for m in snapshot {
+            WCSession.default.sendMessage(m, replyHandler: nil) { [weak self] error in
+                print("Watch flush send error: \(error.localizedDescription)")
+                DispatchQueue.main.async { self?.pendingMessages.append(m) }
+            }
+        }
+    }
+
+    // MARK: - Extended Runtime Session (러닝 중 Watch 앱 keep-alive)
+
+    private func startExtendedRuntime() {
+        if let s = extendedSession, s.state == .running { return }
+        let s = WKExtendedRuntimeSession()
+        s.delegate = self
+        s.start(at: Date())
+        extendedSession = s
+    }
+
+    private func stopExtendedRuntime() {
+        extendedSession?.invalidate()
+        extendedSession = nil
+    }
+
+    func extendedRuntimeSessionDidStart(_ extendedRuntimeSession: WKExtendedRuntimeSession) {
+        print("[ExtendedRuntime] started")
+    }
+
+    func extendedRuntimeSessionWillExpire(_ extendedRuntimeSession: WKExtendedRuntimeSession) {
+        print("[ExtendedRuntime] will expire — running session may outlast keep-alive window")
+    }
+
+    func extendedRuntimeSession(_ extendedRuntimeSession: WKExtendedRuntimeSession,
+                                didInvalidateWith reason: WKExtendedRuntimeSessionInvalidationReason,
+                                error: Error?) {
+        print("[ExtendedRuntime] invalidated reason=\(reason.rawValue) err=\(error?.localizedDescription ?? "-")")
+        self.extendedSession = nil
     }
 
     func startHeartRateSync() {
         heartRateTimer = Timer.scheduledTimer(withTimeInterval: 5.0, repeats: true) { [weak self] _ in
             let hr = HealthKitManager.shared.currentHeartRate
             if hr > 0 {
-                self?.sendCommand("heartRate", data: ["heartRate": hr])
+                self?.sendCommand("heartRate", data: ["heartRate": hr], isImportant: false)
             }
         }
     }
@@ -51,6 +111,7 @@ class WatchSessionManager: NSObject, ObservableObject, WCSessionDelegate {
     func session(_ session: WCSession, activationDidCompleteWith activationState: WCSessionActivationState, error: Error?) {
         DispatchQueue.main.async {
             self.isPhoneReachable = session.isReachable
+            self.flushPending()
         }
     }
 
@@ -69,6 +130,7 @@ class WatchSessionManager: NSObject, ObservableObject, WCSessionDelegate {
     func sessionReachabilityDidChange(_ session: WCSession) {
         DispatchQueue.main.async {
             self.isPhoneReachable = session.isReachable
+            if session.isReachable { self.flushPending() }
         }
     }
 
@@ -80,13 +142,16 @@ class WatchSessionManager: NSObject, ObservableObject, WCSessionDelegate {
             if state == .running && previousState != .running {
                 HealthKitManager.shared.requestAuthorization()
                 startHeartRateSync()
+                startExtendedRuntime()
             } else if state == .idle || state == .result {
                 stopHeartRateSync()
+                stopExtendedRuntime()
                 if state == .idle {
                     HealthKitManager.shared.stopHeartRateQuery()
                 }
             } else if state == .paused {
                 stopHeartRateSync()
+                // extendedSession 은 paused 에서 유지 — 곧 resume 가능하므로.
             }
         }
 
