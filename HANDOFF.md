@@ -29,6 +29,42 @@
 
 ## 최신
 
+### 2026-04-22 16:34 (Mac → Windows) — Mac 세팅 완료 ✅ (새 맥미니)
+
+사용자가 새 맥미니 도입, 이제 Windows 주 개발 · Mac iOS/watchOS 담당 구도로 병행. 새 맥 기준 0에서 iOS 빌드 환경 구축.
+
+**설치 완료:**
+- Xcode 26.4.1 (App Store)
+- Command Line Tools for Xcode 26.4 (Homebrew 설치 과정 중 자동)
+- Homebrew 4.x
+- Flutter 3.41.7 stable (Dart 3.11.5) — `/opt/homebrew/share/flutter/bin`
+- CocoaPods 1.16.2 (Homebrew Ruby 4.0.3)
+- 레포 clone: `~/shadow/shadowrun`
+- git local user: `dorisurararara-crypto / dorisurararara@gmail.com` (GitHub 계정 기준 — 이 레포에만 local 설정)
+- ASC 키 저장소 `~/.appstoreconnect/private_keys/` 생성 (chmod 700)
+
+**사용자 마무리 남은 3건 (⚠️ 이 3가지 끝나야 TestFlight 배포 가능):**
+1. `sudo xcode-select --switch /Applications/Xcode.app/Contents/Developer` — 현재 CLT 경로 잡혀있어 `flutter doctor` 에서 Xcode "installation incomplete"
+2. `sudo xcodebuild -runFirstLaunch` — Xcode 첫 실행 컴포넌트 설치
+3. `AuthKey_KQ46867WUN.p8` 을 Windows 에서 Mac 의 `~/.appstoreconnect/private_keys/` 로 복사 후 `chmod 600`
+4. (선택) `echo 'eval "$(/opt/homebrew/bin/brew shellenv)"' >> ~/.zprofile` — 새 터미널 세션에서도 brew PATH 자동 등록
+
+**현재 `flutter doctor` 경고 (위 3건 해결되면 대부분 clean):**
+- [✗] Xcode: xcode-select 가 CLT 경로 (#1 로 해결)
+- [✗] CocoaPods: Xcode 미완성으로 연쇄 에러 (설치 자체는 됨)
+- [✗] Android SDK: 없음 — iOS 만 할 거면 무시
+- [✗] Chrome: 없음 — 웹 빌드 안 할 거면 무시
+
+**다음 세션 예정 순서:**
+1. 사용자 마무리 3건 확인
+2. `flutter pub get` → `cd ios && pod install` → `flutter doctor` clean 확인
+3. 가벼운 `flutter build ios --no-codesign` 으로 첫 Mac 빌드 sanity
+4. 그 뒤부터 `./scripts/deploy_testflight.sh` 원샷 가능
+
+**3분 자동 폴링 (/loop) 은 아직 설정 안 함** — iOS 빌드 한 번 clean 돌려보고 안정화된 다음에 켤 예정.
+
+---
+
 ### 2026-04-19 16:18 (Mac → Windows) — 빌드 21 외부 TestFlight 제출 ✅ (도플갱어 BGM 시작 버그 fix)
 
 **수정 내용 (커밋 `21f8617`):**
