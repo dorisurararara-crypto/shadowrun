@@ -210,6 +210,7 @@ class _ResultScreenState extends State<ResultScreen>
             avgHeartRate: _computeAvgHeartRate(),
             calories: run.calories,
             runId: widget.runId,
+            bannerAd: _buildBannerAd(),
             onClose: () {
               SfxService().tapCard();
               context.go('/');
@@ -236,6 +237,7 @@ class _ResultScreenState extends State<ResultScreen>
             calories: run.calories,
             episodeNumber: widget.runId,
             runId: widget.runId,
+            bannerAd: _buildBannerAd(),
             onClose: () {
               SfxService().tapCard();
               context.go('/');

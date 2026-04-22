@@ -11,12 +11,16 @@ class MysticHomeLayout extends StatelessWidget {
   final Future<Map<String, dynamic>> statsFuture;
   final Future<List<RunModel>> runsFuture;
   final VoidCallback onRefresh;
+  final Future<int> challengeCountFuture;
+  final Future<void> Function(BuildContext) onAdPlusOneTapped;
 
   const MysticHomeLayout({
     super.key,
     required this.statsFuture,
     required this.runsFuture,
     required this.onRefresh,
+    required this.challengeCountFuture,
+    required this.onAdPlusOneTapped,
   });
 
   static const _ink = Color(0xFF050302);
@@ -367,6 +371,7 @@ class MysticHomeLayout extends StatelessWidget {
         // 시작 카드 2종: 도플갱어 추격(=챌린지) + 새 기록(=자유/전설)
         _doppelgangerCard(context),
         const SizedBox(height: 12),
+        _adPlusOneButton(context),
         _newRecordCard(context),
 
         const SizedBox(height: 28),
@@ -573,6 +578,50 @@ class MysticHomeLayout extends StatelessWidget {
           ),
         ),
       ],
+    );
+  }
+
+  /// "광고 +1" 버튼 — 일일 도전권 소진(used >= maxFree) 시에만 노출
+  /// default layout 과 동일 조건: remaining == 0 ⇔ used >= 3.
+  Widget _adPlusOneButton(BuildContext context) {
+    return FutureBuilder<int>(
+      future: challengeCountFuture,
+      builder: (context, snap) {
+        const maxFree = 3;
+        final used = snap.data ?? 0;
+        if (used < maxFree) return const SizedBox.shrink();
+        return Padding(
+          padding: const EdgeInsets.only(bottom: 12),
+          child: GestureDetector(
+            behavior: HitTestBehavior.opaque,
+            onTap: () => onAdPlusOneTapped(context),
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              decoration: BoxDecoration(
+                color: _ink,
+                border: Border.all(color: _bloodFresh.withValues(alpha: 0.5), width: 1),
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(Icons.play_circle_outline, size: 14, color: _bloodFresh),
+                  const SizedBox(width: 8),
+                  Text(
+                    S.isKo ? '광고 +1' : 'AD +1',
+                    style: GoogleFonts.nanumMyeongjo(
+                      fontSize: 11,
+                      color: _bloodFresh,
+                      letterSpacing: 3,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
     );
   }
 

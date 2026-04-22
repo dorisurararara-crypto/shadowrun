@@ -45,6 +45,9 @@ class PureResultLayout extends StatelessWidget {
   /// DB에서 splits/페이스 분포를 조회할 runId. null이면 상세 섹션 생략.
   final int? runId;
 
+  /// 배너 광고 위젯 (free 유저에 한해 result_screen 이 주입). null = 비노출.
+  final Widget? bannerAd;
+
   const PureResultLayout({
     super.key,
     required this.isWin,
@@ -61,6 +64,7 @@ class PureResultLayout extends StatelessWidget {
     this.onShare,
     this.onRestart,
     this.runId,
+    this.bannerAd,
   });
 
   // Pure Cinematic 팔레트 (full-t1-pure.html 참고)
@@ -190,6 +194,10 @@ class PureResultLayout extends StatelessWidget {
                           ),
                         ),
                       const SizedBox(height: 28),
+                      if (bannerAd != null) ...[
+                        bannerAd!,
+                        const SizedBox(height: 16),
+                      ],
                       _buildActions(),
                       const SizedBox(height: 12),
                     ],

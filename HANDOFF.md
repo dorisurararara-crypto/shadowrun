@@ -29,6 +29,50 @@
 
 ## 최신
 
+### 2026-04-23 01:35 (Mac → Windows) — I-8/I-9 fix: Pure/Mystic 테마에 광고 UI 이식 ✅
+
+**핵심 요약:** `home_screen` default layout 에만 있던 광고 UI 2종이 Pure Cinematic / Korean Mystic 테마에는 누락돼 있었음. 사용자 대부분이 Pure/Mystic 을 쓰므로 **보상형 광고 +1 버튼**과 **Result 배너 광고**가 사실상 비노출 — AdMob 수익·UX 직접 타격. 이번 세션에서 두 군데 모두 이식.
+
+#### I-8 — 홈 "광고 +1" 보상형 광고 버튼 누락 (Pure/Mystic)
+
+- **원인:** `home_screen._buildDailyChallengeCard` 에만 `remaining == 0` 시 노출되는 GestureDetector (`AdService().showRewardedAd` 트리거) 가 있었음. `PureHomeLayout`·`MysticHomeLayout` 에는 아예 없음.
+- **수정:**
+  - `home_screen.dart`: `_triggerAdPlusOne(BuildContext)` 메서드 신설 — AdService 호출 + `daily_challenges` 1 감소 + `setState` 재집계. default layout 의 GestureDetector onTap 도 이 메서드 사용으로 단순화.
+  - `pure_home_layout.dart` / `mystic_home_layout.dart`: `challengeCountFuture` (Future<int>) + `onAdPlusOneTapped` (Future<void> Function(BuildContext)) 2개 props 추가. Doppelgänger 카드 바로 아래에 `_adPlusOneButton(context)` 위젯 추가. `used >= 3` (maxFree) 일 때만 노출 — default 의 `remaining == 0` 조건과 동일.
+  - 버튼 스타일은 각 테마 팔레트에 맞춤: Pure 는 `_bloodSub` + Playfair Italic, Mystic 은 `_bloodFresh` + Nanum Myeongjo.
+
+#### I-9 — Result 화면 배너 광고 누락 (Pure/Mystic)
+
+- **원인:** `result_screen._buildDefaultLayout` 만 `_buildBannerAd()` 를 body 에 삽입. `PureResultLayout`·`MysticResultLayout` 에는 배너 Widget 받을 자리가 없어 Pure/Mystic 유저에겐 Result 배너가 아예 안 뜸.
+- **수정:**
+  - `pure_result_layout.dart` / `mystic_result_layout.dart`: `Widget? bannerAd` prop 추가 (nullable, Pro 유저면 null). `_buildActions` 직전에 `if (bannerAd != null) bannerAd!` 삽입.
+  - `result_screen.dart`: Pure/Mystic 호출부에 `bannerAd: _buildBannerAd()` 전달 (Stateful 부모가 rebuild 시 새 widget 공급 → `_bannerReady` 플래그 setState 전파 정상).
+
+#### 시뮬 검증 결과
+
+- `flutter analyze lib/features/` — No issues found ✅
+- `flutter build ios --simulator --debug -d $IPHONE_UDID` 2회 빌드 성공 ✅
+- **광고 +1 버튼 실제 노출 확인**: iPhone 17 시뮬 + Pure 테마 + `daily_challenges=3` 상태에서 홈 스크린샷 `/tmp/shadowrun-screenshots/apre-02-home-fixed.png` 에 Doppelgänger 카드 아래 빨간 보더의 "▶ 광고 +1" 버튼 렌더 확인 ✅
+- **실제 광고 재생 풀스크린 캡쳐는 이번 세션 미완** — iOS 시뮬레이터 device window 가 `osascript get windows` 에서 empty 반환하는 macOS 측 window-server 이슈로 `cliclick` 탭이 시뮬 안쪽에 도달하지 못함. Simulator.app killall + open + File > Open Simulator 메뉴 클릭 시도 전부 창 재등장 실패. 시뮬 device 는 `simctl io screenshot` 에선 정상 출력돼 launch 자체는 살아있지만 GUI 상호작용 불가 상태. 다음 세션에서 시뮬 창 복구 후 (혹은 실기 TestFlight 로) 재생 캡쳐 필요.
+
+#### Windows 작업자가 알아둘 것
+
+- I-8 구현 시 `_adPlusOneButton` 조건을 처음엔 `count != 0` (버튼은 count==0 만 노출) 로 넣었다가 **로직 반전 버그**였던 걸 발견해 `used < maxFree` 면 숨김 (= `used >= 3` 일 때 노출) 로 수정. default layout 의 `remaining == 0` 과 동치. 리뷰 시 조건 방향 재확인 부탁.
+- Pure/Mystic layout 의 추가 props 는 모두 `required` (Nullable 아님) — home_screen/result_screen 쓰는 곳 외에서 참조 시 컴파일 에러. 현재 쓰는 곳은 home_screen `_build` 와 result_screen `build` 두 군데뿐.
+- 배너 Widget (`bannerAd`) 은 Pro 유저일 때도 `_buildBannerAd()` 가 `SizedBox.shrink()` 반환하므로 null 체크 생략 가능하지만, layout 측 props 는 일단 nullable 로 둬서 Pro 분기에서 명시적으로 null 넘길 여지 열어둠.
+
+#### 다음 세션 할 일 (Mac)
+
+1. **A-pre 광고 재생 풀스크린 실캡쳐 (최우선)** — 시뮬 창 복구 후:
+   - 홈 "광고 +1" 버튼 탭 → `AdService().showRewardedAd` → 풀스크린 광고 재생 → 3~5초 간격 2~3장
+   - 자유 러닝 1건 종료 → Result 진입 → `배너 광고 로드 완료` 로그 후 1장
+2. **P5 Watch 런타임 검증** — 이전 블록의 ExtendedRuntime / WCSession 플로우.
+3. **P7 Edge 시나리오** — 회전 / 메모리 경고 / 인터럽션.
+4. **P6 Mystic 시각 재검증** — `is_pro=true` + `theme_id=korean_mystic` 둘 다 세팅 후 앱 재시작.
+5. (트랙 별개) **I-5 BGM 트랙 교체** — 오디오 파일 작업.
+
+---
+
 ### 2026-04-22 23:14 (Mac → Windows) — 버그 fix 2건 (BGM + Watch) + 시뮬레이터에서 버그 A 동작 검증 ✅
 
 사용자 TestFlight 리포트 2건 수정. 버그 A (iPhone BGM) 는 iPhone 17 시뮬레이터에서 **로그로 2회 재현성 확인**, 버그 B (Watch) 는 코드 수정 + 빌드 통과까지 (실기 검증은 TestFlight 필요).

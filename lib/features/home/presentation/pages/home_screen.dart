@@ -78,6 +78,28 @@ class _HomeScreenState extends State<HomeScreen> {
 
   void _refresh() => setState(() => _loadData());
 
+  /// 일일 도전권 소진 시 보상형 광고를 재생하고 `daily_challenges` 를 1 차감한다.
+  /// Default/Pure/Mystic 세 레이아웃이 공유. `ctx` 는 SnackBar 를 띄울 Scaffold descendant.
+  Future<void> _triggerAdPlusOne(BuildContext ctx) async {
+    SfxService().tapCard();
+    final success = await AdService().showRewardedAd(
+      onRewarded: () async {
+        final count = await DatabaseHelper.getDailyChallengeCount();
+        if (count > 0) {
+          await DatabaseHelper.setSetting('daily_challenges', '${count - 1}');
+        }
+        if (mounted) {
+          setState(() => _challengeCountFuture = DatabaseHelper.getDailyChallengeCount());
+        }
+      },
+    );
+    if (!success && ctx.mounted) {
+      ScaffoldMessenger.of(ctx).showSnackBar(
+        SnackBar(content: Text(S.adLoading), backgroundColor: SRColors.surface),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return ValueListenableBuilder(
@@ -88,6 +110,8 @@ class _HomeScreenState extends State<HomeScreen> {
             statsFuture: _statsFuture,
             runsFuture: _runsFuture,
             onRefresh: _refresh,
+            challengeCountFuture: _challengeCountFuture,
+            onAdPlusOneTapped: _triggerAdPlusOne,
           );
         }
         if (themeId == ThemeId.pureCinematic) {
@@ -95,6 +119,8 @@ class _HomeScreenState extends State<HomeScreen> {
             statsFuture: _statsFuture,
             runsFuture: _runsFuture,
             onRefresh: _refresh,
+            challengeCountFuture: _challengeCountFuture,
+            onAdPlusOneTapped: _triggerAdPlusOne,
           );
         }
         return _buildDefaultLayout(context);
@@ -523,22 +549,7 @@ class _HomeScreenState extends State<HomeScreen> {
               Padding(
                 padding: const EdgeInsets.only(right: 16),
                 child: GestureDetector(
-                  onTap: () async {
-                    SfxService().tapCard();
-                    final success = await AdService().showRewardedAd(
-                      onRewarded: () async {
-                        final count = await DatabaseHelper.getDailyChallengeCount();
-                        if (count > 0) await DatabaseHelper.setSetting('daily_challenges', '${count - 1}');
-                        if (mounted) setState(() => _challengeCountFuture = DatabaseHelper.getDailyChallengeCount());
-                      },
-                    );
-                    if (!success) {
-                      if (!context.mounted) return;
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text(S.adLoading), backgroundColor: SRColors.surface),
-                      );
-                    }
-                  },
+                  onTap: () => _triggerAdPlusOne(context),
                   child: Container(
                     padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                     decoration: BoxDecoration(

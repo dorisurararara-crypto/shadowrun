@@ -13,12 +13,16 @@ class PureHomeLayout extends StatelessWidget {
   final Future<Map<String, dynamic>> statsFuture;
   final Future<List<RunModel>> runsFuture;
   final VoidCallback onRefresh;
+  final Future<int> challengeCountFuture;
+  final Future<void> Function(BuildContext) onAdPlusOneTapped;
 
   const PureHomeLayout({
     super.key,
     required this.statsFuture,
     required this.runsFuture,
     required this.onRefresh,
+    required this.challengeCountFuture,
+    required this.onAdPlusOneTapped,
   });
 
   // ─── Pure Cinematic 팔레트 ──────────────────────────────────
@@ -205,6 +209,7 @@ class PureHomeLayout extends StatelessWidget {
         // ── Doppelgänger card (begin tonight's run) ──
         _doppelgangerCard(context),
         const SizedBox(height: 14),
+        _adPlusOneButton(context),
         _newRecordCard(context),
 
         const SizedBox(height: 32),
@@ -459,6 +464,51 @@ class PureHomeLayout extends StatelessWidget {
           ),
         ),
       ],
+    );
+  }
+
+  // ─── "광고 +1" 버튼 — 일일 도전권 소진(used >= maxFree) 시에만 노출 ─────
+  // default layout 과 동일한 조건: remaining == 0 ⇔ used >= 3.
+  Widget _adPlusOneButton(BuildContext context) {
+    return FutureBuilder<int>(
+      future: challengeCountFuture,
+      builder: (context, snap) {
+        const maxFree = 3;
+        final used = snap.data ?? 0;
+        if (used < maxFree) return const SizedBox.shrink();
+        return Padding(
+          padding: const EdgeInsets.only(bottom: 14),
+          child: GestureDetector(
+            behavior: HitTestBehavior.opaque,
+            onTap: () => onAdPlusOneTapped(context),
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              decoration: BoxDecoration(
+                color: _ink,
+                border: Border.all(color: _bloodSub.withValues(alpha: 0.5), width: 1),
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(Icons.play_circle_outline, size: 14, color: _bloodSub),
+                  const SizedBox(width: 8),
+                  Text(
+                    S.isKo ? '광고 +1' : 'AD +1',
+                    style: GoogleFonts.playfairDisplay(
+                      fontSize: 11,
+                      fontStyle: FontStyle.italic,
+                      color: _bloodSub,
+                      letterSpacing: 2,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
     );
   }
 
