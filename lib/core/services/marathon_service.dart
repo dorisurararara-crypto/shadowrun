@@ -6,6 +6,7 @@ import 'package:vibration/vibration.dart';
 import 'package:shadowrun/core/l10n/app_strings.dart';
 import 'package:shadowrun/core/services/bgm_preferences.dart';
 import 'package:shadowrun/core/services/watch_connector_service.dart';
+import 'package:shadowrun/core/theme/theme_id.dart';
 import 'package:shadowrun/core/theme/theme_manager.dart';
 import 'package:shadowrun/features/running/data/legend_runners.dart';
 
@@ -17,6 +18,21 @@ class MarathonService {
   String _voiceId = 'drill';
   bool _isDisposed = false;
   bool _isPlaying = false;
+
+  /// 테마별 고정 voice (새 3테마). 사용자 설정 무시, 캐릭터 보이스 강제.
+  String get _effectiveVoice {
+    switch (ThemeManager.I.currentId) {
+      case ThemeId.filmNoir:
+        return 'drill';
+      case ThemeId.editorial:
+        return 'harry';
+      case ThemeId.neoNoirCyber:
+        return 'callum';
+      case ThemeId.pureCinematic:
+      case ThemeId.koreanMystic:
+        return _voiceId;
+    }
+  }
 
   final Set<int> _playedKmMilestones = {};
   final Set<int> _playedTimeMinutes = {};
@@ -285,11 +301,12 @@ class MarathonService {
         langBase = '${baseName}_en_$variant';
       }
 
+      final voice = _effectiveVoice;
       String filename;
-      if (_voiceId == 'harry') {
+      if (voice == 'harry') {
         filename = '$langBase.mp3';
       } else {
-        filename = '${langBase}_$_voiceId.mp3';
+        filename = '${langBase}_$voice.mp3';
       }
 
       await _ttsPlayer.setAsset('assets/audio/$filename');
@@ -329,11 +346,12 @@ class MarathonService {
         name = '${baseName}_$number';
       }
 
+      final voice = _effectiveVoice;
       String filename;
-      if (_voiceId == 'harry') {
+      if (voice == 'harry') {
         filename = '$name.mp3';
       } else {
-        filename = '${name}_$_voiceId.mp3';
+        filename = '${name}_$voice.mp3';
       }
 
       await _ttsPlayer.setAsset('assets/audio/$filename');

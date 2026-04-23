@@ -77,8 +77,39 @@ class SfxService {
 
   // === Run End ===
   Future<void> doorClose() => play('sfx_door_close.mp3');
-  Future<void> victory() => play('sfx_victory.mp3');
-  Future<void> defeat() => play('sfx_defeat.mp3');
+  Future<void> victory() {
+    final themeFile = _themeFile('victory');
+    return play(themeFile ?? 'sfx_victory.mp3');
+  }
+  Future<void> defeat() {
+    final themeFile = _themeFile('defeat');
+    return play(themeFile ?? 'sfx_defeat.mp3');
+  }
+
+  /// 테마별 러닝 시작 signature. noir/editorial/cyber 는 전용 SFX,
+  /// Pure/Mystic 은 기존 whistle 로 fallback (whistle 이 범용).
+  Future<void> themeStart() async {
+    final themeFile = _themeFile('start');
+    if (themeFile != null) {
+      return play(themeFile);
+    }
+    return whistle();
+  }
+
+  /// 새 3테마 전용 signature SFX 파일 매핑. 그 외는 null (기본 SFX 사용).
+  String? _themeFile(String kind) {
+    switch (ThemeManager.I.currentId) {
+      case ThemeId.filmNoir:
+        return 'sfx_noir_$kind.mp3';
+      case ThemeId.editorial:
+        return 'sfx_editorial_$kind.mp3';
+      case ThemeId.neoNoirCyber:
+        return 'sfx_cyber_$kind.mp3';
+      case ThemeId.pureCinematic:
+      case ThemeId.koreanMystic:
+        return null;
+    }
+  }
 
   // === Result Screen ===
   Future<void> reportOpen() => play('sfx_report_open.mp3');

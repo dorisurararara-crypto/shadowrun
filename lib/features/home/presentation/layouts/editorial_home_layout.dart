@@ -90,6 +90,79 @@ class EditorialHomeLayout extends StatelessWidget {
           ),
         ],
       ),
+      bottomNavigationBar: _buildBottomNav(context),
+    );
+  }
+
+  // ─── Bottom nav (magazine style) ───────────────────────
+  Widget _buildBottomNav(BuildContext context) {
+    return Container(
+      decoration: const BoxDecoration(
+        color: _ink,
+        border: Border(top: BorderSide(color: _white, width: 2)),
+      ),
+      child: SafeArea(
+        top: false,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 10),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              _navItem('COVER', 'home', active: true, onTap: () {}),
+              _navItem('BACK', 'archive', onTap: () {
+                SfxService().tapCard();
+                context.push('/history');
+              }),
+              _navItem('REPORT', 'stats', onTap: () {
+                SfxService().tapCard();
+                context.push('/analysis');
+              }),
+              _navItem('MAST', 'settings', onTap: () {
+                SfxService().tapCard();
+                context.push('/settings');
+              }),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _navItem(
+    String top,
+    String bottom, {
+    bool active = false,
+    required VoidCallback onTap,
+  }) {
+    final color = active ? _red : _muted;
+    return Expanded(
+      child: InkWell(
+        onTap: onTap,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              top,
+              style: GoogleFonts.inter(
+                fontSize: 9,
+                fontWeight: FontWeight.w700,
+                color: color,
+                letterSpacing: 3,
+              ),
+            ),
+            const SizedBox(height: 3),
+            Text(
+              bottom,
+              style: GoogleFonts.playfairDisplay(
+                fontSize: 10,
+                fontStyle: FontStyle.italic,
+                color: color,
+                fontWeight: FontWeight.w400,
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 

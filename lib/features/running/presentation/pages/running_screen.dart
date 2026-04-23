@@ -26,7 +26,10 @@ import 'package:shadowrun/core/services/watch_connector_service.dart';
 import 'package:shadowrun/core/services/health_service.dart';
 import 'package:shadowrun/core/theme/theme_manager.dart';
 import 'package:shadowrun/core/theme/theme_id.dart';
+import 'package:shadowrun/features/running/presentation/layouts/cyber_running_layout.dart';
+import 'package:shadowrun/features/running/presentation/layouts/editorial_running_layout.dart';
 import 'package:shadowrun/features/running/presentation/layouts/mystic_running_layout.dart';
+import 'package:shadowrun/features/running/presentation/layouts/noir_running_layout.dart';
 import 'package:shadowrun/features/running/presentation/layouts/pure_running_layout.dart';
 import 'package:shadowrun/features/running/data/legend_runners.dart';
 
@@ -316,6 +319,13 @@ class _RunningScreenState extends State<RunningScreen>
       // startup 완료 — 현재 UI 상태를 실제 서비스에 반영.
       SfxService().enabled = _sfxOn;
       _syncAudioState();
+
+      // 테마 전용 signature SFX (러닝 시작) — noir/editorial/cyber 만 다른 음색,
+      // 그 외 테마는 기존 whistle 로 fallback. TTS 보다 먼저 한 번만.
+      if (_sfxOn) {
+        // ignore: unawaited_futures
+        SfxService().themeStart();
+      }
 
       // 모드별 시작 TTS
       if (_ttsOn) {
@@ -1048,6 +1058,15 @@ class _RunningScreenState extends State<RunningScreen>
         if (themeId == ThemeId.pureCinematic) {
           return _buildPureLayout();
         }
+        if (themeId == ThemeId.filmNoir) {
+          return _buildNoirLayout();
+        }
+        if (themeId == ThemeId.editorial) {
+          return _buildEditorialLayout();
+        }
+        if (themeId == ThemeId.neoNoirCyber) {
+          return _buildCyberLayout();
+        }
         return _buildDefaultLayout();
       },
     );
@@ -1094,6 +1113,105 @@ class _RunningScreenState extends State<RunningScreen>
       _activeOverlayIds.clear();
     });
     final content = PureRunningLayout(
+      elapsedSeconds: _runService.durationS,
+      distanceM: _runService.totalDistanceM,
+      paceText: _runService.formattedPace,
+      shadowGapM: _runService.shadowDistanceM,
+      isPaused: _paused,
+      onPauseTap: _togglePause,
+      onStopTap: _confirmStop,
+      isChallenge: widget.shadowRunId != null,
+      runMode: widget.runMode,
+      mapChild: map,
+      ttsOn: _ttsOn,
+      sfxOn: _sfxOn,
+      onToggleTts: () {
+        setState(() => _ttsOn = !_ttsOn);
+        _horrorService.ttsEnabled = _ttsOn;
+      },
+      onToggleSfx: () {
+        setState(() => _sfxOn = !_sfxOn);
+        SfxService().enabled = _sfxOn;
+        _syncAudioState();
+      },
+    );
+    return _applyJumpscareOverlays(content);
+  }
+
+  /// T2 Film Noir 레이아웃.
+  Widget _buildNoirLayout() {
+    final map = _buildNaverMap(onReady: (c) {
+      _mapController = c;
+      _lastAddedKmMarker = 0;
+      _activeOverlayIds.clear();
+    });
+    final content = NoirRunningLayout(
+      elapsedSeconds: _runService.durationS,
+      distanceM: _runService.totalDistanceM,
+      paceText: _runService.formattedPace,
+      shadowGapM: _runService.shadowDistanceM,
+      isPaused: _paused,
+      onPauseTap: _togglePause,
+      onStopTap: _confirmStop,
+      isChallenge: widget.shadowRunId != null,
+      runMode: widget.runMode,
+      mapChild: map,
+      ttsOn: _ttsOn,
+      sfxOn: _sfxOn,
+      onToggleTts: () {
+        setState(() => _ttsOn = !_ttsOn);
+        _horrorService.ttsEnabled = _ttsOn;
+      },
+      onToggleSfx: () {
+        setState(() => _sfxOn = !_sfxOn);
+        SfxService().enabled = _sfxOn;
+        _syncAudioState();
+      },
+    );
+    return _applyJumpscareOverlays(content);
+  }
+
+  /// T4 Editorial Thriller 레이아웃.
+  Widget _buildEditorialLayout() {
+    final map = _buildNaverMap(onReady: (c) {
+      _mapController = c;
+      _lastAddedKmMarker = 0;
+      _activeOverlayIds.clear();
+    });
+    final content = EditorialRunningLayout(
+      elapsedSeconds: _runService.durationS,
+      distanceM: _runService.totalDistanceM,
+      paceText: _runService.formattedPace,
+      shadowGapM: _runService.shadowDistanceM,
+      isPaused: _paused,
+      onPauseTap: _togglePause,
+      onStopTap: _confirmStop,
+      isChallenge: widget.shadowRunId != null,
+      runMode: widget.runMode,
+      mapChild: map,
+      ttsOn: _ttsOn,
+      sfxOn: _sfxOn,
+      onToggleTts: () {
+        setState(() => _ttsOn = !_ttsOn);
+        _horrorService.ttsEnabled = _ttsOn;
+      },
+      onToggleSfx: () {
+        setState(() => _sfxOn = !_sfxOn);
+        SfxService().enabled = _sfxOn;
+        _syncAudioState();
+      },
+    );
+    return _applyJumpscareOverlays(content);
+  }
+
+  /// T5 Neo-Noir Cyber 레이아웃.
+  Widget _buildCyberLayout() {
+    final map = _buildNaverMap(onReady: (c) {
+      _mapController = c;
+      _lastAddedKmMarker = 0;
+      _activeOverlayIds.clear();
+    });
+    final content = CyberRunningLayout(
       elapsedSeconds: _runService.durationS,
       distanceM: _runService.totalDistanceM,
       paceText: _runService.formattedPace,

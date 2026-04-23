@@ -13,13 +13,6 @@ class SoloTtsService {
   String _voiceId = 'harry';
   final _rng = Random();
 
-  // v3/v4/zen3 제외 — ffmpeg 측정으로 삐이잉(v3 고주파 톤) / 클리핑(v4 0dBTP, zen3 -18 LUFS) 확정.
-  // 모바일 BGM 기준 -23 LUFS 내외 + True Peak -2 dBTP 이하만 유지. default 테마 fallback.
-  static const _bgmOptions = [
-    'bgm_running_ambient.mp3', 'bgm_running_ambient_v2.mp3', 'bgm_running_ambient_v5.mp3',
-    'bgm_freerun_zen1.mp3', 'bgm_freerun_zen2.mp3', 'bgm_freerun_zen4.mp3',
-  ];
-
   // Pure Cinematic 테마 — ElevenLabs Music API 2026-04-23 생성, noir minimal piano ambient.
   static const _pureFreerunPool = [
     'themes/t1_freerun_v1.mp3', 'themes/t1_freerun_v2.mp3',
@@ -30,16 +23,50 @@ class SoloTtsService {
     'themes/t3_freerun_v1.mp3', 'themes/t3_freerun_v2.mp3',
   ];
 
+  // Film Noir (T2) — 1940s jazz ambient walking.
+  static const _noirFreerunPool = [
+    'themes/t2_freerun_v1.mp3', 'themes/t2_freerun_v2.mp3',
+  ];
+
+  // Editorial (T4) — 모던 orchestral + electronic pulse ambient.
+  static const _editorialFreerunPool = [
+    'themes/t4_freerun_v1.mp3', 'themes/t4_freerun_v2.mp3',
+  ];
+
+  // Neo-Noir Cyber (T5) — chill synthwave flow.
+  static const _cyberFreerunPool = [
+    'themes/t5_freerun_v1.mp3', 'themes/t5_freerun_v2.mp3',
+  ];
+
   /// 현재 테마에 맞는 자유러닝 BGM 파일 선택.
   String _pickBgm() {
-    final themeId = ThemeManager.I.currentId;
-    if (themeId == ThemeId.koreanMystic) {
-      return _mysticFreerunPool[_rng.nextInt(_mysticFreerunPool.length)];
+    switch (ThemeManager.I.currentId) {
+      case ThemeId.koreanMystic:
+        return _mysticFreerunPool[_rng.nextInt(_mysticFreerunPool.length)];
+      case ThemeId.pureCinematic:
+        return _pureFreerunPool[_rng.nextInt(_pureFreerunPool.length)];
+      case ThemeId.filmNoir:
+        return _noirFreerunPool[_rng.nextInt(_noirFreerunPool.length)];
+      case ThemeId.editorial:
+        return _editorialFreerunPool[_rng.nextInt(_editorialFreerunPool.length)];
+      case ThemeId.neoNoirCyber:
+        return _cyberFreerunPool[_rng.nextInt(_cyberFreerunPool.length)];
     }
-    if (themeId == ThemeId.pureCinematic) {
-      return _pureFreerunPool[_rng.nextInt(_pureFreerunPool.length)];
+  }
+
+  /// 테마별 고정 voice. 새 3테마는 캐릭터 보이스로 강제.
+  String get _effectiveVoice {
+    switch (ThemeManager.I.currentId) {
+      case ThemeId.filmNoir:
+        return 'drill';
+      case ThemeId.editorial:
+        return 'harry';
+      case ThemeId.neoNoirCyber:
+        return 'callum';
+      case ThemeId.pureCinematic:
+      case ThemeId.koreanMystic:
+        return _voiceId;
     }
-    return _bgmOptions[_rng.nextInt(_bgmOptions.length)];
   }
 
   Future<void> initialize({String voice = 'harry'}) async {
@@ -81,12 +108,14 @@ class SoloTtsService {
         langBase = '${baseName.substring(0, lastUnderscore)}_en${baseName.substring(lastUnderscore)}';
       }
 
-      // 음성 분기: harry는 기본 파일명, callum/drill은 접미사
+      // 음성 분기: harry는 기본 파일명, callum/drill은 접미사.
+      // 새 3테마는 사용자 voice 설정 무시하고 테마 고정 voice (특색 강화).
+      final voice = _effectiveVoice;
       String filename;
-      if (_voiceId == 'harry') {
+      if (voice == 'harry') {
         filename = '$langBase.mp3';
       } else {
-        filename = '${langBase}_$_voiceId.mp3';
+        filename = '${langBase}_$voice.mp3';
       }
 
       await _ttsPlayer.setAsset('assets/audio/$filename');

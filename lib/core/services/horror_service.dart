@@ -146,6 +146,24 @@ class HorrorService {
     'themes/t3_run_v2.mp3',
   ];
 
+  // Film Noir (T2) 전용 추격 BGM — 1940s 재즈 pursuit score.
+  static const _noirDoppelgangerPool = [
+    'themes/t2_chase_v1.mp3',
+    'themes/t2_chase_v2.mp3',
+  ];
+
+  // Editorial Thriller (T4) 전용 추격 BGM — 모던 스릴러 score.
+  static const _editorialDoppelgangerPool = [
+    'themes/t4_chase_v1.mp3',
+    'themes/t4_chase_v2.mp3',
+  ];
+
+  // Neo-Noir Cyber (T5) 전용 추격 BGM — darksynth pursuit.
+  static const _cyberDoppelgangerPool = [
+    'themes/t5_chase_v1.mp3',
+    'themes/t5_chase_v2.mp3',
+  ];
+
   // 구간별 배경음 볼륨
   static const _bgmVolume = {
     ThreatLevel.aheadFar: 0.3,
@@ -159,10 +177,21 @@ class HorrorService {
     ThreatLevel.critical: 0.9,
   };
 
-  /// 현재 테마·레벨에 맞는 BGM 파일 1개 선택. Mystic 은 t3_run_v* 풀 사용.
+  /// 현재 테마·레벨에 맞는 BGM 파일 1개 선택.
+  /// T3 Mystic / T2 Noir / T4 Editorial / T5 Cyber 는 전용 chase 풀(ThreatLevel 무관).
+  /// 그 외는 default chase 풀 (bgm_chase_*.mp3, level 별 변형).
   String? _pickBgmFile(ThreatLevel level) {
-    if (ThemeManager.I.currentId == ThemeId.koreanMystic) {
-      return _mysticDoppelgangerPool[_rng.nextInt(_mysticDoppelgangerPool.length)];
+    switch (ThemeManager.I.currentId) {
+      case ThemeId.koreanMystic:
+        return _mysticDoppelgangerPool[_rng.nextInt(_mysticDoppelgangerPool.length)];
+      case ThemeId.filmNoir:
+        return _noirDoppelgangerPool[_rng.nextInt(_noirDoppelgangerPool.length)];
+      case ThemeId.editorial:
+        return _editorialDoppelgangerPool[_rng.nextInt(_editorialDoppelgangerPool.length)];
+      case ThemeId.neoNoirCyber:
+        return _cyberDoppelgangerPool[_rng.nextInt(_cyberDoppelgangerPool.length)];
+      case ThemeId.pureCinematic:
+        break;
     }
     final list = _bgmVariants[level];
     if (list == null || list.isEmpty) return null;
@@ -361,6 +390,22 @@ class HorrorService {
     }
   }
 
+  /// 테마별 고정 voice. 사용자가 설정에서 고른 voice 는 Pure/Mystic 에서만 사용되고,
+  /// 새 3테마는 테마 캐릭터에 맞는 보이스로 강제. "목소리 설정 무관 특색 있는 TTS" 목적.
+  String get _effectiveVoice {
+    switch (ThemeManager.I.currentId) {
+      case ThemeId.filmNoir:
+        return 'drill'; // 깊은 하드보일드 남성 내레이터
+      case ThemeId.editorial:
+        return 'harry'; // 영국 저널리스트 톤
+      case ThemeId.neoNoirCyber:
+        return 'callum'; // 사이버 쿨 스코티시
+      case ThemeId.pureCinematic:
+      case ThemeId.koreanMystic:
+        return _voiceId;
+    }
+  }
+
   Future<void> _playTts(String baseName, {bool force = false}) async {
     if (_isDisposed || _isTtsPlaying) return;
     if (_silenced && !force) return;
@@ -382,12 +427,14 @@ class HorrorService {
         }
       }
 
-      // 음성 분기: harry는 기본 파일명, callum/drill은 접미사
+      // 음성 분기: harry는 기본 파일명, callum/drill은 접미사.
+      // _effectiveVoice 가 테마별 고정 voice 를 반영 (사용자 설정 무시, 특색 강화).
+      final voice = _effectiveVoice;
       String filename;
-      if (_voiceId == 'harry') {
+      if (voice == 'harry') {
         filename = '$langBase.mp3';
       } else {
-        filename = '${langBase}_$_voiceId.mp3';
+        filename = '${langBase}_$voice.mp3';
       }
 
       await _ttsPlayer.stop();
