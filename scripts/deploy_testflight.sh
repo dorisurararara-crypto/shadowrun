@@ -42,8 +42,10 @@ fi
 echo "=== version: $ver+$cur_build → $ver+$new_build (ASC max=${asc_max:-?}) ==="
 sed -i '' "s/^version: .*/version: ${ver}+${new_build}/" pubspec.yaml
 
-echo "=== flutter build ipa --release ==="
-flutter build ipa --release
+echo "=== flutter build ipa --release (build-number=${new_build} 명시) ==="
+# pubspec sed 만으로는 Flutter 빌드 캐시 때문에 이전 build-number 가 그대로 ipa 에 박힐 수 있음.
+# Apple 이 "previous: N" 으로 중복 거부하는 것을 막기 위해 --build-number 로 강제 지정.
+flutter build ipa --release --build-number "${new_build}" --build-name "${ver}"
 
 echo "=== xcrun altool --validate-app ==="
 xcrun altool --validate-app --type ios -f "$IPA_PATH" \
