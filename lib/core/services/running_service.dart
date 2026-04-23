@@ -12,9 +12,8 @@ class RunningService extends ChangeNotifier {
   static const double minSpeedMps = 1.0; // 3.6 km/h
   static const double maxSpeedMps = 8.0; // 28.8 km/h
   static const int _shadowGracePeriodS = 15; // 시작 후 15초 유예
-  // GPS 지연/정지 방어: grace 후에도 사용자 움직임이 적으면 60초까지 도플갱어 대기
-  static const int _shadowStartupMaxS = 60;
-  static const double _shadowStartupMinM = 20;
+  // 사용자는 도플갱어보다 200m 앞서 출발. UI/격차 계산 공통 기준값.
+  static const double _shadowInitialLeadM = 200;
   bool kmSplitTtsEnabled = true; // 마라토너 모드에서는 false (MarathonService가 처리)
 
   // 백그라운드에서도 동작하는 GPS 콜백 (Timer 대체)
@@ -116,13 +115,12 @@ class RunningService extends ChangeNotifier {
   }
 
   /// 도플갱어와의 거리 (양수 = 앞서는 중, 음수 = 뒤처지는 중)
-  /// 도플갱어 위치 업데이트 (GPS 콜백에서 1번만 호출)
+  /// 도플갱어 위치 업데이트 (GPS 콜백 + 1초 Timer 양쪽에서 호출).
+  /// grace 해제 직후 점프 방지 — 15초 후부터 shadowElapsedS 가 0 에서 점진 증가.
   void updateShadowPosition() {
     if (_shadowPoints == null || _lastPosition == null) return;
     final elapsed = durationS;
     if (elapsed < _shadowGracePeriodS) return;
-    // GPS 지연/정지 방어: 유의미한 움직임 없으면 60초까지 도플갱어도 대기
-    if (_totalDistanceM < _shadowStartupMinM && elapsed < _shadowStartupMaxS) return;
     final shadowElapsedS = (elapsed - _shadowGracePeriodS) * _shadowSpeedMultiplier;
     double shadowDist = _cachedShadowDist;
     int shadowIdx = _cachedShadowIdx;
@@ -141,15 +139,15 @@ class RunningService extends ChangeNotifier {
     _currentShadowIndex = shadowIdx;
   }
 
-  /// 도플갱어와의 거리 (읽기 전용, 몇 번 읽어도 같은 값)
+  /// 도플갱어와의 거리 (읽기 전용, 몇 번 읽어도 같은 값).
+  /// 사용자는 도플갱어보다 _shadowInitialLeadM(200m) 앞서 출발 → 격차에 항상 반영.
+  /// 사용자가 정지해도 도플갱어가 서서히 접근해 UI 에서 200→180→... 점진 감소 관찰 가능.
   double get shadowDistanceM {
     if (_shadowPoints == null || _lastPosition == null || currentShadowPoint == null) {
       return double.infinity;
     }
-    if (durationS < _shadowGracePeriodS) return 200.0;
-    // GPS 지연/정지 동안은 +200m 유지 (도플갱어도 움직이지 않으니 일관성 있게)
-    if (_totalDistanceM < _shadowStartupMinM && durationS < _shadowStartupMaxS) return 200.0;
-    return _totalDistanceM - _cachedShadowDist;
+    if (durationS < _shadowGracePeriodS) return _shadowInitialLeadM;
+    return _shadowInitialLeadM + _totalDistanceM - _cachedShadowDist;
   }
 
   String get formattedPace {

@@ -9,6 +9,8 @@ tmp/voice_scripts_v2/generate.log
 
 # BGM DSP 전 원본 백업 (로컬 보존, git history 로도 복원 가능)
 assets/audio/themes/.original/
+assets/audio/themes/.raw/
+assets/audio/.original/
 
 # iOS/Watch 앱 아이콘 (AppIcon.appiconset) 은 *.png 전역 ignore 예외
 !ios/Runner/Assets.xcassets/AppIcon.appiconset/*.png
