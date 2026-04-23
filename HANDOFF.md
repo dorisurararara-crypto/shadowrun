@@ -29,6 +29,74 @@
 
 ## 최신
 
+### 2026-04-24 00:18 (Mac → Windows) — v26 TestFlight 외부 배포 완료 ✅ + BGM 전면 재정비 + 도플갱어 버그 수정
+
+**v26 제출 성공**. Distribution cert 이슈는 ASC API key + `xcodebuild -allowProvisioningUpdates -authenticationKey*` 경로로 **Xcode GUI 없이 자동 발급** 해결. Flutter `build ipa` 는 여전히 fail 하지만(archive 만 만듦) 그 archive 를 `xcodebuild -exportArchive` 로 수동 export → altool 업로드 → VALID (7분) → 외부 그룹 `ganzitester` 할당 HTTP 204 + Beta Review 제출 HTTP 201 → `betaReviewState` 자동 승인 예상.
+
+**Delivery UUID:** `414e12ec-8a00-47fb-b2e5-62c6c957f960`, uploadedDate `2026-04-23T08:05:10-07:00` (UTC+9 2026-04-24 00:05).
+
+#### 이번 세션 해결한 이슈
+
+1. **도플갱어 즉시 caught 버그** — `running_service.dart` 의 `shadowDistanceM` 이 초기 200m 리드를 누락하고 grace(15s) 이후 `_totalDistanceM - _cachedShadowDist = 0` 에서 시작 → 즉시 critical. `_shadowInitialLeadM=200` 상수 도입 + `_shadowStartupMinM`/`Max` 보호 구문 제거. 이제 200 → 점진 감소 → 잡힘 흐름 정상. (`2a977d1`)
+2. **전 BGM 클리핑/과대음량 정규화** — ffmpeg `loudnorm=I=-23:TP=-2:LRA=11` 로 9개 파일 재마스터:
+   - `bgm_chase_critical v1~v3`(기존 +0.2~+1.1 dBTP), `bgm_chase_mid v2/v3`(+0.0~+0.1), `bgm_dark_ambient_v2`(+0.0), `t1_run v1/v2`, `t3_run v1/v2` (과대음량 -12 LUFS → -22 LUFS).
+   - `dark_ambient v1` 은 -50 LUFS 극저음으로 정규화 시 클리핑 발생 → 풀에서 **제외**.
+   - 원본 전부 `.original/` 로 로컬 백업(.gitignore).
+3. **자유러닝 풀 정리** — `bgm_running_ambient_v3`(삐이잉 고주파 톤), `v4`(0 dBTP 클리핑), `bgm_freerun_zen3`(-18 LUFS) 3개 풀에서 제거.
+4. **Mystic BGM 재매핑** — 사용자 피드백 "마라토너에 도플갱어 톤 BGM 나옴" 해결.
+   - `HorrorService._pickBgmFile(level)` 테마 분기 추가 + `_mysticDoppelgangerPool=['themes/t3_run_v1/v2.mp3']`.
+   - `ThreatLevel.critical` 매핑 누락분 추가 (`bgm_chase_critical_v*`), `_bgmVolume[critical]=0.9`.
+5. **ElevenLabs Music API 로 테마 BGM 8트랙 신규 생성** — 약 27,000 크레딧 사용(Creator 131k 중).
+   - `t1_freerun_v1/v2` — Pure 자유러닝 (noir minimal piano ambient)
+   - `t1_marathon_v1/v2` — Pure 마라토너 (noir rhythmic 160 BPM)
+   - `t3_freerun_v1/v2` — Mystic 자유러닝 (Korean zen: gayageum + daegeum)
+   - `t3_marathon_v1/v2` — Mystic 마라토너 (Korean 전통 percussion 160 BPM)
+   - 전부 `loudnorm=-23 LUFS` 정규화 완료. `.raw/` 에 원본 보관(.gitignore).
+   - 주의: `t1_marathon_v1` 최초 시도 시 "Inception Time cue" 문구로 ToS 필터 거부 → 영화 레퍼런스 제거 후 재생성 성공.
+6. **SoloTtsService 테마 분기** — `_pickBgm()` 추가. Pure→`t1_freerun_v*`, Mystic→`t3_freerun_v*`, default→기존 ambient 6개.
+7. **theme_definitions.dart 갱신** — Pure `bgmRunningPool: t1_marathon_v1/v2`, Mystic `bgmRunningPool: t3_marathon_v1/v2`.
+
+#### 인프라 개선
+
+- **ElevenLabs 완전 가이드** `docs/elevenlabs_guide.md` (1591줄, 11개 섹션) 작성. TTS/SFX/Music/Voice/Python 템플릿/요금/한국어 함정 등 전체 커버. WebFetch 20회+ 교차 검증.
+- **`scripts/generate_theme_bgm.py`** — Music API 호출 스크립트. 재시도 3회, raw 백업, 환경변수 `ELEVENLABS_API_KEY` 로 인증.
+- **`.gitignore`** 에 `assets/audio/.original/`, `assets/audio/themes/.raw/` 추가.
+- **BGM 매핑 전체 감사 리포트** 완료 — 모든 테마 × 모드 × ThreatLevel 에서 클리핑/과대음량/매핑 불일치 식별. 리포트 자체는 세션 내부 산출물.
+
+#### 커밋 (push 완료)
+
+- `2a977d1` fix(doppelganger): 거리 계산에 초기 200m 리드 반영 + startup 점프 버그 제거
+- `cb27e6e` feat(audio): Mystic/Pure 전용 BGM 8트랙 신규 + 전 BGM -23 LUFS 정규화
+- `81b9c0f` docs: ElevenLabs 완전 가이드 + 테마 BGM 생성 스크립트
+
+#### v26 에 담긴 사용자 체감 포인트
+
+**Pro 구독이라 광고는 실기 검증 불가.** 대신 아래 6개가 새로 체감 가능:
+
+1. 도플갱어 모드: 200m 시작 → 서서히 감소 → 1~2분 뒤 잡힘 (즉시 caught 버그 사라짐)
+2. Mystic 자유러닝: 새 트랙 (zen 가야금/대금, 공포 없음)
+3. Mystic 마라토너: 새 트랙 (장구/북 160 BPM, 공포 없음)
+4. Mystic 도플갱어: 기존 `t3_run_v1/v2` (공포 톤, 원래 어울리던 자리)
+5. Pure 자유러닝/마라토너: 신규 noir piano 트랙
+6. 클리핑 전반 해소 → 귀 통증 없어야 함
+
+#### 다음 세션 (Mac) 에 할 만한 것
+
+사용자는 이미 결정: **다음 세션은 BGM 이 아닌 "미구현 3개 테마(filmNoir / editorial / neoNoirCyber) 의 화면 구현"**.
+- 목업 HTML 은 `designs/full-t2-noir.html`, `full-t4-editorial.html`, `full-t5-cyber.html` 에 **이미 있음** (Windows 작업물).
+- 각 테마 layout 7개씩 × 3 테마 = 21개 `*_layout.dart` 작성 필요.
+- 팔레트·폰트·ThemeManager 등록은 이미 끝남.
+- 한 세션에 한 테마 권장 (각 4~6시간 분량).
+- 메모리 `reference_shadowrun_designs.md` 에 넘버링 매핑·구현 패턴 기록됨.
+
+#### 기타 미해결 (우선순위 낮음)
+
+- **P5 Watch 실기**: `WKExtendedRuntimeSession` + I-12 fix 15분+ 유지 여부 실기 검증 (v22 부터 담김).
+- **critical 레벨 전용 신규 BGM**: 지금은 `chase_critical` 재활용. 잡힘 전용 극단적 트랙 신규 생성 여유.
+- **Film Noir/Editorial/NeoNoir 의 홈·러닝 BGM**: ElevenLabs 로 각 4트랙 추가 (크레딧 여유 충분).
+
+---
+
 ### 2026-04-23 03:25 (Mac → Windows) — I-13/interstitial ID/deploy 안전장치 코드 push (v26 배포는 다음 세션)
 
 **배포 실패 요약**: v22 이후 3가지 추가 변경을 v25 로 재배포 시도했으나 **Xcode Automatic Signing 의 Distribution cert 사라짐** → `exportArchive: No signing certificate "iOS Distribution" found` → ipa export 실패로 이전 v23 ipa 가 그대로 업로드되어 Apple ASC 에서 `ENTITY_ERROR.ATTRIBUTE.INVALID.DUPLICATE (previousBundleVersion: 23)` reject.
