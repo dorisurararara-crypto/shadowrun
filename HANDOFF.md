@@ -29,6 +29,44 @@
 
 ## 최신
 
+### 2026-04-24 02:30 (Mac → Windows) — v27: 3 신규 테마 홈 + 12 BGM + 4 사용자 이슈 수정
+
+사용자 요청 요약: "오류/편의성 4개 수정 → 오류 테스트 반복 → 테마 3개 BGM 각각 생성 → 다시 테스트 반복 → 커밋/푸쉬 → 외부 TestFlight 빌드".
+
+#### 이번 세션 커밋
+
+- `fd48844` fix(running): 4개 사용자 체감 이슈 수정
+  1. 마라톤/자유 모드에 도플갱어 chase BGM 중복 재생 — `HorrorService.initialize(startBgm:)` 플래그 추가, 도플갱어만 true.
+  2. 포획 TTS 모순 ("잡혔어" 전에 "아직 안잡혔어" 경고 대사 섞임) — `silenceRuntime()` 추가로 `_stopRun` 진입 시 큐 차단, 결과 TTS 만 `force=true` 로 통과.
+  3. 자유 모드 유령 페이서 지도 마커 — `RunningService.pacemakerPoint` (가상 거리 선형 보간) + `running_screen` 에 `pacer_glow`/`pacemaker` 오버레이 (safe 색 + 👻).
+  4. 워치 런닝 화면 초기 스크롤 — `ScrollViewReader` + distance `.id("vitals")` + `onAppear scrollTo(anchor: .top)` 로 첫 프레임에 심박수/칼로리가 보이게. 레이아웃은 그대로.
+
+- `6bc4d73` feat(themes): filmNoir/editorial/neoNoirCyber 홈 화면 + 12 BGM + Pro 우대
+  - `noir_home_layout.dart` (1940s 탐정, Cormorant Italic + Oswald), `editorial_home_layout.dart` (GQ 매거진, Playfair 900 italic + 드롭캡), `cyber_home_layout.dart` (Blade Runner, 크로매틱 애버레이션 + 네온 gradient) — 목업 `full-t{2,4,5}-*.html` 충실 재현.
+  - `home_screen.dart` 디스패처에 3개 분기 추가.
+  - ElevenLabs Music API 로 `t2/t4/t5 × home_v1/v2 + marathon_v1/v2` = **12트랙** 신규 생성. ToS 필터가 5트랙 거부(아티스트/영화명 포함) → 레퍼런스 제거 프롬프트로 retry 성공. 전체 `loudnorm=-23 LUFS` 정규화. `.raw/` 에 원본 보관.
+  - `PurchaseService.canUseTheme`: PRO 체크를 comingSoon 앞으로 이동. IAP 심사(전 상품 `READY_TO_SUBMIT`, `reviewState=nil`) 전이어도 **PRO 사용자**는 3개 새 테마 즉시 체감 가능. 일반 외부 테스터는 여전히 coming soon 배지. `theme_picker_screen` CTA/탭 순서 `canUse` 우선으로 재배치.
+
+#### 시뮬 검증
+
+- iPhone 17 iOS 26.4 debug 빌드 → 설치 → `flutter run` 런타임 로그: `Dart VM Service` 활성, BGM 초기화 정상(사용자 설정에 따라 skip), 전면 광고 로드 OK, **예외/assertion/asset load fail 0건**. 시뮬 DB 에 `is_pro=true` 세팅 후 테마 피커 진입 가능 상태 확인.
+- `flutter analyze`: No issues found (전 프로젝트).
+- 실제 러닝 + 테마 전환 + BGM 재생 실기 검증은 TestFlight v27 에서 사용자 체크 예정.
+
+#### 다음 세션 (또는 이어서) 할 일
+
+- **v27 TestFlight 배포** — 이 HANDOFF 커밋 후 진행. Distribution cert 여전히 부재(Development 만) → v26 경로 재사용: `xcodebuild archive` → `xcodebuild -exportArchive -allowProvisioningUpdates -authenticationKey*` → altool upload → 자동 VALID poll → ganzitester 외부 제출.
+- **IAP 심사 제출** — 3개 신규 테마 IAP 가 `READY_TO_SUBMIT` 상태. PRO 외 사용자가 새 테마 구매/사용하려면 Apple 심사 통과 필요. ASC UI 또는 `POST /v1/inAppPurchases/.../submissions` 로 일괄 제출 가능.
+- **comingSoon=false 플립** — IAP 승인 후 `theme_id.dart` 의 3개 테마 comingSoon 을 false 로 전환해야 정식 공개.
+
+#### 기존 미해결 (우선순위 낮음)
+
+- **P5 Watch 실기**: `WKExtendedRuntimeSession` + I-12 fix 15분+ 유지 실기 검증.
+- **폰→워치 앱 자동 실행**: 조사 결과 `HKWorkoutSession` 도입 필요(150~200줄 Swift/Dart). 현재 구조엔 workout session 없음. 사용자 결정 대기.
+- **critical 레벨 전용 신규 BGM**: 지금은 `chase_critical` 재활용. 잡힘 전용 극단 트랙 여유.
+
+---
+
 ### 2026-04-24 00:18 (Mac → Windows) — v26 TestFlight 외부 배포 완료 ✅ + BGM 전면 재정비 + 도플갱어 버그 수정
 
 **v26 제출 성공**. Distribution cert 이슈는 ASC API key + `xcodebuild -allowProvisioningUpdates -authenticationKey*` 경로로 **Xcode GUI 없이 자동 발급** 해결. Flutter `build ipa` 는 여전히 fail 하지만(archive 만 만듦) 그 archive 를 `xcodebuild -exportArchive` 로 수동 export → altool 업로드 → VALID (7분) → 외부 그룹 `ganzitester` 할당 HTTP 204 + Beta Review 제출 HTTP 201 → `betaReviewState` 자동 승인 예상.
