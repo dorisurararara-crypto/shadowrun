@@ -10,6 +10,7 @@ struct RunningView: View {
         let data = session.runData
 
         ZStack {
+            ScrollViewReader { proxy in
             ScrollView {
                 VStack(spacing: 4) {
                     // Threat bar (doppelganger mode only)
@@ -41,11 +42,14 @@ struct RunningView: View {
                         )
                     }
 
-                    // Main stats
+                    // Main stats — distance 블록을 첫 화면 상단으로 스냅할 앵커.
+                    // 진입 시 threat/map 위에서 시작하면 심박수/칼로리 가 보이지 않음 →
+                    // onAppear 에서 이 anchor 로 스크롤, 위로 스와이프하면 map 다시 볼 수 있음.
                     VStack(spacing: 6) {
                         Text(data.formattedDistance)
                             .font(.system(size: 28, weight: .bold, design: .rounded))
                             .foregroundColor(.white)
+                            .id("vitals")
 
                         HStack(spacing: 16) {
                             VStack(spacing: 1) {
@@ -147,6 +151,16 @@ struct RunningView: View {
                     .padding(.top, 4)
                 }
                 .padding(.horizontal, 4)
+            }
+            .onAppear {
+                // 첫 진입 시 distance/pace/heart/calories 가 보이도록 살짝 내린 상태로 시작.
+                // 위로 스와이프하면 threat bar / shadow distance / map 이 다시 드러남.
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) {
+                    withAnimation(.none) {
+                        proxy.scrollTo("vitals", anchor: .top)
+                    }
+                }
+            }
             }
 
             if showJumpscare {

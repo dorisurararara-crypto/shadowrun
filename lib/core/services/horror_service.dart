@@ -25,6 +25,9 @@ class HorrorService {
   bool _isDisposed = false;
   bool _isTtsPlaying = false;
   bool _wasAhead = false;
+  // 종료 흐름 진입 후엔 contextual/periodic TTS 차단. end TTS(승리/패배)만 force로 재생.
+  // "잡혔어" 직전에 "아직 안잡혔어" 류 경고 대사가 큐에 남아 순차 재생되는 버그 방지.
+  bool _silenced = false;
   String _voiceId = 'harry';
   DateTime? _lastPeriodicTts;
 
@@ -40,11 +43,22 @@ class HorrorService {
     try { await _bgmPlayer.play(); } catch (_) {}
   }
 
+  /// 종료 흐름 진입 시 호출. 재생 중인 contextual TTS 즉시 취소 + 이후 경고 TTS 차단.
+  /// playSurvivedTts/playDefeatedTts 는 force=true 로 이 플래그를 우회해 결과 대사는 정상 재생.
+  Future<void> silenceRuntime() async {
+    _silenced = true;
+    try { await _ttsPlayer.stop(); } catch (_) {}
+    _isTtsPlaying = false;
+  }
+
   Future<void> initialize({
     int horrorLevel = 3,
     bool ttsEnabled = true,
     bool vibrationEnabled = true,
     String voice = 'harry',
+    // 도플갱어 모드가 아닐 땐 false — HorrorService 의 vignette/currentLevel 은
+    // 공유하지만 추격 BGM(t3_run_v*, bgm_chase_*) 은 마라톤/자유 BGM 과 겹치면 안 됨.
+    bool startBgm = true,
   }) async {
     _horrorLevel = horrorLevel;
     _ttsEnabled = ttsEnabled;
@@ -52,12 +66,14 @@ class HorrorService {
     _voiceId = voice;
     _hasVibrator = (await Vibration.hasVibrator()) == true;
 
-    // 초기 BGM 시작 — _onLevelChanged 는 "변경" 트리거라 초기 safe 상태에선 호출되지 않음.
-    // 도플갱어 모드에서 시작 직후 무음 구간이 생기는 걸 방지.
-    final bgm = _pickBgmFile(_currentLevel);
-    if (bgm != null) {
-      final vol = _bgmVolume[_currentLevel] ?? 0.5;
-      await _playBgm(bgm, volume: vol);
+    if (startBgm) {
+      // 초기 BGM 시작 — _onLevelChanged 는 "변경" 트리거라 초기 safe 상태에선 호출되지 않음.
+      // 도플갱어 모드에서 시작 직후 무음 구간이 생기는 걸 방지.
+      final bgm = _pickBgmFile(_currentLevel);
+      if (bgm != null) {
+        final vol = _bgmVolume[_currentLevel] ?? 0.5;
+        await _playBgm(bgm, volume: vol);
+      }
     }
   }
 
@@ -166,6 +182,7 @@ class HorrorService {
   };
 
   Future<void> updateThreat(double distanceM) async {
+    if (_silenced) return;
     ThreatLevel newLevel;
     if (distanceM < 0) {
       newLevel = ThreatLevel.critical;
@@ -217,7 +234,7 @@ class HorrorService {
   }
 
   Future<void> _playPeriodicTts(ThreatLevel level) async {
-    if (!_ttsEnabled || level == ThreatLevel.critical) return;
+    if (_silenced || !_ttsEnabled || level == ThreatLevel.critical) return;
     final interval = _periodicInterval[level] ?? 40;
     final now = DateTime.now();
     if (_lastPeriodicTts != null && now.difference(_lastPeriodicTts!).inSeconds < interval) return;
@@ -228,6 +245,7 @@ class HorrorService {
   /// 신 TtsLineBank 시스템 우선 재생 + 실패 시 구 시스템 fallback.
   /// 20% 확률로 현재 테마 전용 카테고리로 대체 재생.
   Future<void> _playContextualTts(ThreatLevel level) async {
+    if (_silenced) return;
     final category = _levelToCategory[level];
     if (category == null) return;
 
@@ -256,6 +274,7 @@ class HorrorService {
   }
 
   Future<void> _onLevelChanged(ThreatLevel level) async {
+    if (_silenced) return;
     // 배경음 변경 — 테마별 분기 포함 (_pickBgmFile)
     final bgm = _pickBgmFile(level);
     if (bgm != null) {
@@ -303,13 +322,13 @@ class HorrorService {
 
   Future<void> playSurvivedTts() async {
     if (_ttsEnabled) {
-      await _playTts('tts_survived');
+      await _playTts('tts_survived', force: true);
     }
   }
 
   Future<void> playDefeatedTts() async {
     if (_ttsEnabled) {
-      await _playTts('tts_defeated');
+      await _playTts('tts_defeated', force: true);
     }
   }
 
@@ -342,8 +361,9 @@ class HorrorService {
     }
   }
 
-  Future<void> _playTts(String baseName) async {
+  Future<void> _playTts(String baseName, {bool force = false}) async {
     if (_isDisposed || _isTtsPlaying) return;
+    if (_silenced && !force) return;
     _isTtsPlaying = true;
     try {
       // 영어 분기

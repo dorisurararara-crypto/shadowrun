@@ -32,6 +32,9 @@ class RunningService extends ChangeNotifier {
   List<RunPoint>? _shadowPoints;
   int? _shadowRunId;
   double _shadowSpeedMultiplier = 1.0; // 0.7 ~ 1.3
+  // 자유 모드 + 페이스메이커 유령 — 초/km 목표 페이스. null 이면 비활성.
+  // 도플갱어(_shadowPoints) 와는 상호 배타적으로 동작.
+  double? _pacemakerPaceSecPerKm;
 
   bool _isRunning = false;
   bool _isPaused = false;
@@ -114,6 +117,43 @@ class RunningService extends ChangeNotifier {
     return _shadowPoints![_currentShadowIndex];
   }
 
+  /// 자유 모드 페이스메이커 유령의 현재 좌표(사용자 경로 위 가상 지점).
+  /// 페이서 누적 거리 = durationS * (1000 / paceSecPerKm). 사용자 `_points` 위에서 해당 거리 지점을 선형 보간.
+  /// 페이서가 사용자보다 앞서면 (virtualDist > 사용자 누적거리) 사용자 마지막 위치로 클램프.
+  /// `pacemakerPaceSecPerKm` 가 null 이거나 포인트가 부족하면 null.
+  RunPoint? get pacemakerPoint {
+    final paceSec = _pacemakerPaceSecPerKm;
+    if (paceSec == null || paceSec <= 0 || _points.isEmpty) return null;
+    final virtualDist = durationS * (1000.0 / paceSec);
+    if (virtualDist <= 0) return _points.first;
+    double acc = 0;
+    for (int i = 1; i < _points.length; i++) {
+      final p0 = _points[i - 1];
+      final p1 = _points[i];
+      final seg = _distanceBetweenPoints(p0.latitude, p0.longitude, p1.latitude, p1.longitude);
+      if (acc + seg >= virtualDist) {
+        final ratio = seg == 0 ? 0.0 : (virtualDist - acc) / seg;
+        return RunPoint(
+          runId: p1.runId,
+          latitude: p0.latitude + (p1.latitude - p0.latitude) * ratio,
+          longitude: p0.longitude + (p1.longitude - p0.longitude) * ratio,
+          timestampMs: p1.timestampMs,
+          speedMps: p1.speedMps,
+        );
+      }
+      acc += seg;
+    }
+    return _points.last;
+  }
+
+  /// 페이서가 사용자보다 앞서 있으면 양수, 뒤처지면 음수 (m).
+  double get pacemakerGapM {
+    final paceSec = _pacemakerPaceSecPerKm;
+    if (paceSec == null || paceSec <= 0) return 0;
+    final virtualDist = durationS * (1000.0 / paceSec);
+    return virtualDist - _totalDistanceM;
+  }
+
   /// 도플갱어와의 거리 (양수 = 앞서는 중, 음수 = 뒤처지는 중)
   /// 도플갱어 위치 업데이트 (GPS 콜백 + 1초 Timer 양쪽에서 호출).
   /// grace 해제 직후 점프 방지 — 15초 후부터 shadowElapsedS 가 0 에서 점진 증가.
@@ -184,7 +224,12 @@ class RunningService extends ChangeNotifier {
   }
 
   /// 러닝 시작
-  Future<bool> startRun({int? shadowRunId, double shadowSpeedMultiplier = 1.0}) async {
+  Future<bool> startRun({
+    int? shadowRunId,
+    double shadowSpeedMultiplier = 1.0,
+    // 자유 모드 페이스메이커(유령 페이서) 목표 페이스. null 이면 비활성.
+    double? pacemakerPaceSecPerKm,
+  }) async {
     if (_isDisposed) return false;
     // GPS 서비스 활성화 확인
     final serviceEnabled = await Geolocator.isLocationServiceEnabled();
@@ -203,6 +248,7 @@ class RunningService extends ChangeNotifier {
 
     _shadowRunId = shadowRunId;
     _shadowSpeedMultiplier = shadowSpeedMultiplier;
+    _pacemakerPaceSecPerKm = pacemakerPaceSecPerKm;
     if (shadowRunId != null) {
       _shadowPoints = await DatabaseHelper.getRunPoints(shadowRunId);
       if (_isDisposed) return false;

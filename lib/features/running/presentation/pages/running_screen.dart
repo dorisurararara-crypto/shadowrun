@@ -231,6 +231,9 @@ class _RunningScreenState extends State<RunningScreen>
         horrorLevel: horrorLevel,
         ttsEnabled: ttsEnabled,
         vibrationEnabled: vibEnabled,
+        // 추격 BGM 은 도플갱어 모드에서만. 마라톤/자유 모드에선 MarathonService 의
+        // bgmRunningPool 과 겹치면 안 됨 (t3_run_v*, bgm_chase_* 중복 재생 버그 방지).
+        startBgm: widget.runMode == 'doppelganger',
       );
       if (_aborted()) return;
 
@@ -288,6 +291,10 @@ class _RunningScreenState extends State<RunningScreen>
       final ok = await _runService.startRun(
         shadowRunId: widget.shadowRunId,
         shadowSpeedMultiplier: shadowSpeed,
+        // 자유 모드에서 페이스메이커 유령 활성 시 — 지도 마커로 표시용.
+        pacemakerPaceSecPerKm: widget.runMode == 'freerun'
+            ? widget.pacemakerPaceSec?.toDouble()
+            : null,
       );
       // startup 중 dispose된 경우 GPS 스트림을 즉시 cancel (누수 방지).
       // ChangeNotifier dispose() 자체는 widget dispose()에서 한 번만.
@@ -765,6 +772,37 @@ class _RunningScreenState extends State<RunningScreen>
       }
       }
     }
+
+    // Pacemaker ghost marker (자유 모드 + 페이스메이커 활성 시).
+    // 도플갱어와 달리 원본 경로가 없으므로 사용자 궤적 위의 가상 지점에 표시.
+    final pacerPoint = _runService.pacemakerPoint;
+    if (pacerPoint != null && widget.runMode == 'freerun') {
+      final pacerLatLng = NLatLng(pacerPoint.latitude, pacerPoint.longitude);
+      _safeAddOverlay(controller, NCircleOverlay(
+        id: 'pacemaker_glow',
+        center: pacerLatLng,
+        radius: 12,
+        color: SRColors.safe.withValues(alpha: 0.2),
+        outlineColor: SRColors.safe.withValues(alpha: 0.5),
+        outlineWidth: 2,
+      ));
+      final pacerMarker = NMarker(
+        id: 'pacemaker',
+        position: pacerLatLng,
+        size: const Size(48, 48),
+      );
+      if (_shadowArrowIcon != null) {
+        pacerMarker.setIcon(_shadowArrowIcon!);
+      }
+      pacerMarker.setIconTintColor(SRColors.safe);
+      pacerMarker.setCaption(NOverlayCaption(
+        text: '👻',
+        textSize: 14,
+        color: SRColors.safe,
+        haloColor: SRColors.background,
+      ));
+      _safeAddOverlay(controller, pacerMarker);
+    }
   }
 
   void _addKmSplitMarkers(NaverMapController controller, List<RunPoint> points) {
@@ -867,6 +905,11 @@ class _RunningScreenState extends State<RunningScreen>
 
     // GPS 콜백 즉시 해제 (dispose된 서비스 접근 방지)
     _runService.onPositionUpdate = null;
+
+    // 경고/주기 TTS(“아직 안잡혔어” 등)가 결과 TTS(“잡혔어”) 직전에 남아 순차 재생되는 것 방지.
+    // silenceRuntime 이후엔 playSurvivedTts/playDefeatedTts 만 force 로 통과.
+    // ignore: unawaited_futures
+    _horrorService.silenceRuntime();
 
     // 종료 흐름에서 BGM 뮤트 (end TTS/stadium finale와 겹치지 않도록).
     _syncAudioState();
