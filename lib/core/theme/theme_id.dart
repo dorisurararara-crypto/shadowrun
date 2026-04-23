@@ -15,7 +15,7 @@ enum ThemeId {
     description: '1940년대 탐정 영화. 크림 + 골드 + 와인 레드.',
     priceKrw: 5500,
     productId: 'shadowrun_theme_noir',
-    comingSoon: true,
+    comingSoon: false,
   ),
   koreanMystic(
     key: 'korean_mystic',
@@ -33,7 +33,7 @@ enum ThemeId {
     description: 'GQ 매거진 스타일. 거대 세리프 로고 + 이슈 번호.',
     priceKrw: 5500,
     productId: 'shadowrun_theme_editorial',
-    comingSoon: true,
+    comingSoon: false,
   ),
   neoNoirCyber(
     key: 'neo_noir_cyber',
@@ -42,7 +42,7 @@ enum ThemeId {
     description: '블레이드러너. 붉은 네온 + 차가운 시안.',
     priceKrw: 5500,
     productId: 'shadowrun_theme_cyber',
-    comingSoon: true,
+    comingSoon: false,
   );
 
   final String key;
