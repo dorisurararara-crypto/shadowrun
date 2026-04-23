@@ -29,6 +29,53 @@
 
 ## 최신
 
+### 2026-04-24 04:00 (Mac → Windows) — v29 TestFlight 외부 배포 완료 ✅ + 테마 2/4/5 러닝 레이아웃 + BGM 12/SFX 9 + editorial 홈 치명 bug fix
+
+**v29 제출 성공**. `deploy_testflight.sh` 영구 패치 후 **첫 풀 경로 한 번에 끝**. archive → 수동 exportArchive(ASC API key로 Distribution cert 자동 발급) → validate/upload → VALID(12분) → ganzitester 외부 그룹 할당 HTTP 204 + Beta Review 제출 HTTP 201. 이제 cert 함정 없이 `./scripts/deploy_testflight.sh` 한 줄로 끝나는 게 확정.
+
+**Delivery UUID**: `cbd8f4f6-4938-4a92-81f3-b96fa079a88f`.
+
+#### v29 에 담긴 것
+
+1. **editorial 홈 bottomNavigationBar 추가 (치명적 bug fix)** — 테마 4 선택 시 하단 네비 없어서 다른 메뉴 접근 불가능해 앱이 잠기던 문제. magazine-style 탭(COVER/BACK/REPORT/MAST) 추가.
+
+2. **테마 2/4/5 러닝 레이아웃 신규 3종** — 기존에 default 기본 레이아웃으로 나오던 문제.
+   - `noir_running_layout.dart` — 1940s 탐정 HUD. Cormorant italic + Oswald caps, CASE LIVE 스탬프, 브래스/와인 gap 바, CATCH BREATH/CLOSE CASE 버튼.
+   - `editorial_running_layout.dart` — LIVE·P.03 매거진 헤드 + 흰 굵은 rule, Playfair 120px italic 거대 distance, COVER STORY/FEATURE 분기, STOP PRESS 빨간 inset 버튼.
+   - `cyber_running_layout.dart` — TRACKING·LIVE 펄스 태그, 크로매틱 aberration distance, 시안/빨강 ENTITY CLOSING 바, [ TERMINATE ] 빨강 그라디언트 버튼, 시안 스캔라인.
+   `running_screen.dart` 디스패처에 3 테마 분기 추가.
+
+3. **러닝 중 테마별 특색 BGM/TTS/SFX** (목소리 설정 무관, 테마 고정).
+   - ElevenLabs Music API 로 **BGM 12 트랙**(자유 6 + 도플갱어 6, 각 30s, loudnorm -23 LUFS). 약 36,000 크레딧.
+   - ElevenLabs Sound Effects API 로 **signature SFX 9 clip**(start/victory/defeat × 3 테마, 각 1.7~1.8s). 약 900 크레딧.
+   - `HorrorService._pickBgmFile` / `SoloTtsService._pickBgm` 에 noir/editorial/cyber pool 3종 확장.
+   - `SfxService._themeFile` + `themeStart/themeVictory/themeDefeat` 훅. `running_screen _startRun` 성공 직후 `themeStart()` 호출.
+   - `HorrorService` / `MarathonService` / `SoloTtsService` 각각 `_effectiveVoice` 추가: filmNoir→drill / editorial→harry / neoNoirCyber→callum.
+   - 총 ElevenLabs 크레딧 소모 약 **37,000**(사용자 요청 6만 예산 내).
+   - **반성**: 가이드 §4.6 확인을 뒤늦게 함. 30s 앰비언스(freerun)는 Sound Effects(40c/s)가 Music(100c/s)보다 저렴한데 모두 Music 으로 생성. 다음 세션엔 앰비언스 트랙은 SFX API 사용.
+
+4. **comingSoon=false 플립** — filmNoir/editorial/neoNoirCyber. IAP `READY_TO_SUBMIT` 상태여도 TestFlight Sandbox 에서 구매 플로우 동작하므로 일반 외부 테스터도 구매 플로우로 체감 가능. Pro 계정은 앞서 추가한 우대 로직으로 구매 없이 사용.
+
+#### deploy_testflight.sh 영구 패치 검증 완료
+
+매 세션 "exportArchive: No signing certificate iOS Distribution found" → Flutter 가 이전 세션 ipa fallback → CFBundleVersion 중복 거부 패턴 **이제 완전히 해소**. flutter build 는 archive 만 얻는 용도로 쓰고 `xcodebuild -exportArchive -allowProvisioningUpdates -authenticationKey*` 로 수동 export. ASC API key 가 Distribution cert 를 서버에서 즉석 발급해 로컬 키체인 상태와 무관.
+
+#### 커밋 (모두 push 됨)
+
+- `fd48844` fix(running): 4개 사용자 체감 이슈 수정 (BGM 중복, TTS 모순, 페이서 지도, 워치 스크롤)
+- `6bc4d73` feat(themes): filmNoir/editorial/neoNoirCyber 홈 화면 + 12트랙 BGM + Pro 우대
+- `b2d50c6` chore: handoff v27
+- `95ab9cc` fix(deploy): Distribution cert 부재 시 exportArchive 함정 영구 제거
+- `4b78d21` chore: handoff v27 외부 배포 완료
+- `fbc13c8` feat(themes): comingSoon=false 플립
+- `a62895f` fix(themes): v27 치명적 bug + 테마 2/4/5 러닝 레이아웃·오디오
+
+#### 다음 세션 (2026-04-25 예정)
+
+사용자가 TestFlight v29 실기 테스트 후 이슈 리스트 공유 예정. 체크 포인트는 메모리 `project_shadowrun_v29_testing.md` 에 있음. 사용자는 "어제 이어가자, v29 테스트 결과 공유할게 — [이슈]" 한 줄만 말하면 됨.
+
+---
+
 ### 2026-04-24 02:30 (Mac → Windows) — v27 TestFlight 외부 배포 완료 ✅ + 3 신규 테마 홈 + 12 BGM + 4 사용자 이슈 수정
 
 **v27 배포 결과**: VALID (업로드 01:18 → VALID 약 2분 소요, 예상보다 빠름) → `ganzitester` 외부 그룹 할당 HTTP 204 + Beta App Review 제출 HTTP 201. 외부 그룹은 기존 Beta Review 통과 상태라 큰 변화 없으면 즉시~몇 시간 내 자동 승인 예상. Delivery UUID `2f815eb4-77ac-4f3d-8cda-e0d0a104896d`.
