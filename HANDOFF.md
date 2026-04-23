@@ -29,7 +29,10 @@
 
 ## 최신
 
-### 2026-04-24 02:30 (Mac → Windows) — v27: 3 신규 테마 홈 + 12 BGM + 4 사용자 이슈 수정
+### 2026-04-24 02:30 (Mac → Windows) — v27 TestFlight 외부 배포 완료 ✅ + 3 신규 테마 홈 + 12 BGM + 4 사용자 이슈 수정
+
+**v27 배포 결과**: VALID (업로드 01:18 → VALID 약 2분 소요, 예상보다 빠름) → `ganzitester` 외부 그룹 할당 HTTP 204 + Beta App Review 제출 HTTP 201. 외부 그룹은 기존 Beta Review 통과 상태라 큰 변화 없으면 즉시~몇 시간 내 자동 승인 예상. Delivery UUID `2f815eb4-77ac-4f3d-8cda-e0d0a104896d`.
+
 
 사용자 요청 요약: "오류/편의성 4개 수정 → 오류 테스트 반복 → 테마 3개 BGM 각각 생성 → 다시 테스트 반복 → 커밋/푸쉬 → 외부 TestFlight 빌드".
 
