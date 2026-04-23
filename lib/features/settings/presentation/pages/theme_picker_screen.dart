@@ -176,10 +176,10 @@ class _ThemePickerScreenState extends State<ThemePickerScreen> {
                   const SizedBox(height: 10),
                   if (isSelected)
                     _ctaApplied()
-                  else if (theme.id.comingSoon)
-                    _ctaComingSoon()
                   else if (canUse)
                     _ctaSelect(theme)
+                  else if (theme.id.comingSoon)
+                    _ctaComingSoon()
                   else
                     _ctaBuy(theme),
                 ],
@@ -424,10 +424,12 @@ class _ThemePickerScreenState extends State<ThemePickerScreen> {
 
   Future<void> _onTapTheme(AppThemeSet theme, bool canUse) async {
     if (theme.id == ThemeManager.I.currentId) return;
-    if (theme.id.comingSoon) return;
+    // PRO/구매한 사용자는 comingSoon 도 바로 적용. canUseTheme 결과가 권위적.
     if (canUse) {
       await _applyTheme(theme.id);
+      return;
     }
+    if (theme.id.comingSoon) return;
   }
 
   Future<void> _applyTheme(ThemeId id) async {

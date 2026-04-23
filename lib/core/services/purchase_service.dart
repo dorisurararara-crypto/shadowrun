@@ -37,11 +37,13 @@ class PurchaseService {
   int get trialDaysLeft => _trialDaysLeft;
   Set<ThemeId> get purchasedThemes => Set.unmodifiable(_purchasedThemes);
 
-  /// 테마 사용 가능 여부 — 무료 or PRO or 개별 구매됨
+  /// 테마 사용 가능 여부 — 무료 or PRO or 개별 구매됨.
+  /// PRO 체크는 comingSoon 보다 먼저. IAP 심사 전이어도 앱 개발자(PRO) 는 체감할 수 있도록.
+  /// 일반 사용자에겐 comingSoon=true 가 여전히 잠금 배지로 작동.
   bool canUseTheme(ThemeId id) {
     if (id.isFree) return true;
-    if (id.comingSoon) return false;
     if (_isPro) return true;
+    if (id.comingSoon) return false;
     return _purchasedThemes.contains(id);
   }
 

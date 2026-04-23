@@ -12,7 +12,10 @@ import 'package:shadowrun/core/l10n/app_strings.dart';
 import 'package:shadowrun/core/services/sfx_service.dart';
 import 'package:shadowrun/core/services/home_bgm_service.dart';
 import 'package:shadowrun/shared/widgets/challenge_run_picker.dart';
+import 'package:shadowrun/features/home/presentation/layouts/cyber_home_layout.dart';
+import 'package:shadowrun/features/home/presentation/layouts/editorial_home_layout.dart';
 import 'package:shadowrun/features/home/presentation/layouts/mystic_home_layout.dart';
+import 'package:shadowrun/features/home/presentation/layouts/noir_home_layout.dart';
 import 'package:shadowrun/features/home/presentation/layouts/pure_home_layout.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -116,6 +119,33 @@ class _HomeScreenState extends State<HomeScreen> {
         }
         if (themeId == ThemeId.pureCinematic) {
           return PureHomeLayout(
+            statsFuture: _statsFuture,
+            runsFuture: _runsFuture,
+            onRefresh: _refresh,
+            challengeCountFuture: _challengeCountFuture,
+            onAdPlusOneTapped: _triggerAdPlusOne,
+          );
+        }
+        if (themeId == ThemeId.filmNoir) {
+          return NoirHomeLayout(
+            statsFuture: _statsFuture,
+            runsFuture: _runsFuture,
+            onRefresh: _refresh,
+            challengeCountFuture: _challengeCountFuture,
+            onAdPlusOneTapped: _triggerAdPlusOne,
+          );
+        }
+        if (themeId == ThemeId.editorial) {
+          return EditorialHomeLayout(
+            statsFuture: _statsFuture,
+            runsFuture: _runsFuture,
+            onRefresh: _refresh,
+            challengeCountFuture: _challengeCountFuture,
+            onAdPlusOneTapped: _triggerAdPlusOne,
+          );
+        }
+        if (themeId == ThemeId.neoNoirCyber) {
+          return CyberHomeLayout(
             statsFuture: _statsFuture,
             runsFuture: _runsFuture,
             onRefresh: _refresh,

@@ -105,6 +105,17 @@ const filmNoirTheme = AppThemeSet(
     heroItalic: true,
   ),
   tagline: 'A Nightly Chase',
+  // ElevenLabs Music API로 생성 (2026-04-24). 1940s film noir 재즈 톤.
+  // home: upright bass + brushed drums + muted trumpet + felt piano (70 BPM).
+  // marathon: 160 BPM neo-noir jazz chase score (Hammond organ + walking bass).
+  bgmHomePool: [
+    'themes/t2_home_v1.mp3',
+    'themes/t2_home_v2.mp3',
+  ],
+  bgmRunningPool: [
+    'themes/t2_marathon_v1.mp3',
+    'themes/t2_marathon_v2.mp3',
+  ],
 );
 
 const editorialTheme = AppThemeSet(
@@ -131,6 +142,17 @@ const editorialTheme = AppThemeSet(
     heroItalic: true,
   ),
   tagline: 'The Chase Never Sleeps',
+  // ElevenLabs Music API로 생성 (2026-04-24). 고급 매거진 스릴러 톤.
+  // home: minimal orchestral + electronic pulse (Johansson/Max Richter 무드).
+  // marathon: 160 BPM modern thriller score (driving synth bass + staccato strings).
+  bgmHomePool: [
+    'themes/t4_home_v1.mp3',
+    'themes/t4_home_v2.mp3',
+  ],
+  bgmRunningPool: [
+    'themes/t4_marathon_v1.mp3',
+    'themes/t4_marathon_v2.mp3',
+  ],
 );
 
 const neoNoirCyberTheme = AppThemeSet(
@@ -157,4 +179,15 @@ const neoNoirCyberTheme = AppThemeSet(
     heroItalic: true,
   ),
   tagline: 'ENTITY TRACKING ACTIVE',
+  // ElevenLabs Music API로 생성 (2026-04-24). Blade Runner 영감 synthwave.
+  // home: analog synth pad + sub-bass drone + arpeggiated digital synth (Vangelis/Com Truise).
+  // marathon: 160 BPM driving synthwave (Drive 2011 Kavinsky, Perturbator 톤).
+  bgmHomePool: [
+    'themes/t5_home_v1.mp3',
+    'themes/t5_home_v2.mp3',
+  ],
+  bgmRunningPool: [
+    'themes/t5_marathon_v1.mp3',
+    'themes/t5_marathon_v2.mp3',
+  ],
 );
