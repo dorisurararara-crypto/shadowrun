@@ -42,10 +42,43 @@ fi
 echo "=== version: $ver+$cur_build → $ver+$new_build (ASC max=${asc_max:-?}) ==="
 sed -i '' "s/^version: .*/version: ${ver}+${new_build}/" pubspec.yaml
 
-echo "=== flutter build ipa --release (build-number=${new_build} 명시) ==="
-# pubspec sed 만으로는 Flutter 빌드 캐시 때문에 이전 build-number 가 그대로 ipa 에 박힐 수 있음.
-# Apple 이 "previous: N" 으로 중복 거부하는 것을 막기 위해 --build-number 로 강제 지정.
-flutter build ipa --release --build-number "${new_build}" --build-name "${ver}"
+echo "=== flutter build ipa --release (archive 까지만 중요, export 실패해도 OK) ==="
+# Flutter 내부 xcodebuild -exportArchive 는 로컬 키체인에 Apple Distribution cert 가
+# 없으면 "No signing certificate iOS Distribution found" 로 조용히 실패하고,
+# 이전 세션이 남긴 build/ios/ipa/*.ipa 를 그대로 fallback 재사용함 (→ CFBundleVersion
+# 중복 거부). 매 세션 반복되던 함정. 아래에서 archive 만 확보하고 export 는 무시.
+flutter build ipa --release --build-number "${new_build}" --build-name "${ver}" || {
+  echo "  (flutter export 실패는 예상된 동작 — archive 만 있으면 됨)"
+}
+
+ARCHIVE='build/ios/archive/Runner.xcarchive'
+if [ ! -d "$ARCHIVE" ]; then
+  echo "❌ $ARCHIVE 생성 실패. flutter build 가 archive 자체를 못 만듦."
+  exit 3
+fi
+
+echo "=== archive 직접 export (ASC API key 로 Distribution cert 자동 발급) ==="
+# -allowProvisioningUpdates + -authenticationKey* 3개 플래그로 Apple 이 서버에서
+# Distribution cert 를 즉석 발급. 로컬 키체인 상태와 무관해 매 세션 첫 시도 성공.
+EXPORT_DIR='build/ios/ipa'
+rm -rf "$EXPORT_DIR"
+mkdir -p "$EXPORT_DIR"
+xcodebuild -exportArchive \
+  -archivePath "$ARCHIVE" \
+  -exportPath "$EXPORT_DIR" \
+  -exportOptionsPlist ios/ExportOptions.plist \
+  -allowProvisioningUpdates \
+  -authenticationKeyPath "$HOME/.appstoreconnect/private_keys/AuthKey_${KEY_ID}.p8" \
+  -authenticationKeyID "$KEY_ID" \
+  -authenticationKeyIssuerID "$ISSUER_ID"
+
+# exportPath 내 ipa 이름은 xcarchive display name 에 따라 다름 — glob 으로 집어옴.
+IPA_PATH=$(ls "$EXPORT_DIR"/*.ipa 2>/dev/null | head -1)
+if [ -z "$IPA_PATH" ] || [ ! -f "$IPA_PATH" ]; then
+  echo "❌ exportArchive 성공했지만 ipa 가 $EXPORT_DIR 에 없음."
+  exit 4
+fi
+echo "✓ IPA: $IPA_PATH ($(du -h "$IPA_PATH" | awk '{print $1}'))"
 
 echo "=== xcrun altool --validate-app ==="
 xcrun altool --validate-app --type ios -f "$IPA_PATH" \

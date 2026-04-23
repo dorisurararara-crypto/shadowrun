@@ -56,6 +56,10 @@
 #### 다음 세션 (또는 이어서) 할 일
 
 - **v27 TestFlight 배포** — 이 HANDOFF 커밋 후 진행. Distribution cert 여전히 부재(Development 만) → v26 경로 재사용: `xcodebuild archive` → `xcodebuild -exportArchive -allowProvisioningUpdates -authenticationKey*` → altool upload → 자동 VALID poll → ganzitester 외부 제출.
+
+#### deploy_testflight.sh 영구 패치 (이 세션에서 함께 반영)
+
+매 세션마다 "exportArchive: No signing certificate iOS Distribution found" → Flutter 가 이전 세션 ipa 를 fallback 으로 재업로드 → CFBundleVersion 중복 거부 패턴이 반복됐음. 이 세션에서 스크립트를 **archive 는 flutter 로, export 는 수동 `xcodebuild -exportArchive -allowProvisioningUpdates -authenticationKey*` 로** 분리했음. ASC API key 로 Apple 이 서버에서 Distribution cert 를 즉석 발급해 주므로 로컬 키체인 상태와 무관. v28 부터 `./scripts/deploy_testflight.sh` 한 줄로 끝나야 정상. `ios/ExportOptions.plist` (method=app-store, automatic signing, team=Q6H9HCTK6W) 도 함께 커밋.
 - **IAP 심사 제출** — 3개 신규 테마 IAP 가 `READY_TO_SUBMIT` 상태. PRO 외 사용자가 새 테마 구매/사용하려면 Apple 심사 통과 필요. ASC UI 또는 `POST /v1/inAppPurchases/.../submissions` 로 일괄 제출 가능.
 - **comingSoon=false 플립** — IAP 승인 후 `theme_id.dart` 의 3개 테마 comingSoon 을 false 로 전환해야 정식 공개.
 
