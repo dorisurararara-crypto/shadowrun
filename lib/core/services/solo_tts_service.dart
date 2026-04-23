@@ -2,6 +2,8 @@ import 'dart:math';
 import 'package:flutter/foundation.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:shadowrun/core/l10n/app_strings.dart';
+import 'package:shadowrun/core/theme/theme_id.dart';
+import 'package:shadowrun/core/theme/theme_manager.dart';
 
 class SoloTtsService {
   final AudioPlayer _ttsPlayer = AudioPlayer();
@@ -11,16 +13,39 @@ class SoloTtsService {
   String _voiceId = 'harry';
   final _rng = Random();
 
+  // v3/v4/zen3 제외 — ffmpeg 측정으로 삐이잉(v3 고주파 톤) / 클리핑(v4 0dBTP, zen3 -18 LUFS) 확정.
+  // 모바일 BGM 기준 -23 LUFS 내외 + True Peak -2 dBTP 이하만 유지. default 테마 fallback.
   static const _bgmOptions = [
-    'bgm_running_ambient.mp3', 'bgm_running_ambient_v2.mp3',
-    'bgm_running_ambient_v3.mp3', 'bgm_running_ambient_v4.mp3', 'bgm_running_ambient_v5.mp3',
-    'bgm_freerun_zen1.mp3', 'bgm_freerun_zen2.mp3', 'bgm_freerun_zen3.mp3', 'bgm_freerun_zen4.mp3',
+    'bgm_running_ambient.mp3', 'bgm_running_ambient_v2.mp3', 'bgm_running_ambient_v5.mp3',
+    'bgm_freerun_zen1.mp3', 'bgm_freerun_zen2.mp3', 'bgm_freerun_zen4.mp3',
   ];
+
+  // Pure Cinematic 테마 — ElevenLabs Music API 2026-04-23 생성, noir minimal piano ambient.
+  static const _pureFreerunPool = [
+    'themes/t1_freerun_v1.mp3', 'themes/t1_freerun_v2.mp3',
+  ];
+
+  // Korean Mystic 테마 — ElevenLabs Music API 2026-04-23 생성, 전통 zen ambient (gayageum + daegeum).
+  static const _mysticFreerunPool = [
+    'themes/t3_freerun_v1.mp3', 'themes/t3_freerun_v2.mp3',
+  ];
+
+  /// 현재 테마에 맞는 자유러닝 BGM 파일 선택.
+  String _pickBgm() {
+    final themeId = ThemeManager.I.currentId;
+    if (themeId == ThemeId.koreanMystic) {
+      return _mysticFreerunPool[_rng.nextInt(_mysticFreerunPool.length)];
+    }
+    if (themeId == ThemeId.pureCinematic) {
+      return _pureFreerunPool[_rng.nextInt(_pureFreerunPool.length)];
+    }
+    return _bgmOptions[_rng.nextInt(_bgmOptions.length)];
+  }
 
   Future<void> initialize({String voice = 'harry'}) async {
     _voiceId = voice;
     try {
-      final bgm = _bgmOptions[_rng.nextInt(_bgmOptions.length)];
+      final bgm = _pickBgm();
       await _bgmPlayer.setAsset('assets/audio/$bgm');
       _bgmPlayer.setLoopMode(LoopMode.one);
       _bgmPlayer.setVolume(0.25);

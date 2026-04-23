@@ -32,9 +32,11 @@ const pureCinematicTheme = AppThemeSet(
     'themes/t1_home_v1.mp3',
     'themes/t1_home_v2.mp3',
   ],
+  // t1_marathon_v*.mp3 — 2026-04-23 ElevenLabs Music API 로 재생성·정규화(-22~-23 LUFS).
+  // 기존 t1_run_v*.mp3 는 사용 중단(유지 파일만 남김).
   bgmRunningPool: [
-    'themes/t1_run_v1.mp3',
-    'themes/t1_run_v2.mp3',
+    'themes/t1_marathon_v1.mp3',
+    'themes/t1_marathon_v2.mp3',
   ],
 );
 
@@ -70,9 +72,12 @@ const koreanMysticTheme = AppThemeSet(
     'themes/t3_home_v1.mp3',
     'themes/t3_home_v2.mp3',
   ],
+  // t3_marathon_v*.mp3 — 2026-04-23 ElevenLabs Music API 로 신규 생성.
+  // Korean traditional percussion (janggu + buk) driven running music, 공포 없음.
+  // t3_run_v*.mp3 는 Mystic 도플갱어 전용으로 이동 (HorrorService._mysticDoppelgangerPool).
   bgmRunningPool: [
-    'themes/t3_run_v1.mp3',
-    'themes/t3_run_v2.mp3',
+    'themes/t3_marathon_v1.mp3',
+    'themes/t3_marathon_v2.mp3',
   ],
 );
 

@@ -54,9 +54,8 @@ class HorrorService {
 
     // 초기 BGM 시작 — _onLevelChanged 는 "변경" 트리거라 초기 safe 상태에선 호출되지 않음.
     // 도플갱어 모드에서 시작 직후 무음 구간이 생기는 걸 방지.
-    final bgmList = _bgmVariants[_currentLevel];
-    if (bgmList != null && bgmList.isNotEmpty) {
-      final bgm = bgmList[_rng.nextInt(bgmList.length)];
+    final bgm = _pickBgmFile(_currentLevel);
+    if (bgm != null) {
       final vol = _bgmVolume[_currentLevel] ?? 0.5;
       await _playBgm(bgm, volume: vol);
     }
@@ -110,17 +109,26 @@ class HorrorService {
   // 테마 전용 TTS 혼합 확률 (20%)
   static const double _themeMixRatio = 0.20;
 
-  // 구간별 배경음 (3개 변형 중 랜덤)
+  // 구간별 배경음 (3개 변형 중 랜덤) — default/Pure/기타 테마용
   static const _bgmVariants = {
     ThreatLevel.aheadFar: ['bgm_peaceful.mp3', 'bgm_peaceful_v2.mp3', 'bgm_peaceful_v3.mp3'],
     ThreatLevel.aheadMid: ['bgm_calm_wind.mp3', 'bgm_calm_wind_v2.mp3', 'bgm_calm_wind_v3.mp3'],
     ThreatLevel.aheadClose: ['bgm_tension_low.mp3', 'bgm_tension_low_v2.mp3', 'bgm_tension_low_v3.mp3'],
-    ThreatLevel.safe: ['bgm_dark_ambient.mp3', 'bgm_dark_ambient_v2.mp3', 'bgm_dark_ambient_v3.mp3'],
+    // v1 은 원본이 -50 LUFS 로 거의 무음 + 정규화 시 클리핑. 풀에서 제외 (v2/v3 만).
+    ThreatLevel.safe: ['bgm_dark_ambient_v2.mp3', 'bgm_dark_ambient_v3.mp3'],
     ThreatLevel.warningFar: ['bgm_chase_far.mp3', 'bgm_chase_far_v2.mp3', 'bgm_chase_far_v3.mp3'],
     ThreatLevel.warningClose: ['bgm_chase_mid.mp3', 'bgm_chase_mid_v2.mp3', 'bgm_chase_mid_v3.mp3'],
     ThreatLevel.dangerFar: ['bgm_chase_close.mp3', 'bgm_chase_close_v2.mp3', 'bgm_chase_close_v3.mp3'],
     ThreatLevel.dangerClose: ['bgm_chase_critical.mp3', 'bgm_chase_critical_v2.mp3', 'bgm_chase_critical_v3.mp3'],
+    ThreatLevel.critical: ['bgm_chase_critical.mp3', 'bgm_chase_critical_v2.mp3', 'bgm_chase_critical_v3.mp3'],
   };
+
+  // Mystic 테마 전용 — t3_run_v*.mp3 (한국 전통 공포 톤, ElevenLabs Music API 생성).
+  // ThreatLevel 별 개별 변형 없이 2개 트랙에서 랜덤 재생. 볼륨은 _bgmVolume 으로 레벨별 차등.
+  static const _mysticDoppelgangerPool = [
+    'themes/t3_run_v1.mp3',
+    'themes/t3_run_v2.mp3',
+  ];
 
   // 구간별 배경음 볼륨
   static const _bgmVolume = {
@@ -132,7 +140,18 @@ class HorrorService {
     ThreatLevel.warningClose: 0.6,
     ThreatLevel.dangerFar: 0.7,
     ThreatLevel.dangerClose: 0.8,
+    ThreatLevel.critical: 0.9,
   };
+
+  /// 현재 테마·레벨에 맞는 BGM 파일 1개 선택. Mystic 은 t3_run_v* 풀 사용.
+  String? _pickBgmFile(ThreatLevel level) {
+    if (ThemeManager.I.currentId == ThemeId.koreanMystic) {
+      return _mysticDoppelgangerPool[_rng.nextInt(_mysticDoppelgangerPool.length)];
+    }
+    final list = _bgmVariants[level];
+    if (list == null || list.isEmpty) return null;
+    return list[_rng.nextInt(list.length)];
+  }
 
   // 주기적 TTS 간격 (초) — 위험할수록 더 자주
   static const _periodicInterval = {
@@ -237,10 +256,9 @@ class HorrorService {
   }
 
   Future<void> _onLevelChanged(ThreatLevel level) async {
-    // 배경음 변경 (3개 변형 중 랜덤)
-    final bgmList = _bgmVariants[level];
-    if (bgmList != null && bgmList.isNotEmpty) {
-      final bgm = bgmList[_rng.nextInt(bgmList.length)];
+    // 배경음 변경 — 테마별 분기 포함 (_pickBgmFile)
+    final bgm = _pickBgmFile(level);
+    if (bgm != null) {
       final vol = _bgmVolume[level] ?? 0.5;
       await _playBgm(bgm, volume: vol);
     } else {
