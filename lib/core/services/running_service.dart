@@ -6,6 +6,7 @@ import 'package:geolocator/geolocator.dart';
 import 'package:shadowrun/shared/models/run_model.dart';
 import 'package:shadowrun/core/database/database_helper.dart';
 import 'package:shadowrun/core/services/geocoding_service.dart';
+import 'package:shadowrun/core/services/tts_coordinator.dart';
 import 'package:shadowrun/core/l10n/app_strings.dart';
 
 class RunningService extends ChangeNotifier {
@@ -579,6 +580,7 @@ class RunningService extends ChangeNotifier {
 
     await _tts.awaitSpeakCompletion(true);
     if (_isDisposed || !_isRunning) return;
+    TtsCoordinator.I.begin(() => _tts.stop());
     await _tts.speak(text);
   }
 

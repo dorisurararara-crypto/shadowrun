@@ -2,6 +2,7 @@ import 'dart:math';
 import 'package:flutter/foundation.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:shadowrun/core/l10n/app_strings.dart';
+import 'package:shadowrun/core/services/tts_coordinator.dart';
 import 'package:shadowrun/core/theme/theme_id.dart';
 import 'package:shadowrun/core/theme/theme_manager.dart';
 
@@ -118,6 +119,7 @@ class SoloTtsService {
         filename = '${langBase}_$voice.mp3';
       }
 
+      TtsCoordinator.I.begin(() => _ttsPlayer.stop());
       await _ttsPlayer.setAsset('assets/audio/$filename');
       _ttsPlayer.setVolume(1.0);
       // ignore: unawaited_futures

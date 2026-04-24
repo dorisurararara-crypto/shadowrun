@@ -3,6 +3,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:shadowrun/core/l10n/app_strings.dart';
+import 'package:shadowrun/core/services/tts_coordinator.dart';
 import 'package:shadowrun/core/theme/theme_id.dart';
 import 'package:shadowrun/core/theme/theme_manager.dart';
 
@@ -74,6 +75,7 @@ class TtsLineBank {
         _recent[key]!.removeAt(0);
       }
       try {
+        TtsCoordinator.I.begin(() => _player.stop());
         await _player.stop();
         await _player.setAsset(pick);
         await _player.setVolume(volume);

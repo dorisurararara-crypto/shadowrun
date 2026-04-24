@@ -6,6 +6,7 @@ import 'package:shadowrun/core/l10n/app_strings.dart';
 import 'package:shadowrun/core/services/sfx_service.dart';
 import 'package:shadowrun/core/services/bgm_preferences.dart';
 import 'package:shadowrun/core/services/theme_tts_service.dart';
+import 'package:shadowrun/core/services/tts_coordinator.dart';
 import 'package:shadowrun/core/services/tts_line_bank.dart';
 import 'package:shadowrun/core/theme/theme_id.dart';
 import 'package:shadowrun/core/theme/theme_manager.dart';
@@ -479,6 +480,7 @@ class HorrorService {
         filename = '${langBase}_$voice.mp3';
       }
 
+      TtsCoordinator.I.begin(() => _ttsPlayer.stop());
       await _ttsPlayer.stop();
       await _ttsPlayer.setAsset('assets/audio/$filename');
       _ttsPlayer.setVolume(1.0);

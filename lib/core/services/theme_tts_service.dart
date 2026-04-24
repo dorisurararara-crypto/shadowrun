@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:just_audio/just_audio.dart';
+import 'package:shadowrun/core/services/tts_coordinator.dart';
 import 'package:shadowrun/core/theme/theme_id.dart';
 import 'package:shadowrun/core/theme/theme_manager.dart';
 
@@ -67,6 +68,7 @@ class ThemeTtsService {
     final path = 'assets/audio/tts/${prefix}_tts_$eventName.mp3';
     debugPrint('[ThemeTts] play event=$eventName path=$path');
     try {
+      TtsCoordinator.I.begin(() => _player.stop());
       await _player.setAsset(path);
       _player.setVolume(1.0);
       _player.play().catchError((_) {});

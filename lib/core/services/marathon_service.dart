@@ -5,6 +5,7 @@ import 'package:just_audio/just_audio.dart';
 import 'package:vibration/vibration.dart';
 import 'package:shadowrun/core/l10n/app_strings.dart';
 import 'package:shadowrun/core/services/bgm_preferences.dart';
+import 'package:shadowrun/core/services/tts_coordinator.dart';
 import 'package:shadowrun/core/services/watch_connector_service.dart';
 import 'package:shadowrun/core/theme/theme_id.dart';
 import 'package:shadowrun/core/theme/theme_manager.dart';
@@ -354,6 +355,10 @@ class MarathonService {
         filename = '${name}_$voice.mp3';
       }
 
+      TtsCoordinator.I.begin(() async {
+        await _ttsPlayer.stop();
+        await _flutterTts?.stop();
+      });
       await _ttsPlayer.setAsset('assets/audio/$filename');
       _ttsPlayer.setVolume(1.0);
       _ttsPlayer.play().catchError((_) {});
@@ -532,6 +537,10 @@ class MarathonService {
     _isLegendSpeaking = true;
     _lastLegendAnnounceSec = elapsedSec;
     try {
+      TtsCoordinator.I.begin(() async {
+        await tts.stop();
+        await _ttsPlayer.stop();
+      });
       await tts.stop();
       await tts.speak(text);
     } catch (e) {
