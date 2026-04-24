@@ -85,3 +85,31 @@
 - pure/mystic 홈 CTA 스크롤/매핑 문제 해결 (Flutter widget scroll 컨트롤 개선 or Maestro 좌표 기반 tap)
 - L6 시각 요소 자동화 (이미지 diff 기반)
 - TestFlight 실기 cross-check (배포 빌드는 AX 비활성이라 자동화 불가, 사용자 수동)
+
+## 세션 진행 상태 (2026-04-24 14:30)
+
+### ✅ 커버 완료
+- A1~A9 도플갱어 threat ladder 전 단계 + 각 전환 테마 SFX/TTS (filmNoir 상세 검증, 신규 3 테마 대동소이)
+- B2 1km 체크포인트 (filmNoir `t2_typewriter_stamp` + `checkpoint_1km` 발동)
+- L2 화면 렌더 5테마 × 6화면
+- L3 네비 (신규 3테마 × 3모드 진입)
+
+### 🟡 부분 커버
+- B3 5km encourage_early: 러닝 시간 부족으로 미확인. GPS speed=20m/s 로 긴 트랙 필요.
+- B4 10km encourage_late: 동일.
+- 마라톤 C1~C4 (legend 페이스 비교 TTS): legend 선택은 했으나 pace 비교 음성 로그 미확인.
+
+### ❌ 미커버
+- D1 언어 전환 UI 상호작용 (DB 변경은 한 번 했지만 설정 화면 tap flow 없음)
+- D2 테마 picker UI tap (DB 직접 변경 방식만)
+- D3~D5 기록 스와이프/편집
+- D6/D7 분석 PRO 락/해제 시각 diff
+- L7 러닝 데이터 정확성 (distance_m 계산 GPS 기대치 ±10%)
+- pure/mystic 홈 CTA Maestro 매핑 (viewport/스크롤 이슈)
+
+### 다음 세션 1순위
+1. 설정 D1~D2 (가장 기본적 사용자 상호작용)
+2. 기록 D3~D5 (스와이프 삭제는 Maestro swipe 지원)
+3. L7 데이터 정확성 (DB 쿼리 기반, 간단)
+4. B3/B4 encourage 발동 (GPS 속도·트랙 조정으로 10~15분 러닝 필요)
+5. pure/mystic Maestro 매핑 연구
