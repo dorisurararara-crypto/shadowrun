@@ -1855,23 +1855,32 @@ class _SettingsScreenState extends State<SettingsScreen> {
         children: List.generate(options.length, (i) {
           final isSelected = options[i] == selected;
           return Expanded(
-            child: GestureDetector(
-              onTap: () => onChanged(options[i]),
-              child: AnimatedContainer(
+            child: Semantics(
+              button: true,
+              selected: isSelected,
+              label: labels[i],
+              child: GestureDetector(
+                behavior: HitTestBehavior.opaque,
+                onTap: () {
+                  debugPrint('[Settings] seg tap: ${labels[i]} -> ${options[i]}');
+                  onChanged(options[i]);
+                },
+                child: AnimatedContainer(
                 duration: const Duration(milliseconds: 200),
                 padding: const EdgeInsets.symmetric(vertical: 10),
                 decoration: BoxDecoration(
                   color: isSelected ? const Color(0xFFFF0044) : Colors.transparent,
                   borderRadius: BorderRadius.circular(22),
                 ),
-                child: Center(
-                  child: Text(
-                    labels[i],
-                    style: GoogleFonts.inter(
-                      fontSize: 12,
-                      fontWeight: FontWeight.w700,
-                      color: isSelected ? Colors.white : SRColors.onSurface.withValues(alpha: 0.4),
-                      letterSpacing: 0.5,
+                  child: Center(
+                    child: Text(
+                      labels[i],
+                      style: GoogleFonts.inter(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w700,
+                        color: isSelected ? Colors.white : SRColors.onSurface.withValues(alpha: 0.4),
+                        letterSpacing: 0.5,
+                      ),
                     ),
                   ),
                 ),
