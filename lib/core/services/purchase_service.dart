@@ -54,6 +54,37 @@ class PurchaseService {
     await DatabaseHelper.setSetting('is_pro', 'true');
   }
 
+  /// 관리자 키 — PRO 활성화와 동시에 모든 유료 테마를 구매 완료 상태로 표시.
+  /// PRO 가 true 면 canUseTheme 은 이미 모두 true 를 반환하지만, picker 의 OWNED
+  /// 배지·purchasedThemes set 일관성까지 맞추기 위해 개별 테마도 mark.
+  Future<void> activateAllThemes() async {
+    await activatePro();
+    for (final id in _themeProductMap.values) {
+      _purchasedThemes.add(id);
+      await DatabaseHelper.setSetting('theme_purchased_${id.key}', 'true');
+    }
+    themesNotifier.value = Set.from(_purchasedThemes);
+  }
+
+  /// 관리자 키 (해제용) — PRO/체험 상태 + 모든 구매 테마를 최초 상태로 초기화.
+  /// DB 의 is_pro/trial_start_date/theme_purchased_* 를 모두 'false'/null 로 되돌리고
+  /// Notifier 도 갱신해 UI 전체가 즉시 락 상태로 전환되도록.
+  Future<void> deactivateProAndReset() async {
+    _isPro = false;
+    _isTrial = false;
+    _trialDaysLeft = 0;
+    proNotifier.value = false;
+    await DatabaseHelper.setSetting('is_pro', 'false');
+    // trial 시작일은 재진입 시 'pending' 으로 읽히도록 빈 값으로 초기화
+    await DatabaseHelper.setSetting('trial_start_date', '');
+
+    _purchasedThemes.clear();
+    for (final id in _themeProductMap.values) {
+      await DatabaseHelper.setSetting('theme_purchased_${id.key}', 'false');
+    }
+    themesNotifier.value = Set.from(_purchasedThemes);
+  }
+
   Future<void> initialize() async {
     // 저장된 PRO 상태를 항상 먼저 확인
     final savedPro = await DatabaseHelper.getSetting('is_pro');

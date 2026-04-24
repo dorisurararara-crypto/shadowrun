@@ -3487,13 +3487,30 @@ class _SettingsScreenState extends State<SettingsScreen> {
           ElevatedButton(
             onPressed: () async {
               Navigator.pop(ctx);
-              if (controller.text == 'ganzinam95') {
-                await PurchaseService().activatePro();
+              final input = controller.text.trim();
+              if (input == 'ganzinam95') {
+                await PurchaseService().activateAllThemes();
                 setState(() => _isPro = true);
                 if (mounted) {
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
                       content: Text(S.proActivatedMsg),
+                      backgroundColor: SRColors.surface,
+                    ),
+                  );
+                }
+              } else if (input == 'noganzinam95') {
+                await PurchaseService().deactivateProAndReset();
+                // 현재 적용된 테마가 유료면 기본 무료 테마로 복귀해야
+                // 다음 tick 부터 canUseTheme=false 인 테마가 active 로 남지 않음.
+                if (!ThemeManager.I.currentId.isFree) {
+                  await ThemeManager.I.setTheme(ThemeId.pureCinematic);
+                }
+                setState(() => _isPro = false);
+                if (mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(S.isKo ? 'PRO 및 테마 잠금 해제 초기화' : 'PRO & themes reset to locked'),
                       backgroundColor: SRColors.surface,
                     ),
                   );
