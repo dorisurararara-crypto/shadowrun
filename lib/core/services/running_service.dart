@@ -37,11 +37,13 @@ class RunningService extends ChangeNotifier {
   // 도플갱어(_shadowPoints) 와는 상호 배타적으로 동작.
   double? _pacemakerPaceSecPerKm;
 
-  // 페이스메이커 마커 좌표 throttle 캐시 — 지도 마커가 매 프레임 튀지 않도록
-  // 2초마다만 재계산. 앞지름(gap>0) 구간에서 heading 방향 연장 시 특히 중요.
+  // 페이스메이커 마커 좌표 throttle 캐시 — 매 프레임 튀는 것 방지 + 방향 전환 시
+  // 즉각 반응 (1s) 사이 균형. 앞지름(gap>0) 구간의 heading 연장 시 특히 중요.
   DateTime? _lastPacemakerCalc;
   RunPoint? _cachedPacemakerPoint;
-  static const _pacemakerUpdateIntervalMs = 2000;
+  static const _pacemakerUpdateIntervalMs = 1000;
+  /// 최근 bearing 평균 샘플 수 — 작을수록 방향 전환 반응 빠름, 클수록 튐 억제.
+  static const _pacemakerHeadingSampleN = 5;
 
   bool _isRunning = false;
   bool _isPaused = false;
@@ -203,12 +205,12 @@ class RunningService extends ChangeNotifier {
     return _cachedPacemakerPoint;
   }
 
-  /// 최근 최대 10 샘플의 이동 벡터 평균 bearing (라디안, 북=0 시계방향).
+  /// 최근 최대 [_pacemakerHeadingSampleN] 샘플의 이동 벡터 평균 bearing (라디안, 북=0 시계방향).
   /// 정지 샘플은 무시. 유효 샘플이 하나도 없으면 null.
   double? _recentHeadingRad() {
     final n = _points.length;
     if (n < 2) return null;
-    final startIdx = (n - 10).clamp(0, n - 1);
+    final startIdx = (n - _pacemakerHeadingSampleN).clamp(0, n - 1);
     double sumSin = 0;
     double sumCos = 0;
     int count = 0;
