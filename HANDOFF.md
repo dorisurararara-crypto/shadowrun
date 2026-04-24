@@ -29,6 +29,53 @@
 
 ## 최신
 
+### 2026-04-24 09:50 (Mac → Windows) — 신규 3테마 전 탭 확장 완료 ✅ (history/settings/analysis × 3테마 = 9 레이아웃 신규)
+
+**v29 체감 이슈 처리**. 사용자가 v29 실기 확인 후 "새 테마 3종이 홈(첫 탭)만 테마 바뀌고 나머지 4개 탭은 기본 레이아웃"이라고 보고. 원인: `home_screen.dart` 는 5 테마 분기 있었는데 `history_screen / settings_screen / analysis_screen` 3개 디스패처가 Pure/Mystic 만 처리하고 filmNoir/editorial/neoNoirCyber 는 default fallthrough.
+
+이번 세션에 **3 테마 × 3 화면 = 9개 레이아웃 파일 신규 + 3개 screen 디스패처 확장**. subagent 3개 병렬(화면별로 분담) + 각 테마 홈 레이아웃의 팔레트/폰트 토큰 완전 계승 + 목업 `full-t{2,4,5}-*.html` 해당 섹션(5/6/자유구성) 충실 재현.
+
+#### 이번 세션 추가 파일 (9개, 총 +8478 줄)
+
+**Analysis (공통 AnalysisDashboard 에 테마 AnalyticsPalette 주입 + wrapper 재해석)**
+- `noir_analysis_layout.dart` (240줄) — `← FILE` + DOSSIER 와인 스탬프, `The Ledger.` Cormorant italic 48px, 풋터 `— CASE CLOSED —`. palette: brass accent + wine danger.
+- `editorial_analysis_layout.dart` (299줄) — `← COVER` + `REPORT · P.04`, `The\nReport.` Playfair italic 52px, 흰 2px rule, 풋터 `— FIN —`. palette: red accent.
+- `cyber_analysis_layout.dart` (347줄) — `// BACK` + `DIAGNOSTICS · ACTIVE` 펄스 태그, 크로매틱 aberration `Diagnostics.`, scanlines, 풋터 `// EOF @ HH:MM`. palette: cyan accent + red danger, JetBrains Mono.
+
+**History (Pure/Mystic 과 기능 패리티: 필터 탭, 검색, 스와이프 삭제, 편집/챌린지/삭제 액션시트, 배너 광고)**
+- `noir_history_layout.dart` (968줄) — CASE No. 스탬프 뱃지(회전) + Monthly Report 헤더, 브래스·와인 3열 요약 (Cases/Solved/Cold), Cormorant italic 날짜 + Oswald caps 라인, 액션시트 `[CHASE]/[RE-FILE]/[BURN]` 스탬프.
+- `editorial_history_layout.dart` (1097줄) — `Archive · P.05 / 2026 / SHADOWRUN·HISTORY` pagehead + 2px rule, 거대 Playfair italic `The\nArchive.` (Archive 만 red), red eyebrow 월별 그룹 + italic No.NN + ESCAPED/CAUGHT 배지 (실패 strike-through), mast-foot 인용구.
+- `cyber_history_layout.dart` (1244줄) — 크로매틱 `LOGS · APR 2026` (cyan/red layer), 3 cyan corner panel (RUNS/DIST/W/L), log row `[ESCAPED]/[CAPTURED]` 박스 + `+312\nMETERS`, 액션시트 커맨드 스타일 `exec --replay / mv <log> / rm -f <log>`.
+
+**Settings (Pure signature 1:1 복제 · 38 prop 전원 매치 · 모달 바텀시트는 상위 Pure 핸들러 재사용)**
+- `noir_settings_layout.dart` (1334줄) — CASE FILE PERSONNEL 와인 스탬프(기울임), Cormorant italic `Agent Profile` + Oswald `§NN`, 3칼럼 미니스탯(SHOES·FEAR LV·GRADE) 브래스 괘선.
+- `editorial_settings_layout.dart` (1335줄) — 2px 흰 rule + `Masthead.` 거대 이탤릭(마지막 점만 red), §01~§07 매거진 섹션 + ◆ red 마커, IBM Plex Mono 데이터값 + Playfair italic 라벨, MAGAZINE 풋터.
+- `cyber_settings_layout.dart` (1614줄) — 크로매틱 aberration SYSTEM 타이틀 (적/시안/화이트 3레이어), JetBrains Mono `KEY · NAME · VALUE` 3칼럼 터미널식 행, 커스텀 네온 glow 토글(`AnimatedPositioned`), SYS.0N 페이지 ID.
+
+#### 디스패처 수정
+
+- `history_screen.dart` (+78줄) — import 3개 + `filmNoir/editorial/neoNoirCyber` 3 분기 추가, 각각 `FutureBuilder<List<RunModel>>` 로 Pure 패턴 그대로 복사.
+- `settings_screen.dart` (+262/-10줄) — import 3개 + `_buildNoirLayout/_buildEditorialLayout/_buildCyberLayout` 3 함수 + 3 분기 + 로딩 indicator 색상 분기 5-case `switch(themeId)` 로 리팩토링.
+- `analysis_screen.dart` (+24줄) — import 3개 + 3 분기.
+
+#### 검증
+
+- `flutter analyze` (전 프로젝트): **No issues found! (2.8s)**
+- iOS 시뮬 debug 빌드: 성공 (41.6s)
+- iPhone 17 iOS 26.4 부팅 시뮬 설치+런치: Dart VM 예외 0, RenderFlex overflow 0, null check 0. 로그의 error 는 전부 시뮬 환경 노이즈(StoreKit Sandbox / CoreTelephony / WatchConnectivity / AudioToolbox `-302`).
+
+#### 남은 작업 / 후속
+
+- TestFlight 재배포(v30) — 이번 변경은 앱 동작 크게 영향. 사용자 결정시 `./scripts/deploy_testflight.sh` 한 줄.
+- Settings 모달 시트(신발/음성/개인정보/약관)는 3 테마 모두 Pure 핸들러를 재사용하도록 결정. 시트까지 테마화하려면 후속 작업 분리 필요.
+- v29 체크 포인트 격자(3 테마 × 3 모드 × 6 항목) 실기 테스트는 여전히 사용자 몫.
+
+#### 다음 세션
+
+사용자가 실기로 신규 테마 × 4 탭 전부 돌며 시각/UX 이슈 리스트 공유할 예정. 체크 포인트는 메모리 `project_shadowrun_v29_testing.md` 에 있음. TestFlight 재배포 결정 필요.
+
+---
+
 ### 2026-04-24 04:00 (Mac → Windows) — v29 TestFlight 외부 배포 완료 ✅ + 테마 2/4/5 러닝 레이아웃 + BGM 12/SFX 9 + editorial 홈 치명 bug fix
 
 **v29 제출 성공**. `deploy_testflight.sh` 영구 패치 후 **첫 풀 경로 한 번에 끝**. archive → 수동 exportArchive(ASC API key로 Distribution cert 자동 발급) → validate/upload → VALID(12분) → ganzitester 외부 그룹 할당 HTTP 204 + Beta Review 제출 HTTP 201. 이제 cert 함정 없이 `./scripts/deploy_testflight.sh` 한 줄로 끝나는 게 확정.
