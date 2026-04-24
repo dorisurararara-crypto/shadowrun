@@ -87,28 +87,70 @@ class SfxService {
   }
 
   /// 테마별 러닝 시작 signature. noir/editorial/cyber 는 전용 SFX,
-  /// Pure/Mystic 은 기존 whistle 로 fallback (whistle 이 범용).
+  /// Pure/Mystic 은 기존 whistle 로 fallback.
   Future<void> themeStart() async {
     final themeFile = _themeFile('start');
-    if (themeFile != null) {
-      return play(themeFile);
-    }
+    if (themeFile != null) return play(themeFile);
     return whistle();
   }
 
-  /// 새 3테마 전용 signature SFX 파일 매핑. 그 외는 null (기본 SFX 사용).
+  /// 테마별 체크포인트(1km 통과 등) signature.
+  Future<void> themeCheckpoint() async {
+    final themeFile = _themeFile('checkpoint');
+    if (themeFile != null) return play(themeFile);
+    return kmDing();
+  }
+
+  /// 테마별 그림자 근접 경고 signature.
+  Future<void> themeNearShadow() async {
+    final themeFile = _themeFile('nearShadow');
+    if (themeFile != null) return play(themeFile);
+    return alertHigh();
+  }
+
+  /// 새 3테마 전용 signature SFX 파일 매핑. 5종(start/checkpoint/nearShadow/victory/defeat) 지원.
+  /// v30: zippo/shutter/boot 등 고유 oneshot 으로 교체.
   String? _themeFile(String kind) {
+    const mapping = <String, Map<String, String>>{
+      't2': {
+        'start': 't2_zippo_strike',
+        'checkpoint': 't2_typewriter_stamp',
+        'nearShadow': 't2_rain_splash',
+        'victory': 't2_revolver_cock',
+        'defeat': 't2_vintage_radio',
+      },
+      't4': {
+        'start': 't4_camera_shutter',
+        'checkpoint': 't4_page_turn',
+        'nearShadow': 't4_glass_clink',
+        'victory': 't4_champagne_pop',
+        'defeat': 't4_ink_splash',
+      },
+      't5': {
+        'start': 't5_system_boot',
+        'checkpoint': 't5_data_pulse',
+        'nearShadow': 't5_proximity_alarm',
+        'victory': 't5_system_cleared',
+        'defeat': 't5_error_static',
+      },
+    };
+    String? prefix;
     switch (ThemeManager.I.currentId) {
       case ThemeId.filmNoir:
-        return 'sfx_noir_$kind.mp3';
+        prefix = 't2';
+        break;
       case ThemeId.editorial:
-        return 'sfx_editorial_$kind.mp3';
+        prefix = 't4';
+        break;
       case ThemeId.neoNoirCyber:
-        return 'sfx_cyber_$kind.mp3';
+        prefix = 't5';
+        break;
       case ThemeId.pureCinematic:
       case ThemeId.koreanMystic:
         return null;
     }
+    final base = mapping[prefix]?[kind];
+    return base == null ? null : '$base.mp3';
   }
 
   // === Result Screen ===

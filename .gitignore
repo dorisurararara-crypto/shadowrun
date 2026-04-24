@@ -11,6 +11,7 @@ tmp/voice_scripts_v2/generate.log
 assets/audio/themes/.original/
 assets/audio/themes/.raw/
 assets/audio/.original/
+assets/audio/.raw/
 
 # iOS/Watch 앱 아이콘 (AppIcon.appiconset) 은 *.png 전역 ignore 예외
 !ios/Runner/Assets.xcassets/AppIcon.appiconset/*.png

@@ -5,6 +5,7 @@ import 'package:vibration/vibration.dart';
 import 'package:shadowrun/core/l10n/app_strings.dart';
 import 'package:shadowrun/core/services/sfx_service.dart';
 import 'package:shadowrun/core/services/bgm_preferences.dart';
+import 'package:shadowrun/core/services/theme_tts_service.dart';
 import 'package:shadowrun/core/services/tts_line_bank.dart';
 import 'package:shadowrun/core/theme/theme_id.dart';
 import 'package:shadowrun/core/theme/theme_manager.dart';
@@ -249,8 +250,11 @@ class HorrorService {
     _wasAhead = isNowAhead;
 
     if (newLevel != _currentLevel) {
+      final prevLevel = _currentLevel;
       _currentLevel = newLevel;
       _lastPeriodicTts = DateTime.now();
+      // v30: 테마 내레이터 이벤트 라인 + signature SFX. 노이즈 방지 위해 쿨다운 있는 ThemeTts 내부에서 억제.
+      _dispatchThemeThreatHook(prevLevel, newLevel);
       await _onLevelChanged(newLevel);
     } else {
       // 같은 레벨에 머물면 주기적 TTS
@@ -299,6 +303,43 @@ class HorrorService {
     final variants = _ttsVariants[level];
     if (variants != null && variants.isNotEmpty) {
       await _playTts(variants[_rng.nextInt(variants.length)]);
+    }
+  }
+
+  /// v30: 테마 고정 내레이터 + signature SFX 를 threat 전환 시점에 1회 트리거.
+  /// Severity 순서: safe < warningFar < warningClose < dangerFar < dangerClose < critical.
+  /// ahead* 는 플레이어가 앞선 상태 (선두). 플레이어가 뒤처지는 쪽으로 이동 = near/critical.
+  void _dispatchThemeThreatHook(ThreatLevel prev, ThreatLevel next) {
+    int sev(ThreatLevel l) {
+      switch (l) {
+        case ThreatLevel.aheadFar:
+        case ThreatLevel.aheadMid:
+        case ThreatLevel.aheadClose:
+        case ThreatLevel.safe:
+          return 0;
+        case ThreatLevel.warningFar:
+        case ThreatLevel.warningClose:
+          return 1;
+        case ThreatLevel.dangerFar:
+        case ThreatLevel.dangerClose:
+          return 2;
+        case ThreatLevel.critical:
+          return 3;
+      }
+    }
+    final pv = sev(prev);
+    final nv = sev(next);
+    if (nv > pv) {
+      // 위협 상승 — 근접/치명
+      if (next == ThreatLevel.critical) {
+        ThemeTtsService.I.playEvent('critical');
+      } else if (nv >= 1) {
+        SfxService().themeNearShadow();
+        ThemeTtsService.I.playEvent('near_shadow');
+      }
+    } else if (nv < pv && pv >= 2) {
+      // 위험에서 회복 — 격차 재확보
+      ThemeTtsService.I.playEvent('regained');
     }
   }
 

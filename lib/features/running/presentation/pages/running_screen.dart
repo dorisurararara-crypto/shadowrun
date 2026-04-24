@@ -21,6 +21,7 @@ import 'package:shadowrun/core/services/tts_line_bank.dart';
 import 'package:shadowrun/core/l10n/app_strings.dart';
 import 'package:shadowrun/shared/models/run_model.dart';
 import 'package:shadowrun/core/services/sfx_service.dart';
+import 'package:shadowrun/core/services/theme_tts_service.dart';
 import 'package:shadowrun/shared/widgets/stick_figure_marker.dart';
 import 'package:shadowrun/core/services/watch_connector_service.dart';
 import 'package:shadowrun/core/services/health_service.dart';
@@ -327,6 +328,15 @@ class _RunningScreenState extends State<RunningScreen>
         SfxService().themeStart();
       }
 
+      // v30: 테마 고정 내레이터 시작 라인. 도플갱어 모드엔 doppel 버전, 아니면 run 버전.
+      ThemeTtsService.I.resetSession();
+      if (_ttsOn) {
+        // ignore: unawaited_futures
+        ThemeTtsService.I.playEvent(
+          widget.runMode == 'doppelganger' ? 'start_doppel' : 'start_run',
+        );
+      }
+
       // 모드별 시작 TTS
       if (_ttsOn) {
         if (widget.runMode == 'doppelganger') {
@@ -590,6 +600,15 @@ class _RunningScreenState extends State<RunningScreen>
       if (_kmSfxPlayed.add(currentKm)) {
         SfxService().kmDing();
         SfxService().whistle();
+        // v30: 테마 체크포인트 signature + 내레이터 라인 (1km/5km/10km 마일스톤)
+        if (currentKm == 1) {
+          SfxService().themeCheckpoint();
+          if (_ttsOn) ThemeTtsService.I.playEvent('checkpoint_1km');
+        } else if (currentKm == 5) {
+          if (_ttsOn) ThemeTtsService.I.playEvent('encourage_early');
+        } else if (currentKm == 10) {
+          if (_ttsOn) ThemeTtsService.I.playEvent('encourage_late');
+        }
       }
       bool kmOk = true;
       if (_ttsOn) {
@@ -956,14 +975,21 @@ class _RunningScreenState extends State<RunningScreen>
       if (widget.runMode == 'doppelganger' && result != null) {
         if (result.challengeResult == 'win') {
           SfxService().victory();
+          if (_ttsOn) ThemeTtsService.I.playEvent('victory');
           await _horrorService.playSurvivedTts();
         } else if (result.challengeResult == 'lose') {
           SfxService().defeat();
+          if (_ttsOn) ThemeTtsService.I.playEvent('defeat');
           await _horrorService.playDefeatedTts();
         }
       } else if (widget.runMode == 'marathon' && _ttsOn) {
+        // v30: 마라톤/자유 모드에서도 테마 내레이터가 결과 라인 전달
+        ThemeTtsService.I.playEvent(
+          (result?.challengeResult == 'win') ? 'victory' : 'defeat',
+        );
         await _marathonService?.playEndTts();
       } else if (widget.runMode == 'freerun' && _ttsOn) {
+        ThemeTtsService.I.playEvent('victory');
         await _soloTtsService?.playEndTts();
       }
     } catch (e) {

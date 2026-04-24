@@ -58,4 +58,5 @@ flutter:
     - assets/audio/sfx/
     - assets/audio/themes/
     - assets/audio/voice/
+    - assets/audio/tts/
     - assets/icon/
