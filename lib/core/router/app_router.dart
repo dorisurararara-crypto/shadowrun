@@ -11,9 +11,20 @@ import 'package:shadowrun/features/analysis/presentation/pages/analysis_screen.d
 import 'package:shadowrun/features/onboarding/presentation/pages/language_select_screen.dart';
 import 'package:shadowrun/features/splash/splash_screen.dart';
 
-GoRouter createRouter(bool languageSelected) => GoRouter(
-  initialLocation: languageSelected ? '/splash' : '/language',
-  routes: [
+GoRouter createRouter(bool languageSelected) {
+  // 테스트용 초기 라우트 override (dart-define=INITIAL_ROUTE=/history 등).
+  // 비어 있으면 기존 동작 (언어 선택 → splash → home).
+  const override = String.fromEnvironment('INITIAL_ROUTE', defaultValue: '');
+  final initial = override.isNotEmpty
+      ? override
+      : (languageSelected ? '/splash' : '/language');
+  return GoRouter(
+    initialLocation: initial,
+    routes: _routes,
+  );
+}
+
+final _routes = <GoRoute>[
     GoRoute(
       path: '/language',
       builder: (context, state) => const LanguageSelectScreen(),
@@ -56,13 +67,22 @@ GoRouter createRouter(bool languageSelected) => GoRouter(
       path: '/result',
       redirect: (context, state) {
         final args = state.extra as Map<String, dynamic>? ?? {};
-        final runId = args['runId'] as int? ?? 0;
+        var runId = args['runId'] as int? ?? 0;
+        // 테스트용: state.extra 없을 때만 dart-define 의 TEST_RUN_ID 로 대체.
+        if (runId == 0) {
+          const testRunId = int.fromEnvironment('TEST_RUN_ID', defaultValue: 0);
+          if (testRunId > 0) runId = testRunId;
+        }
         if (runId == 0) return '/';
         return null;
       },
       builder: (context, state) {
         final args = state.extra as Map<String, dynamic>? ?? {};
-        final runId = args['runId'] as int? ?? 0;
+        var runId = args['runId'] as int? ?? 0;
+        if (runId == 0) {
+          const testRunId = int.fromEnvironment('TEST_RUN_ID', defaultValue: 0);
+          if (testRunId > 0) runId = testRunId;
+        }
         final result = args['result'] as String?;
         return ResultScreen(
           runId: runId,
@@ -86,8 +106,7 @@ GoRouter createRouter(bool languageSelected) => GoRouter(
       path: '/analysis',
       builder: (context, state) => const AnalysisScreen(),
     ),
-  ],
-);
+  ];
 
 Future<bool> isLanguageSelected() async {
   final prefs = await SharedPreferences.getInstance();
