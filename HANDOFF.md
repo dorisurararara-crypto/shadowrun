@@ -29,6 +29,51 @@
 
 ## 최신
 
+### 2026-04-24 15:51 (Mac → Windows) — v32 TestFlight 외부 배포 완료 ✅ (설정/기록/분석 E2E 꼼꼼 검증 + Semantics fix 포함)
+
+**v32 배포 성공**. Delivery UUID `96d22879-70d0-469f-bec0-214935637fa2`, VALID(6.5분 poll, 13번째 시도), ganzitester 외부 그룹 HTTP 204 + Beta App Review HTTP 201 제출 완료. 빌드 번호 32 (pubspec `1.0.0+32`).
+
+#### v31 → v32 변화
+
+v31 이후 추가된 변경은 **작지만 품질 개선 2건**:
+
+1. **Doppelganger threat tick 버그 수정** (`7ff07ee`) — `_ticker` 안 도플갱어 모드 `_updateHorror` 호출 누락 → 플레이어 GPS 정지 시 그림자 접근 threat 재계산 안 되던 버그. 주석은 "그림자 접근" 이라 적혀있었는데 실제 동작 불일치. 수정 + `[Horror]`/`[HorrorTick]`/`[SfxTheme]`/`[ThemeTts]` 런타임 계측 로그 추가.
+2. **Settings segmented control Semantics wrap** (`2c387cf`, **신규**) — 언어/런모드/단위 토글의 `GestureDetector` 를 `Semantics(button)` 로 감싸고 `HitTestBehavior.opaque` 적용. Maestro tapOn 이 Text bounds 에만 닿아 onTap 미호출되던 hit test 실패 fix. 사용자 체감 영향은 없으나(모든 tap 은 원래 잘 되었음) 접근성 tree 에 세그먼트 버튼으로 올바르게 publish.
+
+#### 이번 세션 E2E 검증 (TestFlight 전 최종 확인)
+
+**D1~D7 설정/기록/분석 + L7 + pure/mystic CTA 전부 Maestro + simctl + plist/DB 교차 검증 완료**:
+
+| ID | 항목 | 증거 |
+|---|---|---|
+| D1 | 언어 ko↔en 토글 | plist `flutter.language` round-trip + 전체 UI 문자열 전환 |
+| D2 | 테마 picker tap | plist/DB theme_id 전환 + 홈 CTA 즉시 반영 |
+| D3 | 스와이프 삭제 | Dismissible → 확인 다이얼로그 → DB DELETE + 복원 |
+| D4 | 롱프레스 이름 편집 | inputText → DB name NULL→"테스트러닝"→NULL |
+| D5 | 기록 tap → Result | 거리/시간/페이스/칼로리 정확 렌더 |
+| L7 | 러닝 데이터 정확성 | distance/duration/pace/calories 수식 상호 일관성 완전 일치 |
+| D6/D7 | 분석 PRO lock/unlock | is_pro=false → 락 오버레이, is_pro=true → 통계 차트 전체 렌더 |
+| pure/mystic CTA | 홈 CTA Maestro tap | 5 테마 × 2 모드 매핑 전부 확정 (mystic 자유러닝은 scroll 필수) |
+
+#### 알려진 한계 (실기 검증 권장)
+
+1. **5km/10km encourage TTS** — 코드 경로(running_screen.dart:622-624) + TTS assets(t2/t4/t5) 존재 정적 증명 완료. 실기 도달 검증은 시뮬 GPS 재생이 1km 당 36초 + 7분 기다려도 앱 자동 pause 이슈로 실패. 실기 iPhone 러닝으로 위임.
+2. **기록 검색 아이콘(⌕)**, **홈 BGM 토글**, **run_mode/units segmented control** — 미검증 (Semantics fix 로 후자는 구조적으로 동일하게 작동 예상).
+
+#### 커밋 (v31 → v32 range)
+
+- `fa73835` test(semantics): ENABLE_SEMANTICS dart-define 으로 Flutter iOS AX tree 강제 활성화
+- `7ff07ee` fix(doppelganger): 1초 Timer 에서 threat 재계산 누락 수정 + 오디오 이벤트 계측
+- `2bfbdc8` docs(testing): v31 꼼꼼 테스트 계획서 진행 상태 갱신
+- `2c387cf` test(settings): segmented control Semantics wrap + HitTest.opaque
+- (이 커밋) chore: v32 TestFlight 배포 완료 (build 1.0.0+32)
+
+#### 배포 과정 특이점
+
+시뮬 debug 빌드를 이번 세션에 **대량 반복**(홈 / 설정 / 기록 / 분석 / running / result × 5 테마 정도) → `flutter clean && flutter pub get && (cd ios && pod install)` 선제 실행 후 `./scripts/deploy_testflight.sh` → 1회 시도로 성공. 91169 재발 없음 (기존 메모리 가이드 적중).
+
+---
+
 ### 2026-04-24 12:45 (Mac → Windows) — v31 TestFlight 외부 배포 완료 ✅ (자동 테마 테스트 25/25 + 오디오 전면 재생성 포함)
 
 **v31 배포 성공**. Delivery UUID `e08fd592-db8a-426f-a537-6436fa7235ad`, VALID(6분 poll), ganzitester 외부 그룹 HTTP 204 + Beta Review HTTP 201 제출 완료. 빌드 번호 31 (pubspec `1.0.0+31`).
