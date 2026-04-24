@@ -1,7 +1,7 @@
 name: shadowrun
 description: "SHADOW RUN — 도플갱어 추격 러닝앱"
 publish_to: 'none'
-version: 1.0.0+33
+version: 1.0.0+34
 
 environment:
   sdk: ^3.11.0
