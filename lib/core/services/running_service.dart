@@ -37,6 +37,12 @@ class RunningService extends ChangeNotifier {
   // 도플갱어(_shadowPoints) 와는 상호 배타적으로 동작.
   double? _pacemakerPaceSecPerKm;
 
+  // 페이스메이커 마커 좌표 throttle 캐시 — 지도 마커가 매 프레임 튀지 않도록
+  // 2초마다만 재계산. 앞지름(gap>0) 구간에서 heading 방향 연장 시 특히 중요.
+  DateTime? _lastPacemakerCalc;
+  RunPoint? _cachedPacemakerPoint;
+  static const _pacemakerUpdateIntervalMs = 2000;
+
   bool _isRunning = false;
   bool _isPaused = false;
   DateTime? _startTime;
@@ -118,15 +124,38 @@ class RunningService extends ChangeNotifier {
     return _shadowPoints![_currentShadowIndex];
   }
 
-  /// 자유 모드 페이스메이커 유령의 현재 좌표(사용자 경로 위 가상 지점).
-  /// 페이서 누적 거리 = durationS * (1000 / paceSecPerKm). 사용자 `_points` 위에서 해당 거리 지점을 선형 보간.
-  /// 페이서가 사용자보다 앞서면 (virtualDist > 사용자 누적거리) 사용자 마지막 위치로 클램프.
-  /// `pacemakerPaceSecPerKm` 가 null 이거나 포인트가 부족하면 null.
+  /// 자유 모드 페이스메이커 유령의 현재 좌표.
+  ///
+  /// 두 구간:
+  /// - **사용자가 앞섬 (virtualDist <= _totalDistanceM)**: 사용자 경로 위 해당 거리 지점 (선형 보간).
+  /// - **페이스메이커가 앞섬 (virtualDist > _totalDistanceM)**: 사용자 현재 위치에서 최근 이동 방향
+  ///   (최근 포인트들 평균 bearing) 으로 `gap` 미터 만큼 직선 연장.
+  ///   이 덕분에 페이스메이커가 "내 앞에서 달리는 느낌" 이 유지된다.
+  ///
+  /// 사용자가 방향을 바꾸면 다음 업데이트(최대 [_pacemakerUpdateIntervalMs]ms 지연) 부터 새 heading
+  /// 에 맞춰 페이스메이커 마커도 꺾인다. throttle 덕분에 마커 좌표가 매 프레임 튀지 않음.
+  ///
+  /// `pacemakerPaceSecPerKm` 가 null 이거나 포인트가 없으면 null.
   RunPoint? get pacemakerPoint {
     final paceSec = _pacemakerPaceSecPerKm;
     if (paceSec == null || paceSec <= 0 || _points.isEmpty) return null;
+
+    // Throttle: 최근 계산 결과 재사용.
+    final now = DateTime.now();
+    if (_cachedPacemakerPoint != null &&
+        _lastPacemakerCalc != null &&
+        now.difference(_lastPacemakerCalc!).inMilliseconds < _pacemakerUpdateIntervalMs) {
+      return _cachedPacemakerPoint;
+    }
+
     final virtualDist = durationS * (1000.0 / paceSec);
-    if (virtualDist <= 0) return _points.first;
+    if (virtualDist <= 0) {
+      _cachedPacemakerPoint = _points.first;
+      _lastPacemakerCalc = now;
+      return _cachedPacemakerPoint;
+    }
+
+    // 1) 사용자 경로 위에서 virtualDist 지점 찾기 (gap <= 0 상황).
     double acc = 0;
     for (int i = 1; i < _points.length; i++) {
       final p0 = _points[i - 1];
@@ -134,17 +163,72 @@ class RunningService extends ChangeNotifier {
       final seg = _distanceBetweenPoints(p0.latitude, p0.longitude, p1.latitude, p1.longitude);
       if (acc + seg >= virtualDist) {
         final ratio = seg == 0 ? 0.0 : (virtualDist - acc) / seg;
-        return RunPoint(
+        _cachedPacemakerPoint = RunPoint(
           runId: p1.runId,
           latitude: p0.latitude + (p1.latitude - p0.latitude) * ratio,
           longitude: p0.longitude + (p1.longitude - p0.longitude) * ratio,
           timestampMs: p1.timestampMs,
           speedMps: p1.speedMps,
         );
+        _lastPacemakerCalc = now;
+        return _cachedPacemakerPoint;
       }
       acc += seg;
     }
-    return _points.last;
+
+    // 2) 페이스메이커가 앞섬 → heading 방향 직선 연장.
+    final gap = virtualDist - _totalDistanceM;
+    final last = _points.last;
+    final bearing = _recentHeadingRad();
+    if (bearing == null) {
+      // 정지 중이거나 샘플 부족 → 사용자 현재 위치로 표시.
+      _cachedPacemakerPoint = last;
+      _lastPacemakerCalc = now;
+      return _cachedPacemakerPoint;
+    }
+    // ENU 근사: 위도 1도 ≈ 111111m, 경도 1도 ≈ 111111*cos(lat)m.
+    final latRad = last.latitude * (pi / 180);
+    final east = gap * sin(bearing);
+    final north = gap * cos(bearing);
+    final dLat = north / 111111.0;
+    final dLon = east / (111111.0 * cos(latRad).abs().clamp(0.001, 1.0));
+    _cachedPacemakerPoint = RunPoint(
+      runId: last.runId,
+      latitude: last.latitude + dLat,
+      longitude: last.longitude + dLon,
+      timestampMs: last.timestampMs,
+      speedMps: last.speedMps,
+    );
+    _lastPacemakerCalc = now;
+    return _cachedPacemakerPoint;
+  }
+
+  /// 최근 최대 10 샘플의 이동 벡터 평균 bearing (라디안, 북=0 시계방향).
+  /// 정지 샘플은 무시. 유효 샘플이 하나도 없으면 null.
+  double? _recentHeadingRad() {
+    final n = _points.length;
+    if (n < 2) return null;
+    final startIdx = (n - 10).clamp(0, n - 1);
+    double sumSin = 0;
+    double sumCos = 0;
+    int count = 0;
+    for (int i = startIdx + 1; i < n; i++) {
+      final p0 = _points[i - 1];
+      final p1 = _points[i];
+      final dLat = p1.latitude - p0.latitude;
+      final dLon = p1.longitude - p0.longitude;
+      final latRad = p0.latitude * (pi / 180);
+      final east = dLon * cos(latRad);
+      final north = dLat;
+      final mag = sqrt(east * east + north * north);
+      if (mag < 1e-8) continue;
+      final b = atan2(east, north);
+      sumSin += sin(b);
+      sumCos += cos(b);
+      count++;
+    }
+    if (count == 0) return null;
+    return atan2(sumSin / count, sumCos / count);
   }
 
   /// 페이서가 사용자보다 앞서 있으면 양수, 뒤처지면 음수 (m).
@@ -299,6 +383,8 @@ class RunningService extends ChangeNotifier {
     _lastMilestoneNotified = 0;
     _lastPaceCheckS = 0;
     _prevAvgPace = 0;
+    _cachedPacemakerPoint = null;
+    _lastPacemakerCalc = null;
     _isPaused = false;
     _pausedDuration = Duration.zero;
     _pauseStart = null;
