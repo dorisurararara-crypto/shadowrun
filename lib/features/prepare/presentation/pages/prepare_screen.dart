@@ -15,7 +15,10 @@ import 'package:shadowrun/core/l10n/app_strings.dart';
 import 'package:shadowrun/core/services/sfx_service.dart';
 import 'package:shadowrun/core/services/purchase_service.dart';
 import 'package:shadowrun/features/running/data/legend_runners.dart';
+import 'package:shadowrun/features/prepare/presentation/layouts/cyber_prepare_layout.dart';
+import 'package:shadowrun/features/prepare/presentation/layouts/editorial_prepare_layout.dart';
 import 'package:shadowrun/features/prepare/presentation/layouts/mystic_prepare_layout.dart';
+import 'package:shadowrun/features/prepare/presentation/layouts/noir_prepare_layout.dart';
 import 'package:shadowrun/features/prepare/presentation/layouts/pure_prepare_layout.dart';
 
 class PrepareScreen extends StatefulWidget {
@@ -396,56 +399,163 @@ class _PrepareScreenState extends State<PrepareScreen>
             countdownValue: _countdownValue,
           );
         }
-        if (themeId == ThemeId.pureCinematic) {
-          if (_loading) {
-            return const Scaffold(
-              backgroundColor: Color(0xFF000000),
-              body: Center(
-                child: CircularProgressIndicator(color: Color(0xFF8B0000)),
-              ),
-            );
-          }
-          return PurePrepareLayout(
-            isChallenge: _isChallenge,
-            gpsReady: _gpsReady,
-            tooFarFromStart: _tooFarFromStart,
-            canStart: _canStart,
-            selectedQuote: _selectedQuote,
-            selectedMode: _selectedMode,
-            onModeChanged: (m) {
-              SfxService().toggle();
-              setState(() => _selectedMode = m);
-            },
-            shadowRun: _shadowRun,
-            shadowLocationType: _shadowLocationType,
-            onShadowLocationChanged: (t) {
-              SfxService().toggle();
-              setState(() => _shadowLocationType = t);
-            },
-            shadowSpeedLevel: _shadowSpeedLevel,
-            onShadowSpeedChanged: _onShadowSpeedChanged,
-            shoes: _shoes,
-            selectedShoeId: _selectedShoeId,
-            onShoeChanged: (id) => setState(() => _selectedShoeId = id),
-            selectedLegendId: _selectedLegendId,
-            onLegendChanged: (id) => setState(() => _selectedLegendId = id),
-            isPro: _isPro,
-            onLegendLocked: _showLegendLockedMessage,
-            pacemakerEnabled: _pacemakerEnabled,
-            onPacemakerToggled: (v) {
-              SfxService().toggle();
-              setState(() => _pacemakerEnabled = v);
-            },
-            pacemakerSecPerKm: _pacemakerSecPerKm,
-            onPacemakerPaceChanged: (v) =>
-                setState(() => _pacemakerSecPerKm = v),
-            onStart: _startCountdown,
-            onBack: () => context.pop(),
-            countdownActive: _countdownActive,
-            countdownValue: _countdownValue,
+        // 테마별 prepare 레이아웃 (pure/noir/editorial/cyber 는 동일 widget props 사용).
+        // loading scaffold 색만 테마별로 다르다.
+        Color loadingBg;
+        Color loadingAccent;
+        switch (themeId) {
+          case ThemeId.pureCinematic:
+            loadingBg = const Color(0xFF000000);
+            loadingAccent = const Color(0xFF8B0000);
+            break;
+          case ThemeId.filmNoir:
+            loadingBg = const Color(0xFF0D0907);
+            loadingAccent = const Color(0xFFB89660);
+            break;
+          case ThemeId.editorial:
+            loadingBg = const Color(0xFF0A0A0A);
+            loadingAccent = const Color(0xFFDC2626);
+            break;
+          case ThemeId.neoNoirCyber:
+            loadingBg = const Color(0xFF04040A);
+            loadingAccent = const Color(0xFFFF1744);
+            break;
+          case ThemeId.koreanMystic:
+            // 위쪽 분기에서 이미 반환됨 — fallback.
+            return _buildDefaultLayout(context);
+        }
+        if (_loading) {
+          return Scaffold(
+            backgroundColor: loadingBg,
+            body: Center(
+              child: CircularProgressIndicator(color: loadingAccent),
+            ),
           );
         }
-        return _buildDefaultLayout(context);
+        switch (themeId) {
+          case ThemeId.pureCinematic:
+            return PurePrepareLayout(
+              isChallenge: _isChallenge,
+              gpsReady: _gpsReady,
+              tooFarFromStart: _tooFarFromStart,
+              canStart: _canStart,
+              selectedQuote: _selectedQuote,
+              selectedMode: _selectedMode,
+              onModeChanged: (m) { SfxService().toggle(); setState(() => _selectedMode = m); },
+              shadowRun: _shadowRun,
+              shadowLocationType: _shadowLocationType,
+              onShadowLocationChanged: (t) { SfxService().toggle(); setState(() => _shadowLocationType = t); },
+              shadowSpeedLevel: _shadowSpeedLevel,
+              onShadowSpeedChanged: _onShadowSpeedChanged,
+              shoes: _shoes,
+              selectedShoeId: _selectedShoeId,
+              onShoeChanged: (id) => setState(() => _selectedShoeId = id),
+              selectedLegendId: _selectedLegendId,
+              onLegendChanged: (id) => setState(() => _selectedLegendId = id),
+              isPro: _isPro,
+              onLegendLocked: _showLegendLockedMessage,
+              pacemakerEnabled: _pacemakerEnabled,
+              onPacemakerToggled: (v) { SfxService().toggle(); setState(() => _pacemakerEnabled = v); },
+              pacemakerSecPerKm: _pacemakerSecPerKm,
+              onPacemakerPaceChanged: (v) => setState(() => _pacemakerSecPerKm = v),
+              onStart: _startCountdown,
+              onBack: () => context.pop(),
+              countdownActive: _countdownActive,
+              countdownValue: _countdownValue,
+            );
+          case ThemeId.filmNoir:
+            return NoirPrepareLayout(
+              isChallenge: _isChallenge,
+              gpsReady: _gpsReady,
+              tooFarFromStart: _tooFarFromStart,
+              canStart: _canStart,
+              selectedQuote: _selectedQuote,
+              selectedMode: _selectedMode,
+              onModeChanged: (m) { SfxService().toggle(); setState(() => _selectedMode = m); },
+              shadowRun: _shadowRun,
+              shadowLocationType: _shadowLocationType,
+              onShadowLocationChanged: (t) { SfxService().toggle(); setState(() => _shadowLocationType = t); },
+              shadowSpeedLevel: _shadowSpeedLevel,
+              onShadowSpeedChanged: _onShadowSpeedChanged,
+              shoes: _shoes,
+              selectedShoeId: _selectedShoeId,
+              onShoeChanged: (id) => setState(() => _selectedShoeId = id),
+              selectedLegendId: _selectedLegendId,
+              onLegendChanged: (id) => setState(() => _selectedLegendId = id),
+              isPro: _isPro,
+              onLegendLocked: _showLegendLockedMessage,
+              pacemakerEnabled: _pacemakerEnabled,
+              onPacemakerToggled: (v) { SfxService().toggle(); setState(() => _pacemakerEnabled = v); },
+              pacemakerSecPerKm: _pacemakerSecPerKm,
+              onPacemakerPaceChanged: (v) => setState(() => _pacemakerSecPerKm = v),
+              onStart: _startCountdown,
+              onBack: () => context.pop(),
+              countdownActive: _countdownActive,
+              countdownValue: _countdownValue,
+            );
+          case ThemeId.editorial:
+            return EditorialPrepareLayout(
+              isChallenge: _isChallenge,
+              gpsReady: _gpsReady,
+              tooFarFromStart: _tooFarFromStart,
+              canStart: _canStart,
+              selectedQuote: _selectedQuote,
+              selectedMode: _selectedMode,
+              onModeChanged: (m) { SfxService().toggle(); setState(() => _selectedMode = m); },
+              shadowRun: _shadowRun,
+              shadowLocationType: _shadowLocationType,
+              onShadowLocationChanged: (t) { SfxService().toggle(); setState(() => _shadowLocationType = t); },
+              shadowSpeedLevel: _shadowSpeedLevel,
+              onShadowSpeedChanged: _onShadowSpeedChanged,
+              shoes: _shoes,
+              selectedShoeId: _selectedShoeId,
+              onShoeChanged: (id) => setState(() => _selectedShoeId = id),
+              selectedLegendId: _selectedLegendId,
+              onLegendChanged: (id) => setState(() => _selectedLegendId = id),
+              isPro: _isPro,
+              onLegendLocked: _showLegendLockedMessage,
+              pacemakerEnabled: _pacemakerEnabled,
+              onPacemakerToggled: (v) { SfxService().toggle(); setState(() => _pacemakerEnabled = v); },
+              pacemakerSecPerKm: _pacemakerSecPerKm,
+              onPacemakerPaceChanged: (v) => setState(() => _pacemakerSecPerKm = v),
+              onStart: _startCountdown,
+              onBack: () => context.pop(),
+              countdownActive: _countdownActive,
+              countdownValue: _countdownValue,
+            );
+          case ThemeId.neoNoirCyber:
+            return CyberPrepareLayout(
+              isChallenge: _isChallenge,
+              gpsReady: _gpsReady,
+              tooFarFromStart: _tooFarFromStart,
+              canStart: _canStart,
+              selectedQuote: _selectedQuote,
+              selectedMode: _selectedMode,
+              onModeChanged: (m) { SfxService().toggle(); setState(() => _selectedMode = m); },
+              shadowRun: _shadowRun,
+              shadowLocationType: _shadowLocationType,
+              onShadowLocationChanged: (t) { SfxService().toggle(); setState(() => _shadowLocationType = t); },
+              shadowSpeedLevel: _shadowSpeedLevel,
+              onShadowSpeedChanged: _onShadowSpeedChanged,
+              shoes: _shoes,
+              selectedShoeId: _selectedShoeId,
+              onShoeChanged: (id) => setState(() => _selectedShoeId = id),
+              selectedLegendId: _selectedLegendId,
+              onLegendChanged: (id) => setState(() => _selectedLegendId = id),
+              isPro: _isPro,
+              onLegendLocked: _showLegendLockedMessage,
+              pacemakerEnabled: _pacemakerEnabled,
+              onPacemakerToggled: (v) { SfxService().toggle(); setState(() => _pacemakerEnabled = v); },
+              pacemakerSecPerKm: _pacemakerSecPerKm,
+              onPacemakerPaceChanged: (v) => setState(() => _pacemakerSecPerKm = v),
+              onStart: _startCountdown,
+              onBack: () => context.pop(),
+              countdownActive: _countdownActive,
+              countdownValue: _countdownValue,
+            );
+          case ThemeId.koreanMystic:
+            return _buildDefaultLayout(context);
+        }
       },
     );
   }
