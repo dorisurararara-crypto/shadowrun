@@ -90,6 +90,7 @@ class SfxService {
   /// Pure/Mystic 은 기존 whistle 로 fallback.
   Future<void> themeStart() async {
     final themeFile = _themeFile('start');
+    debugPrint('[SfxTheme] themeStart file=${themeFile ?? "fallback:whistle"}');
     if (themeFile != null) return play(themeFile);
     return whistle();
   }
@@ -97,6 +98,7 @@ class SfxService {
   /// 테마별 체크포인트(1km 통과 등) signature.
   Future<void> themeCheckpoint() async {
     final themeFile = _themeFile('checkpoint');
+    debugPrint('[SfxTheme] themeCheckpoint file=${themeFile ?? "fallback:kmDing"}');
     if (themeFile != null) return play(themeFile);
     return kmDing();
   }
@@ -104,6 +106,7 @@ class SfxService {
   /// 테마별 그림자 근접 경고 signature.
   Future<void> themeNearShadow() async {
     final themeFile = _themeFile('nearShadow');
+    debugPrint('[SfxTheme] themeNearShadow file=${themeFile ?? "fallback:alertHigh"}');
     if (themeFile != null) return play(themeFile);
     return alertHigh();
   }

@@ -253,6 +253,7 @@ class HorrorService {
       final prevLevel = _currentLevel;
       _currentLevel = newLevel;
       _lastPeriodicTts = DateTime.now();
+      debugPrint('[Horror] threat ${prevLevel.name} → ${newLevel.name} (dist=${distanceM.toStringAsFixed(1)}m)');
       // v30: 테마 내레이터 이벤트 라인 + signature SFX. 노이즈 방지 위해 쿨다운 있는 ThemeTts 내부에서 억제.
       _dispatchThemeThreatHook(prevLevel, newLevel);
       await _onLevelChanged(newLevel);

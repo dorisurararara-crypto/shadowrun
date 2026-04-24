@@ -374,13 +374,23 @@ class _RunningScreenState extends State<RunningScreen>
 
       // Timer: UI 갱신 + 지도 + 시간 기반 마라톤 TTS (GPS 멈춰도 동작).
       // km 마일스톤은 GPS 콜백에서만 처리 (거리 정확도 필요).
+      debugPrint('[Ticker] starting mode=${widget.runMode} shadowRunId=${widget.shadowRunId}');
       _ticker = Timer.periodic(const Duration(seconds: 1), (_) {
+        debugPrint('[Ticker] tick aborted=${_aborted()} paused=$_paused');
         if (_aborted()) return;
         if (!_paused) {
           _runService.updateShadowPosition();
           setState(() {});
           _updateMap();
           _sendDataToWatch();
+          // 도플갱어: GPS 이동이 없어도(플레이어 정지) 그림자는 계속 접근해야 하므로
+          // 시간 기반 threat 재계산을 매 초 수행. GPS 콜백 경로와 중복되지만
+          // HorrorService 내부 쿨다운이 있어 이벤트 중복은 억제됨.
+          if (widget.runMode == 'doppelganger' && !_stopping) {
+            debugPrint('[Ticker] doppel branch firing _updateHorror');
+            // ignore: unawaited_futures
+            _updateHorror();
+          }
           if (widget.runMode == 'marathon' && _ttsOn) {
             _updateMarathonTime();
             // Legend(전설) 트래커 — legendId가 있을 때만 내부에서 동작.
@@ -566,10 +576,14 @@ class _RunningScreenState extends State<RunningScreen>
   }
 
   Future<void> _updateHorror() async {
-    if (widget.shadowRunId == null || _isUpdatingHorror) return;
+    if (widget.shadowRunId == null || _isUpdatingHorror) {
+      debugPrint('[HorrorTick] skip shadowRunId=${widget.shadowRunId} updating=$_isUpdatingHorror');
+      return;
+    }
     _isUpdatingHorror = true;
     try {
       final dist = _runService.shadowDistanceM;
+      debugPrint('[HorrorTick] dist=${dist.toStringAsFixed(1)}m dur=${_runService.durationS}s');
       if (!dist.isInfinite) {
         await _horrorService.updateThreat(dist);
         // dispose/stop 사이 race 방지: 애니메이션/서비스 접근 전 재확인

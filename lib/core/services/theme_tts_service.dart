@@ -48,20 +48,30 @@ class ThemeTtsService {
 
   /// 테마 전용 이벤트 TTS 1회 재생. 현재 테마가 지원하지 않으면 no-op.
   Future<void> playEvent(String eventName) async {
-    if (!enabled || _disposed) return;
+    if (!enabled || _disposed) {
+      debugPrint('[ThemeTts] skip event=$eventName enabled=$enabled disposed=$_disposed');
+      return;
+    }
     final prefix = _themePrefix();
-    if (prefix == null) return;
+    if (prefix == null) {
+      debugPrint('[ThemeTts] skip event=$eventName — theme without TTS pool');
+      return;
+    }
     final now = DateTime.now();
     final last = _lastPlayed[eventName];
-    if (last != null && now.difference(last) < _cooldown) return;
+    if (last != null && now.difference(last) < _cooldown) {
+      debugPrint('[ThemeTts] cooldown skip event=$eventName');
+      return;
+    }
     _lastPlayed[eventName] = now;
     final path = 'assets/audio/tts/${prefix}_tts_$eventName.mp3';
+    debugPrint('[ThemeTts] play event=$eventName path=$path');
     try {
       await _player.setAsset(path);
       _player.setVolume(1.0);
       _player.play().catchError((_) {});
     } catch (e) {
-      debugPrint('ThemeTts error: $e (path=$path)');
+      debugPrint('[ThemeTts] ERROR event=$eventName path=$path err=$e');
     }
   }
 

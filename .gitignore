@@ -67,3 +67,6 @@ upload-keystore.jks
 *.png
 .gstack/
 tmp_screenshots/
+
+# 테스트 녹화 영상 (로컬)
+test_recordings/
