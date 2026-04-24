@@ -7,7 +7,10 @@ import 'package:shadowrun/core/theme/theme_manager.dart';
 import 'package:shadowrun/core/services/purchase_service.dart';
 import 'package:shadowrun/core/l10n/app_strings.dart';
 import 'package:shadowrun/core/services/sfx_service.dart';
+import 'package:shadowrun/features/analysis/presentation/layouts/cyber_analysis_layout.dart';
+import 'package:shadowrun/features/analysis/presentation/layouts/editorial_analysis_layout.dart';
 import 'package:shadowrun/features/analysis/presentation/layouts/mystic_analysis_layout.dart';
+import 'package:shadowrun/features/analysis/presentation/layouts/noir_analysis_layout.dart';
 import 'package:shadowrun/features/analysis/presentation/layouts/pure_analysis_layout.dart';
 import 'package:shadowrun/features/analysis/presentation/widgets/analysis_dashboard.dart';
 import 'package:shadowrun/shared/widgets/banner_ad_tile.dart';
@@ -61,6 +64,27 @@ class _AnalysisScreenState extends State<AnalysisScreen> {
         }
         if (themeId == ThemeId.pureCinematic) {
           return PureAnalysisLayout(
+            onClose: _goHome,
+            locked: !isPro,
+            proOverlay: !isPro ? _buildProOverlay() : null,
+          );
+        }
+        if (themeId == ThemeId.filmNoir) {
+          return NoirAnalysisLayout(
+            onClose: _goHome,
+            locked: !isPro,
+            proOverlay: !isPro ? _buildProOverlay() : null,
+          );
+        }
+        if (themeId == ThemeId.editorial) {
+          return EditorialAnalysisLayout(
+            onClose: _goHome,
+            locked: !isPro,
+            proOverlay: !isPro ? _buildProOverlay() : null,
+          );
+        }
+        if (themeId == ThemeId.neoNoirCyber) {
+          return CyberAnalysisLayout(
             onClose: _goHome,
             locked: !isPro,
             proOverlay: !isPro ? _buildProOverlay() : null,

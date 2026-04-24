@@ -10,6 +10,9 @@ import 'package:shadowrun/core/l10n/app_strings.dart';
 import 'package:shadowrun/core/services/sfx_service.dart';
 import 'package:shadowrun/features/history/presentation/layouts/mystic_history_layout.dart';
 import 'package:shadowrun/features/history/presentation/layouts/pure_history_layout.dart';
+import 'package:shadowrun/features/history/presentation/layouts/noir_history_layout.dart';
+import 'package:shadowrun/features/history/presentation/layouts/editorial_history_layout.dart';
+import 'package:shadowrun/features/history/presentation/layouts/cyber_history_layout.dart';
 import 'package:shadowrun/shared/widgets/banner_ad_tile.dart';
 
 class HistoryScreen extends StatefulWidget {
@@ -216,6 +219,81 @@ class _HistoryScreenState extends State<HistoryScreen>
             builder: (context, snapshot) {
               final runs = snapshot.data ?? const <RunModel>[];
               return PureHistoryLayout(
+                runs: runs,
+                onRunTap: (run) {
+                  SfxService().tapCard();
+                  context.push('/result', extra: {'runId': run.id});
+                },
+                onClose: () {
+                  SfxService().tapCard();
+                  context.go('/');
+                },
+                onRunChallenge: (run) {
+                  SfxService().tapCard();
+                  context.push('/prepare', extra: run.id);
+                },
+                onRunEdit: _editRunName,
+                onRunDelete: _deleteRun,
+              );
+            },
+          );
+        }
+        if (themeId == ThemeId.filmNoir) {
+          return FutureBuilder<List<RunModel>>(
+            future: _runsFuture,
+            builder: (context, snapshot) {
+              final runs = snapshot.data ?? const <RunModel>[];
+              return NoirHistoryLayout(
+                runs: runs,
+                onRunTap: (run) {
+                  SfxService().tapCard();
+                  context.push('/result', extra: {'runId': run.id});
+                },
+                onClose: () {
+                  SfxService().tapCard();
+                  context.go('/');
+                },
+                onRunChallenge: (run) {
+                  SfxService().tapCard();
+                  context.push('/prepare', extra: run.id);
+                },
+                onRunEdit: _editRunName,
+                onRunDelete: _deleteRun,
+              );
+            },
+          );
+        }
+        if (themeId == ThemeId.editorial) {
+          return FutureBuilder<List<RunModel>>(
+            future: _runsFuture,
+            builder: (context, snapshot) {
+              final runs = snapshot.data ?? const <RunModel>[];
+              return EditorialHistoryLayout(
+                runs: runs,
+                onRunTap: (run) {
+                  SfxService().tapCard();
+                  context.push('/result', extra: {'runId': run.id});
+                },
+                onClose: () {
+                  SfxService().tapCard();
+                  context.go('/');
+                },
+                onRunChallenge: (run) {
+                  SfxService().tapCard();
+                  context.push('/prepare', extra: run.id);
+                },
+                onRunEdit: _editRunName,
+                onRunDelete: _deleteRun,
+              );
+            },
+          );
+        }
+        if (themeId == ThemeId.neoNoirCyber) {
+          return FutureBuilder<List<RunModel>>(
+            future: _runsFuture,
+            builder: (context, snapshot) {
+              final runs = snapshot.data ?? const <RunModel>[];
+              return CyberHistoryLayout(
                 runs: runs,
                 onRunTap: (run) {
                   SfxService().tapCard();

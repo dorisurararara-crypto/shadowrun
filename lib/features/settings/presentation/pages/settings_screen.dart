@@ -19,6 +19,9 @@ import 'package:shadowrun/core/docs/legal_texts.dart';
 import 'package:shadowrun/shared/models/run_model.dart';
 import 'package:shadowrun/features/settings/presentation/layouts/mystic_settings_layout.dart';
 import 'package:shadowrun/features/settings/presentation/layouts/pure_settings_layout.dart';
+import 'package:shadowrun/features/settings/presentation/layouts/noir_settings_layout.dart';
+import 'package:shadowrun/features/settings/presentation/layouts/editorial_settings_layout.dart';
+import 'package:shadowrun/features/settings/presentation/layouts/cyber_settings_layout.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
@@ -154,16 +157,30 @@ class _SettingsScreenState extends State<SettingsScreen> {
       valueListenable: ThemeManager.I.themeIdNotifier,
       builder: (context, themeId, _) {
         if (_loading) {
-          final bg = themeId == ThemeId.koreanMystic
-              ? const Color(0xFF050302)
-              : themeId == ThemeId.pureCinematic
-                  ? const Color(0xFF000000)
-                  : SRColors.background;
-          final ring = themeId == ThemeId.koreanMystic
-              ? const Color(0xFFC42029)
-              : themeId == ThemeId.pureCinematic
-                  ? const Color(0xFFC83030)
-                  : SRColors.primaryContainer;
+          final Color bg;
+          final Color ring;
+          switch (themeId) {
+            case ThemeId.koreanMystic:
+              bg = const Color(0xFF050302);
+              ring = const Color(0xFFC42029);
+              break;
+            case ThemeId.pureCinematic:
+              bg = const Color(0xFF000000);
+              ring = const Color(0xFFC83030);
+              break;
+            case ThemeId.filmNoir:
+              bg = const Color(0xFF0D0907);
+              ring = const Color(0xFFB89660);
+              break;
+            case ThemeId.editorial:
+              bg = const Color(0xFF0A0A0A);
+              ring = const Color(0xFFDC2626);
+              break;
+            case ThemeId.neoNoirCyber:
+              bg = const Color(0xFF04040A);
+              ring = const Color(0xFFFF1744);
+              break;
+          }
           return Scaffold(
             backgroundColor: bg,
             body: Center(
@@ -176,6 +193,15 @@ class _SettingsScreenState extends State<SettingsScreen> {
         }
         if (themeId == ThemeId.pureCinematic) {
           return _buildPureLayout(context);
+        }
+        if (themeId == ThemeId.filmNoir) {
+          return _buildNoirLayout(context);
+        }
+        if (themeId == ThemeId.editorial) {
+          return _buildEditorialLayout(context);
+        }
+        if (themeId == ThemeId.neoNoirCyber) {
+          return _buildCyberLayout(context);
         }
         return _buildDefaultLayout(context);
       },
@@ -347,6 +373,222 @@ class _SettingsScreenState extends State<SettingsScreen> {
               onTermsTap: _openTermsBottomSheet,
 
               // Footer / Nav
+              versionLabel: 'v1.0.0 · build 12',
+              onBack: () => context.go('/'),
+            );
+          },
+        );
+      },
+    );
+  }
+
+  /// T2 Film Noir Settings — Pure 와 동일한 prop 주입, 누아르 케이스파일 톤.
+  Widget _buildNoirLayout(BuildContext context) {
+    final themeId = ThemeManager.I.currentId;
+    final themeName = S.isKo ? themeId.displayNameKo : themeId.displayName;
+    final purchase = PurchaseService();
+
+    return FutureBuilder<Directory>(
+      future: getApplicationDocumentsDirectory(),
+      builder: (ctx, snap) {
+        final File? photoFile = (_hasProfileFace && snap.hasData)
+            ? File('${snap.data!.path}/profile_face.png')
+            : null;
+        return FutureBuilder<String?>(
+          future: DatabaseHelper.getSetting('trial_start_date'),
+          builder: (ctx2, trialSnap) {
+            final trialUsed = trialSnap.data != null;
+            return NoirSettingsLayout(
+              userName: _profileDisplayName(),
+              hasProfilePhoto: _hasProfileFace,
+              profilePhotoFile: photoFile,
+              onProfilePhotoTap: _captureProfileFace,
+              isPro: _isPro,
+              isTrial: purchase.isTrial,
+              trialDaysLeft: purchase.trialDaysLeft,
+              trialAlreadyUsed: trialUsed,
+              themeDisplayName: themeName,
+              onThemeTap: () => context.push('/settings/theme'),
+              langCode: S.isKo ? 'ko' : 'en',
+              onLangChange: _onLangChange,
+              runMode: _runMode,
+              onRunModeChange: _onPureRunModeChange,
+              unit: _unit,
+              onUnitChange: _onPureUnitChange,
+              shoes: _shoes,
+              onShoesTap: _openShoeManager,
+              activeGoal: _activeGoal,
+              onGoalEditTap: () => _showGoalDialog(existing: _activeGoal),
+              ttsEnabled: _ttsEnabled,
+              onTtsToggle: (v) {
+                setState(() => _ttsEnabled = v);
+                _save('tts_enabled', '$v');
+              },
+              sfxEnabled: _stadiumFinale,
+              onSfxToggle: (v) {
+                setState(() => _stadiumFinale = v);
+                _save('stadium_finale', '$v');
+              },
+              hapticEnabled: _vibrationEnabled,
+              onHapticToggle: (v) {
+                setState(() => _vibrationEnabled = v);
+                _save('vibration_enabled', '$v');
+              },
+              voiceId: _selectedVoice,
+              voiceLabel: _voiceDisplayLabel(_selectedVoice),
+              onVoiceTap: _openPureVoicePicker,
+              horrorLevel: _horrorLevel,
+              onHorrorLevelChange: _onPureHorrorChange,
+              onHorrorHeaderTap: _onHorrorHeaderTap,
+              onProUpgradeTap: _onPureProUpgrade,
+              onStartTrialTap: _onPureStartTrial,
+              onRestorePurchases: _onPureRestore,
+              onPrivacyTap: _openPrivacyBottomSheet,
+              onTermsTap: _openTermsBottomSheet,
+              versionLabel: 'v1.0.0 · build 12',
+              onBack: () => context.go('/'),
+            );
+          },
+        );
+      },
+    );
+  }
+
+  /// T4 Editorial Settings — Pure 와 동일한 prop 주입, 매거진 판권면 톤.
+  Widget _buildEditorialLayout(BuildContext context) {
+    final themeId = ThemeManager.I.currentId;
+    final themeName = S.isKo ? themeId.displayNameKo : themeId.displayName;
+    final purchase = PurchaseService();
+
+    return FutureBuilder<Directory>(
+      future: getApplicationDocumentsDirectory(),
+      builder: (ctx, snap) {
+        final File? photoFile = (_hasProfileFace && snap.hasData)
+            ? File('${snap.data!.path}/profile_face.png')
+            : null;
+        return FutureBuilder<String?>(
+          future: DatabaseHelper.getSetting('trial_start_date'),
+          builder: (ctx2, trialSnap) {
+            final trialUsed = trialSnap.data != null;
+            return EditorialSettingsLayout(
+              userName: _profileDisplayName(),
+              hasProfilePhoto: _hasProfileFace,
+              profilePhotoFile: photoFile,
+              onProfilePhotoTap: _captureProfileFace,
+              isPro: _isPro,
+              isTrial: purchase.isTrial,
+              trialDaysLeft: purchase.trialDaysLeft,
+              trialAlreadyUsed: trialUsed,
+              themeDisplayName: themeName,
+              onThemeTap: () => context.push('/settings/theme'),
+              langCode: S.isKo ? 'ko' : 'en',
+              onLangChange: _onLangChange,
+              runMode: _runMode,
+              onRunModeChange: _onPureRunModeChange,
+              unit: _unit,
+              onUnitChange: _onPureUnitChange,
+              shoes: _shoes,
+              onShoesTap: _openShoeManager,
+              activeGoal: _activeGoal,
+              onGoalEditTap: () => _showGoalDialog(existing: _activeGoal),
+              ttsEnabled: _ttsEnabled,
+              onTtsToggle: (v) {
+                setState(() => _ttsEnabled = v);
+                _save('tts_enabled', '$v');
+              },
+              sfxEnabled: _stadiumFinale,
+              onSfxToggle: (v) {
+                setState(() => _stadiumFinale = v);
+                _save('stadium_finale', '$v');
+              },
+              hapticEnabled: _vibrationEnabled,
+              onHapticToggle: (v) {
+                setState(() => _vibrationEnabled = v);
+                _save('vibration_enabled', '$v');
+              },
+              voiceId: _selectedVoice,
+              voiceLabel: _voiceDisplayLabel(_selectedVoice),
+              onVoiceTap: _openPureVoicePicker,
+              horrorLevel: _horrorLevel,
+              onHorrorLevelChange: _onPureHorrorChange,
+              onHorrorHeaderTap: _onHorrorHeaderTap,
+              onProUpgradeTap: _onPureProUpgrade,
+              onStartTrialTap: _onPureStartTrial,
+              onRestorePurchases: _onPureRestore,
+              onPrivacyTap: _openPrivacyBottomSheet,
+              onTermsTap: _openTermsBottomSheet,
+              versionLabel: 'v1.0.0 · build 12',
+              onBack: () => context.go('/'),
+            );
+          },
+        );
+      },
+    );
+  }
+
+  /// T5 Neo-Noir Cyber Settings — Pure 와 동일한 prop 주입, 네온 터미널 톤.
+  Widget _buildCyberLayout(BuildContext context) {
+    final themeId = ThemeManager.I.currentId;
+    final themeName = S.isKo ? themeId.displayNameKo : themeId.displayName;
+    final purchase = PurchaseService();
+
+    return FutureBuilder<Directory>(
+      future: getApplicationDocumentsDirectory(),
+      builder: (ctx, snap) {
+        final File? photoFile = (_hasProfileFace && snap.hasData)
+            ? File('${snap.data!.path}/profile_face.png')
+            : null;
+        return FutureBuilder<String?>(
+          future: DatabaseHelper.getSetting('trial_start_date'),
+          builder: (ctx2, trialSnap) {
+            final trialUsed = trialSnap.data != null;
+            return CyberSettingsLayout(
+              userName: _profileDisplayName(),
+              hasProfilePhoto: _hasProfileFace,
+              profilePhotoFile: photoFile,
+              onProfilePhotoTap: _captureProfileFace,
+              isPro: _isPro,
+              isTrial: purchase.isTrial,
+              trialDaysLeft: purchase.trialDaysLeft,
+              trialAlreadyUsed: trialUsed,
+              themeDisplayName: themeName,
+              onThemeTap: () => context.push('/settings/theme'),
+              langCode: S.isKo ? 'ko' : 'en',
+              onLangChange: _onLangChange,
+              runMode: _runMode,
+              onRunModeChange: _onPureRunModeChange,
+              unit: _unit,
+              onUnitChange: _onPureUnitChange,
+              shoes: _shoes,
+              onShoesTap: _openShoeManager,
+              activeGoal: _activeGoal,
+              onGoalEditTap: () => _showGoalDialog(existing: _activeGoal),
+              ttsEnabled: _ttsEnabled,
+              onTtsToggle: (v) {
+                setState(() => _ttsEnabled = v);
+                _save('tts_enabled', '$v');
+              },
+              sfxEnabled: _stadiumFinale,
+              onSfxToggle: (v) {
+                setState(() => _stadiumFinale = v);
+                _save('stadium_finale', '$v');
+              },
+              hapticEnabled: _vibrationEnabled,
+              onHapticToggle: (v) {
+                setState(() => _vibrationEnabled = v);
+                _save('vibration_enabled', '$v');
+              },
+              voiceId: _selectedVoice,
+              voiceLabel: _voiceDisplayLabel(_selectedVoice),
+              onVoiceTap: _openPureVoicePicker,
+              horrorLevel: _horrorLevel,
+              onHorrorLevelChange: _onPureHorrorChange,
+              onHorrorHeaderTap: _onHorrorHeaderTap,
+              onProUpgradeTap: _onPureProUpgrade,
+              onStartTrialTap: _onPureStartTrial,
+              onRestorePurchases: _onPureRestore,
+              onPrivacyTap: _openPrivacyBottomSheet,
+              onTermsTap: _openTermsBottomSheet,
               versionLabel: 'v1.0.0 · build 12',
               onBack: () => context.go('/'),
             );
