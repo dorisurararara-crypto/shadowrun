@@ -29,6 +29,82 @@
 
 ## 최신
 
+### 2026-04-24 10:35 (Mac → Windows) — 신규 3테마 오디오 전면 재생성 ✅ (BGM 12 + SFX 15 + TTS 30 + 새 voice 3)
+
+**v29 체감 이슈 후속 처리 #2**. 사용자가 "기존 테마 3종 BGM/사운드가 테마 느낌이 안 남" 보고. 이전 세션에서 ToS 필터 우회하려고 프롬프트에서 영화/아티스트 레퍼런스를 제거했는데 그 결과 generic 한 무드로 떨어진 것이 원인.
+
+이번 세션에 **프롬프트 레시피 전면 재설계 (악기/BPM/무드/조성 구체적 명시)** + **테마 내레이터 voice 교체** + **signature SFX 5종·TTS 10종 신규**.
+
+#### 프롬프트 재설계 방향
+
+- **T2 filmNoir** — 1940s 탐정 누아르. 저음 색소폰, 콘트라베이스 pizzicato, 브러시 드럼, 빈티지 피아노, 비닐 크랙클, 라디오 노이즈, 비. 러닝은 160 BPM pounding big-band, 추격은 150 BPM 브래스 스탭 + 현 트레몰로.
+- **T4 editorial** — 매거진 시네마틱 스릴러. Pizzicato 현·피아노 staccato·sub-bass pulse·glassy synth·orchestral brass. 러닝 162 BPM driving ostinato + brass swells, 추격 155 BPM 현 스탭 + sub-bass throb.
+- **T5 neoNoirCyber** — 사이버펑크 네오누아르. Synthwave pads·analog bass·glitchy arps·vocoder·808·modular. 러닝 165 BPM 808 + acid synth bass + vocoder chops, 추격 155 BPM 디스토션 베이스 + glitch stabs + 알람.
+- 영화 레퍼런스(Blade Runner/Akira) 제거. 첫 시도에서 ToS 거부된 cyber/marathon 은 API `prompt_suggestion`("inspired by futuristic sci-fi atmospheres") 로 자동 재시도해 성공.
+
+#### 테마 고정 voice 교체 (drill/harry/callum → Cedric/Clarice/River)
+
+- **filmNoir → Cedric** `BQOei2tk6QCBMHQWPhbj` — Slow-Burn Horror Storyteller (middle-aged M, 누아르 탐정 내레이터)
+- **editorial → Clarice** `MWUpoNpAY0rOQGP294mF` — Natural & Calm British Voice (middle-aged F, GQ 매거진 큐레이터)
+- **neoNoirCyber → River** `SAz9YHcvj6GT2YYXdXww` — Relaxed Neutral Informative (neutral gender, 시스템 AI)
+- 셋 다 한국어 지원 professional 카테고리. My Voices 추가 없이 voice_id 만으로 호출 가능.
+
+#### 자산 현황 (총 57 클립 신규/교체)
+
+**BGM 12** (기존 v1 파일 덮어쓰기, v2 는 기존 유지하되 서비스가 v1 위주 사용)
+- SFX API + `loop=true` (22초): 홈 BGM 3 + 자유 BGM 3 = 6 트랙
+- Music API + `force_instrumental` (30초): 마라톤 3 + 도플갱어 3 = 6 트랙
+- 전부 ffmpeg `loudnorm=I=-23 LUFS` 정규화. 원본 `.raw/` 에 보관(gitignore).
+
+**SFX 15 signature** (각 테마 5, `assets/audio/sfx/t{2,4,5}_*.mp3`)
+- noir: zippo_strike · typewriter_stamp · rain_splash · revolver_cock · vintage_radio
+- editorial: camera_shutter · page_turn · glass_clink · champagne_pop · ink_splash
+- cyber: system_boot · data_pulse · proximity_alarm · system_cleared · error_static
+- 각 1.1~2.0s, `loudnorm=-18 LUFS`.
+
+**TTS 30 line** (각 테마 10, `assets/audio/tts/t{2,4,5}_tts_*.mp3`, multilingual_v2, stability=0.55/style=0.3)
+- 10 카테고리: start_run · start_doppel · checkpoint_1km · near_shadow · critical · regained · victory · defeat · encourage_early · encourage_late
+- 한국어 대사, 테마별 톤:
+  - noir(Cedric, 냉소적 탐정): `"어둠이 내렸다. 오늘 밤도 사건은 당신의 몫이야."`
+  - editorial(Clarice, 세련된 내레이터): `"오늘의 커버 스토리는 당신입니다."`
+  - cyber(River, 시스템 AI): `"SYSTEM 온라인. 러닝 프로토콜을 시작합니다."`
+- `loudnorm=-16 LUFS` (대화형 라우드니스).
+
+#### 서비스 코드 연결
+
+- `sfx_service.dart` — `_themeFile()` 를 mapping 테이블로 재작성. 5종(start/checkpoint/nearShadow/victory/defeat) 지원. 신규 `themeCheckpoint()` / `themeNearShadow()` hook 추가 (fallback: kmDing / alertHigh).
+- `theme_tts_service.dart` (신규 71줄) — 10 이벤트 라우터 + 3초 쿨다운 + 세션별 reset. 테마가 noir/editorial/cyber 아니면 전부 no-op.
+- `horror_service.dart` — threat 전환 시 severity 기반 dispatcher 신규 (`_dispatchThemeThreatHook`). 상승 → near_shadow/critical + themeNearShadow SFX, 하강(회복) → regained.
+- `running_screen.dart` — `_startRun` 성공 후 start_run/start_doppel 재생. `_stopRun` 결과에 victory/defeat. `_updateMarathon` km tick 에 checkpoint_1km(1km) + encourage_early(5km) + encourage_late(10km) + themeCheckpoint SFX.
+- `pubspec.yaml` — `assets/audio/tts/` 추가.
+
+#### 크레딧 소모 (대략)
+
+- SFX 15 clip × 1.5s × 40c/s ≈ 900c
+- BGM SFX API 6 × 22s × 40c = 5,280c
+- BGM Music API 6 × 30s × 100c = 18,000c + cyber/marathon 1회 재시도
+- TTS 30 lines (한글 평균 20자) multilingual_v2 ≈ 1,500c
+- **총 약 26,000c**. Creator plan 131k 풀에서 여유(이전 세션 37k + 이번 26k = 63k, 잔여 68k).
+- 참고: `/v1/user/subscription` 은 API 키에 `user_read` 권한 없어 잔액 조회 실패. 사용자 웹 콘솔에서 확인 권장.
+
+#### 검증
+
+- `flutter analyze`: **No issues found! (4.1s)**
+- iOS 시뮬 debug 빌드: 성공 (21.8s)
+- iPhone 17 iOS 26.4 런치: Dart 예외/Asset load 실패 0. asset 번들에 `assets/audio/tts/` 신규 등록 후 재빌드 확인.
+
+#### 도구
+
+- `tools/regen_theme_audio_v30.py` (재사용 가능) — 스테이지별(`bgm`/`sfx`/`tts`/`all`) 호출. 병렬 워커 + 재시도 + ffmpeg 후처리 내장.
+
+#### 후속
+
+- v30 TestFlight 재배포 결정 대기. 사용자가 시뮬에서 먼저 사운드 체크 후 진행 여부 판단 예정.
+- v2 BGM 트랙은 이번 재생성에서 **제외** (v1 만 교체). 풀 다양성 원하면 후속 세션에 v2 도 재생성.
+- encourage_early/late 훅은 marathon 모드 5km/10km 지점 한정. 자유/도플갱어 모드에서도 시간 기반 훅 추가 고려.
+
+---
+
 ### 2026-04-24 09:50 (Mac → Windows) — 신규 3테마 전 탭 확장 완료 ✅ (history/settings/analysis × 3테마 = 9 레이아웃 신규)
 
 **v29 체감 이슈 처리**. 사용자가 v29 실기 확인 후 "새 테마 3종이 홈(첫 탭)만 테마 바뀌고 나머지 4개 탭은 기본 레이아웃"이라고 보고. 원인: `home_screen.dart` 는 5 테마 분기 있었는데 `history_screen / settings_screen / analysis_screen` 3개 디스패처가 Pure/Mystic 만 처리하고 filmNoir/editorial/neoNoirCyber 는 default fallthrough.
