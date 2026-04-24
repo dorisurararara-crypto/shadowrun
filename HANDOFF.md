@@ -29,6 +29,55 @@
 
 ## 최신
 
+### 2026-04-24 12:45 (Mac → Windows) — v31 TestFlight 외부 배포 완료 ✅ (자동 테마 테스트 25/25 + 오디오 전면 재생성 포함)
+
+**v31 배포 성공**. Delivery UUID `e08fd592-db8a-426f-a537-6436fa7235ad`, VALID(6분 poll), ganzitester 외부 그룹 HTTP 204 + Beta Review HTTP 201 제출 완료. 빌드 번호 31 (pubspec `1.0.0+31`).
+
+#### v31 포함 내용 (누적)
+
+1. **신규 3테마 × 3 화면 레이아웃 9개** (commit 31b4922, +8478줄) — history/settings/analysis 탭이 filmNoir/editorial/neoNoirCyber 테마에서도 렌더되도록 레이아웃 추가.
+2. **오디오 전면 재생성** (commit 4886320) — BGM 12 트랙 프롬프트 재설계, 신규 voice 3(Cedric/Clarice/River), SFX 15 signature, TTS 30 라인, 서비스 코드 연결.
+3. **테스트 override** (commit 642c0ca) — `app_router.dart` 에 `INITIAL_ROUTE` + `TEST_RUN_ID` dart-define 오버라이드. 기본 동작 유지, 자동 테스트 전용.
+
+#### 자동 테스트 결과 (TestFlight 전 최종 검증)
+
+`xcrun simctl` + DB 직접 조작 + INITIAL_ROUTE 재빌드 조합으로 다음 모두 통과:
+- 홈 × 5 테마 = 5/5 clean
+- 기록/설정/분석 × 5 테마 = 15/15 clean + screenshot md5 조합별 상이
+- prepare/result × 5 테마 = 10/10 clean + screenshot md5 상이 (result 는 `TEST_RUN_ID` 로 state.extra 우회)
+- **총 25/25 Dart 예외 0 + 테마 차이 실증**
+- Codex 라운드 2 리뷰: "치명 위험 없음"
+- `flutter analyze` 0 이슈
+
+스크립트: `/tmp/sr_test/loop_full.sh`, `/tmp/sr_test/loop_prepare_result.sh`. 재사용 가능.
+
+#### 배포 함정 & 복구
+
+1차 배포 시도: `altool --validate-app` 에서 **91169 에러** ("objective_c.framework references unsupported platform / Simulator platforms aren't permitted"). 원인: 자동 테스트로 시뮬 debug 빌드를 수 차례 돌리면서 `ios/Pods` 가 시뮬 slice 포함 상태가 된 것.
+
+**복구**: `flutter clean` → `flutter pub get` → `cd ios && pod install --repo-update` → `./scripts/deploy_testflight.sh` 재실행 → 정상 배포. 2차 시도는 완전 자동 완료.
+
+**다음 세션 주의**: 시뮬 debug 테스트 루프 후 release archive 하려면 **반드시 flutter clean + pod install 재실행**. deploy_testflight.sh 앞단에 clean 스텝 추가 고려 가치 있음 (안전이 성능보다 중요).
+
+#### 커밋
+
+- `642c0ca` test(router): INITIAL_ROUTE + TEST_RUN_ID dart-define overrides for automated screen tests
+- `4886320` chore: handoff v30 오디오 재생성 + 서비스 훅 연결
+- `31b4922` feat(themes): filmNoir/editorial/neoNoirCyber × history/settings/analysis 9 레이아웃 신규
+- (이번 세션 pubspec bump +31 은 배포 스크립트 자동 처리)
+
+#### 다음 세션
+
+사용자가 TestFlight v31 실기 테스트 후 이슈 리스트 공유 예정. 체크 포인트는 `project_shadowrun_v29_testing.md` 참조 + v31 추가 변경:
+- 새 3 테마가 4 탭 전부에서 렌더되는지 (홈/기록/설정/분석/prepare/result)
+- 테마별 내레이터(Cedric/Clarice/River) 음성 실제 재생
+- 5 signature SFX × 테마 (start/checkpoint/near/victory/defeat)
+- 10 상황 TTS 라인 각 테마 톤에 맞는지
+
+사용자는 "어제 이어가자, v31 테스트 결과 공유 — [이슈]" 한 줄만 말하면 됨.
+
+---
+
 ### 2026-04-24 10:35 (Mac → Windows) — 신규 3테마 오디오 전면 재생성 ✅ (BGM 12 + SFX 15 + TTS 30 + 새 voice 3)
 
 **v29 체감 이슈 후속 처리 #2**. 사용자가 "기존 테마 3종 BGM/사운드가 테마 느낌이 안 남" 보고. 이전 세션에서 ToS 필터 우회하려고 프롬프트에서 영화/아티스트 레퍼런스를 제거했는데 그 결과 generic 한 무드로 떨어진 것이 원인.
