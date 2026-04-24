@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/semantics.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_naver_map/flutter_naver_map.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -16,6 +17,13 @@ import 'shared/models/run_model.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  // 테스트용: Maestro/Appium 등 외부 UI 자동화가 iOS Accessibility tree 로 Text 위젯을
+  // 찾을 수 있도록 SemanticsBinding 강제 활성화. 기본값 false (production 영향 0).
+  const enableSemantics = bool.fromEnvironment('ENABLE_SEMANTICS', defaultValue: false);
+  if (enableSemantics) {
+    SemanticsBinding.instance.ensureSemantics();
+  }
 
   SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
     statusBarColor: Colors.transparent,
